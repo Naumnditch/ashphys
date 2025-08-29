@@ -15,9 +15,9 @@ export function BookingCalendar({ readOnly = false }: { readOnly?: boolean }) {
     if (!selectedDate) return [] as Date[];
     const base = startOfDay(selectedDate);
     const slots: Date[] = [];
-    for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+    for (let hour = START_HOUR; hour <= END_HOUR; hour++) {
       const d = setMinutes(setHours(base, hour), 0);
-      if (!isBefore(d, new Date())) slots.push(d);
+      slots.push(d);
     }
     return slots;
   }, [selectedDate]);
