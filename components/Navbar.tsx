@@ -6,6 +6,7 @@ export function Navbar() {
   return (
     <header className="border-b border-gray-200">
       <div className="container-max py-4 flex items-center justify-between">
+<<<<<<< Updated upstream
         <div className="flex items-center">
           <div className="flex items-center">
             <div className="h-px bg-black w-16 relative">
@@ -17,6 +18,19 @@ export function Navbar() {
             <div className="flex items-center">
               <div className="h-px bg-black w-16 relative">
                 <div className="absolute left-0 top-0 w-px h-4 bg-black"></div>
+=======
+        <div className="flex items-center gap-4">
+          <div className="flex items-center">
+            <div className="h-px bg-black flex-1 mr-2 relative">
+              <div className="absolute right-0 top-0 w-px h-3 bg-black"></div>
+            </div>
+            <Link href="/" className="text-xl font-semibold">
+              <Image src="/assets/logo.png" alt="AshPhys" width={140} height={100} />
+            </Link>
+            <div className="flex items-center">
+              <div className="h-px bg-black flex-1 ml-2 relative">
+                <div className="absolute left-0 top-0 w-px h-3 bg-black"></div>
+>>>>>>> Stashed changes
               </div>
             </div>
           </div>
@@ -26,7 +40,6 @@ export function Navbar() {
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
-          
         </nav>
       </div>
     </header>
