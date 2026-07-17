@@ -21,6 +21,8 @@ export function Navbar() {
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
+          <Link className="text-sm hover:underline text-blue-600 font-medium" href="/auth/login">Sign In</Link>
+          <Link className="btn btn-primary text-sm" href="/auth/signup">Sign Up</Link>
           <Link className="btn btn-primary text-sm" href="/book">Book Now</Link>
         </nav>
       </div>
