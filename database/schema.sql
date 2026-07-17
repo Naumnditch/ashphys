@@ -162,7 +162,7 @@ CREATE TABLE IF NOT EXISTS quiz_problems (
   quiz_id UUID NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
   problem_id UUID NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
   "order" INT,
-  PRIMARY KEY (quiz_id, problem_id)
+  UNIQUE (quiz_id, problem_id)
 );
 
 -- ============================================
