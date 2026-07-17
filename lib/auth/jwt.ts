@@ -12,13 +12,12 @@ interface TokenPayload {
   sectionId?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+const JWT_SECRET: jwt.Secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
+const JWT_EXPIRES_IN = (process.env.JWT_EXPIRES_IN || '24h') as jwt.SignOptions['expiresIn'];
 
 export function generateToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
+  const options: jwt.SignOptions = { expiresIn: JWT_EXPIRES_IN };
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 export function verifyToken(token: string): TokenPayload | null {
