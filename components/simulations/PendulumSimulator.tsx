@@ -3,15 +3,23 @@
 import { useEffect, useRef, useState } from 'react';
 
 const G = 9.8;
+const DAMPING = 0.12; // energy loss coefficient (air resistance + pivot friction)
+const TRAIL_SECONDS = 3.5;
 
 function theoreticalPeriod(L: number) {
   return 2 * Math.PI * Math.sqrt(L / G);
 }
 
+interface TrailPoint {
+  x: number;
+  y: number;
+  t: number;
+}
+
 export function PendulumSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const trailRef = useRef<TrailPoint[]>([]);
 
-  // Physics state kept in refs so the animation loop always reads the latest values
   const stateRef = useRef({
     length: 0.8,
     amplitude: 15,
@@ -20,10 +28,10 @@ export function PendulumSimulator() {
     running: false,
     elapsed: 0,
     lastTime: null as number | null,
-    timingMode: false,
     swingCount: 0,
     lastSign: null as number | null,
-    timingStart: null as number | null,
+    lastAngularVelSign: null as number | null,
+    currentAmplitudeDeg: 15,
   });
 
   const [length, setLength] = useState(0.8);
@@ -32,8 +40,7 @@ export function PendulumSimulator() {
   const [elapsedDisplay, setElapsedDisplay] = useState('0.00');
   const [angleDisplay, setAngleDisplay] = useState('0.0');
   const [swingCount, setSwingCount] = useState(0);
-  const [timingActive, setTimingActive] = useState(false);
-  const [result, setResult] = useState<{ measured: number; pctDiff: number } | null>(null);
+  const [currentAmplitude, setCurrentAmplitude] = useState('15.0');
 
   const theory = theoreticalPeriod(length);
 
@@ -44,15 +51,15 @@ export function PendulumSimulator() {
     s.angle = (amplitude * Math.PI) / 180;
     s.angularVel = 0;
     s.lastTime = null;
-    s.timingMode = false;
     s.swingCount = 0;
     s.lastSign = null;
-    s.timingStart = null;
+    s.lastAngularVelSign = null;
+    s.currentAmplitudeDeg = amplitude;
+    trailRef.current = [];
     setIsRunning(false);
     setElapsedDisplay('0.00');
     setSwingCount(0);
-    setTimingActive(false);
-    setResult(null);
+    setCurrentAmplitude(amplitude.toFixed(1));
     draw();
   };
 
@@ -77,19 +84,37 @@ export function PendulumSimulator() {
     const bobX = pivotX + rodLen * Math.sin(s.angle);
     const bobY = pivotY + rodLen * Math.cos(s.angle);
 
+    // faint full-swing guide arc (based on original amplitude, for reference)
+    const origAmpRad = (amplitude * Math.PI) / 180;
     ctx.strokeStyle = '#e9e1cd';
     ctx.setLineDash([3, 4]);
     ctx.beginPath();
-    ctx.arc(pivotX, pivotY, rodLen, Math.PI / 2 - 0.7, Math.PI / 2 + 0.7);
+    ctx.arc(pivotX, pivotY, rodLen, Math.PI / 2 - origAmpRad, Math.PI / 2 + origAmpRad);
     ctx.stroke();
     ctx.setLineDash([]);
 
+    // motion trace (fading trail of recent bob positions)
+    const trail = trailRef.current;
+    for (let i = 1; i < trail.length; i++) {
+      const age = s.elapsed - trail[i].t;
+      const alpha = Math.max(0, 1 - age / TRAIL_SECONDS) * 0.55;
+      if (alpha <= 0.01) continue;
+      ctx.beginPath();
+      ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
+      ctx.lineTo(trail[i].x, trail[i].y);
+      ctx.strokeStyle = `rgba(46, 125, 107, ${alpha})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // pivot bracket
     ctx.fillStyle = '#4a5a72';
     ctx.fillRect(pivotX - 30, pivotY - 8, 60, 8);
     ctx.beginPath();
     ctx.arc(pivotX, pivotY, 4, 0, Math.PI * 2);
     ctx.fill();
 
+    // string
     ctx.strokeStyle = '#8a94a3';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -97,6 +122,7 @@ export function PendulumSimulator() {
     ctx.lineTo(bobX, bobY);
     ctx.stroke();
 
+    // bob (brass)
     const grad = ctx.createRadialGradient(bobX - 5, bobY - 5, 2, bobX, bobY, 16);
     grad.addColorStop(0, '#e0b871');
     grad.addColorStop(1, '#8f6428');
@@ -111,19 +137,6 @@ export function PendulumSimulator() {
     setAngleDisplay(Math.abs((s.angle * 180) / Math.PI).toFixed(1));
   };
 
-  const finishTiming = (totalTimeForTenSwings: number) => {
-    const s = stateRef.current;
-    s.timingMode = false;
-    s.running = false;
-    setIsRunning(false);
-    setTimingActive(false);
-
-    const measured = totalTimeForTenSwings / 10;
-    const th = theoreticalPeriod(s.length);
-    const pctDiff = (Math.abs(measured - th) / th) * 100;
-    setResult({ measured, pctDiff });
-  };
-
   const step = (ts: number) => {
     const s = stateRef.current;
     if (!s.running) return;
@@ -132,20 +145,41 @@ export function PendulumSimulator() {
     s.lastTime = ts;
     s.elapsed += dt;
 
+    // damped SHM: theta'' = -omega^2 * theta - damping * theta'
     const omega2 = G / s.length;
-    const angularAcc = -omega2 * s.angle;
+    const angularAcc = -omega2 * s.angle - DAMPING * s.angularVel;
     s.angularVel += angularAcc * dt;
     s.angle += s.angularVel * dt;
 
+    // count swings (each zero-crossing = half a swing)
     const sign = Math.sign(s.angle);
-    if (s.lastSign !== null && sign !== 0 && sign !== s.lastSign && s.timingMode) {
+    if (s.lastSign !== null && sign !== 0 && sign !== s.lastSign) {
       s.swingCount += 0.5;
-      setSwingCount(Math.min(s.swingCount, 10));
-      if (s.swingCount >= 10 && s.timingStart !== null) {
-        finishTiming((performance.now() - s.timingStart) / 1000);
-      }
+      setSwingCount(Math.floor(s.swingCount));
     }
     if (sign !== 0) s.lastSign = sign;
+
+    // capture amplitude at each turning point (where angular velocity changes sign)
+    const velSign = Math.sign(s.angularVel);
+    if (s.lastAngularVelSign !== null && velSign !== 0 && velSign !== s.lastAngularVelSign) {
+      s.currentAmplitudeDeg = Math.abs((s.angle * 180) / Math.PI);
+      setCurrentAmplitude(s.currentAmplitudeDeg.toFixed(1));
+    }
+    if (velSign !== 0) s.lastAngularVelSign = velSign;
+
+    // record trail point in canvas space
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const pivotX = rect.width / 2;
+      const pivotY = 36;
+      const pxPerMeter = (rect.height - 90) / 1.5;
+      const rodLen = s.length * pxPerMeter;
+      const bobX = pivotX + rodLen * Math.sin(s.angle);
+      const bobY = pivotY + rodLen * Math.cos(s.angle);
+      trailRef.current.push({ x: bobX, y: bobY, t: s.elapsed });
+      trailRef.current = trailRef.current.filter((p) => s.elapsed - p.t < TRAIL_SECONDS);
+    }
 
     setElapsedDisplay(s.elapsed.toFixed(2));
     draw();
@@ -161,18 +195,8 @@ export function PendulumSimulator() {
       s.running = true;
       s.lastTime = null;
       setIsRunning(true);
-      if (s.timingMode && s.timingStart === null) {
-        s.timingStart = performance.now();
-      }
       requestAnimationFrame(step);
     }
-  };
-
-  const handleStartTiming = () => {
-    resetPendulum();
-    const s = stateRef.current;
-    s.timingMode = true;
-    setTimingActive(true);
   };
 
   const handleLengthChange = (val: number) => {
@@ -203,13 +227,18 @@ export function PendulumSimulator() {
     resize();
     window.addEventListener('resize', resize);
 
-    // initialize
     stateRef.current.angle = (amplitude * Math.PI) / 180;
     draw();
 
     return () => window.removeEventListener('resize', resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const variables = [
+    { symbol: 'T', name: 'Period', def: 'Time for one complete swing (there and back), in seconds (s).' },
+    { symbol: 'L', name: 'Length', def: 'Distance from the pivot to the centre of the bob, in metres (m).' },
+    { symbol: 'g', name: 'Gravitational acceleration', def: 'How strongly gravity pulls near Earth\u2019s surface, \u2248 9.8 m/s\u00B2.' },
+  ];
 
   return (
     <div className="pendulum-lab">
@@ -226,7 +255,14 @@ export function PendulumSimulator() {
           </div>
           <canvas ref={canvasRef} className="block w-full" style={{ height: 340 }} />
 
-          <div className="px-4 pb-5 pt-4 border-t border-[#eee6d3]">
+          <div className="px-4 pb-2 -mt-1">
+            <p className="text-[11.5px] text-[#4a5a72] leading-snug">
+              The teal trail shows the bob&rsquo;s recent path. Watch it shrink over time as the swing loses
+              energy to air resistance and friction at the pivot &mdash; a real pendulum never swings forever.
+            </p>
+          </div>
+
+          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
             <div className="flex items-center gap-3 mb-3">
               <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Length (L)</label>
               <input
@@ -266,14 +302,6 @@ export function PendulumSimulator() {
               >
                 ⟲ Reset
               </button>
-              <button
-                onClick={handleStartTiming}
-                className={`text-white text-[13.5px] font-semibold px-3.5 py-2 rounded ${
-                  timingActive ? 'bg-[#b34a3c]' : 'bg-[#2e7d6b] hover:bg-[#24685a]'
-                }`}
-              >
-                ⏱ {timingActive ? 'Timing… release now' : 'Start Timing 10 Swings'}
-              </button>
             </div>
           </div>
         </div>
@@ -289,8 +317,16 @@ export function PendulumSimulator() {
               <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
             </div>
             <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+              <div className="text-[11px] text-[#4a5a72] mb-1">Swings completed</div>
+              <div className="font-mono text-xl font-bold">{swingCount}</div>
+            </div>
+            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
               <div className="text-[11px] text-[#4a5a72] mb-1">Theoretical period T</div>
               <div className="font-mono text-xl font-bold text-[#2e7d6b]">{theory.toFixed(2)} s</div>
+            </div>
+            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+              <div className="text-[11px] text-[#4a5a72] mb-1">Amplitude now</div>
+              <div className="font-mono text-xl font-bold text-[#b34a3c]">{currentAmplitude}°</div>
             </div>
           </div>
 
@@ -298,32 +334,26 @@ export function PendulumSimulator() {
             <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
               T = 2π √(L / g)
             </div>
-            <div className="text-[11.5px] text-[#4a5a72] mt-1.5">
-              g ≈ 9.8 m/s² · small-angle approximation
-            </div>
           </div>
 
           <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
-            Measure It Yourself
+            What Each Variable Means
           </h2>
-          <div className="bg-white border border-dashed border-[#d8cfb6] rounded px-4 py-3.5">
-            <p className="text-[12.5px] text-[#4a5a72] leading-relaxed mb-2.5">
-              Press <b>Start Timing</b>, then <b>Release</b>. The lab counts 10 full swings automatically —
-              the technique used to reduce timing error.
-            </p>
-            <div className="font-mono text-[13px] mb-2.5">
-              Swings counted: <b className="text-[#2e7d6b] text-[15px]">{swingCount}</b> / 10
-            </div>
-            {result && (
-              <div className="mt-3.5 pt-3 border-t border-[#eee6d3] text-[12.5px] text-[#4a5a72] leading-relaxed">
-                Measured period: <b className="text-[#1b2a41]">{result.measured.toFixed(2)} s</b>{' '}
-                <span className="inline-block font-mono text-[11px] px-1.5 py-0.5 rounded-full bg-[#cfe4de] text-[#2e7d6b] ml-1">
-                  {result.pctDiff < 3
-                    ? `within ${result.pctDiff.toFixed(1)}% of theory ✓`
-                    : `${result.pctDiff.toFixed(1)}% off — check timing`}
-                </span>
+          <div className="space-y-2.5">
+            {variables.map((v) => (
+              <div key={v.symbol} className="flex gap-3 items-start">
+                <div
+                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                  style={{ fontFamily: 'Georgia, serif' }}
+                >
+                  {v.symbol}
+                </div>
+                <div>
+                  <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
+                  <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                </div>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
