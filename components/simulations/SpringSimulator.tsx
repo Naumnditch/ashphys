@@ -171,7 +171,7 @@ function drawDimensionBracket(
   if (yBottom - yTop < 12) return;
   const midY = (yTop + yBottom) / 2;
   ctx.save();
-  ctx.translate(x + 5, midY);
+  ctx.translate(x + 14, midY);
   ctx.rotate(-Math.PI / 2);
   ctx.fillStyle = color;
   ctx.font = '700 10px "Courier New", monospace';
