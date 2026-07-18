@@ -24,7 +24,6 @@ function getModeParams(mode: Mode, constantSpeed: number, accel: number, decelSt
   }
 }
 
-// distance & speed at time t, given v0/a, with decelerating clamped at v=0
 function kinematics(t: number, v0: number, a: number) {
   if (a === 0) {
     return { s: v0 * t, v: v0 };
@@ -32,7 +31,6 @@ function kinematics(t: number, v0: number, a: number) {
   if (a > 0) {
     return { s: v0 * t + 0.5 * a * t * t, v: v0 + a * t };
   }
-  // decelerating: clamp at v = 0
   const tStop = v0 / -a;
   if (t >= tStop) {
     const sStop = v0 * tStop + 0.5 * a * tStop * tStop;
@@ -55,6 +53,59 @@ const MODE_LABELS: Record<Mode, string> = {
   accelerating: 'Accelerating',
   decelerating: 'Decelerating',
 };
+
+function drawCar(ctx: CanvasRenderingContext2D, x: number, trackY: number) {
+  const carW = 34;
+  const carH = 13;
+  const cabinW = 17;
+  const cabinH = 10;
+  const wheelR = 4.5;
+
+  const bodyBottom = trackY - wheelR * 1.2;
+  const bodyTop = bodyBottom - carH;
+  const bodyLeft = x - carW / 2;
+
+  // body
+  ctx.fillStyle = '#2e7d6b';
+  ctx.beginPath();
+  ctx.roundRect(bodyLeft, bodyTop, carW, carH, 3);
+  ctx.fill();
+  ctx.strokeStyle = '#1c4a3f';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // cabin
+  const cabinLeft = x - cabinW / 2 + 2;
+  const cabinBottom = bodyTop + 2;
+  const cabinTop = cabinBottom - cabinH;
+  ctx.fillStyle = '#2e7d6b';
+  ctx.beginPath();
+  ctx.roundRect(cabinLeft, cabinTop, cabinW, cabinH, 3);
+  ctx.fill();
+  ctx.stroke();
+
+  // window
+  ctx.fillStyle = '#eaf3f0';
+  ctx.beginPath();
+  ctx.roundRect(cabinLeft + 2.5, cabinTop + 2, cabinW - 5, cabinH - 5, 1.5);
+  ctx.fill();
+
+  // wheels
+  ctx.fillStyle = '#1b2a41';
+  ctx.beginPath();
+  ctx.arc(bodyLeft + 8, trackY - wheelR, wheelR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(bodyLeft + carW - 8, trackY - wheelR, wheelR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#8a94a3';
+  ctx.beginPath();
+  ctx.arc(bodyLeft + 8, trackY - wheelR, 1.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(bodyLeft + carW - 8, trackY - wheelR, 1.6, 0, Math.PI * 2);
+  ctx.fill();
+}
 
 export function DistanceTimeGraphSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -115,8 +166,8 @@ export function DistanceTimeGraphSimulator() {
     const { s: dist, v: speed } = kinematics(s.elapsed, v0, a);
 
     // --- Track (top strip) ---
-    const trackY = 34;
-    const trackPadding = 20;
+    const trackY = 44;
+    const trackPadding = 24;
     const trackW = w - trackPadding * 2;
     ctx.strokeStyle = '#d8cfb6';
     ctx.lineWidth = 2;
@@ -126,18 +177,12 @@ export function DistanceTimeGraphSimulator() {
     ctx.stroke();
 
     const objX = trackPadding + Math.min(1, dist / s.maxDistance) * trackW;
-    ctx.fillStyle = '#2e7d6b';
-    ctx.beginPath();
-    ctx.arc(objX, trackY, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#1c4a3f';
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    drawCar(ctx, objX, trackY);
 
     // --- Graph area ---
-    const graphTop = 64;
+    const graphTop = 78;
     const graphBottom = h - 34;
-    const graphLeft = 46;
+    const graphLeft = 50;
     const graphRight = w - 14;
     const graphH = graphBottom - graphTop;
     const graphW = graphRight - graphLeft;
@@ -145,7 +190,6 @@ export function DistanceTimeGraphSimulator() {
     const xForT = (t: number) => graphLeft + (t / MAX_TIME) * graphW;
     const yForS = (dVal: number) => graphBottom - (dVal / s.maxDistance) * graphH;
 
-    // axes
     ctx.strokeStyle = '#b8b0a0';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -154,11 +198,10 @@ export function DistanceTimeGraphSimulator() {
     ctx.lineTo(graphRight, graphBottom);
     ctx.stroke();
 
-    // gridlines + labels
     ctx.font = '10px "Courier New", monospace';
     ctx.fillStyle = '#8a94a3';
     ctx.strokeStyle = '#eee6d3';
-    for (let tt = 0; tt <= MAX_TIME; tt += 2) {
+    for (let tt = 0; tt <= MAX_TIME; tt += 1) {
       const x = xForT(tt);
       ctx.beginPath();
       ctx.moveTo(x, graphTop);
@@ -167,7 +210,7 @@ export function DistanceTimeGraphSimulator() {
       ctx.textAlign = 'center';
       ctx.fillText(String(tt), x, graphBottom + 14);
     }
-    const distStep = s.maxDistance / 4;
+    const distStep = s.maxDistance / 5;
     for (let dd = 0; dd <= s.maxDistance + 0.01; dd += distStep) {
       const y = yForS(dd);
       ctx.beginPath();
@@ -182,12 +225,11 @@ export function DistanceTimeGraphSimulator() {
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.fillText('time (s)', graphRight - 44, graphBottom + 26);
     ctx.save();
-    ctx.translate(14, graphTop + 10);
+    ctx.translate(16, graphTop + 10);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText('distance (m)', 0, 0);
     ctx.restore();
 
-    // trace line
     const trace = traceRef.current;
     if (trace.length > 1) {
       ctx.strokeStyle = '#2e7d6b';
@@ -202,7 +244,6 @@ export function DistanceTimeGraphSimulator() {
       ctx.stroke();
     }
 
-    // current point marker
     if (s.elapsed > 0 || trace.length > 0) {
       const cx = xForT(s.elapsed);
       const cy = yForS(dist);
@@ -211,7 +252,6 @@ export function DistanceTimeGraphSimulator() {
       ctx.arc(cx, cy, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // technical overlay: tangent / gradient triangle at current point
       if (s.showTechnical && s.elapsed > 0.4) {
         const dt = 0.6;
         const tBack = Math.max(0, s.elapsed - dt);
@@ -222,12 +262,10 @@ export function DistanceTimeGraphSimulator() {
         ctx.strokeStyle = '#b34a3c';
         ctx.setLineDash([4, 3]);
         ctx.lineWidth = 1.4;
-        // horizontal leg
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(cx, y0);
         ctx.stroke();
-        // vertical leg
         ctx.beginPath();
         ctx.moveTo(cx, y0);
         ctx.lineTo(cx, cy);
@@ -241,7 +279,6 @@ export function DistanceTimeGraphSimulator() {
         ctx.textAlign = 'left';
         ctx.fillText('Δs', cx + 6, (y0 + cy) / 2);
 
-        // info box
         const boxX = graphLeft + 6;
         const boxY = graphTop + 4;
         ctx.fillStyle = 'rgba(255,255,255,0.9)';
@@ -367,46 +404,47 @@ export function DistanceTimeGraphSimulator() {
 
   return (
     <div className="dt-graph-lab">
-      <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
-          <div className="flex justify-between items-baseline px-4 pt-3">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
-              Live Track & Graph
-            </span>
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
-              {MODE_LABELS[mode]}
-            </span>
+      {/* Apparatus: full width */}
+      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+        <div className="flex justify-between items-baseline px-4 pt-3">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            Live Track & Graph
+          </span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            {MODE_LABELS[mode]}
+          </span>
+        </div>
+        <canvas ref={canvasRef} className="block w-full" style={{ height: 400 }} />
+
+        {finished && (
+          <div className="px-4 pt-1">
+            <p className="text-[11.5px] text-[#1b2a41] font-semibold">
+              ✓ Recording finished ({MAX_TIME}s). Press Release Again to re-run.
+            </p>
           </div>
-          <canvas ref={canvasRef} className="block w-full" style={{ height: 300 }} />
+        )}
 
-          {finished && (
-            <div className="px-4 pt-1">
-              <p className="text-[11.5px] text-[#1b2a41] font-semibold">
-                ✓ Recording finished ({MAX_TIME}s). Press Release Again to re-run.
-              </p>
-            </div>
-          )}
+        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {(Object.keys(MODE_LABELS) as Mode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => handleModeChange(m)}
+                className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
+                  mode === m
+                    ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
+                    : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                }`}
+              >
+                {MODE_LABELS[m]}
+              </button>
+            ))}
+          </div>
 
-          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {(Object.keys(MODE_LABELS) as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => handleModeChange(m)}
-                  className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                    mode === m
-                      ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                      : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
-                  }`}
-                >
-                  {MODE_LABELS[m]}
-                </button>
-              ))}
-            </div>
-
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mb-4">
             {mode === 'constant' && (
-              <div className="flex items-center gap-3 mb-3">
-                <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Speed</label>
+              <div className="flex items-center gap-3 flex-1">
+                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Speed</label>
                 <input
                   type="range"
                   min={1}
@@ -420,8 +458,8 @@ export function DistanceTimeGraphSimulator() {
               </div>
             )}
             {mode === 'accelerating' && (
-              <div className="flex items-center gap-3 mb-3">
-                <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Acceleration</label>
+              <div className="flex items-center gap-3 flex-1">
+                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Acceleration</label>
                 <input
                   type="range"
                   min={0.3}
@@ -435,8 +473,8 @@ export function DistanceTimeGraphSimulator() {
               </div>
             )}
             {mode === 'decelerating' && (
-              <div className="flex items-center gap-3 mb-3">
-                <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Start speed</label>
+              <div className="flex items-center gap-3 flex-1">
+                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Start speed</label>
                 <input
                   type="range"
                   min={3}
@@ -452,7 +490,7 @@ export function DistanceTimeGraphSimulator() {
 
             <button
               onClick={handleToggleTechnical}
-              className={`w-full mb-3 text-[12.5px] font-semibold px-3 py-2 rounded border ${
+              className={`text-[12.5px] font-semibold px-3.5 py-2 rounded border whitespace-nowrap ${
                 showTechnical
                   ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
                   : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
@@ -460,69 +498,83 @@ export function DistanceTimeGraphSimulator() {
             >
               {showTechnical ? '✓ Gradient Details Shown' : '⚙ Show Gradient Details'}
             </button>
+          </div>
 
-            <div className="flex gap-2 flex-wrap">
-              <button
-                onClick={handlePlayPause}
-                className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
-              >
-                {finished ? '↻ Release Again' : isRunning ? '⏸ Pause' : '▶ Start'}
-              </button>
-              <button
-                onClick={resetSim}
-                className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
-              >
-                ⟲ Reset
-              </button>
-            </div>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={handlePlayPause}
+              className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
+            >
+              {finished ? '↻ Release Again' : isRunning ? '⏸ Pause' : '▶ Start'}
+            </button>
+            <button
+              onClick={resetSim}
+              className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+            >
+              ⟲ Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Readouts: full width row */}
+      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+          Readouts
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
+          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+            <div className="text-[11px] text-[#4a5a72] mb-1">Elapsed time</div>
+            <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
+          </div>
+          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+            <div className="text-[11px] text-[#4a5a72] mb-1">Distance covered</div>
+            <div className="font-mono text-xl font-bold text-[#2e7d6b]">{distanceDisplay} m</div>
+          </div>
+          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+            <div className="text-[11px] text-[#4a5a72] mb-1">Current speed (gradient)</div>
+            <div className="font-mono text-xl font-bold text-[#b8823d]">{speedDisplay} m/s</div>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
-            Readouts
-          </h2>
-          <div className="grid grid-cols-2 gap-2.5 mb-4">
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Elapsed time</div>
-              <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
-            </div>
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Distance covered</div>
-              <div className="font-mono text-xl font-bold text-[#2e7d6b]">{distanceDisplay} m</div>
-            </div>
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5 col-span-2">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Current speed (gradient)</div>
-              <div className="font-mono text-xl font-bold text-[#b8823d]">{speedDisplay} m/s</div>
-            </div>
-          </div>
+        <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-[12.5px] text-[#4a5a72] leading-relaxed">
+          {mode === 'stationary' && 'A flat line: distance never changes, so the object is at rest.'}
+          {mode === 'constant' && 'A straight line with steady slope: equal distances covered in equal times.'}
+          {mode === 'accelerating' && 'A curve that gets steeper: the gradient — and so the speed — keeps increasing.'}
+          {mode === 'decelerating' && 'A curve that flattens out: the gradient shrinks toward zero as the object slows to a stop.'}
+        </div>
+      </div>
 
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-[12.5px] text-[#4a5a72] leading-relaxed mb-4">
-            {mode === 'stationary' && 'A flat line: distance never changes, so the object is at rest.'}
-            {mode === 'constant' && 'A straight line with steady slope: equal distances covered in equal times.'}
-            {mode === 'accelerating' && 'A curve that gets steeper: the gradient — and so the speed — keeps increasing.'}
-            {mode === 'decelerating' && 'A curve that flattens out: the gradient shrinks toward zero as the object slows to a stop.'}
-          </div>
+      {/* Formula box: full width */}
+      <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-5 text-center mb-5">
+        <div className="italic text-[26px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          v = Δs / Δt
+        </div>
+        <div className="text-[12px] text-[#4a5a72] mt-2">
+          speed = gradient of the distance-time graph
+        </div>
+      </div>
 
-          <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
-            What Each Variable Means
-          </h2>
-          <div className="space-y-2.5">
-            {variables.map((v) => (
-              <div key={v.symbol} className="flex gap-3 items-start">
-                <div
-                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
-                  {v.symbol}
-                </div>
-                <div>
-                  <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                  <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
-                </div>
+      {/* Variables: full width row */}
+      <div className="bg-white border border-[#e4ddcc] rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+          What Each Variable Means
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {variables.map((v) => (
+            <div key={v.symbol} className="flex gap-3 items-start">
+              <div
+                className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                style={{ fontFamily: 'Georgia, serif' }}
+              >
+                {v.symbol}
               </div>
-            ))}
-          </div>
+              <div>
+                <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
+                <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
