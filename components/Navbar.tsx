@@ -1,7 +1,23 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { query } from '@/lib/db/client';
+import { CurriculumDropdown } from './CurriculumDropdown';
 
-export function Navbar() {
+async function getChapters() {
+  try {
+    const result = await query(
+      `SELECT id, chapter_number, title FROM chapters WHERE status = 'published' ORDER BY chapter_number ASC`
+    );
+    return result.rows;
+  } catch (err) {
+    console.error('Navbar: failed to load chapters', err);
+    return [];
+  }
+}
+
+export async function Navbar() {
+  const chapters = await getChapters();
+
   return (
     <header className="border-b border-gray-200">
       <div className="container-max py-4 flex items-center justify-between">
@@ -18,7 +34,7 @@ export function Navbar() {
         </div>
         <nav className="flex items-center gap-4">
           <Link className="text-sm hover:underline" href="/">Home</Link>
-          <Link className="text-sm hover:underline" href="/curriculum">Curriculum</Link>
+          <CurriculumDropdown chapters={chapters} />
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
@@ -30,5 +46,3 @@ export function Navbar() {
     </header>
   );
 }
-
-

@@ -48,7 +48,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg border">
           <h2 className="text-xl font-semibold mb-2">Chapters Completed</h2>
-          <p className="text-3xl font-bold text-blue-600">0 / 20</p>
+          <p className="text-3xl font-bold text-blue-600">0 / 25</p>
           <p className="text-gray-600 mt-2">Start learning physics today!</p>
         </div>
 
