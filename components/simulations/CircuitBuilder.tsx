@@ -32,7 +32,7 @@ function nodePos(n: NodeId) {
   return { x: PADDING + n.col * SPACING, y: PADDING + n.row * SPACING };
 }
 
-type ComponentType = 'wire' | 'resistor' | 'battery' | 'switch' | 'led';
+type ComponentType = 'wire' | 'resistor' | 'battery' | 'switch' | 'led' | 'ammeter' | 'voltmeter';
 
 interface ComponentData {
   type: ComponentType;
@@ -40,6 +40,7 @@ interface ComponentData {
   b: NodeId;
   value: number; // ohms for resistor, volts for battery; unused otherwise
   closed?: boolean; // switch state
+  flipped?: boolean; // switch lever orientation
 }
 
 interface SolveResult {
@@ -48,13 +49,15 @@ interface SolveResult {
   totalCurrent: number;
   equivalentResistance: number | null;
   edgeCurrents: Record<string, number>; // signed, a->b positive
+  edgeVoltages: Record<string, number>; // Va - Vb
   nodeDistance: Record<string, number>; // BFS distance from battery + terminal, for wire animation direction
 }
 
 const RESISTOR_VALUES = [2, 5, 10, 20, 50];
 const BATTERY_VALUES = [3, 6, 9, 12];
 const LED_RESISTANCE = 15;
-const WIRE_RESISTANCE = 0.0005;
+const AMMETER_RESISTANCE = 0.0005; // near-ideal, negligible
+const VOLTMETER_RESISTANCE = 1e8; // near-ideal, draws almost no current
 
 // ============================================================
 // Union-Find (merges nodes joined by ideal wires / closed switches)
@@ -106,12 +109,20 @@ function gaussianSolve(A: number[][], B: number[]): number[] {
 // not just simple series/parallel)
 // ============================================================
 
+function resistanceOf(c: ComponentData): number {
+  if (c.type === 'led') return LED_RESISTANCE;
+  if (c.type === 'ammeter') return AMMETER_RESISTANCE;
+  if (c.type === 'voltmeter') return VOLTMETER_RESISTANCE;
+  return Math.max(0.01, c.value);
+}
+
 function solveCircuit(components: Map<string, ComponentData>): SolveResult {
   const empty: SolveResult = {
     ok: false,
     totalCurrent: 0,
     equivalentResistance: null,
     edgeCurrents: {},
+    edgeVoltages: {},
     nodeDistance: {},
   };
 
@@ -137,9 +148,10 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
     return { ...empty, message: 'Short circuit! The battery terminals are joined by plain wire.' };
   }
 
-  // resistive edges: resistors and LEDs, and open switches are simply excluded
+  // resistive-ish edges: resistors, LEDs, ammeters (near-zero R), voltmeters (near-infinite R).
+  // open switches are simply excluded.
   const resistiveEdges = [...components.entries()].filter(
-    ([, c]) => c.type === 'resistor' || c.type === 'led'
+    ([, c]) => c.type === 'resistor' || c.type === 'led' || c.type === 'ammeter' || c.type === 'voltmeter'
   );
 
   const rootsInvolved = new Set<string>();
@@ -157,8 +169,6 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
   const n = unknownRoots.length;
   const A: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
   const B: number[] = Array(n).fill(0);
-
-  const resistanceOf = (c: ComponentData) => (c.type === 'led' ? LED_RESISTANCE : Math.max(0.01, c.value));
 
   resistiveEdges.forEach(([, c]) => {
     const rA = dsu.find(nodeKey(c.a));
@@ -192,19 +202,22 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
   unknownRoots.forEach((r, i) => nodeVoltage.set(r, solved[i]));
 
   const edgeCurrents: Record<string, number> = {};
+  const edgeVoltages: Record<string, number> = {};
   resistiveEdges.forEach(([key, c]) => {
     const rA = dsu.find(nodeKey(c.a));
     const rB = dsu.find(nodeKey(c.b));
     if (rA === rB) {
       edgeCurrents[key] = 0;
+      edgeVoltages[key] = 0;
       return;
     }
     const vA = nodeVoltage.get(rA) ?? 0;
     const vB = nodeVoltage.get(rB) ?? 0;
     edgeCurrents[key] = (vA - vB) / resistanceOf(c);
+    edgeVoltages[key] = vA - vB;
   });
 
-  // total current leaving the battery's + terminal (sum over directly attached resistive edges)
+  // total current leaving the battery's + terminal (sum over directly attached edges)
   let totalCurrent = 0;
   resistiveEdges.forEach(([key, c]) => {
     const rA = dsu.find(nodeKey(c.a));
@@ -213,7 +226,7 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
     else if (rB === posRoot) totalCurrent -= edgeCurrents[key];
   });
 
-  // BFS distance from the + terminal supernode, across ALL edges (for wire animation direction)
+  // BFS distance from the + terminal supernode, across ALL edges (for wire/battery animation direction)
   const adj = new Map<string, string[]>();
   components.forEach((c) => {
     const rA = dsu.find(nodeKey(c.a));
@@ -235,7 +248,6 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
       }
     }
   }
-  // expand root distances back onto every original grid node
   const fullNodeDistance: Record<string, number> = {};
   for (let c = 0; c < GRID_COLS; c++) {
     for (let r = 0; r < GRID_ROWS; r++) {
@@ -252,12 +264,13 @@ function solveCircuit(components: Map<string, ComponentData>): SolveResult {
     totalCurrent,
     equivalentResistance,
     edgeCurrents,
+    edgeVoltages,
     nodeDistance: fullNodeDistance,
   };
 }
 
 // ============================================================
-// Component symbol rendering (SVG path strings)
+// Component symbol path (SVG path strings)
 // ============================================================
 
 function componentPath(type: ComponentType, x1: number, y1: number, x2: number, y2: number): string {
@@ -291,7 +304,7 @@ function componentPath(type: ComponentType, x1: number, y1: number, x2: number, 
     return d;
   }
 
-  // battery / led: just leads, symbol drawn separately at midpoint
+  // battery / led / ammeter / voltmeter: just leads, symbol drawn separately at midpoint
   const leadLen = len * 0.32;
   return `M ${x1} ${y1} L ${x1 + ux * leadLen} ${y1 + uy * leadLen} M ${x2 - ux * leadLen} ${
     y2 - uy * leadLen
@@ -306,19 +319,24 @@ type Tool = ComponentType | 'erase';
 
 const TOOLS: { id: Tool; label: string; hint: string }[] = [
   { id: 'wire', label: '⎯ Wire', hint: 'Plain conductor' },
-  { id: 'resistor', label: '⌇ Resistor', hint: 'Click to cycle value' },
-  { id: 'battery', label: '⊢ Battery', hint: 'Click to cycle voltage' },
-  { id: 'switch', label: '⌁ Switch', hint: 'Click to open/close' },
+  { id: 'resistor', label: '⌇ Resistor', hint: 'Click to cycle value, double-click to type one' },
+  { id: 'battery', label: '⊢ Battery', hint: 'Click to cycle voltage, double-click to type one' },
+  { id: 'switch', label: '⌁ Switch', hint: 'Click to open/close, drag to flip' },
   { id: 'led', label: '◭ LED', hint: 'Lights up with current' },
+  { id: 'ammeter', label: '(A) Ammeter', hint: 'Reads current in series' },
+  { id: 'voltmeter', label: '(V) Voltmeter', hint: 'Reads voltage across two points' },
   { id: 'erase', label: '✕ Erase', hint: 'Remove a component' },
 ];
 
 export function CircuitBuilder() {
   const [components, setComponents] = useState<Map<string, ComponentData>>(new Map());
   const [tool, setTool] = useState<Tool>('battery');
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const phaseRef = useRef(0);
   const solveRef = useRef<SolveResult | null>(null);
+  const dragStartRef = useRef<{ x: number; y: number; key: string } | null>(null);
 
   const allEdges = useMemo(() => {
     const edges: { a: NodeId; b: NodeId; key: string }[] = [];
@@ -342,6 +360,20 @@ export function CircuitBuilder() {
   const solveResult = useMemo(() => solveCircuit(components), [components]);
   solveRef.current = solveResult;
 
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', handler);
+    return () => document.removeEventListener('fullscreenchange', handler);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      wrapperRef.current?.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   const handleEdgeClick = (a: NodeId, b: NodeId) => {
     const key = edgeKey(a, b);
     setComponents((prev) => {
@@ -357,20 +389,18 @@ export function CircuitBuilder() {
         if (tool === 'resistor') {
           const idx = RESISTOR_VALUES.indexOf(existing.value);
           const nextVal = RESISTOR_VALUES[(idx + 1) % RESISTOR_VALUES.length];
-          next.set(key, { ...existing, value: nextVal });
+          next.set(key, { ...existing, value: nextVal >= 0 ? nextVal : RESISTOR_VALUES[0] });
         } else if (tool === 'battery') {
           const idx = BATTERY_VALUES.indexOf(existing.value);
           const nextVal = BATTERY_VALUES[(idx + 1) % BATTERY_VALUES.length];
-          next.set(key, { ...existing, value: nextVal });
+          next.set(key, { ...existing, value: idx >= 0 ? nextVal : BATTERY_VALUES[0] });
         } else if (tool === 'switch') {
           next.set(key, { ...existing, closed: !existing.closed });
         }
         return next;
       }
 
-      // placing a new component (replacing whatever was there, if anything)
       if (tool === 'battery') {
-        // enforce a single battery: remove any existing one first
         for (const [k, c] of next) {
           if (c.type === 'battery') next.delete(k);
         }
@@ -386,6 +416,44 @@ export function CircuitBuilder() {
       next.set(key, data);
       return next;
     });
+  };
+
+  const handleSwitchFlip = (key: string) => {
+    setComponents((prev) => {
+      const existing = prev.get(key);
+      if (!existing || existing.type !== 'switch') return prev;
+      const next = new Map(prev);
+      next.set(key, { ...existing, flipped: !existing.flipped });
+      return next;
+    });
+  };
+
+  const handleSetExactValue = (key: string) => {
+    const existing = components.get(key);
+    if (!existing) return;
+    if (existing.type === 'resistor') {
+      const input = window.prompt('Resistance in ohms (Ω):', String(existing.value));
+      if (input === null) return;
+      const val = parseFloat(input);
+      if (!isNaN(val) && val > 0) {
+        setComponents((prev) => {
+          const next = new Map(prev);
+          next.set(key, { ...existing, value: val });
+          return next;
+        });
+      }
+    } else if (existing.type === 'battery') {
+      const input = window.prompt('Battery voltage (V):', String(existing.value));
+      if (input === null) return;
+      const val = parseFloat(input);
+      if (!isNaN(val) && val > 0) {
+        setComponents((prev) => {
+          const next = new Map(prev);
+          next.set(key, { ...existing, value: val });
+          return next;
+        });
+      }
+    }
   };
 
   const drawOverlay = () => {
@@ -405,11 +473,15 @@ export function CircuitBuilder() {
       let flowing = false;
       let forward = true;
 
-      if (c.type === 'resistor' || c.type === 'led') {
+      if (c.type === 'resistor' || c.type === 'led' || c.type === 'ammeter') {
         const cur = result.edgeCurrents[key] ?? 0;
         flowing = Math.abs(cur) > 0.01;
         forward = cur >= 0;
-      } else if (c.type === 'wire' || (c.type === 'switch' && c.closed)) {
+      } else if (
+        c.type === 'wire' ||
+        c.type === 'battery' ||
+        (c.type === 'switch' && c.closed)
+      ) {
         const da = result.nodeDistance[nodeKey(c.a)];
         const db = result.nodeDistance[nodeKey(c.b)];
         if (da !== undefined && db !== undefined && da !== db) {
@@ -417,6 +489,7 @@ export function CircuitBuilder() {
           forward = da < db;
         }
       }
+      // voltmeters carry ~0 current by design: never animate flow through them
 
       if (!flowing) return;
 
@@ -450,7 +523,10 @@ export function CircuitBuilder() {
   }, [components]);
 
   return (
-    <div className="circuit-builder">
+    <div
+      ref={wrapperRef}
+      className={isFullscreen ? 'circuit-builder bg-[#faf7f0] p-6 overflow-auto h-full' : 'circuit-builder'}
+    >
       <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
@@ -478,14 +554,34 @@ export function CircuitBuilder() {
           ))}
           <button
             onClick={() => setComponents(new Map())}
-            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#b34a3c] hover:bg-[#f5f0e2] ml-auto"
+            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#b34a3c] hover:bg-[#f5f0e2]"
           >
             ⟲ Clear All
           </button>
+          <button
+            onClick={toggleFullscreen}
+            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#f5f0e2] ml-auto"
+          >
+            {isFullscreen ? '⤡ Exit Fullscreen' : '⤢ Fullscreen'}
+          </button>
         </div>
 
-        <div className="relative overflow-x-auto p-4">
-          <div className="relative" style={{ width: SVG_W, height: SVG_H }}>
+        <div
+          className="relative overflow-auto p-4"
+          style={
+            isFullscreen
+              ? { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 200px)' }
+              : undefined
+          }
+        >
+          <div
+            className="relative"
+            style={{
+              width: SVG_W,
+              height: SVG_H,
+              transform: isFullscreen ? 'scale(1.7)' : undefined,
+            }}
+          >
             <svg width={SVG_W} height={SVG_H} className="block">
               {allEdges.map(({ a, b, key }) => {
                 const pa = nodePos(a);
@@ -501,7 +597,22 @@ export function CircuitBuilder() {
                       stroke="transparent"
                       strokeWidth={18}
                       className="cursor-pointer"
-                      onClick={() => handleEdgeClick(a, b)}
+                      onPointerDown={(e) => {
+                        dragStartRef.current = { x: e.clientX, y: e.clientY, key };
+                      }}
+                      onPointerUp={(e) => {
+                        const start = dragStartRef.current;
+                        dragStartRef.current = null;
+                        if (!start || start.key !== key) return;
+                        const dist = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+                        const existing = components.get(key);
+                        if (dist > 6 && existing?.type === 'switch' && tool === 'switch') {
+                          handleSwitchFlip(key);
+                        } else {
+                          handleEdgeClick(a, b);
+                        }
+                      }}
+                      onDoubleClick={() => handleSetExactValue(key)}
                     />
                     {!comp && (
                       <line
@@ -521,7 +632,7 @@ export function CircuitBuilder() {
                         pa={pa}
                         pb={pb}
                         current={solveResult.edgeCurrents[key]}
-                        onClick={() => handleEdgeClick(a, b)}
+                        voltage={solveResult.edgeVoltages[key]}
                       />
                     )}
                   </g>
@@ -583,9 +694,11 @@ export function CircuitBuilder() {
         </h2>
         <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
           <p>Pick a tool above, then click any grid line to place it there.</p>
-          <p>Click a placed <b>resistor</b> again to cycle its value; click a <b>battery</b> to cycle its voltage.</p>
-          <p>Click a <b>switch</b> to open or close it. Use <b>Erase</b> to remove anything.</p>
-          <p>Every current shown is computed by actually solving the circuit&rsquo;s node voltages &mdash; try building a series loop, then a parallel branch, and compare.</p>
+          <p>Click a placed <b>resistor</b> or <b>battery</b> to cycle its value, or double-click it to type an exact one.</p>
+          <p>Click a <b>switch</b> to open or close it &mdash; click and drag it to flip which way it swings.</p>
+          <p>Place an <b>Ammeter</b> in series to read current, or a <b>Voltmeter</b> across two points to read voltage.</p>
+          <p>Use <b>Fullscreen</b> for a bigger workspace, and <b>Erase</b> to remove anything.</p>
+          <p>Every value shown is computed by actually solving the circuit&rsquo;s node voltages &mdash; try building a series loop, then a parallel branch, and compare.</p>
         </div>
       </div>
 
@@ -617,13 +730,13 @@ function ComponentSymbol({
   pa,
   pb,
   current,
-  onClick,
+  voltage,
 }: {
   comp: ComponentData;
   pa: { x: number; y: number };
   pb: { x: number; y: number };
   current?: number;
-  onClick: () => void;
+  voltage?: number;
 }) {
   const midX = (pa.x + pb.x) / 2;
   const midY = (pa.y + pb.y) / 2;
@@ -633,9 +746,10 @@ function ComponentSymbol({
 
   const path = componentPath(comp.type, pa.x, pa.y, pb.x, pb.y);
   const lit = comp.type === 'led' && current !== undefined && Math.abs(current) > 0.01;
+  const leverDir = comp.flipped ? 1 : -1;
 
   return (
-    <g onClick={onClick} className="cursor-pointer">
+    <g className="pointer-events-none">
       <path d={path} stroke="#3d4653" strokeWidth={2.2} fill="none" strokeLinecap="round" />
 
       {comp.type === 'battery' && (
@@ -655,7 +769,7 @@ function ComponentSymbol({
           {comp.closed ? (
             <line x1={-9} y1={0} x2={9} y2={0} stroke="#2e7d6b" strokeWidth={2.5} />
           ) : (
-            <line x1={-9} y1={0} x2={7} y2={-10} stroke="#b34a3c" strokeWidth={2.5} />
+            <line x1={-9} y1={0} x2={7} y2={10 * leverDir} stroke="#b34a3c" strokeWidth={2.5} />
           )}
         </g>
       )}
@@ -673,6 +787,40 @@ function ComponentSymbol({
         </g>
       )}
 
+      {comp.type === 'ammeter' && (
+        <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
+          <circle cx={0} cy={0} r={13} fill="#faf7f0" stroke="#4a5a72" strokeWidth={2} />
+          <text
+            x={0}
+            y={4}
+            fontSize={12}
+            fontWeight={700}
+            fill="#4a5a72"
+            textAnchor="middle"
+            transform={`rotate(${-angle})`}
+          >
+            A
+          </text>
+        </g>
+      )}
+
+      {comp.type === 'voltmeter' && (
+        <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
+          <circle cx={0} cy={0} r={13} fill="#faf7f0" stroke="#7a4a8f" strokeWidth={2} />
+          <text
+            x={0}
+            y={4}
+            fontSize={12}
+            fontWeight={700}
+            fill="#7a4a8f"
+            textAnchor="middle"
+            transform={`rotate(${-angle})`}
+          >
+            V
+          </text>
+        </g>
+      )}
+
       {(comp.type === 'resistor' || comp.type === 'battery') && (
         <text
           x={midX}
@@ -687,17 +835,33 @@ function ComponentSymbol({
         </text>
       )}
 
-      {comp.type === 'resistor' && current !== undefined && Math.abs(current) > 0.005 && (
+      {(comp.type === 'resistor' || comp.type === 'ammeter') &&
+        current !== undefined &&
+        Math.abs(current) > 0.005 && (
+          <text
+            x={midX}
+            y={midY + 26}
+            fontSize={9.5}
+            fontWeight={700}
+            fill="#2e7d6b"
+            textAnchor="middle"
+            fontFamily="Courier New, monospace"
+          >
+            {Math.abs(current).toFixed(2)}A
+          </text>
+        )}
+
+      {comp.type === 'voltmeter' && voltage !== undefined && (
         <text
           x={midX}
-          y={midY + 22}
+          y={midY + 26}
           fontSize={9.5}
           fontWeight={700}
-          fill="#2e7d6b"
+          fill="#7a4a8f"
           textAnchor="middle"
           fontFamily="Courier New, monospace"
         >
-          {Math.abs(current).toFixed(2)}A
+          {Math.abs(voltage).toFixed(2)}V
         </text>
       )}
     </g>
