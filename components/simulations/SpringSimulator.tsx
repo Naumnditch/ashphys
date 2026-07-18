@@ -11,18 +11,23 @@ interface KeyPoints {
   O: Pt;
   P1: Pt; // limit of proportionality
   P2: Pt; // elastic limit
-  maxX: number; // slider / graph upper bound, no "breaking" semantics
 }
 
 function buildKeyPoints(k: number): KeyPoints {
-  const FA = 6; // N, force at the limit of proportionality
-  const xP1 = (FA / k) * 100; // cm
+  const FA = 6; // N, force at the limit of proportionality (roughly a material property)
+  const xP1 = (FA / k) * 100; // cm - a stiffer spring reaches this force at a smaller extension
   const O: Pt = { x: 0, y: 0 };
   const P1: Pt = { x: xP1, y: FA };
   const P2: Pt = { x: xP1 * 1.22, y: FA * 1.1 };
-  const maxX = xP1 * 3.6;
-  return { O, P1, P2, maxX };
+  return { O, P1, P2 };
 }
+
+// Fixed reference frame (based on the softest spring on the slider) so that
+// changing stiffness visibly changes how much of the graph the curve uses,
+// instead of everything auto-rescaling to look the same regardless of k.
+const REFERENCE = buildKeyPoints(20);
+const FIXED_MAX_EXTENSION_CM = REFERENCE.P2.x * 3;
+const FIXED_MAX_FORCE = 14;
 
 function cubicBezier(p0: Pt, c1: Pt, c2: Pt, p1: Pt, t: number): Pt {
   const mt = 1 - t;
@@ -32,7 +37,7 @@ function cubicBezier(p0: Pt, c1: Pt, c2: Pt, p1: Pt, t: number): Pt {
 }
 
 function sampleCurve(k: number): Pt[] {
-  const { O, P1, P2, maxX } = buildKeyPoints(k);
+  const { O, P1, P2 } = buildKeyPoints(k);
   const pts: Pt[] = [];
 
   const n1 = 18;
@@ -41,8 +46,6 @@ function sampleCurve(k: number): Pt[] {
     pts.push({ x: O.x + (P1.x - O.x) * t, y: O.y + (P1.y - O.y) * t });
   }
 
-  // smooth, tangent-matched transition: incoming slope (O->P1) blends into
-  // the shallow outgoing plateau slope, so there's no kink at P1 or P2
   const inSlope = P1.y / P1.x;
   const plateauSlope = inSlope * 0.07;
   const segDX = P2.x - P1.x;
@@ -55,10 +58,11 @@ function sampleCurve(k: number): Pt[] {
     pts.push(cubicBezier(P1, c1, c2, P2, t));
   }
 
-  const n3 = 24;
+  // plateau continues all the way to the shared fixed bound, regardless of k
+  const n3 = 30;
   for (let i = 1; i <= n3; i++) {
     const t = i / n3;
-    const x = P2.x + (maxX - P2.x) * t;
+    const x = P2.x + (FIXED_MAX_EXTENSION_CM - P2.x) * t;
     pts.push({ x, y: P2.y + (x - P2.x) * plateauSlope });
   }
 
@@ -78,15 +82,37 @@ function forceAtExtension(curve: Pt[], xCm: number): number {
   return curve[curve.length - 1].y;
 }
 
+function lerpColor(stops: [number, string][], t: number): string {
+  const hexToRgb = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [t0, c0] = stops[i];
+    const [t1, c1] = stops[i + 1];
+    if (t >= t0 && t <= t1) {
+      const localT = t1 === t0 ? 0 : (t - t0) / (t1 - t0);
+      const rgb0 = hexToRgb(c0);
+      const rgb1 = hexToRgb(c1);
+      const rgb = rgb0.map((v, idx) => Math.round(v + (rgb1[idx] - v) * localT));
+      return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+    }
+  }
+  return stops[stops.length - 1][1];
+}
+
+const HEAT_STOPS: [number, string][] = [
+  [0, '#8b93a0'],
+  [0.4, '#d4b23c'],
+  [0.7, '#c2703a'],
+  [1, '#b34a3c'],
+];
+
 function drawZigzagSpring(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   topY: number,
   length: number,
-  straighten: number // 0 = full zigzag, 1 = fully straight line
+  stressFraction: number
 ) {
-  const baseWidth = 15;
-  const coilWidth = baseWidth * (1 - straighten);
+  const coilWidth = 15;
   const turns = 9;
   const segH = length / (turns * 2);
 
@@ -102,20 +128,19 @@ function drawZigzagSpring(
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
 
-  // dark outline pass
   ctx.strokeStyle = '#3d4653';
-  ctx.lineWidth = 7 - straighten * 3;
+  ctx.lineWidth = 7;
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
 
-  // lighter gradient highlight pass on top
-  const grad = ctx.createLinearGradient(centerX - baseWidth, topY, centerX + baseWidth, topY);
-  grad.addColorStop(0, '#eef1f4');
-  grad.addColorStop(0.5, '#aab6c4');
-  grad.addColorStop(1, '#7c8896');
+  const heatColor = lerpColor(HEAT_STOPS, stressFraction);
+  const grad = ctx.createLinearGradient(centerX - coilWidth, topY, centerX + coilWidth, topY);
+  grad.addColorStop(0, '#f2f0ea');
+  grad.addColorStop(0.5, heatColor);
+  grad.addColorStop(1, '#6b4a1c');
   ctx.strokeStyle = grad;
-  ctx.lineWidth = 5 - straighten * 2.2;
+  ctx.lineWidth = 5;
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
@@ -138,19 +163,39 @@ export function SpringSimulator() {
     k: 40,
     showTechnical: false,
     running: false,
+    maxExtensionEver: 0,
   });
 
   const [forceDisplay, setForceDisplay] = useState('0.00');
   const [extensionDisplay, setExtensionDisplay] = useState('0.0');
   const [regionLabel, setRegionLabel] = useState('At rest');
+  const [permanentSetDisplay, setPermanentSetDisplay] = useState(0);
 
-  const maxExtensionCm = keyPointsRef.current.maxX;
+  const permanentSetFor = (maxEver: number, P2x: number) => {
+    if (maxEver <= P2x) return 0;
+    return (maxEver - P2x) * 0.75;
+  };
 
-  const regionFor = (xCm: number) => {
+  const forceWithHysteresis = (xCm: number) => {
+    const a = animRef.current;
+    const { P2 } = keyPointsRef.current;
+    const permSet = permanentSetFor(a.maxExtensionEver, P2.x);
+    if (permSet === 0) return forceAtExtension(curveRef.current, xCm);
+    if (xCm <= permSet) return 0;
+    if (xCm <= a.maxExtensionEver) {
+      const fAtMax = forceAtExtension(curveRef.current, a.maxExtensionEver);
+      const t = (xCm - permSet) / Math.max(0.001, a.maxExtensionEver - permSet);
+      return fAtMax * t;
+    }
+    return forceAtExtension(curveRef.current, xCm);
+  };
+
+  const regionFor = (xCm: number, permSet: number) => {
     const { P1, P2 } = keyPointsRef.current;
+    if (permSet > 0 && xCm <= permSet) return 'Permanently deformed — resting at new length';
     if (xCm <= P1.x) return "Hooke's law region (F = kx)";
     if (xCm <= P2.x) return 'Beyond the limit of proportionality';
-    return 'Past the elastic limit — permanently stretched';
+    return 'Past the elastic limit — stretching permanently';
   };
 
   const draw = () => {
@@ -166,10 +211,10 @@ export function SpringSimulator() {
 
     const a = animRef.current;
     const xCm = a.currentExtension;
-    const forceN = forceAtExtension(curveRef.current, xCm);
-    const { P1, P2, maxX } = keyPointsRef.current;
-
-    const straighten = Math.max(0, Math.min(1, (xCm - P2.x) / Math.max(0.01, maxX - P2.x)));
+    const { P1, P2 } = keyPointsRef.current;
+    const permSet = permanentSetFor(a.maxExtensionEver, P2.x);
+    const forceN = forceWithHysteresis(xCm);
+    const stressFraction = Math.max(0, Math.min(1, xCm / FIXED_MAX_EXTENSION_CM));
 
     // --- Spring panel (left) ---
     const springAreaW = Math.min(180, w * 0.3);
@@ -177,7 +222,7 @@ export function SpringSimulator() {
     const ceilingX = springAreaW / 2 + 10;
     const restLenPx = 70;
     const maxSpringLenPx = 260;
-    const pxPerCm = (maxSpringLenPx - restLenPx) / Math.max(1, maxX);
+    const pxPerCm = (maxSpringLenPx - restLenPx) / FIXED_MAX_EXTENSION_CM;
     const springLenPx = restLenPx + xCm * pxPerCm;
 
     ctx.fillStyle = '#4a5a72';
@@ -191,15 +236,15 @@ export function SpringSimulator() {
       ctx.stroke();
     }
 
-    drawZigzagSpring(ctx, ceilingX, ceilingY, springLenPx, straighten);
+    drawZigzagSpring(ctx, ceilingX, ceilingY, springLenPx, stressFraction);
 
     const weightY = ceilingY + springLenPx + 10;
     const weightSize = 22;
-    ctx.fillStyle = '#b8823d';
+    ctx.fillStyle = lerpColor(HEAT_STOPS, stressFraction);
     ctx.beginPath();
     ctx.roundRect(ceilingX - weightSize / 2, weightY, weightSize, weightSize * 0.75, 3);
     ctx.fill();
-    ctx.strokeStyle = '#6b4a1c';
+    ctx.strokeStyle = '#3d4653';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -211,11 +256,8 @@ export function SpringSimulator() {
     const graphW = graphRight - graphLeft;
     const graphH = graphBottom - graphTop;
 
-    const MAX_X_CM = maxX * 1.05;
-    const MAX_F = P2.y * 1.5;
-
-    const xForExt = (ext: number) => graphLeft + (ext / MAX_X_CM) * graphW;
-    const yForForce = (f: number) => graphBottom - (f / MAX_F) * graphH;
+    const xForExt = (ext: number) => graphLeft + (ext / FIXED_MAX_EXTENSION_CM) * graphW;
+    const yForForce = (f: number) => graphBottom - (f / FIXED_MAX_FORCE) * graphH;
 
     ctx.strokeStyle = '#b8b0a0';
     ctx.lineWidth = 1.2;
@@ -248,7 +290,7 @@ export function SpringSimulator() {
     };
     drawSegment(0, P1.x, '#c7d6e6');
     drawSegment(P1.x, P2.x, '#e8c3ba');
-    drawSegment(P2.x, maxX, '#d3d6da');
+    drawSegment(P2.x, FIXED_MAX_EXTENSION_CM, '#d3d6da');
 
     const labelPoint = (p: Pt, text: string, color: string, dy: number) => {
       const px = xForExt(p.x);
@@ -263,12 +305,42 @@ export function SpringSimulator() {
     labelPoint(P1, 'limit of proportionality', '#7a4a8f', 14);
     labelPoint(P2, 'elastic limit', '#2e7d6b', -8);
 
-    const traced = curveRef.current.filter((p) => p.x <= xCm + 0.001);
-    if (traced.length > 1) {
+    // persistent hysteresis reference line, once the spring has yielded
+    if (permSet > 0) {
+      const fAtMax = forceAtExtension(curveRef.current, a.maxExtensionEver);
+      ctx.strokeStyle = '#8a94a3';
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(xForExt(permSet), yForForce(0));
+      ctx.lineTo(xForExt(a.maxExtensionEver), yForForce(fAtMax));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#4a5a72';
+      ctx.font = '600 9.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      ctx.fillText('unloads along here now', xForExt(permSet) + 4, yForForce(0) - 6);
+
+      // little downward tick marking the permanent set on the x-axis
+      ctx.strokeStyle = '#b34a3c';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(xForExt(permSet), graphBottom);
+      ctx.lineTo(xForExt(permSet), graphBottom + 7);
+      ctx.stroke();
+    }
+
+    // live traced curve
+    const tracePts: Pt[] = [];
+    const steps = 40;
+    for (let i = 0; i <= steps; i++) {
+      const x = (xCm * i) / steps;
+      tracePts.push({ x, y: x <= permSet ? 0 : forceWithHysteresis(x) });
+    }
+    if (tracePts.length > 1) {
       ctx.strokeStyle = '#2e7d6b';
       ctx.lineWidth = 2.6;
       ctx.beginPath();
-      traced.forEach((p, i) => {
+      tracePts.forEach((p, i) => {
         const x = xForExt(p.x);
         const y = yForForce(p.y);
         if (i === 0) ctx.moveTo(x, y);
@@ -280,10 +352,13 @@ export function SpringSimulator() {
     if (xCm > 0) {
       const cx = xForExt(xCm);
       const cy = yForForce(forceN);
-      ctx.fillStyle = '#b8823d';
+      ctx.fillStyle = lerpColor(HEAT_STOPS, stressFraction);
       ctx.beginPath();
       ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
       ctx.fill();
+      ctx.strokeStyle = '#3d4653';
+      ctx.lineWidth = 1;
+      ctx.stroke();
     }
 
     if (a.showTechnical) {
@@ -330,7 +405,8 @@ export function SpringSimulator() {
 
     setForceDisplay(forceN.toFixed(2));
     setExtensionDisplay(xCm.toFixed(1));
-    setRegionLabel(regionFor(xCm));
+    setRegionLabel(regionFor(xCm, permSet));
+    setPermanentSetDisplay(permSet);
   };
 
   const tick = () => {
@@ -338,6 +414,10 @@ export function SpringSimulator() {
     const diff = a.targetExtension - a.currentExtension;
     a.velocity += diff * 55 * (1 / 60) - a.velocity * 7.5 * (1 / 60);
     a.currentExtension += a.velocity * (1 / 60);
+
+    if (a.currentExtension > a.maxExtensionEver) {
+      a.maxExtensionEver = a.currentExtension;
+    }
 
     if (Math.abs(diff) < 0.02 && Math.abs(a.velocity) < 0.02) {
       a.currentExtension = a.targetExtension;
@@ -351,16 +431,19 @@ export function SpringSimulator() {
   };
 
   const handleLoadChange = (val: number) => {
-    setTargetExtension(val);
     const a = animRef.current;
-    a.targetExtension = val;
+    const { P2 } = keyPointsRef.current;
+    const permSet = permanentSetFor(a.maxExtensionEver, P2.x);
+    const clamped = Math.max(val, permSet);
+    setTargetExtension(clamped);
+    a.targetExtension = clamped;
     if (!a.running) {
       a.running = true;
       requestAnimationFrame(tick);
     }
   };
 
-  const handleReset = () => {
+  const handleRemoveLoad = () => {
     handleLoadChange(0);
   };
 
@@ -368,11 +451,13 @@ export function SpringSimulator() {
     setK(val);
     curveRef.current = sampleCurve(val);
     keyPointsRef.current = buildKeyPoints(val);
-    animRef.current.k = val;
-    animRef.current.currentExtension = 0;
-    animRef.current.velocity = 0;
-    animRef.current.targetExtension = 0;
-    animRef.current.running = false;
+    const a = animRef.current;
+    a.k = val;
+    a.currentExtension = 0;
+    a.velocity = 0;
+    a.targetExtension = 0;
+    a.running = false;
+    a.maxExtensionEver = 0;
     setTargetExtension(0);
     draw();
   };
@@ -408,7 +493,7 @@ export function SpringSimulator() {
   const variables = [
     { symbol: 'F', name: 'Force (load)', def: 'The pulling force applied to the spring, in newtons (N).' },
     { symbol: 'x', name: 'Extension', def: 'How much longer the spring gets compared to its natural length, in cm.' },
-    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only up to the limit of proportionality.' },
+    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only up to the limit of proportionality. A bigger k means a steeper line — more force needed for the same stretch.' },
   ];
 
   return (
@@ -430,7 +515,7 @@ export function SpringSimulator() {
             <input
               type="range"
               min={0}
-              max={maxExtensionCm}
+              max={FIXED_MAX_EXTENSION_CM}
               step={0.1}
               value={targetExtension}
               onChange={(e) => handleLoadChange(parseFloat(e.target.value))}
@@ -464,11 +549,18 @@ export function SpringSimulator() {
           </button>
 
           <button
-            onClick={handleReset}
+            onClick={handleRemoveLoad}
             className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
           >
             ⟲ Remove Load
           </button>
+
+          {permanentSetDisplay > 0 && (
+            <p className="text-[12px] text-[#b34a3c] font-medium mt-3">
+              This spring has been permanently stretched by {permanentSetDisplay.toFixed(1)} cm. Removing
+              the load won&rsquo;t bring it back below that.
+            </p>
+          )}
         </div>
       </div>
 
@@ -499,7 +591,7 @@ export function SpringSimulator() {
         <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
           <p><b style={{ color: '#3a6ea8' }}>Hooke&rsquo;s law region:</b> straight line through the origin. F = kx.</p>
           <p><b style={{ color: '#7a4a8f' }}>Limit of proportionality:</b> the line stops being straight here.</p>
-          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded &mdash; it keeps stretching, flattening out toward a straight wire.</p>
+          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded. The dashed line shows its new, permanent path.</p>
         </div>
       </div>
 
