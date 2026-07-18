@@ -11,7 +11,7 @@ interface KeyPoints {
   O: Pt;
   P1: Pt; // limit of proportionality
   P2: Pt; // elastic limit
-  P3: Pt; // spring breaks
+  maxX: number; // slider / graph upper bound, no "breaking" semantics
 }
 
 function buildKeyPoints(k: number): KeyPoints {
@@ -20,34 +20,46 @@ function buildKeyPoints(k: number): KeyPoints {
   const O: Pt = { x: 0, y: 0 };
   const P1: Pt = { x: xP1, y: FA };
   const P2: Pt = { x: xP1 * 1.22, y: FA * 1.1 };
-  const P3: Pt = { x: xP1 * 3.4, y: FA * 1.18 };
-  return { O, P1, P2, P3 };
+  const maxX = xP1 * 3.6;
+  return { O, P1, P2, maxX };
+}
+
+function cubicBezier(p0: Pt, c1: Pt, c2: Pt, p1: Pt, t: number): Pt {
+  const mt = 1 - t;
+  const x = mt * mt * mt * p0.x + 3 * mt * mt * t * c1.x + 3 * mt * t * t * c2.x + t * t * t * p1.x;
+  const y = mt * mt * mt * p0.y + 3 * mt * mt * t * c1.y + 3 * mt * t * t * c2.y + t * t * t * p1.y;
+  return { x, y };
 }
 
 function sampleCurve(k: number): Pt[] {
-  const { O, P1, P2, P3 } = buildKeyPoints(k);
+  const { O, P1, P2, maxX } = buildKeyPoints(k);
   const pts: Pt[] = [];
 
-  const n1 = 20;
+  const n1 = 18;
   for (let i = 0; i <= n1; i++) {
     const t = i / n1;
     pts.push({ x: O.x + (P1.x - O.x) * t, y: O.y + (P1.y - O.y) * t });
   }
 
-  // quadratic bezier: bends from the steep line over to the shallow plateau
-  const ctrl: Pt = { x: P2.x, y: P1.y };
+  // smooth, tangent-matched transition: incoming slope (O->P1) blends into
+  // the shallow outgoing plateau slope, so there's no kink at P1 or P2
+  const inSlope = P1.y / P1.x;
+  const plateauSlope = inSlope * 0.07;
+  const segDX = P2.x - P1.x;
+  const c1: Pt = { x: P1.x + segDX * 0.4, y: P1.y + segDX * 0.4 * inSlope };
+  const c2: Pt = { x: P2.x - segDX * 0.4, y: P2.y - segDX * 0.4 * plateauSlope };
+
   const n2 = 26;
   for (let i = 1; i <= n2; i++) {
     const t = i / n2;
-    const x = (1 - t) * (1 - t) * P1.x + 2 * (1 - t) * t * ctrl.x + t * t * P2.x;
-    const y = (1 - t) * (1 - t) * P1.y + 2 * (1 - t) * t * ctrl.y + t * t * P2.y;
-    pts.push({ x, y });
+    pts.push(cubicBezier(P1, c1, c2, P2, t));
   }
 
-  const n3 = 20;
+  const n3 = 24;
   for (let i = 1; i <= n3; i++) {
     const t = i / n3;
-    pts.push({ x: P2.x + (P3.x - P2.x) * t, y: P2.y + (P3.y - P2.y) * t });
+    const x = P2.x + (maxX - P2.x) * t;
+    pts.push({ x, y: P2.y + (x - P2.x) * plateauSlope });
   }
 
   return pts;
@@ -66,81 +78,46 @@ function forceAtExtension(curve: Pt[], xCm: number): number {
   return curve[curve.length - 1].y;
 }
 
-function drawSpring(
+function drawZigzagSpring(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   topY: number,
   length: number,
-  broken: boolean,
-  breakFraction: number,
-  straighten: number // 0 = normal coil, 1 = nearly straight wire
+  straighten: number // 0 = full zigzag, 1 = fully straight line
 ) {
-  const baseCoilRadius = 15;
-  const coilRadius = baseCoilRadius * (1 - straighten * 0.85);
-  const baseLineWidth = 4.2;
-  const lineWidth = baseLineWidth - straighten * 1.8;
-  const coils = 11;
-  const coilSpacing = length / coils;
+  const baseWidth = 15;
+  const coilWidth = baseWidth * (1 - straighten);
+  const turns = 9;
+  const segH = length / (turns * 2);
 
-  const drawCoilRun = (fromY: number, coilCount: number) => {
-    for (let i = 0; i < coilCount; i++) {
-      const y = fromY + i * coilSpacing;
-      const grad = ctx.createLinearGradient(centerX - coilRadius, y, centerX + coilRadius, y);
-      grad.addColorStop(0, '#f2f2f0');
-      grad.addColorStop(0.35, '#c4c9cf');
-      grad.addColorStop(0.65, '#8b93a0');
-      grad.addColorStop(1, '#565f6d');
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = Math.max(1.2, lineWidth);
-      ctx.beginPath();
-      ctx.ellipse(centerX, y, Math.max(1.5, coilRadius), 4.4 - straighten * 2.2, 0, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  };
-
-  ctx.strokeStyle = '#8a94a3';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(centerX, topY - 10);
-  ctx.lineTo(centerX, topY);
-  ctx.stroke();
-
-  if (!broken) {
-    drawCoilRun(topY, coils);
-    ctx.strokeStyle = '#8a94a3';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(centerX, topY + length);
-    ctx.lineTo(centerX, topY + length + 10);
-    ctx.stroke();
-    return;
+  const points: Pt[] = [{ x: centerX, y: topY }];
+  let y = topY;
+  for (let i = 0; i < turns * 2; i++) {
+    const dir = i % 2 === 0 ? 1 : -1;
+    y += segH;
+    points.push({ x: centerX + dir * coilWidth, y });
   }
+  points.push({ x: centerX, y: topY + length });
 
-  const breakY = topY + length * breakFraction;
-  const upperCoils = Math.max(1, Math.round(coils * breakFraction) - 1);
-  const lowerCoils = Math.max(1, coils - upperCoils - 1);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
 
-  drawCoilRun(topY, upperCoils);
-  const upperEndY = topY + upperCoils * coilSpacing;
-  ctx.strokeStyle = '#8a94a3';
-  ctx.lineWidth = 2;
+  // dark outline pass
+  ctx.strokeStyle = '#3d4653';
+  ctx.lineWidth = 7 - straighten * 3;
   ctx.beginPath();
-  ctx.moveTo(centerX, upperEndY);
-  ctx.lineTo(centerX - 6, upperEndY + 10);
-  ctx.lineTo(centerX + 4, upperEndY + 18);
+  points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
 
-  const lowerStartY = breakY + 26;
+  // lighter gradient highlight pass on top
+  const grad = ctx.createLinearGradient(centerX - baseWidth, topY, centerX + baseWidth, topY);
+  grad.addColorStop(0, '#eef1f4');
+  grad.addColorStop(0.5, '#aab6c4');
+  grad.addColorStop(1, '#7c8896');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 5 - straighten * 2.2;
   ctx.beginPath();
-  ctx.moveTo(centerX - 4, lowerStartY - 18);
-  ctx.lineTo(centerX + 6, lowerStartY - 10);
-  ctx.lineTo(centerX, lowerStartY);
-  ctx.stroke();
-  drawCoilRun(lowerStartY, lowerCoils);
-
-  ctx.beginPath();
-  ctx.moveTo(centerX, lowerStartY + lowerCoils * coilSpacing);
-  ctx.lineTo(centerX, lowerStartY + lowerCoils * coilSpacing + 10);
+  points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
 }
 
@@ -150,8 +127,6 @@ export function SpringSimulator() {
   const [k, setK] = useState(40);
   const [targetExtension, setTargetExtension] = useState(0);
   const [showTechnical, setShowTechnical] = useState(false);
-  const [snapped, setSnapped] = useState(false);
-  const [running, setRunning] = useState(false);
 
   const curveRef = useRef(sampleCurve(40));
   const keyPointsRef = useRef(buildKeyPoints(40));
@@ -163,22 +138,19 @@ export function SpringSimulator() {
     k: 40,
     showTechnical: false,
     running: false,
-    snapped: false,
-    breakFraction: 1,
   });
 
   const [forceDisplay, setForceDisplay] = useState('0.00');
   const [extensionDisplay, setExtensionDisplay] = useState('0.0');
   const [regionLabel, setRegionLabel] = useState('At rest');
 
-  const maxExtensionCm = keyPointsRef.current.P3.x * 1.08;
+  const maxExtensionCm = keyPointsRef.current.maxX;
 
   const regionFor = (xCm: number) => {
-    const { P1, P2, P3 } = keyPointsRef.current;
+    const { P1, P2 } = keyPointsRef.current;
     if (xCm <= P1.x) return "Hooke's law region (F = kx)";
     if (xCm <= P2.x) return 'Beyond the limit of proportionality';
-    if (xCm <= P3.x) return 'Past the elastic limit — stretching permanently';
-    return 'Broken';
+    return 'Past the elastic limit — permanently stretched';
   };
 
   const draw = () => {
@@ -195,9 +167,9 @@ export function SpringSimulator() {
     const a = animRef.current;
     const xCm = a.currentExtension;
     const forceN = forceAtExtension(curveRef.current, xCm);
-    const { P1, P2, P3 } = keyPointsRef.current;
+    const { P1, P2, maxX } = keyPointsRef.current;
 
-    const straighten = Math.max(0, Math.min(1, (xCm - P2.x) / Math.max(0.01, P3.x - P2.x)));
+    const straighten = Math.max(0, Math.min(1, (xCm - P2.x) / Math.max(0.01, maxX - P2.x)));
 
     // --- Spring panel (left) ---
     const springAreaW = Math.min(180, w * 0.3);
@@ -205,7 +177,7 @@ export function SpringSimulator() {
     const ceilingX = springAreaW / 2 + 10;
     const restLenPx = 70;
     const maxSpringLenPx = 260;
-    const pxPerCm = (maxSpringLenPx - restLenPx) / Math.max(1, P3.x);
+    const pxPerCm = (maxSpringLenPx - restLenPx) / Math.max(1, maxX);
     const springLenPx = restLenPx + xCm * pxPerCm;
 
     ctx.fillStyle = '#4a5a72';
@@ -219,24 +191,17 @@ export function SpringSimulator() {
       ctx.stroke();
     }
 
-    drawSpring(ctx, ceilingX, ceilingY, springLenPx, a.snapped, a.breakFraction, straighten);
+    drawZigzagSpring(ctx, ceilingX, ceilingY, springLenPx, straighten);
 
-    if (!a.snapped) {
-      const weightY = ceilingY + springLenPx + 10;
-      const weightSize = 22;
-      ctx.fillStyle = '#b8823d';
-      ctx.beginPath();
-      ctx.roundRect(ceilingX - weightSize / 2, weightY, weightSize, weightSize * 0.75, 3);
-      ctx.fill();
-      ctx.strokeStyle = '#6b4a1c';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    } else {
-      ctx.font = '600 22px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('💥', ceilingX, ceilingY + springLenPx * a.breakFraction + 20);
-      ctx.textAlign = 'left';
-    }
+    const weightY = ceilingY + springLenPx + 10;
+    const weightSize = 22;
+    ctx.fillStyle = '#b8823d';
+    ctx.beginPath();
+    ctx.roundRect(ceilingX - weightSize / 2, weightY, weightSize, weightSize * 0.75, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#6b4a1c';
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     // --- Graph panel (right) ---
     const graphLeft = springAreaW + 44;
@@ -246,8 +211,8 @@ export function SpringSimulator() {
     const graphW = graphRight - graphLeft;
     const graphH = graphBottom - graphTop;
 
-    const MAX_X_CM = P3.x * 1.12;
-    const MAX_F = P3.y * 1.3;
+    const MAX_X_CM = maxX * 1.05;
+    const MAX_F = P2.y * 1.5;
 
     const xForExt = (ext: number) => graphLeft + (ext / MAX_X_CM) * graphW;
     const yForForce = (f: number) => graphBottom - (f / MAX_F) * graphH;
@@ -267,7 +232,6 @@ export function SpringSimulator() {
     ctx.textAlign = 'left';
     ctx.fillText('Extension (cm)', graphRight - 78, graphBottom + 28);
 
-    // faint background reference curve, colour-coded by region
     const drawSegment = (fromX: number, toX: number, color: string) => {
       const seg = curveRef.current.filter((p) => p.x >= fromX - 0.001 && p.x <= toX + 0.001);
       if (seg.length < 2) return;
@@ -282,11 +246,10 @@ export function SpringSimulator() {
       });
       ctx.stroke();
     };
-    drawSegment(0, P1.x, '#c7d6e6'); // faint blue: Hooke's law region
-    drawSegment(P1.x, P2.x, '#e8c3ba'); // faint red: proportionality -> elastic limit
-    drawSegment(P2.x, P3.x, '#cfd2d6'); // faint dark: plastic plateau
+    drawSegment(0, P1.x, '#c7d6e6');
+    drawSegment(P1.x, P2.x, '#e8c3ba');
+    drawSegment(P2.x, maxX, '#d3d6da');
 
-    // key point labels
     const labelPoint = (p: Pt, text: string, color: string, dy: number) => {
       const px = xForExt(p.x);
       const py = yForForce(p.y);
@@ -299,12 +262,10 @@ export function SpringSimulator() {
     };
     labelPoint(P1, 'limit of proportionality', '#7a4a8f', 14);
     labelPoint(P2, 'elastic limit', '#2e7d6b', -8);
-    labelPoint(P3, 'spring breaks', '#b8823d', 4);
 
-    // live traced curve up to current extension
     const traced = curveRef.current.filter((p) => p.x <= xCm + 0.001);
     if (traced.length > 1) {
-      ctx.strokeStyle = a.snapped ? '#b34a3c' : '#2e7d6b';
+      ctx.strokeStyle = '#2e7d6b';
       ctx.lineWidth = 2.6;
       ctx.beginPath();
       traced.forEach((p, i) => {
@@ -319,13 +280,12 @@ export function SpringSimulator() {
     if (xCm > 0) {
       const cx = xForExt(xCm);
       const cy = yForForce(forceN);
-      ctx.fillStyle = a.snapped ? '#b34a3c' : '#b8823d';
+      ctx.fillStyle = '#b8823d';
       ctx.beginPath();
       ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // technical overlay: gradient triangle in the linear region only
     if (a.showTechnical) {
       const sampleX = P1.x * 0.7;
       const sampleF = forceAtExtension(curveRef.current, sampleX);
@@ -370,31 +330,19 @@ export function SpringSimulator() {
 
     setForceDisplay(forceN.toFixed(2));
     setExtensionDisplay(xCm.toFixed(1));
-    setRegionLabel(a.snapped ? 'Broken' : regionFor(xCm));
+    setRegionLabel(regionFor(xCm));
   };
 
   const tick = () => {
     const a = animRef.current;
-    const { P3 } = keyPointsRef.current;
     const diff = a.targetExtension - a.currentExtension;
     a.velocity += diff * 55 * (1 / 60) - a.velocity * 7.5 * (1 / 60);
     a.currentExtension += a.velocity * (1 / 60);
-
-    if (a.currentExtension >= P3.x) {
-      a.currentExtension = P3.x;
-      a.snapped = true;
-      a.running = false;
-      setSnapped(true);
-      setRunning(false);
-      draw();
-      return;
-    }
 
     if (Math.abs(diff) < 0.02 && Math.abs(a.velocity) < 0.02) {
       a.currentExtension = a.targetExtension;
       a.velocity = 0;
       a.running = false;
-      setRunning(false);
       draw();
       return;
     }
@@ -402,29 +350,18 @@ export function SpringSimulator() {
     requestAnimationFrame(tick);
   };
 
-  const handleRelease = () => {
+  const handleLoadChange = (val: number) => {
+    setTargetExtension(val);
     const a = animRef.current;
-    if (a.snapped) return;
-    a.currentExtension = 0;
-    a.velocity = 0;
-    a.targetExtension = targetExtension;
-    a.running = true;
-    setRunning(true);
-    requestAnimationFrame(tick);
+    a.targetExtension = val;
+    if (!a.running) {
+      a.running = true;
+      requestAnimationFrame(tick);
+    }
   };
 
   const handleReset = () => {
-    const a = animRef.current;
-    a.currentExtension = 0;
-    a.velocity = 0;
-    a.targetExtension = 0;
-    a.running = false;
-    a.snapped = false;
-    a.breakFraction = 0.4 + Math.random() * 0.2;
-    setSnapped(false);
-    setRunning(false);
-    setTargetExtension(0);
-    draw();
+    handleLoadChange(0);
   };
 
   const handleKChange = (val: number) => {
@@ -432,7 +369,12 @@ export function SpringSimulator() {
     curveRef.current = sampleCurve(val);
     keyPointsRef.current = buildKeyPoints(val);
     animRef.current.k = val;
-    handleReset();
+    animRef.current.currentExtension = 0;
+    animRef.current.velocity = 0;
+    animRef.current.targetExtension = 0;
+    animRef.current.running = false;
+    setTargetExtension(0);
+    draw();
   };
 
   const handleToggleTechnical = () => {
@@ -466,7 +408,7 @@ export function SpringSimulator() {
   const variables = [
     { symbol: 'F', name: 'Force (load)', def: 'The pulling force applied to the spring, in newtons (N).' },
     { symbol: 'x', name: 'Extension', def: 'How much longer the spring gets compared to its natural length, in cm.' },
-    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only up to the limit of proportionality — point P1 on the graph.' },
+    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only up to the limit of proportionality.' },
   ];
 
   return (
@@ -484,15 +426,14 @@ export function SpringSimulator() {
 
         <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
           <div className="flex items-center gap-3 mb-3">
-            <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Set load (stretch to)</label>
+            <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Load</label>
             <input
               type="range"
               min={0}
               max={maxExtensionCm}
-              step={0.2}
+              step={0.1}
               value={targetExtension}
-              onChange={(e) => setTargetExtension(parseFloat(e.target.value))}
-              disabled={running || snapped}
+              onChange={(e) => handleLoadChange(parseFloat(e.target.value))}
               className="flex-1"
             />
             <span className="font-mono text-[13px] w-16 text-right">{targetExtension.toFixed(1)} cm</span>
@@ -506,7 +447,6 @@ export function SpringSimulator() {
               step={2}
               value={k}
               onChange={(e) => handleKChange(parseFloat(e.target.value))}
-              disabled={running}
               className="flex-1"
             />
             <span className="font-mono text-[13px] w-16 text-right">{k} N/m</span>
@@ -523,27 +463,12 @@ export function SpringSimulator() {
             {showTechnical ? '✓ Gradient Details Shown' : '⚙ Show Gradient Details'}
           </button>
 
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={handleRelease}
-              disabled={running || snapped}
-              className="bg-[#b8823d] hover:bg-[#8f6428] disabled:opacity-50 disabled:cursor-not-allowed text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
-            >
-              {running ? '… Releasing' : '▶ Release'}
-            </button>
-            <button
-              onClick={handleReset}
-              className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
-            >
-              ⟲ Reset
-            </button>
-          </div>
-
-          {snapped && (
-            <p className="text-[12px] text-[#b34a3c] font-medium mt-3">
-              💥 Stretched thin and past its breaking point. Press Reset to fit a new spring.
-            </p>
-          )}
+          <button
+            onClick={handleReset}
+            className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+          >
+            ⟲ Remove Load
+          </button>
         </div>
       </div>
 
@@ -574,8 +499,7 @@ export function SpringSimulator() {
         <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
           <p><b style={{ color: '#3a6ea8' }}>Hooke&rsquo;s law region:</b> straight line through the origin. F = kx.</p>
           <p><b style={{ color: '#7a4a8f' }}>Limit of proportionality:</b> the line stops being straight here.</p>
-          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded.</p>
-          <p><b style={{ color: '#b8823d' }}>Spring breaks:</b> extension keeps growing with barely any extra force, until it snaps.</p>
+          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded &mdash; it keeps stretching, flattening out toward a straight wire.</p>
         </div>
       </div>
 
