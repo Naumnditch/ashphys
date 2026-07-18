@@ -7,55 +7,50 @@ interface Pt {
   y: number; // N
 }
 
-// Catmull-Rom interpolation through a control point array
-function catmullRom(p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt {
-  const t2 = t * t;
-  const t3 = t2 * t;
-  const x =
-    0.5 *
-    (2 * p1.x +
-      (-p0.x + p2.x) * t +
-      (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
-      (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3);
-  const y =
-    0.5 *
-    (2 * p1.y +
-      (-p0.y + p2.y) * t +
-      (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
-      (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3);
-  return { x, y };
+interface KeyPoints {
+  O: Pt;
+  P1: Pt; // limit of proportionality
+  P2: Pt; // elastic limit
+  P3: Pt; // spring breaks
 }
 
-// Build key points (elastic -> yield -> plastic -> ultimate -> necking -> fracture)
-// scaled from the elastic region's limit point A, which itself scales with k.
-function buildKeyPoints(k: number): { O: Pt; A: Pt; B: Pt; C: Pt; D: Pt; E: Pt } {
-  const FA = 6; // N, force at end of the pure linear region
-  const xA = (FA / k) * 100; // cm
+function buildKeyPoints(k: number): KeyPoints {
+  const FA = 6; // N, force at the limit of proportionality
+  const xP1 = (FA / k) * 100; // cm
   const O: Pt = { x: 0, y: 0 };
-  const A: Pt = { x: xA, y: FA };
-  const B: Pt = { x: xA * 1.18, y: FA * 1.1 };
-  const C: Pt = { x: xA * 1.42, y: FA * 0.97 };
-  const D: Pt = { x: xA * 2.65, y: FA * 1.95 };
-  const E: Pt = { x: xA * 3.35, y: FA * 1.18 };
-  return { O, A, B, C, D, E };
+  const P1: Pt = { x: xP1, y: FA };
+  const P2: Pt = { x: xP1 * 1.22, y: FA * 1.1 };
+  const P3: Pt = { x: xP1 * 3.4, y: FA * 1.18 };
+  return { O, P1, P2, P3 };
 }
 
-function sampleCurve(k: number, samplesPerSegment = 40): Pt[] {
-  const { O, A, B, C, D, E } = buildKeyPoints(k);
-  const pts = [O, A, B, C, D, E];
-  const extended = [pts[0], ...pts, pts[pts.length - 1]];
-  const result: Pt[] = [];
-  for (let seg = 0; seg < pts.length - 1; seg++) {
-    const p0 = extended[seg];
-    const p1 = extended[seg + 1];
-    const p2 = extended[seg + 2];
-    const p3 = extended[seg + 3];
-    for (let i = 0; i <= samplesPerSegment; i++) {
-      const t = i / samplesPerSegment;
-      result.push(catmullRom(p0, p1, p2, p3, t));
-    }
+function sampleCurve(k: number): Pt[] {
+  const { O, P1, P2, P3 } = buildKeyPoints(k);
+  const pts: Pt[] = [];
+
+  const n1 = 20;
+  for (let i = 0; i <= n1; i++) {
+    const t = i / n1;
+    pts.push({ x: O.x + (P1.x - O.x) * t, y: O.y + (P1.y - O.y) * t });
   }
-  return result;
+
+  // quadratic bezier: bends from the steep line over to the shallow plateau
+  const ctrl: Pt = { x: P2.x, y: P1.y };
+  const n2 = 26;
+  for (let i = 1; i <= n2; i++) {
+    const t = i / n2;
+    const x = (1 - t) * (1 - t) * P1.x + 2 * (1 - t) * t * ctrl.x + t * t * P2.x;
+    const y = (1 - t) * (1 - t) * P1.y + 2 * (1 - t) * t * ctrl.y + t * t * P2.y;
+    pts.push({ x, y });
+  }
+
+  const n3 = 20;
+  for (let i = 1; i <= n3; i++) {
+    const t = i / n3;
+    pts.push({ x: P2.x + (P3.x - P2.x) * t, y: P2.y + (P3.y - P2.y) * t });
+  }
+
+  return pts;
 }
 
 function forceAtExtension(curve: Pt[], xCm: number): number {
@@ -77,14 +72,18 @@ function drawSpring(
   topY: number,
   length: number,
   broken: boolean,
-  breakFraction: number
+  breakFraction: number,
+  straighten: number // 0 = normal coil, 1 = nearly straight wire
 ) {
-  const coilRadius = 15;
+  const baseCoilRadius = 15;
+  const coilRadius = baseCoilRadius * (1 - straighten * 0.85);
+  const baseLineWidth = 4.2;
+  const lineWidth = baseLineWidth - straighten * 1.8;
   const coils = 11;
   const coilSpacing = length / coils;
 
-  const drawCoilRun = (fromY: number, toCoilCount: number, startIndex: number) => {
-    for (let i = 0; i < toCoilCount; i++) {
+  const drawCoilRun = (fromY: number, coilCount: number) => {
+    for (let i = 0; i < coilCount; i++) {
       const y = fromY + i * coilSpacing;
       const grad = ctx.createLinearGradient(centerX - coilRadius, y, centerX + coilRadius, y);
       grad.addColorStop(0, '#f2f2f0');
@@ -92,14 +91,13 @@ function drawSpring(
       grad.addColorStop(0.65, '#8b93a0');
       grad.addColorStop(1, '#565f6d');
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 4.2;
+      ctx.lineWidth = Math.max(1.2, lineWidth);
       ctx.beginPath();
-      ctx.ellipse(centerX, y, coilRadius, 4.4, 0, 0, Math.PI * 2);
+      ctx.ellipse(centerX, y, Math.max(1.5, coilRadius), 4.4 - straighten * 2.2, 0, 0, Math.PI * 2);
       ctx.stroke();
     }
   };
 
-  // top connector rod
   ctx.strokeStyle = '#8a94a3';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -108,7 +106,7 @@ function drawSpring(
   ctx.stroke();
 
   if (!broken) {
-    drawCoilRun(topY, coils, 0);
+    drawCoilRun(topY, coils);
     ctx.strokeStyle = '#8a94a3';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -118,12 +116,11 @@ function drawSpring(
     return;
   }
 
-  // broken: two segments with a jagged gap
   const breakY = topY + length * breakFraction;
   const upperCoils = Math.max(1, Math.round(coils * breakFraction) - 1);
   const lowerCoils = Math.max(1, coils - upperCoils - 1);
 
-  drawCoilRun(topY, upperCoils, 0);
+  drawCoilRun(topY, upperCoils);
   const upperEndY = topY + upperCoils * coilSpacing;
   ctx.strokeStyle = '#8a94a3';
   ctx.lineWidth = 2;
@@ -139,7 +136,7 @@ function drawSpring(
   ctx.lineTo(centerX + 6, lowerStartY - 10);
   ctx.lineTo(centerX, lowerStartY);
   ctx.stroke();
-  drawCoilRun(lowerStartY, lowerCoils, upperCoils + 1);
+  drawCoilRun(lowerStartY, lowerCoils);
 
   ctx.beginPath();
   ctx.moveTo(centerX, lowerStartY + lowerCoils * coilSpacing);
@@ -174,16 +171,14 @@ export function SpringSimulator() {
   const [extensionDisplay, setExtensionDisplay] = useState('0.0');
   const [regionLabel, setRegionLabel] = useState('At rest');
 
-  const maxExtensionCm = keyPointsRef.current.E.x * 1.1;
+  const maxExtensionCm = keyPointsRef.current.P3.x * 1.08;
 
   const regionFor = (xCm: number) => {
-    const { A, B, C, D, E } = keyPointsRef.current;
-    if (xCm <= A.x) return "Elastic region (obeys Hooke's law)";
-    if (xCm <= B.x) return 'Approaching the limit of proportionality';
-    if (xCm <= C.x) return 'Yield point \u2014 stretching with less force';
-    if (xCm <= D.x) return 'Plastic region \u2014 strain hardening';
-    if (xCm <= E.x) return 'Necking \u2014 close to breaking';
-    return 'Fractured';
+    const { P1, P2, P3 } = keyPointsRef.current;
+    if (xCm <= P1.x) return "Hooke's law region (F = kx)";
+    if (xCm <= P2.x) return 'Beyond the limit of proportionality';
+    if (xCm <= P3.x) return 'Past the elastic limit — stretching permanently';
+    return 'Broken';
   };
 
   const draw = () => {
@@ -200,15 +195,17 @@ export function SpringSimulator() {
     const a = animRef.current;
     const xCm = a.currentExtension;
     const forceN = forceAtExtension(curveRef.current, xCm);
-    const { A, B, C, D, E } = keyPointsRef.current;
+    const { P1, P2, P3 } = keyPointsRef.current;
+
+    const straighten = Math.max(0, Math.min(1, (xCm - P2.x) / Math.max(0.01, P3.x - P2.x)));
 
     // --- Spring panel (left) ---
     const springAreaW = Math.min(180, w * 0.3);
     const ceilingY = 26;
     const ceilingX = springAreaW / 2 + 10;
     const restLenPx = 70;
-    const maxSpringLenPx = 240;
-    const pxPerCm = (maxSpringLenPx - restLenPx) / Math.max(1, E.x);
+    const maxSpringLenPx = 260;
+    const pxPerCm = (maxSpringLenPx - restLenPx) / Math.max(1, P3.x);
     const springLenPx = restLenPx + xCm * pxPerCm;
 
     ctx.fillStyle = '#4a5a72';
@@ -222,7 +219,7 @@ export function SpringSimulator() {
       ctx.stroke();
     }
 
-    drawSpring(ctx, ceilingX, ceilingY, springLenPx, a.snapped, a.breakFraction);
+    drawSpring(ctx, ceilingX, ceilingY, springLenPx, a.snapped, a.breakFraction, straighten);
 
     if (!a.snapped) {
       const weightY = ceilingY + springLenPx + 10;
@@ -249,8 +246,8 @@ export function SpringSimulator() {
     const graphW = graphRight - graphLeft;
     const graphH = graphBottom - graphTop;
 
-    const MAX_X_CM = E.x * 1.12;
-    const MAX_F = D.y * 1.15;
+    const MAX_X_CM = P3.x * 1.12;
+    const MAX_F = P3.y * 1.3;
 
     const xForExt = (ext: number) => graphLeft + (ext / MAX_X_CM) * graphW;
     const yForForce = (f: number) => graphBottom - (f / MAX_F) * graphH;
@@ -266,41 +263,43 @@ export function SpringSimulator() {
     ctx.textAlign = 'right';
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.fillStyle = '#4a5a72';
-    ctx.fillText('stress (N)', graphLeft - 2, graphTop - 6);
+    ctx.fillText('Force (N)', graphLeft - 2, graphTop - 6);
     ctx.textAlign = 'left';
-    ctx.fillText('strain (cm)', graphRight - 56, graphBottom + 28);
+    ctx.fillText('Extension (cm)', graphRight - 78, graphBottom + 28);
 
-    // faint full reference curve
-    ctx.strokeStyle = '#e6ded0';
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    curveRef.current.forEach((p, i) => {
-      const x = xForExt(p.x);
-      const y = yForForce(p.y);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
+    // faint background reference curve, colour-coded by region
+    const drawSegment = (fromX: number, toX: number, color: string) => {
+      const seg = curveRef.current.filter((p) => p.x >= fromX - 0.001 && p.x <= toX + 0.001);
+      if (seg.length < 2) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      seg.forEach((p, i) => {
+        const x = xForExt(p.x);
+        const y = yForForce(p.y);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+    };
+    drawSegment(0, P1.x, '#c7d6e6'); // faint blue: Hooke's law region
+    drawSegment(P1.x, P2.x, '#e8c3ba'); // faint red: proportionality -> elastic limit
+    drawSegment(P2.x, P3.x, '#cfd2d6'); // faint dark: plastic plateau
 
-    // labeled key points (A-E)
-    const labeled: [Pt, string][] = [
-      [A, 'A'],
-      [B, 'B'],
-      [C, 'C'],
-      [D, 'D'],
-      [E, 'E'],
-    ];
-    ctx.font = '600 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    labeled.forEach(([p, label]) => {
+    // key point labels
+    const labelPoint = (p: Pt, text: string, color: string, dy: number) => {
       const px = xForExt(p.x);
       const py = yForForce(p.y);
-      ctx.fillStyle = '#c9c0ab';
+      ctx.fillStyle = color;
       ctx.beginPath();
-      ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+      ctx.arc(px, py, 2.6, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#8f6428';
-      ctx.fillText(label, px + 5, py - 5);
-    });
+      ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      ctx.fillText(text, px + 5, py + dy);
+    };
+    labelPoint(P1, 'limit of proportionality', '#7a4a8f', 14);
+    labelPoint(P2, 'elastic limit', '#2e7d6b', -8);
+    labelPoint(P3, 'spring breaks', '#b8823d', 4);
 
     // live traced curve up to current extension
     const traced = curveRef.current.filter((p) => p.x <= xCm + 0.001);
@@ -328,7 +327,7 @@ export function SpringSimulator() {
 
     // technical overlay: gradient triangle in the linear region only
     if (a.showTechnical) {
-      const sampleX = A.x * 0.7;
+      const sampleX = P1.x * 0.7;
       const sampleF = forceAtExtension(curveRef.current, sampleX);
       const x0 = xForExt(0);
       const y0 = yForForce(0);
@@ -371,18 +370,18 @@ export function SpringSimulator() {
 
     setForceDisplay(forceN.toFixed(2));
     setExtensionDisplay(xCm.toFixed(1));
-    setRegionLabel(a.snapped ? 'Fractured' : regionFor(xCm));
+    setRegionLabel(a.snapped ? 'Broken' : regionFor(xCm));
   };
 
   const tick = () => {
     const a = animRef.current;
-    const { E } = keyPointsRef.current;
+    const { P3 } = keyPointsRef.current;
     const diff = a.targetExtension - a.currentExtension;
     a.velocity += diff * 55 * (1 / 60) - a.velocity * 7.5 * (1 / 60);
     a.currentExtension += a.velocity * (1 / 60);
 
-    if (a.currentExtension >= E.x) {
-      a.currentExtension = E.x;
+    if (a.currentExtension >= P3.x) {
+      a.currentExtension = P3.x;
       a.snapped = true;
       a.running = false;
       setSnapped(true);
@@ -465,9 +464,9 @@ export function SpringSimulator() {
   }, []);
 
   const variables = [
-    { symbol: 'F', name: 'Force (stress)', def: 'The pulling force applied to the spring, in newtons (N).' },
-    { symbol: 'x', name: 'Extension (strain)', def: 'How much longer the spring gets compared to its natural length, in cm.' },
-    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only in the straight-line (elastic) region \u2014 point A and before.' },
+    { symbol: 'F', name: 'Force (load)', def: 'The pulling force applied to the spring, in newtons (N).' },
+    { symbol: 'x', name: 'Extension', def: 'How much longer the spring gets compared to its natural length, in cm.' },
+    { symbol: 'k', name: 'Spring constant', def: 'k = F/x, but only up to the limit of proportionality — point P1 on the graph.' },
   ];
 
   return (
@@ -542,7 +541,7 @@ export function SpringSimulator() {
 
           {snapped && (
             <p className="text-[12px] text-[#b34a3c] font-medium mt-3">
-              💥 The spring exceeded its breaking point and snapped. Press Reset to fit a new one.
+              💥 Stretched thin and past its breaking point. Press Reset to fit a new spring.
             </p>
           )}
         </div>
@@ -572,13 +571,11 @@ export function SpringSimulator() {
         <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
           Reading the Curve
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-[12.5px] text-[#4a5a72]">
-          <p><b className="text-[#8f6428]">O → A:</b> Elastic region. Hooke&rsquo;s law holds: F = kx.</p>
-          <p><b className="text-[#8f6428]">B:</b> Yield point &mdash; permanent stretching begins.</p>
-          <p><b className="text-[#8f6428]">B → C:</b> Extends further with less force needed.</p>
-          <p><b className="text-[#8f6428]">C → D:</b> Strain hardening &mdash; force rises again.</p>
-          <p><b className="text-[#8f6428]">D:</b> Maximum force the spring can take.</p>
-          <p><b className="text-[#8f6428]">D → E:</b> Necking, weakening toward fracture at E.</p>
+        <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
+          <p><b style={{ color: '#3a6ea8' }}>Hooke&rsquo;s law region:</b> straight line through the origin. F = kx.</p>
+          <p><b style={{ color: '#7a4a8f' }}>Limit of proportionality:</b> the line stops being straight here.</p>
+          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded.</p>
+          <p><b style={{ color: '#b8823d' }}>Spring breaks:</b> extension keeps growing with barely any extra force, until it snaps.</p>
         </div>
       </div>
 
@@ -587,7 +584,7 @@ export function SpringSimulator() {
           F = k x
         </div>
         <div className="text-[12px] text-[#4a5a72] mt-2">
-          true only in the elastic region, up to the limit of proportionality (point A)
+          true only in the Hooke&rsquo;s law region, up to the limit of proportionality
         </div>
       </div>
 
