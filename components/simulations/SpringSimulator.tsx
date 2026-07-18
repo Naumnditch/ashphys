@@ -28,6 +28,7 @@ function buildKeyPoints(k: number): KeyPoints {
 const REFERENCE = buildKeyPoints(20);
 const FIXED_MAX_EXTENSION_CM = REFERENCE.P2.x * 3;
 const FIXED_MAX_FORCE = 14;
+const NATURAL_LENGTH_CM = 10; // nominal unstretched spring length, for the length readouts
 
 function cubicBezier(p0: Pt, c1: Pt, c2: Pt, p1: Pt, t: number): Pt {
   const mt = 1 - t;
@@ -110,9 +111,10 @@ function drawZigzagSpring(
   centerX: number,
   topY: number,
   length: number,
-  stressFraction: number
+  stressFraction: number,
+  straighten: number // 0 = full zigzag, 1 = nearly a straight wire
 ) {
-  const coilWidth = 15;
+  const coilWidth = 15 * (1 - straighten * 0.85);
   const turns = 9;
   const segH = length / (turns * 2);
 
@@ -129,21 +131,54 @@ function drawZigzagSpring(
   ctx.lineCap = 'round';
 
   ctx.strokeStyle = '#3d4653';
-  ctx.lineWidth = 7;
+  ctx.lineWidth = 7 - straighten * 3;
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
 
   const heatColor = lerpColor(HEAT_STOPS, stressFraction);
-  const grad = ctx.createLinearGradient(centerX - coilWidth, topY, centerX + coilWidth, topY);
+  const grad = ctx.createLinearGradient(centerX - 15, topY, centerX + 15, topY);
   grad.addColorStop(0, '#f2f0ea');
   grad.addColorStop(0.5, heatColor);
   grad.addColorStop(1, '#6b4a1c');
   ctx.strokeStyle = grad;
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 5 - straighten * 2.2;
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
   ctx.stroke();
+}
+
+function drawDimensionBracket(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  yTop: number,
+  yBottom: number,
+  label: string,
+  color: string
+) {
+  const tickW = 7;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.moveTo(x - tickW / 2, yTop);
+  ctx.lineTo(x + tickW / 2, yTop);
+  ctx.moveTo(x, yTop);
+  ctx.lineTo(x, yBottom);
+  ctx.moveTo(x - tickW / 2, yBottom);
+  ctx.lineTo(x + tickW / 2, yBottom);
+  ctx.stroke();
+
+  if (yBottom - yTop < 12) return;
+  const midY = (yTop + yBottom) / 2;
+  ctx.save();
+  ctx.translate(x + 5, midY);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = color;
+  ctx.font = '700 10px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(label, 0, 0);
+  ctx.restore();
+  ctx.textAlign = 'left';
 }
 
 export function SpringSimulator() {
@@ -215,11 +250,12 @@ export function SpringSimulator() {
     const permSet = permanentSetFor(a.maxExtensionEver, P2.x);
     const forceN = forceWithHysteresis(xCm);
     const stressFraction = Math.max(0, Math.min(1, xCm / FIXED_MAX_EXTENSION_CM));
+    const straighten = Math.max(0, Math.min(1, (xCm - P2.x) / Math.max(0.01, FIXED_MAX_EXTENSION_CM - P2.x)));
 
     // --- Spring panel (left) ---
-    const springAreaW = Math.min(180, w * 0.3);
+    const springAreaW = Math.min(220, w * 0.34);
     const ceilingY = 26;
-    const ceilingX = springAreaW / 2 + 10;
+    const ceilingX = springAreaW / 2 - 20;
     const restLenPx = 70;
     const maxSpringLenPx = 260;
     const pxPerCm = (maxSpringLenPx - restLenPx) / FIXED_MAX_EXTENSION_CM;
@@ -236,7 +272,17 @@ export function SpringSimulator() {
       ctx.stroke();
     }
 
-    drawZigzagSpring(ctx, ceilingX, ceilingY, springLenPx, stressFraction);
+    drawZigzagSpring(ctx, ceilingX, ceilingY, springLenPx, stressFraction, straighten);
+
+    // --- Dimension brackets: initial length (L0), extension (Δx), new length (L) ---
+    const restY = ceilingY + restLenPx;
+    const currentY = ceilingY + springLenPx;
+    const bracketX0 = ceilingX + 22;
+    drawDimensionBracket(ctx, bracketX0, ceilingY, restY, 'L₀', '#4a5a72');
+    if (xCm > 0.3) {
+      drawDimensionBracket(ctx, bracketX0 + 20, restY, currentY, 'Δx', '#b34a3c');
+    }
+    drawDimensionBracket(ctx, bracketX0 + 40, ceilingY, currentY, 'L', '#2e7d6b');
 
     const weightY = ceilingY + springLenPx + 10;
     const weightSize = 22;
@@ -568,18 +614,28 @@ export function SpringSimulator() {
         <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
           Readouts
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
           <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
             <div className="text-[11px] text-[#4a5a72] mb-1">Force applied</div>
-            <div className="font-mono text-xl font-bold">{forceDisplay} N</div>
+            <div className="font-mono text-lg font-bold">{forceDisplay} N</div>
           </div>
           <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Extension</div>
-            <div className="font-mono text-xl font-bold text-[#2e7d6b]">{extensionDisplay} cm</div>
+            <div className="text-[11px] text-[#4a5a72] mb-1">Initial length L₀</div>
+            <div className="font-mono text-lg font-bold text-[#4a5a72]">{NATURAL_LENGTH_CM.toFixed(1)} cm</div>
+          </div>
+          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+            <div className="text-[11px] text-[#4a5a72] mb-1">Extension Δx</div>
+            <div className="font-mono text-lg font-bold text-[#b34a3c]">{extensionDisplay} cm</div>
+          </div>
+          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
+            <div className="text-[11px] text-[#4a5a72] mb-1">New length L</div>
+            <div className="font-mono text-lg font-bold text-[#2e7d6b]">
+              {(NATURAL_LENGTH_CM + parseFloat(extensionDisplay)).toFixed(1)} cm
+            </div>
           </div>
           <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
             <div className="text-[11px] text-[#4a5a72] mb-1">Spring constant k</div>
-            <div className="font-mono text-xl font-bold text-[#b8823d]">{k} N/m</div>
+            <div className="font-mono text-lg font-bold text-[#b8823d]">{k} N/m</div>
           </div>
         </div>
       </div>
