@@ -48,7 +48,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg border">
           <h2 className="text-xl font-semibold mb-2">Chapters Completed</h2>
-          <p className="text-3xl font-bold text-blue-600">0 / 10</p>
+          <p className="text-3xl font-bold text-blue-600">0 / 20</p>
           <p className="text-gray-600 mt-2">Start learning physics today!</p>
         </div>
 
@@ -63,6 +63,21 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold text-purple-600">0h</p>
           <p className="text-gray-600 mt-2">Time spent learning</p>
         </div>
+      </div>
+
+      <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold mb-1">📖 Browse the Full Curriculum</h2>
+          <p className="text-gray-600 text-sm">
+            See all 20 units for the year and pick what you want to study.
+          </p>
+        </div>
+        <Link
+          href="/curriculum"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded font-medium whitespace-nowrap"
+        >
+          View Curriculum
+        </Link>
       </div>
 
       <div className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-200">

@@ -18,6 +18,7 @@ export function Navbar() {
         </div>
         <nav className="flex items-center gap-4">
           <Link className="text-sm hover:underline" href="/">Home</Link>
+          <Link className="text-sm hover:underline" href="/curriculum">Curriculum</Link>
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
