@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 const G = 9.8;
 const DAMPING = 0.12; // energy loss coefficient (air resistance + pivot friction)
 const TRAIL_SECONDS = 3.5;
+const FLASH_DURATION = 1.2; // seconds, how long the "lost distance" flash takes to fade
+const SETTLE_THRESHOLD_DEG = 0.2; // stop the clock once amplitude decays to this
 
 function theoreticalPeriod(L: number) {
   return 2 * Math.PI * Math.sqrt(L / G);
@@ -16,9 +18,16 @@ interface TrailPoint {
   t: number;
 }
 
+interface Flash {
+  startAngle: number; // canvas arc angle (radians)
+  endAngle: number;
+  createdAt: number; // s.elapsed at creation
+}
+
 export function PendulumSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<TrailPoint[]>([]);
+  const flashesRef = useRef<Flash[]>([]);
 
   const stateRef = useRef({
     length: 0.8,
@@ -32,6 +41,9 @@ export function PendulumSimulator() {
     lastSign: null as number | null,
     lastAngularVelSign: null as number | null,
     currentAmplitudeDeg: 15,
+    prevRightPeakDeg: null as number | null,
+    prevLeftPeakDeg: null as number | null,
+    settled: false,
   });
 
   const [length, setLength] = useState(0.8);
@@ -41,6 +53,7 @@ export function PendulumSimulator() {
   const [angleDisplay, setAngleDisplay] = useState('0.0');
   const [swingCount, setSwingCount] = useState(0);
   const [currentAmplitude, setCurrentAmplitude] = useState('15.0');
+  const [settled, setSettled] = useState(false);
 
   const theory = theoreticalPeriod(length);
 
@@ -55,11 +68,16 @@ export function PendulumSimulator() {
     s.lastSign = null;
     s.lastAngularVelSign = null;
     s.currentAmplitudeDeg = amplitude;
+    s.prevRightPeakDeg = amplitude; // pendulum always released from the right side
+    s.prevLeftPeakDeg = null;
+    s.settled = false;
     trailRef.current = [];
+    flashesRef.current = [];
     setIsRunning(false);
     setElapsedDisplay('0.00');
     setSwingCount(0);
     setCurrentAmplitude(amplitude.toFixed(1));
+    setSettled(false);
     draw();
   };
 
@@ -84,7 +102,7 @@ export function PendulumSimulator() {
     const bobX = pivotX + rodLen * Math.sin(s.angle);
     const bobY = pivotY + rodLen * Math.cos(s.angle);
 
-    // faint full-swing guide arc (based on original amplitude, for reference)
+    // faint full-swing guide arc (based on original release amplitude, for reference)
     const origAmpRad = (amplitude * Math.PI) / 180;
     ctx.strokeStyle = '#e9e1cd';
     ctx.setLineDash([3, 4]);
@@ -93,16 +111,28 @@ export function PendulumSimulator() {
     ctx.stroke();
     ctx.setLineDash([]);
 
+    // "lost distance" flashes — the arc no longer being reached, fading red
+    for (const flash of flashesRef.current) {
+      const age = s.elapsed - flash.createdAt;
+      const alpha = Math.max(0, 1 - age / FLASH_DURATION) * 0.85;
+      if (alpha <= 0.01) continue;
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, rodLen, flash.startAngle, flash.endAngle);
+      ctx.strokeStyle = `rgba(179, 74, 60, ${alpha})`;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+
     // motion trace (fading trail of recent bob positions)
     const trail = trailRef.current;
     for (let i = 1; i < trail.length; i++) {
       const age = s.elapsed - trail[i].t;
-      const alpha = Math.max(0, 1 - age / TRAIL_SECONDS) * 0.55;
-      if (alpha <= 0.01) continue;
+      const trailAlpha = Math.max(0, 1 - age / TRAIL_SECONDS) * 0.55;
+      if (trailAlpha <= 0.01) continue;
       ctx.beginPath();
       ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
       ctx.lineTo(trail[i].x, trail[i].y);
-      ctx.strokeStyle = `rgba(46, 125, 107, ${alpha})`;
+      ctx.strokeStyle = `rgba(46, 125, 107, ${trailAlpha})`;
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -159,13 +189,47 @@ export function PendulumSimulator() {
     }
     if (sign !== 0) s.lastSign = sign;
 
-    // capture amplitude at each turning point (where angular velocity changes sign)
+    // turning point (peak) detection — where angular velocity changes sign
     const velSign = Math.sign(s.angularVel);
     if (s.lastAngularVelSign !== null && velSign !== 0 && velSign !== s.lastAngularVelSign) {
-      s.currentAmplitudeDeg = Math.abs((s.angle * 180) / Math.PI);
-      setCurrentAmplitude(s.currentAmplitudeDeg.toFixed(1));
+      const peakDeg = Math.abs((s.angle * 180) / Math.PI);
+      const angleRad = Math.abs(s.angle);
+      s.currentAmplitudeDeg = peakDeg;
+      setCurrentAmplitude(peakDeg.toFixed(1));
+
+      if (s.angle > 0) {
+        // right-side peak
+        if (s.prevRightPeakDeg !== null && peakDeg < s.prevRightPeakDeg - 0.05) {
+          const prevRad = (s.prevRightPeakDeg * Math.PI) / 180;
+          flashesRef.current.push({
+            startAngle: Math.PI / 2 - prevRad,
+            endAngle: Math.PI / 2 - angleRad,
+            createdAt: s.elapsed,
+          });
+        }
+        s.prevRightPeakDeg = peakDeg;
+      } else if (s.angle < 0) {
+        // left-side peak
+        if (s.prevLeftPeakDeg !== null && peakDeg < s.prevLeftPeakDeg - 0.05) {
+          const prevRad = (s.prevLeftPeakDeg * Math.PI) / 180;
+          flashesRef.current.push({
+            startAngle: Math.PI / 2 + angleRad,
+            endAngle: Math.PI / 2 + prevRad,
+            createdAt: s.elapsed,
+          });
+        }
+        s.prevLeftPeakDeg = peakDeg;
+      }
+
+      // has the pendulum effectively settled?
+      if (peakDeg <= SETTLE_THRESHOLD_DEG) {
+        s.settled = true;
+      }
     }
     if (velSign !== 0) s.lastAngularVelSign = velSign;
+
+    // prune old flashes
+    flashesRef.current = flashesRef.current.filter((f) => s.elapsed - f.createdAt < FLASH_DURATION);
 
     // record trail point in canvas space
     const canvas = canvasRef.current;
@@ -183,11 +247,29 @@ export function PendulumSimulator() {
 
     setElapsedDisplay(s.elapsed.toFixed(2));
     draw();
+
+    if (s.settled) {
+      // pendulum has come to rest — stop the clock and the loop
+      s.running = false;
+      setIsRunning(false);
+      setSettled(true);
+      return;
+    }
+
     if (s.running) requestAnimationFrame(step);
   };
 
   const handlePlayPause = () => {
     const s = stateRef.current;
+    if (s.settled) {
+      // fully re-release rather than resume a spent swing
+      resetPendulum();
+      s.running = true;
+      s.lastTime = null;
+      setIsRunning(true);
+      requestAnimationFrame(step);
+      return;
+    }
     if (s.running) {
       s.running = false;
       setIsRunning(false);
@@ -228,6 +310,7 @@ export function PendulumSimulator() {
     window.addEventListener('resize', resize);
 
     stateRef.current.angle = (amplitude * Math.PI) / 180;
+    stateRef.current.prevRightPeakDeg = amplitude;
     draw();
 
     return () => window.removeEventListener('resize', resize);
@@ -257,8 +340,14 @@ export function PendulumSimulator() {
 
           <div className="px-4 pb-2 -mt-1">
             <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-              The teal trail shows the bob&rsquo;s recent path. Watch it shrink over time as the swing loses
-              energy to air resistance and friction at the pivot &mdash; a real pendulum never swings forever.
+              <span className="text-[#2e7d6b] font-semibold">Teal trail</span> = the bob&rsquo;s recent path.{' '}
+              <span className="text-[#b34a3c] font-semibold">Red flash</span> = the distance it no longer
+              reaches compared to its last swing on that side.
+              {settled && (
+                <span className="block mt-1 text-[#1b2a41] font-semibold">
+                  ✓ Settled — the pendulum has come to rest. Elapsed time stopped.
+                </span>
+              )}
             </p>
           </div>
 
@@ -294,7 +383,7 @@ export function PendulumSimulator() {
                 onClick={handlePlayPause}
                 className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
               >
-                {isRunning ? '⏸ Pause' : '▶ Release'}
+                {settled ? '↻ Release Again' : isRunning ? '⏸ Pause' : '▶ Release'}
               </button>
               <button
                 onClick={resetPendulum}
@@ -313,7 +402,9 @@ export function PendulumSimulator() {
           </h2>
           <div className="grid grid-cols-2 gap-2.5 mb-4">
             <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Elapsed time</div>
+              <div className="text-[11px] text-[#4a5a72] mb-1">
+                Elapsed time {settled && <span className="text-[#b34a3c]">(stopped)</span>}
+              </div>
               <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
             </div>
             <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
