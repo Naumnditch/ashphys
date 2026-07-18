@@ -25,10 +25,14 @@ async function getChaptersWithTopics(): Promise<ChapterRow[]> {
     const topicsResult = await query(
       `SELECT id, chapter_id, topic_name, "order" FROM topics ORDER BY chapter_id, "order" ASC`
     );
+    const simsResult = await query(`SELECT topic_id FROM simulations WHERE topic_id IS NOT NULL`);
+    const simTopicIds = new Set(simsResult.rows.map((r: any) => r.topic_id));
 
     return chaptersResult.rows.map((ch: any) => ({
       ...ch,
-      topics: topicsResult.rows.filter((t: any) => t.chapter_id === ch.id),
+      topics: topicsResult.rows
+        .filter((t: any) => t.chapter_id === ch.id)
+        .map((t: any) => ({ ...t, hasSimulation: simTopicIds.has(t.id) })),
     }));
   } catch (err) {
     console.error('Failed to load curriculum:', err);
@@ -66,13 +70,16 @@ export default async function CurriculumPage() {
             </Link>
             {chapter.topics.length > 0 && (
               <ul className="divide-y divide-gray-100">
-                {chapter.topics.map((topic) => (
+                {chapter.topics.map((topic: any) => (
                   <li key={topic.id}>
                     <Link
                       href={`/curriculum/${chapter.id}#topic-${topic.id}`}
-                      className="block px-5 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                      className="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
                     >
-                      {topic.topic_name}
+                      <span>{topic.topic_name}</span>
+                      {topic.hasSimulation && (
+                        <span className="text-xs text-blue-600 font-medium flex-shrink-0 ml-2">🧪 Simulation</span>
+                      )}
                     </Link>
                   </li>
                 ))}

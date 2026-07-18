@@ -17,6 +17,13 @@ interface TopicRow {
   order: number;
 }
 
+interface SimRow {
+  id: string;
+  topic_id: string | null;
+  title: string;
+  url_path: string;
+}
+
 async function getChapter(id: string): Promise<ChapterDetail | null> {
   try {
     const result = await query(
@@ -34,6 +41,18 @@ async function getTopics(chapterId: string): Promise<TopicRow[]> {
   try {
     const result = await query(
       `SELECT id, topic_name, "order" FROM topics WHERE chapter_id = $1 ORDER BY "order" ASC`,
+      [chapterId]
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
+
+async function getSimulations(chapterId: string): Promise<SimRow[]> {
+  try {
+    const result = await query(
+      `SELECT id, topic_id, title, url_path FROM simulations WHERE chapter_id = $1`,
       [chapterId]
     );
     return result.rows;
@@ -60,10 +79,13 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
   const chapter = await getChapter(params.chapterId);
   if (!chapter) notFound();
 
-  const [topics, { prev, next }] = await Promise.all([
+  const [topics, simulations, { prev, next }] = await Promise.all([
     getTopics(chapter.id),
+    getSimulations(chapter.id),
     getAdjacentChapters(chapter.chapter_number),
   ]);
+
+  const simByTopic = new Map(simulations.filter((s) => s.topic_id).map((s) => [s.topic_id, s]));
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -85,11 +107,26 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
             Lessons in this chapter
           </h2>
           <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
-            {topics.map((topic) => (
-              <li key={topic.id} id={`topic-${topic.id}`} className="px-4 py-3 scroll-mt-24">
-                <span className="text-gray-800">{topic.topic_name}</span>
-              </li>
-            ))}
+            {topics.map((topic) => {
+              const sim = simByTopic.get(topic.id);
+              return (
+                <li
+                  key={topic.id}
+                  id={`topic-${topic.id}`}
+                  className="px-4 py-3 scroll-mt-24 flex items-center justify-between gap-3"
+                >
+                  <span className="text-gray-800">{topic.topic_name}</span>
+                  {sim && (
+                    <Link
+                      href={sim.url_path}
+                      className="flex-shrink-0 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap"
+                    >
+                      🧪 Launch Simulation
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
