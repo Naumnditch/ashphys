@@ -6,10 +6,14 @@ import { CopyCodeButton } from '@/components/teacher/CopyCodeButton';
 
 export const dynamic = 'force-dynamic';
 
-async function getSection(sectionId: string, teacherId: string) {
+async function getSection(sectionId: string) {
   const result = await query(
-    `SELECT id, name, join_code, created_at FROM sections WHERE id = $1 AND teacher_id = $2`,
-    [sectionId, teacherId]
+    `SELECT s.id, s.name, s.join_code, s.created_at, s.teacher_id,
+            t.first_name as teacher_first_name, t.last_name as teacher_last_name
+     FROM sections s
+     JOIN users t ON t.id = s.teacher_id
+     WHERE s.id = $1`,
+    [sectionId]
   );
   return result.rows[0] || null;
 }
@@ -29,18 +33,25 @@ async function getRoster(sectionId: string) {
 export default async function SectionDetailPage({ params }: { params: { sectionId: string } }) {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login');
-  if (user.role !== 'teacher') redirect('/dashboard');
-  if (user.status !== 'active') redirect('/teacher/pending');
+  if (user.role !== 'teacher' && user.role !== 'admin') redirect('/dashboard');
+  if (user.role === 'teacher' && user.status !== 'active') redirect('/teacher/pending');
 
-  const section = await getSection(params.sectionId, user.id);
+  const section = await getSection(params.sectionId);
   if (!section) notFound();
 
+  // Teachers may only view their own sections; admins may view any.
+  if (user.role === 'teacher' && section.teacher_id !== user.id) redirect('/teacher/dashboard');
+
+  const isAdminView = user.role === 'admin';
   const roster = await getRoster(section.id);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <Link href="/teacher/dashboard" className="text-sm text-blue-600 hover:underline mb-6 inline-block">
-        ← Back to Dashboard
+      <Link
+        href={isAdminView ? '/admin/sections' : '/teacher/dashboard'}
+        className="text-sm text-blue-600 hover:underline mb-6 inline-block"
+      >
+        ← Back to {isAdminView ? 'Sections' : 'Dashboard'}
       </Link>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -48,6 +59,12 @@ export default async function SectionDetailPage({ params }: { params: { sectionI
           <h1 className="text-2xl font-bold text-gray-900">{section.name}</h1>
           <p className="text-gray-500 text-sm mt-1">
             {roster.length} student{roster.length === 1 ? '' : 's'} enrolled
+            {isAdminView && (
+              <span>
+                {' '}
+                · taught by {section.teacher_first_name} {section.teacher_last_name}
+              </span>
+            )}
           </p>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg px-4 py-3 flex items-center gap-3">

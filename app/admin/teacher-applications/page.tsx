@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth/session';
 import { query } from '@/lib/db/client';
 import { ApplicationActions } from '@/components/admin/ApplicationActions';
 
@@ -21,10 +19,6 @@ async function getActiveTeacherCount() {
 }
 
 export default async function TeacherApplicationsPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect('/auth/login');
-  if (user.role !== 'admin') redirect('/dashboard');
-
   const [applications, activeTeacherCount] = await Promise.all([
     getPendingApplications(),
     getActiveTeacherCount(),
