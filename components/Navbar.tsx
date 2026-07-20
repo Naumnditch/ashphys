@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { query } from '@/lib/db/client';
 import { CurriculumDropdown } from './CurriculumDropdown';
+import { getCurrentUser } from '@/lib/auth/session';
 
 async function getChapters() {
   try {
@@ -15,8 +16,14 @@ async function getChapters() {
   }
 }
 
+function dashboardHref(user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>) {
+  if (user.role === 'admin') return '/admin/teacher-applications';
+  if (user.role === 'teacher') return user.status === 'active' ? '/teacher/dashboard' : '/teacher/pending';
+  return '/dashboard';
+}
+
 export async function Navbar() {
-  const chapters = await getChapters();
+  const [chapters, user] = await Promise.all([getChapters(), getCurrentUser()]);
 
   return (
     <header className="border-b border-gray-200">
@@ -38,8 +45,16 @@ export async function Navbar() {
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
-          <Link className="text-sm hover:underline text-blue-600 font-medium" href="/auth/login">Sign In</Link>
-          <Link className="btn btn-primary text-sm" href="/auth/signup">Sign Up</Link>
+          {user ? (
+            <Link className="btn btn-primary text-sm" href={dashboardHref(user)}>
+              {user.role === 'admin' ? 'Admin' : 'Dashboard'}
+            </Link>
+          ) : (
+            <>
+              <Link className="text-sm hover:underline text-blue-600 font-medium" href="/auth/login">Sign In</Link>
+              <Link className="btn btn-primary text-sm" href="/auth/signup">Sign Up</Link>
+            </>
+          )}
           <Link className="btn btn-primary text-sm" href="/book">Book Now</Link>
         </nav>
       </div>

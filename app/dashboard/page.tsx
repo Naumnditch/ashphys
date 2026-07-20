@@ -20,7 +20,12 @@ export default function DashboardPage() {
     setLoading(false);
   }, [router]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // proceed with client-side cleanup regardless
+    }
     localStorage.removeItem('token');
     router.push('/');
   };
@@ -65,19 +70,36 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold mb-1">📖 Browse the Full Curriculum</h2>
-          <p className="text-gray-600 text-sm">
-            See all 20 units for the year and pick what you want to study.
-          </p>
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-semibold mb-1">📖 Browse the Curriculum</h2>
+            <p className="text-gray-600 text-sm">
+              See all 25 chapters and pick what you want to study.
+            </p>
+          </div>
+          <Link
+            href="/curriculum"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded font-medium mt-4 text-center"
+          >
+            View Curriculum
+          </Link>
         </div>
-        <Link
-          href="/curriculum"
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded font-medium whitespace-nowrap"
-        >
-          View Curriculum
-        </Link>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="text-xl font-semibold mb-1">🏫 Join a Class</h2>
+            <p className="text-gray-600 text-sm">
+              Have a join code from your teacher? Enter it to join their class.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/join-class"
+            className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded font-medium mt-4 text-center"
+          >
+            Enter Join Code
+          </Link>
+        </div>
       </div>
 
       <div className="mt-8 bg-blue-50 p-6 rounded-lg border border-blue-200">

@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,13 +38,18 @@ export default function LoginPage() {
         return;
       }
 
-      // Save token to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', data.data.token);
       }
-      
-      // Redirect to dashboard
-      router.push('/dashboard');
+
+      const { role, status } = data.data;
+      if (role === 'admin') {
+        router.push('/admin/teacher-applications');
+      } else if (role === 'teacher') {
+        router.push(status === 'active' ? '/teacher/dashboard' : '/teacher/pending');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (err) {
       setError('An error occurred. Please try again.');
       setLoading(false);
@@ -102,7 +107,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don&rsquo;t have an account?{' '}
           <Link href="/auth/signup" className="text-blue-600 hover:underline">
             Sign up here
           </Link>

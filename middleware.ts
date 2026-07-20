@@ -11,7 +11,7 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Only protect these route prefixes
-  const protectedPrefixes = ['/teacher'];
+  const protectedPrefixes = ['/teacher', '/admin'];
 
   const needsAuth = protectedPrefixes.some((route) => pathname.startsWith(route));
 
@@ -29,5 +29,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/teacher/:path*'],
+  matcher: ['/teacher/:path*', '/admin/:path*'],
 };
