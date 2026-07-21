@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-21
+Last updated: 2026-07-21 (homepage rebrand)
 
 ---
 
@@ -22,6 +22,13 @@ Last updated: 2026-07-21
 
 ## What's fully built and live
 
+- **Homepage / positioning**: platform-first, not tutoring-first. Markets
+  AshPhys as the only place needed to study physics, across IGCSE (marked
+  "Available Now" — the only one with real content), IB and HMH (marked
+  "Coming Soon" — honest, not yet built). Live stats and pricing tiers
+  pulled from the DB, not hardcoded. Private tutoring is now a Pro-tier
+  subscription perk, not a standalone headline CTA — `/book` still works,
+  just isn't featured in the navbar anymore.
 - **Curriculum**: 25 chapters, 89 lessons, matching the real Cambridge IGCSE
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
