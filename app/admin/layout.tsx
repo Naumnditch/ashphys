@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/session';
 import { AdminNav } from '@/components/admin/AdminNav';
+import { LogoutButton } from '@/components/LogoutButton';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -16,6 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Admin Portal</span>
               <p className="text-sm text-gray-600">Signed in as {user.firstName} {user.lastName}</p>
             </div>
+            <LogoutButton className="text-sm font-medium text-gray-500 hover:text-red-600 border border-gray-300 hover:border-red-300 rounded-lg px-3.5 py-2 transition-colors" />
           </div>
           <AdminNav />
         </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { query } from '@/lib/db/client';
+import { SimulationIcon } from '@/components/icons/SimulationIcon';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,7 +79,9 @@ export default async function CurriculumPage() {
                     >
                       <span>{topic.topic_name}</span>
                       {topic.hasSimulation && (
-                        <span className="text-xs text-blue-600 font-medium flex-shrink-0 ml-2">🧪 Simulation</span>
+                        <span className="text-xs text-blue-600 font-medium flex-shrink-0 ml-2 flex items-center gap-1">
+                          <SimulationIcon className="w-3.5 h-3.5" /> Simulation
+                        </span>
                       )}
                     </Link>
                   </li>

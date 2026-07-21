@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { query } from '@/lib/db/client';
+import { SimulationIcon } from '@/components/icons/SimulationIcon';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,9 +120,9 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
                   {sim && (
                     <Link
                       href={sim.url_path}
-                      className="flex-shrink-0 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap"
+                      className="flex-shrink-0 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1.5"
                     >
-                      🧪 Launch Simulation
+                      <SimulationIcon className="w-3.5 h-3.5" /> Launch Simulation
                     </Link>
                   )}
                 </li>

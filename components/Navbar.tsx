@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { query } from '@/lib/db/client';
 import { CurriculumDropdown } from './CurriculumDropdown';
+import { SearchBar } from './SearchBar';
 import { getCurrentUser } from '@/lib/auth/session';
 
 async function getChapters() {
@@ -45,6 +46,7 @@ export async function Navbar() {
           <Link className="text-sm hover:underline" href="/about">About Us</Link>
           <Link className="text-sm hover:underline" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline" href="/contact">Contact</Link>
+          <SearchBar />
           {user ? (
             <Link className="btn btn-primary text-sm" href={dashboardHref(user)}>
               {user.role === 'admin' ? 'Admin' : 'Dashboard'}

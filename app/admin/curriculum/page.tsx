@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { query } from '@/lib/db/client';
+import { SimulationIcon } from '@/components/icons/SimulationIcon';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,7 +76,9 @@ export default async function AdminCurriculumPage() {
               <div className="flex items-center gap-3 flex-shrink-0 text-xs text-gray-400">
                 <span>{c.topic_count} lessons</span>
                 {parseInt(c.simulation_count, 10) > 0 && (
-                  <span className="text-blue-600 font-medium">🧪 {c.simulation_count}</span>
+                  <span className="text-blue-600 font-medium flex items-center gap-1">
+                    <SimulationIcon className="w-3.5 h-3.5" /> {c.simulation_count}
+                  </span>
                 )}
               </div>
             </Link>
