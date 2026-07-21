@@ -1,0 +1,139 @@
+/**
+ * POST /api/practice/[topicId]/submit
+ * Body: { problemId: string, submittedAnswer: string }
+ *
+ * Grades the answer, records the submission, and updates the
+ * student's mastery streak for this topic (IXL-style: a streak of
+ * MASTERY_STREAK correct answers in a row marks the topic mastered;
+ * a wrong answer resets the streak to 0).
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth/session';
+import { query } from '@/lib/db/client';
+
+const MASTERY_STREAK = 5;
+const NUMERIC_TOLERANCE = 0.02; // 2% relative tolerance for numeric answers
+
+export async function POST(req: NextRequest, { params }: { params: { topicId: string } }) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ success: false, error: 'Please log in first' }, { status: 401 });
+  }
+
+  const { problemId, submittedAnswer } = await req.json();
+  if (!problemId || submittedAnswer === undefined || submittedAnswer === null) {
+    return NextResponse.json({ success: false, error: 'Missing answer' }, { status: 400 });
+  }
+
+  const problemResult = await query(
+    `SELECT id, answer_type, answer_correct, explanation FROM problems WHERE id = $1 AND topic_id = $2`,
+    [problemId, params.topicId]
+  );
+  if (problemResult.rows.length === 0) {
+    return NextResponse.json({ success: false, error: 'Question not found' }, { status: 404 });
+  }
+  const problem = problemResult.rows[0];
+
+  let isCorrect = false;
+  let correctAnswerLabel = problem.answer_correct;
+
+  if (problem.answer_type === 'multiple_choice') {
+    const correctOption = await query(
+      `SELECT id, option_text FROM problem_options WHERE problem_id = $1 AND is_correct = TRUE LIMIT 1`,
+      [problemId]
+    );
+    if (correctOption.rows.length > 0) {
+      isCorrect = String(submittedAnswer) === String(correctOption.rows[0].id);
+      correctAnswerLabel = correctOption.rows[0].option_text;
+    }
+  } else if (problem.answer_type === 'numeric') {
+    const correctNum = parseFloat(problem.answer_correct);
+    const submittedNum = parseFloat(submittedAnswer);
+    if (!isNaN(correctNum) && !isNaN(submittedNum)) {
+      const tolerance = Math.max(Math.abs(correctNum) * NUMERIC_TOLERANCE, 0.001);
+      isCorrect = Math.abs(correctNum - submittedNum) <= tolerance;
+    }
+  } else {
+    isCorrect = String(submittedAnswer).trim().toLowerCase() === String(problem.answer_correct).trim().toLowerCase();
+  }
+
+  await query(
+    `INSERT INTO problem_submissions (student_id, problem_id, submitted_answer, is_correct, points_earned)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [user.id, problemId, String(submittedAnswer), isCorrect, isCorrect ? 1 : 0]
+  );
+
+  const existing = await query(
+    `SELECT correct_streak, best_streak, total_attempted, total_correct, mastered
+     FROM topic_mastery WHERE student_id = $1 AND topic_id = $2`,
+    [user.id, params.topicId]
+  );
+
+  let newStreak: number;
+  let bestStreak: number;
+  let totalAttempted: number;
+  let totalCorrect: number;
+
+  if (existing.rows.length === 0) {
+    newStreak = isCorrect ? 1 : 0;
+    bestStreak = newStreak;
+    totalAttempted = 1;
+    totalCorrect = isCorrect ? 1 : 0;
+    await query(
+      `INSERT INTO topic_mastery (student_id, topic_id, correct_streak, best_streak, total_attempted, total_correct, mastered, mastered_at, last_practiced_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+      [
+        user.id,
+        params.topicId,
+        newStreak,
+        bestStreak,
+        totalAttempted,
+        totalCorrect,
+        newStreak >= MASTERY_STREAK,
+        newStreak >= MASTERY_STREAK ? new Date() : null,
+      ]
+    );
+  } else {
+    const prev = existing.rows[0];
+    newStreak = isCorrect ? prev.correct_streak + 1 : 0;
+    bestStreak = Math.max(prev.best_streak, newStreak);
+    totalAttempted = prev.total_attempted + 1;
+    totalCorrect = prev.total_correct + (isCorrect ? 1 : 0);
+    const justMastered = !prev.mastered && newStreak >= MASTERY_STREAK;
+
+    await query(
+      `UPDATE topic_mastery
+       SET correct_streak = $1, best_streak = $2, total_attempted = $3, total_correct = $4,
+           mastered = $5, mastered_at = COALESCE(mastered_at, $6), last_practiced_at = NOW(), updated_at = NOW()
+       WHERE student_id = $7 AND topic_id = $8`,
+      [
+        newStreak,
+        bestStreak,
+        totalAttempted,
+        totalCorrect,
+        newStreak >= MASTERY_STREAK || prev.mastered,
+        justMastered ? new Date() : null,
+        user.id,
+        params.topicId,
+      ]
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    data: {
+      isCorrect,
+      correctAnswerLabel,
+      explanation: problem.explanation,
+      mastery: {
+        correctStreak: newStreak,
+        bestStreak,
+        totalAttempted,
+        totalCorrect,
+        mastered: newStreak >= MASTERY_STREAK,
+        streakNeeded: MASTERY_STREAK,
+      },
+    },
+  });
+}

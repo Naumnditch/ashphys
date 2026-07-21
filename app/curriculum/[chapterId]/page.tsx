@@ -62,6 +62,18 @@ async function getSimulations(chapterId: string): Promise<SimRow[]> {
   }
 }
 
+async function getTopicsWithPractice(chapterId: string): Promise<Set<string>> {
+  try {
+    const result = await query(
+      `SELECT DISTINCT topic_id FROM problems WHERE chapter_id = $1 AND topic_id IS NOT NULL`,
+      [chapterId]
+    );
+    return new Set(result.rows.map((r: any) => r.topic_id));
+  } catch {
+    return new Set();
+  }
+}
+
 async function getAdjacentChapters(chapterNumber: number) {
   try {
     const result = await query(
@@ -80,9 +92,10 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
   const chapter = await getChapter(params.chapterId);
   if (!chapter) notFound();
 
-  const [topics, simulations, { prev, next }] = await Promise.all([
+  const [topics, simulations, topicsWithPractice, { prev, next }] = await Promise.all([
     getTopics(chapter.id),
     getSimulations(chapter.id),
+    getTopicsWithPractice(chapter.id),
     getAdjacentChapters(chapter.chapter_number),
   ]);
 
@@ -110,6 +123,7 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
           <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
             {topics.map((topic) => {
               const sim = simByTopic.get(topic.id);
+              const hasPractice = topicsWithPractice.has(topic.id);
               return (
                 <li
                   key={topic.id}
@@ -117,14 +131,24 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
                   className="px-4 py-3 scroll-mt-24 flex items-center justify-between gap-3"
                 >
                   <span className="text-gray-800">{topic.topic_name}</span>
-                  {sim && (
-                    <Link
-                      href={sim.url_path}
-                      className="flex-shrink-0 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1.5"
-                    >
-                      <SimulationIcon className="w-3.5 h-3.5" /> Launch Simulation
-                    </Link>
-                  )}
+                  <span className="flex-shrink-0 flex items-center gap-2">
+                    {hasPractice && (
+                      <Link
+                        href={`/practice/${topic.id}`}
+                        className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-full whitespace-nowrap"
+                      >
+                        🎯 Practice
+                      </Link>
+                    )}
+                    {sim && (
+                      <Link
+                        href={sim.url_path}
+                        className="text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1.5"
+                      >
+                        <SimulationIcon className="w-3.5 h-3.5" /> Launch Simulation
+                      </Link>
+                    )}
+                  </span>
                 </li>
               );
             })}
@@ -132,10 +156,12 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
         </div>
       )}
 
-      <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 text-center mb-8">
-        <p className="text-gray-700 font-medium mb-1">📹 Video lessons & practice problems coming soon</p>
-        <p className="text-sm text-gray-500">Your teacher is preparing content for this chapter.</p>
-      </div>
+      {simulations.length === 0 && topicsWithPractice.size === 0 && (
+        <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 text-center mb-8">
+          <p className="text-gray-700 font-medium mb-1">📹 Video lessons & practice problems coming soon</p>
+          <p className="text-sm text-gray-500">Your teacher is preparing content for this chapter.</p>
+        </div>
+      )}
 
       <div className="flex justify-between items-center border-t pt-4">
         {prev ? (
