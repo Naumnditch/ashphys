@@ -57,7 +57,6 @@ export async function Navbar() {
               <Link className="btn btn-primary text-sm" href="/auth/signup">Sign Up</Link>
             </>
           )}
-          <Link className="btn btn-primary text-sm" href="/book">Book Now</Link>
         </nav>
       </div>
     </header>
