@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-21 (homepage rebrand)
+Last updated: 2026-07-23 (refraction/TIR simulation)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-21 (homepage rebrand)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **6 interactive simulations**, each a real physics engine (not a canned
+- **7 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -43,10 +43,17 @@ Last updated: 2026-07-21 (homepage rebrand)
   - `/simulations/ohms-law` — circuit with animated current flow, V-I graph
   - `/simulations/circuit-builder` — real nodal-analysis solver (Gaussian
     elimination), grid-based drag-and-place circuit sandbox
+  - `/simulations/refraction` — optics bench for 13.2/13.3: live Snell's law,
+    draggable ray box on a protractor, Fresnel intensity split (reflected ray
+    brightens toward the critical angle), animated wavefronts that slow and
+    compress in the denser medium, and a record-your-own sin i vs sin r plot
+    that fits n from the gradient. Registered under topic 13.2; enum
+    `sim_type` gained an 'optics' value (migration add_optics_sim_type).
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
   question, streak-based mastery (5 correct in a row), wrong answers surface
-  a "revise this" link back to the lesson + its simulation. 30 original
-  practice questions seeded across 6 lessons (the ones with simulations).
+  a "revise this" link back to the lesson + its simulation. 40 original
+  practice questions seeded across 8 lessons — 5 each for the 6 original
+  sim lessons plus 5 for 13.2 (refraction) and 5 for 13.3 (TIR).
   Green "🎯 Practice" button appears on chapter pages for lessons that have
   questions.
 - **Teacher accounts**: signup requires school name + message, starts
