@@ -3,6 +3,7 @@ import { query } from '@/lib/db/client';
 import { Reveal } from '@/components/home/Reveal';
 import { AnimatedCounter } from '@/components/home/AnimatedCounter';
 import { PhysicsBackground } from '@/components/home/PhysicsBackground';
+import { FloatingFormulas } from '@/components/home/FloatingFormulas';
 
 export const dynamic = 'force-dynamic';
 
@@ -100,6 +101,7 @@ export default async function HomePage() {
           aria-hidden="true"
         />
         <PhysicsBackground />
+        <FloatingFormulas />
 
         <div className="relative text-center max-w-3xl mx-auto px-4 pt-16 pb-14">
           <div

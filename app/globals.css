@@ -91,9 +91,23 @@ body {
   to   { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
 }
 
+@keyframes driftD {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(-16px, -18px) rotate(-5deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+@keyframes driftE {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(22px, 10px) rotate(7deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
 .animate-drift-a { animation: driftA 14s ease-in-out infinite; }
 .animate-drift-b { animation: driftB 17s ease-in-out infinite; }
 .animate-drift-c { animation: driftC 12s ease-in-out infinite; }
+.animate-drift-d { animation: driftD 16s ease-in-out infinite; }
+.animate-drift-e { animation: driftE 13s ease-in-out infinite; }
 .animate-spin-slow { animation: spinSlow 22s linear infinite; }
 .animate-spin-slower { animation: spinSlow 34s linear infinite reverse; }
 
