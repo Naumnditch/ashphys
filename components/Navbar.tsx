@@ -40,21 +40,21 @@ export async function Navbar() {
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black" style={{ width: '2.7px', height: '10px' }}></div>
           </div>
         </div>
-        <nav className="flex items-center gap-4">
-          <Link className="text-sm hover:underline" href="/">Home</Link>
+        <nav className="flex items-center gap-3 sm:gap-4">
+          <Link className="text-sm hover:underline hidden lg:inline-block" href="/">Home</Link>
           <CurriculumDropdown chapters={chapters} />
-          <Link className="text-sm hover:underline" href="/about">About Us</Link>
-          <Link className="text-sm hover:underline" href="/resources">Resources</Link>
-          <Link className="text-sm hover:underline" href="/contact">Contact</Link>
+          <Link className="text-sm hover:underline hidden lg:inline-block" href="/about">About Us</Link>
+          <Link className="text-sm hover:underline hidden xl:inline-block" href="/resources">Resources</Link>
+          <Link className="text-sm hover:underline hidden xl:inline-block" href="/contact">Contact</Link>
           <SearchBar />
           {user ? (
-            <Link className="btn btn-primary text-sm" href={dashboardHref(user)}>
+            <Link className="btn btn-primary text-sm whitespace-nowrap" href={dashboardHref(user)}>
               {user.role === 'admin' ? 'Admin' : 'Dashboard'}
             </Link>
           ) : (
             <>
-              <Link className="text-sm hover:underline text-blue-600 font-medium" href="/auth/login">Sign In</Link>
-              <Link className="btn btn-primary text-sm" href="/auth/signup">Sign Up</Link>
+              <Link className="text-sm hover:underline text-blue-600 font-medium whitespace-nowrap" href="/auth/login">Sign In</Link>
+              <Link className="btn btn-primary text-sm whitespace-nowrap" href="/auth/signup">Sign Up</Link>
             </>
           )}
         </nav>
