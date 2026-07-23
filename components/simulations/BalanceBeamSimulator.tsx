@@ -549,9 +549,10 @@ export function BalanceBeamSimulator() {
   const hasUnknown = ledger.some((r) => r.moment === null);
 
   const variables = [
-    { symbol: 'M', name: 'Moment', def: 'The turning effect of a force: moment = force × perpendicular distance from the pivot, in N·m.' },
-    { symbol: 'F', name: 'Force', def: 'Here, the weight of each load: F = m·g, with g = 9.8 N/kg.' },
-    { symbol: 'd', name: 'Distance', def: 'Measured from the pivot to the line of the force, in metres.' },
+    { symbol: 'M', name: 'Moment', def: 'The turning effect of a force about the pivot, in newton-metres (N·m).' },
+    { symbol: 'F', name: 'Force', def: 'Here, the weight of each load: F = m·g, with g = 9.8 N/kg. Measured in newtons (N).' },
+    { symbol: 'd', name: 'Perpendicular distance', def: 'From the pivot to the line of action of the force, in metres (m). The ledger lists d for every load.' },
+    { symbol: 'Σ', name: 'Sum of', def: 'Add up every moment on that side of the pivot. When the two sums are equal, there is no resultant turning effect — the beam is in equilibrium.' },
   ];
 
   return (
@@ -728,11 +729,27 @@ export function BalanceBeamSimulator() {
           )}
 
           <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Variables</span>
-            <div className="mt-2 space-y-2">
+            <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
+              <div className="italic text-[21px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+                M = F × d
+              </div>
+              <div className="italic text-[15px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+                Σ clockwise moments = Σ anticlockwise moments
+              </div>
+              <div className="text-[10.5px] text-[#4a5a72] mt-1 not-italic font-sans">(for an object in equilibrium)</div>
+            </div>
+            <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+              What Each Variable Means
+            </h2>
+            <div className="space-y-2.5">
               {variables.map((v) => (
-                <div key={v.symbol} className="flex gap-3">
-                  <span className="font-serif italic font-bold text-[15px] text-[#1b2a41] w-5 flex-shrink-0">{v.symbol}</span>
+                <div key={v.symbol} className="flex gap-3 items-start">
+                  <div
+                    className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    {v.symbol}
+                  </div>
                   <p className="text-[12px] text-[#4a5a72] leading-snug">
                     <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
                   </p>
