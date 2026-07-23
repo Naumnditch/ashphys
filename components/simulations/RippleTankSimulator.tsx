@@ -156,11 +156,17 @@ export function RippleTankSimulator() {
   const stepPhysics = () => {
     const s = simRef.current;
     const f = fieldRef.current;
-    const { u, uPrev, c2, wall, damp } = f;
+    const { c2, wall, damp } = f; // static per scene — never swapped
 
     for (let sub = 0; sub < STEPS_PER_FRAME; sub++) {
       timeRef.current += 1 / STEPS_PER_SEC;
       const t = timeRef.current;
+
+      // IMPORTANT: read u/uPrev fresh each substep — they swap below, and a
+      // stale local alias here freezes the whole field (the dipper blinks,
+      // nothing propagates)
+      const u = f.u;
+      const uPrev = f.uPrev;
 
       // leapfrog update: uNext overwrites uPrev in place, then swap
       for (let y = 1; y < GH - 1; y++) {
@@ -177,10 +183,9 @@ export function RippleTankSimulator() {
           uPrev[i] = next;
         }
       }
-      // swap so u holds the newest field
-      const tmp = f.u;
-      f.u = f.uPrev;
-      f.uPrev = tmp;
+      // swap so f.u holds the newest field
+      f.u = uPrev;
+      f.uPrev = u;
 
       // drive the sources on the fresh field
       const drive = Math.sin(2 * Math.PI * s.freq * t);
