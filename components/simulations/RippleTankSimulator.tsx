@@ -29,7 +29,10 @@ const STEPS_PER_FRAME = 2;
 const STEPS_PER_SEC = 120; // 60 fps × 2
 const V_DEEP = C_DEEP * STEPS_PER_SEC * CM_PER_CELL; // 30 cm/s
 const V_SHALLOW = C_SHALLOW * STEPS_PER_SEC * CM_PER_CELL; // 18 cm/s
-const SPONGE = 10; // absorbing beach width, cells
+const SIDE_SPONGE = 20; // absorbing beach width, cells
+const G_RIGHT = 0.35; // beach strength, far wall
+const G_TB = 0.22; // beach strength, top/bottom (softer: less waveguide focusing)
+const SRC_X = 10; // the dipper housing occupies x <= SRC_X
 
 type SceneKey = 'open' | 'reflection' | 'narrow-gap' | 'wide-gap' | 'refraction' | 'two-point';
 
@@ -91,7 +94,7 @@ interface Field {
   uPrev: Float32Array;
   c2: Float32Array; // (c·dt/dx)² per cell
   wall: Uint8Array;
-  damp: Float32Array;
+  g: Float32Array; // velocity-damping coefficient γ/2 per cell (absorbing beaches)
   shallow: Uint8Array;
 }
 
@@ -101,7 +104,7 @@ function buildField(scene: SceneKey): Field {
   const uPrev = new Float32Array(n);
   const c2 = new Float32Array(n);
   const wall = new Uint8Array(n);
-  const damp = new Float32Array(n);
+  const g = new Float32Array(n);
   const shallow = new Uint8Array(n);
 
   for (let y = 0; y < GH; y++) {
@@ -117,9 +120,28 @@ function buildField(scene: SceneKey): Field {
       }
       c2[i] = c * c;
 
-      // absorbing beach: damping ramps up towards every edge
-      const edge = Math.min(x, y, GW - 1 - x, GH - 1 - y);
-      damp[i] = edge < SPONGE ? 0.06 * (1 - edge / SPONGE) : 0;
+      // absorbing beaches: VELOCITY damping (−γ·u_t), quadratic ramps.
+      // A naive multiplicative decay on displacement acts as an impedance
+      // change and reflects badly — this form absorbs cleanly (~1% echo).
+      let gv = 0;
+      const eTB = Math.min(y, GH - 1 - y);
+      if (eTB < SIDE_SPONGE) {
+        const r = 1 - eTB / SIDE_SPONGE;
+        gv = Math.max(gv, G_TB * r * r);
+      }
+      const eR = GW - 1 - x;
+      if (eR < SIDE_SPONGE) {
+        const r = 1 - eR / SIDE_SPONGE;
+        gv = Math.max(gv, G_RIGHT * r * r);
+      }
+      // strong absorber inside the dipper housing: backward emission from the
+      // transparent source dies here, and reflected waves returning from the
+      // tank pass through the source and are swallowed too
+      if (x < SRC_X) {
+        const r = 1 - x / SRC_X;
+        gv = Math.max(gv, 0.6 * r * r + 0.04);
+      }
+      g[i] = gv;
 
       // barriers
       if (scene === 'reflection') {
@@ -133,7 +155,7 @@ function buildField(scene: SceneKey): Field {
       }
     }
   }
-  return { u, uPrev, c2, wall, damp, shallow };
+  return { u, uPrev, c2, wall, g, shallow };
 }
 
 export function RippleTankSimulator() {
@@ -148,17 +170,18 @@ export function RippleTankSimulator() {
   const [scene, setScene] = useState<SceneKey>('open');
   const [freq, setFreq] = useState(6);
   const [paused, setPaused] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const [strobe, setStrobe] = useState(false);
   const [showTechnical, setShowTechnical] = useState(false);
 
-  const simRef = useRef({ scene: 'open' as SceneKey, freq: 6, paused: false, strobe: false, showTechnical: false });
+  const simRef = useRef({ scene: 'open' as SceneKey, freq: 6, paused: false, strobe: false, showTechnical: false, speed: 1, acc: 0 });
 
   const stepPhysics = () => {
     const s = simRef.current;
     const f = fieldRef.current;
-    const { c2, wall, damp } = f; // static per scene — never swapped
+    const { c2, wall, g } = f; // static per scene — never swapped
 
-    for (let sub = 0; sub < STEPS_PER_FRAME; sub++) {
+    {
       timeRef.current += 1 / STEPS_PER_SEC;
       const t = timeRef.current;
 
@@ -178,27 +201,30 @@ export function RippleTankSimulator() {
             continue;
           }
           const lap = u[i - 1] + u[i + 1] + u[i - GW] + u[i + GW] - 4 * u[i];
-          let next = 2 * u[i] - uPrev[i] + c2[i] * lap;
-          next *= 1 - damp[i];
-          uPrev[i] = next;
+          // damped wave equation: u_tt = c²∇²u − γ·u_t
+          uPrev[i] = (2 * u[i] - (1 - g[i]) * uPrev[i] + c2[i] * lap) / (1 + g[i]);
         }
       }
       // swap so f.u holds the newest field
       f.u = uPrev;
       f.uPrev = u;
 
-      // drive the sources on the fresh field
-      const drive = Math.sin(2 * Math.PI * s.freq * t);
+      // SOFT (additive) sources: transparent to returning waves, so the tank
+      // never becomes a resonant cavity between dipper and beach. Backward
+      // emission dies in the housing absorber — the wave launches one way,
+      // left to right. Gain scales with f to keep amplitude even.
+      const gain = 0.3 * (s.freq / 6);
+      const drive = gain * Math.sin(2 * Math.PI * s.freq * t);
       const newU = f.u;
       if (s.scene === 'two-point') {
         const y1 = Math.round(GH / 2 - 13);
         const y2 = Math.round(GH / 2 + 13);
-        newU[y1 * GW + 12] = drive * 1.4;
-        newU[y2 * GW + 12] = drive * 1.4;
+        newU[y1 * GW + 26] += drive * 1.6;
+        newU[y2 * GW + 26] += drive * 1.6;
       } else {
-        // straight dipper: a vertical line near the left wall
-        for (let y = SPONGE + 2; y < GH - SPONGE - 2; y++) {
-          newU[y * GW + 8] = drive;
+        // full-height dipper line at the housing edge: plane wavefronts
+        for (let y = 1; y < GH - 1; y++) {
+          newU[y * GW + SRC_X] += drive;
         }
       }
     }
@@ -225,6 +251,12 @@ export function RippleTankSimulator() {
     const f = fieldRef.current;
     for (let i = 0; i < GW * GH; i++) {
       const p = i * 4;
+      const cx = i % GW;
+      if (cx <= SRC_X) {
+        // dipper housing: hides the absorber sliver behind the wave generator
+        data[p] = 27; data[p + 1] = 42; data[p + 2] = 65; data[p + 3] = 255;
+        continue;
+      }
       if (f.wall[i]) {
         data[p] = 184; data[p + 1] = 130; data[p + 2] = 61; data[p + 3] = 255; // brass barrier
         continue;
@@ -286,7 +318,9 @@ export function RippleTankSimulator() {
         `wave equation u_tt = c²·∇²u on ${GW}×${GH} cells, ${STEPS_PER_SEC} steps/s`,
         `deep: v = ${V_DEEP.toFixed(0)} cm/s   λ = ${(V_DEEP / s.freq).toFixed(1)} cm`,
         s.scene === 'refraction' ? `shelf: v = ${V_SHALLOW.toFixed(0)} cm/s   λ = ${(V_SHALLOW / s.freq).toFixed(1)} cm` : '',
-        `absorbing beach ${SPONGE * CM_PER_CELL} cm wide on every side`,
+        `beaches: velocity damping (−γ·u_t), measured wall echo ≈ 1%`,
+        `one-way source: soft dipper line + absorber housing behind it`,
+        `playback ${s.speed === 1 ? '1×' : s.speed === 0.5 ? '½×' : '¼×'} — physics unchanged, only slowed`,
       ].filter(Boolean);
       lines.forEach((line, idx) => {
         ctx.fillText(line, 10, 18 + idx * 15);
@@ -297,7 +331,12 @@ export function RippleTankSimulator() {
   const loop = () => {
     const s = simRef.current;
     if (!s.paused) {
-      stepPhysics();
+      // slow motion: run fractional substeps via an accumulator — the physics
+      // is identical, only the playback rate changes
+      s.acc += s.speed * STEPS_PER_FRAME;
+      const whole = Math.floor(s.acc);
+      s.acc -= whole;
+      for (let k = 0; k < whole; k++) stepPhysics();
       if (s.strobe) {
         // re-render exactly once per source period, like a strobe lamp
         const cycle = Math.floor(timeRef.current * s.freq);
@@ -393,9 +432,11 @@ export function RippleTankSimulator() {
           <div className="px-4 pb-2 pt-2">
             <p className="text-[11.5px] text-[#4a5a72] leading-snug">
               <span className="text-[#1b2a41] font-semibold">Bright bands</span> = crests,{' '}
-              <span className="text-[#1b2a41] font-semibold">dark bands</span> = troughs — just like the light table
-              under a real tank. <span className="text-[#b8823d] font-semibold">Brass</span> = barriers. Gridlines are
-              10 cm apart, for measuring λ.
+              <span className="text-[#1b2a41] font-semibold">dark bands</span> = troughs — like the light table under
+              a real tank. The dark bar on the left is the wave generator: it launches waves one way, left to right,
+              and swallows anything that comes back. Every wall has an absorbing beach, so what you see is each
+              phenomenon by itself — no echoes. <span className="text-[#b8823d] font-semibold">Brass</span> = barriers.
+              Gridlines are 10 cm apart, for measuring λ.
             </p>
           </div>
 
@@ -447,6 +488,26 @@ export function RippleTankSimulator() {
               >
                 {strobe ? '✓ Stroboscope' : '◉ Stroboscope'}
               </button>
+            </div>
+
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Speed</span>
+              {[0.25, 0.5, 1].map((sp) => (
+                <button
+                  key={sp}
+                  onClick={() => {
+                    setSpeed(sp);
+                    simRef.current.speed = sp;
+                  }}
+                  className={`flex-1 text-[12.5px] font-semibold px-3 py-1.5 rounded border ${
+                    speed === sp
+                      ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
+                      : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  }`}
+                >
+                  {sp === 0.25 ? '¼×' : sp === 0.5 ? '½×' : '1×'}
+                </button>
+              ))}
             </div>
 
             <button

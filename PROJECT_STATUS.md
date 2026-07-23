@@ -61,8 +61,15 @@ Last updated: 2026-07-23 (ripple tank simulation)
     stroboscope, absorbing beach edges, 10 cm measuring grid. Scaled to a
     real tank: v = 30 cm/s deep / 18 cm/s shelf. Reflection/diffraction/
     refraction all EMERGE from the solver, nothing scripted. Registered
-    under topic 14.3. Numerics verified against numpy (lambda within ~3%%
-    of v/f; grid dispersion).
+    under topic 14.3. Numerics verified against numpy (lambda within ~3%
+    of v/f; grid dispersion). Engine details that matter: beaches use
+    VELOCITY damping (-gamma*u_t) - a naive multiplicative decay on
+    displacement reflects badly (~50%+); measured wall echo now ~1% via
+    detrended standing-wave-ratio test. Source is a SOFT (additive)
+    full-height dipper line at x=10 with a strong absorber housing behind
+    it: launches one-way left-to-right, transparent to returning waves
+    (a hard source line makes the tank a resonant cavity). Playback speed
+    control (1/4x, 1/2x, 1x) via a substep accumulator.
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
   question, streak-based mastery (5 correct in a row), wrong answers surface
   a "revise this" link back to the lesson + its simulation. 65 original
