@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-23 (refraction/TIR simulation)
+Last updated: 2026-07-23 (balance beam simulation)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-23 (refraction/TIR simulation)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **7 interactive simulations**, each a real physics engine (not a canned
+- **8 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -49,11 +49,17 @@ Last updated: 2026-07-23 (refraction/TIR simulation)
     compress in the denser medium, and a record-your-own sin i vs sin r plot
     that fits n from the gradient. Registered under topic 13.2; enum
     `sim_type` gained an 'optics' value (migration add_optics_sim_type).
+  - `/simulations/balance-beam` — moments practical for 4.1/4.2: metre rule
+    on a draggable pivot, drag-and-stack weights at 5 cm notches, real
+    rotational dynamics (I·alpha = net torque, lever arms shorten with tilt,
+    end stops), live CW/ACW moments ledger, adjustable beam mass at its
+    centre of gravity ("find the mass of the ruler"), and a mystery-mass
+    challenge. Registered under topic 4.2, sim_type 'force_diagram'.
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
   question, streak-based mastery (5 correct in a row), wrong answers surface
-  a "revise this" link back to the lesson + its simulation. 40 original
-  practice questions seeded across 8 lessons — 5 each for the 6 original
-  sim lessons plus 5 for 13.2 (refraction) and 5 for 13.3 (TIR).
+  a "revise this" link back to the lesson + its simulation. 50 original
+  practice questions seeded across 10 lessons — 5 each for the 6 original
+  sim lessons, plus 13.2/13.3 (refraction/TIR) and 4.1/4.2 (moments).
   Green "🎯 Practice" button appears on chapter pages for lessons that have
   questions.
 - **Teacher accounts**: signup requires school name + message, starts
