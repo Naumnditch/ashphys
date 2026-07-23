@@ -219,8 +219,10 @@ export function RippleTankSimulator() {
       if (s.scene === 'two-point') {
         const y1 = Math.round(GH / 2 - 13);
         const y2 = Math.round(GH / 2 + 13);
-        newU[y1 * GW + 26] += drive * 1.6;
-        newU[y2 * GW + 26] += drive * 1.6;
+        // point sources spread energy over circular fronts (amplitude ~ 1/√r),
+        // so they need far more drive than the plane dipper to read clearly
+        newU[y1 * GW + 26] += drive * 6;
+        newU[y2 * GW + 26] += drive * 6;
       } else {
         // full-height dipper line at the housing edge: plane wavefronts
         for (let y = 1; y < GH - 1; y++) {
@@ -261,8 +263,12 @@ export function RippleTankSimulator() {
         data[p] = 184; data[p + 1] = 130; data[p + 2] = 61; data[p + 3] = 255; // brass barrier
         continue;
       }
-      // water: mid-tone teal paper, crests brighten, troughs deepen to ink
-      const v = Math.max(-1, Math.min(1, f.u[i] * 1.15));
+      // water: mid-tone teal paper, crests brighten, troughs deepen to ink.
+      // Perceptual tone curve: |u|^0.65 lifts mid-amplitude bands into
+      // visibility (0.3 → ~0.46) while full crests stay saturated
+      const raw = f.u[i] * 1.15;
+      const mag = Math.min(1, Math.abs(raw));
+      const v = Math.sign(raw) * Math.pow(mag, 0.65);
       const sh = f.shallow[i] ? 1 : 0;
       const baseR = 205 - sh * 22;
       const baseG = 224 - sh * 8;
