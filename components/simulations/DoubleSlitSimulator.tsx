@@ -3,356 +3,462 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Double-Slit Lab — Young's experiment, built around the fringe equation.
+ * Double-Slit Lab — the same physics engine as the ripple tank,
+ * dedicated to Young's experiment and the fringe equation.
  *
  * Real physics, not a canned animation:
- *  - The path difference at any screen point is computed EXACTLY from the
- *    geometry: Δ = |S₂P| − |S₁P|, no small-angle shortcut. The familiar
- *    x = λD/a emerges from it — and the technical overlay shows how close
- *    the small-angle approximation Δ ≈ ay/D really is
- *  - The screen pattern is the true intensity I ∝ cos²(πΔ/λ), coloured by
- *    the actual wavelength you dial in
- *  - Drag the probe point along the screen and watch the path difference
- *    pass through whole numbers of λ (bright) and half-numbers (dark)
- *
- * Companion to the ripple tank: there you SEE the wave field make fringes;
- * here you MEASURE them and command the equation.
+ *  - Identical FDTD wave engine to /simulations/ripple-tank: the 2D wave
+ *    equation with velocity-damped absorbing beaches, a one-way soft
+ *    dipper behind a housing, and the same rendering
+ *  - The slit separation a physically moves the slits; the screen
+ *    distance D physically moves a measurement line in the tank
+ *  - A detector integrates the wave envelope along that screen line and
+ *    the fringe spacing is MEASURED from the actual field, then compared
+ *    with the prediction x = λD/a — including the honest mismatch when
+ *    the small-angle assumption (D ≫ a) starts to strain
  */
 
-const LAMBDA_MIN = 400; // nm
-const LAMBDA_MAX = 700;
-const FRINGES_SHOWN = 4.6; // bright fringes visible each side of centre
+const GW = 176;
+const GH = 104;
+const CM_PER_CELL = 0.5;
+const C_DEEP = 0.5; // cells per step
+const STEPS_PER_FRAME = 2;
+const STEPS_PER_SEC = 120;
+const V_DEEP = C_DEEP * STEPS_PER_SEC * CM_PER_CELL; // 30 cm/s
+const SIDE_SPONGE = 20;
+const G_RIGHT = 0.35;
+const G_TB = 0.22;
+const SRC_X = 10; // dipper housing occupies x <= SRC_X
+const BARRIER_X = 56; // slit barrier, 28 cm from the left wall
+const GAP_HALF = 3; // each slit ≈ 3 cm wide
 
-/** Approximate spectral colour for a visible wavelength in nm. */
-function wavelengthToRGB(nm: number): [number, number, number] {
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  if (nm < 440) {
-    r = -(nm - 440) / 40;
-    b = 1;
-  } else if (nm < 490) {
-    g = (nm - 440) / 50;
-    b = 1;
-  } else if (nm < 510) {
-    g = 1;
-    b = -(nm - 510) / 20;
-  } else if (nm < 580) {
-    r = (nm - 510) / 70;
-    g = 1;
-  } else if (nm < 645) {
-    r = 1;
-    g = -(nm - 645) / 65;
-  } else {
-    r = 1;
-  }
-  // gentle intensity roll-off at the spectrum ends
-  let f = 1;
-  if (nm < 420) f = 0.5 + (0.5 * (nm - 400)) / 20;
-  if (nm > 660) f = 0.5 + (0.5 * (700 - nm)) / 40;
-  return [Math.round(255 * r * f), Math.round(255 * g * f), Math.round(255 * b * f)];
+interface Field {
+  u: Float32Array;
+  uPrev: Float32Array;
+  c2: Float32Array;
+  wall: Uint8Array;
+  g: Float32Array;
 }
 
-/** Exact path difference |S2P| − |S1P| in metres, for slits at ±a/2. */
-function pathDifference(aM: number, dM: number, yM: number): number {
-  const s1 = Math.hypot(dM, yM - aM / 2);
-  const s2 = Math.hypot(dM, yM + aM / 2);
-  return s2 - s1;
+function buildField(aCm: number): Field {
+  const n = GW * GH;
+  const u = new Float32Array(n);
+  const uPrev = new Float32Array(n);
+  const c2 = new Float32Array(n).fill(C_DEEP * C_DEEP);
+  const wall = new Uint8Array(n);
+  const g = new Float32Array(n);
+  const halfSepCells = (aCm / CM_PER_CELL) / 2;
+
+  for (let y = 0; y < GH; y++) {
+    for (let x = 0; x < GW; x++) {
+      const i = y * GW + x;
+      // velocity-damped beaches, identical to the ripple tank
+      let gv = 0;
+      const eTB = Math.min(y, GH - 1 - y);
+      if (eTB < SIDE_SPONGE) {
+        const r = 1 - eTB / SIDE_SPONGE;
+        gv = Math.max(gv, G_TB * r * r);
+      }
+      const eR = GW - 1 - x;
+      if (eR < SIDE_SPONGE) {
+        const r = 1 - eR / SIDE_SPONGE;
+        gv = Math.max(gv, G_RIGHT * r * r);
+      }
+      if (x < SRC_X) {
+        const r = 1 - x / SRC_X;
+        gv = Math.max(gv, 0.6 * r * r + 0.04);
+      }
+      g[i] = gv;
+
+      // the double slit: two gaps, centres a apart — moving the slider
+      // physically rebuilds this barrier
+      const inGap =
+        Math.abs(y - (GH / 2 - halfSepCells)) <= GAP_HALF ||
+        Math.abs(y - (GH / 2 + halfSepCells)) <= GAP_HALF;
+      if (Math.abs(x - BARRIER_X) < 2 && !inGap) wall[i] = 1;
+    }
+  }
+  return { u, uPrev, c2, wall, g };
+}
+
+/** Peaks of the smoothed envelope along the screen line → mean fringe spacing (cm). */
+function measureFringeSpacing(env: Float32Array): { xCm: number | null; peaks: number[] } {
+  const y0 = SIDE_SPONGE + 2;
+  const y1 = GH - SIDE_SPONGE - 2;
+  const sm = new Float32Array(GH);
+  let mx = 0;
+  for (let y = y0 + 1; y < y1 - 1; y++) {
+    sm[y] = (env[y - 1] + 2 * env[y] + env[y + 1]) / 4;
+    mx = Math.max(mx, sm[y]);
+  }
+  if (mx < 0.08) return { xCm: null, peaks: [] }; // detector still warming up
+  const peaks: number[] = [];
+  for (let y = y0 + 2; y < y1 - 2; y++) {
+    if (sm[y] > sm[y - 1] && sm[y] >= sm[y + 1] && sm[y] > 0.35 * mx) {
+      if (peaks.length === 0 || y - peaks[peaks.length - 1] > 4) peaks.push(y);
+    }
+  }
+  if (peaks.length < 2) return { xCm: null, peaks };
+  let sum = 0;
+  for (let k = 1; k < peaks.length; k++) sum += peaks[k] - peaks[k - 1];
+  return { xCm: (sum / (peaks.length - 1)) * CM_PER_CELL, peaks };
+}
+
+/**
+ * Exact wave theory: the n-th bright fringe sits where the true path
+ * difference √(D²+(y+a/2)²) − √(D²+(y−a/2)²) equals nλ. Solved by
+ * bisection — no small-angle assumption. Returns the mean fringe spacing
+ * over nSide orders each side of centre (matching what the detector
+ * averages), or null when nλ ≥ a (no such fringe exists).
+ */
+function exactFringeMean(lamCm: number, aCm: number, dCm: number, nSide: number): number | null {
+  const delta = (y: number) =>
+    Math.hypot(dCm, y + aCm / 2) - Math.hypot(dCm, y - aCm / 2);
+  const solve = (target: number): number | null => {
+    if (target >= aCm) return null; // Δ can never reach nλ
+    let lo = 0;
+    let hi = 500;
+    for (let k = 0; k < 60; k++) {
+      const mid = (lo + hi) / 2;
+      if (delta(mid) < target) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
+  const yN = solve(nSide * lamCm);
+  return yN === null ? null : yN / nSide;
 }
 
 export function DoubleSlitSimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const offscreenRef = useRef<HTMLCanvasElement | null>(null);
+  const imageRef = useRef<ImageData | null>(null);
+  const fieldRef = useRef<Field>(buildField(12));
+  const envRef = useRef<Float32Array>(new Float32Array(GH));
   const rafRef = useRef<number | null>(null);
-  const phaseRef = useRef(0);
-  const lastTimeRef = useRef<number | null>(null);
-  const draggingRef = useRef(false);
+  const timeRef = useRef(0);
+  const lastStrobeCycleRef = useRef(-1);
 
-  const [lambdaNm, setLambdaNm] = useState(600);
-  const [aMm, setAMm] = useState(0.5);
-  const [dM, setDM] = useState(1.0);
-  const [probeYmm, setProbeYmm] = useState(1.2); // start on the first side fringe
+  const [freq, setFreq] = useState(9);
+  const [aCm, setACm] = useState(12);
+  const [dCm, setDCm] = useState(35);
+  const [paused, setPaused] = useState(false);
+  const [strobe, setStrobe] = useState(false);
+  const [speed, setSpeed] = useState(1);
   const [showTechnical, setShowTechnical] = useState(false);
+  const [measured, setMeasured] = useState<number | null>(null);
+  const [peakCount, setPeakCount] = useState(0);
 
-  const simRef = useRef({ lambdaNm: 600, aMm: 0.5, dM: 1.0, probeYmm: 1.2, showTechnical: false });
+  const simRef = useRef({ freq: 9, aCm: 12, dCm: 35, paused: false, strobe: false, speed: 1, acc: 0, showTechnical: false });
 
-  // ---- physics (SI units) ----
-  const lambdaM = lambdaNm * 1e-9;
-  const aM = aMm * 1e-3;
-  const fringeSpacingM = (lambdaM * dM) / aM; // x = λD/a
-  const fringeSpacingMm = fringeSpacingM * 1e3;
-  const probeYM = probeYmm * 1e-3;
-  const deltaM = pathDifference(aM, dM, probeYM);
-  const nExact = deltaM / lambdaM;
-  const nNearest = Math.round(nExact);
-  const offN = Math.abs(nExact - nNearest);
-  const isBright = offN < 0.12;
-  const isDark = Math.abs(offN - 0.5) < 0.12;
+  const lambdaCm = V_DEEP / freq;
+  const predictedX = (lambdaCm * dCm) / aCm; // x = λD/a, all in cm
+  const nSide = peakCount >= 3 ? Math.floor((peakCount - 1) / 2) : 1;
+  const exactX = exactFringeMean(lambdaCm, aCm, dCm, nSide);
 
-  const geom = () => {
-    const canvas = canvasRef.current;
-    const rect = canvas ? canvas.getBoundingClientRect() : ({ width: 900, height: 480 } as DOMRect);
-    const w = rect.width;
-    const h = rect.height;
-    const slitX = Math.min(150, w * 0.16);
-    const screenX = w - Math.max(120, w * 0.14);
-    const midY = h * 0.5;
-    // vertical scale: keep a constant number of fringes on screen — the
-    // printed mm values carry the real size
+  const screenXCells = () => BARRIER_X + Math.round(simRef.current.dCm / CM_PER_CELL);
+
+  const stepPhysics = () => {
     const s = simRef.current;
-    const ySpanM = FRINGES_SHOWN * ((s.lambdaNm * 1e-9 * s.dM) / (s.aMm * 1e-3));
-    const pxPerM = (h * 0.44) / ySpanM;
-    return { w, h, slitX, screenX, midY, pxPerM, ySpanM };
+    const f = fieldRef.current;
+    const { c2, wall, g } = f;
+
+    {
+      timeRef.current += 1 / STEPS_PER_SEC;
+      const t = timeRef.current;
+      const u = f.u;
+      const uPrev = f.uPrev;
+      for (let y = 1; y < GH - 1; y++) {
+        const row = y * GW;
+        for (let x = 1; x < GW - 1; x++) {
+          const i = row + x;
+          if (wall[i]) {
+            uPrev[i] = 0;
+            continue;
+          }
+          const lap = u[i - 1] + u[i + 1] + u[i - GW] + u[i + GW] - 4 * u[i];
+          uPrev[i] = (2 * u[i] - (1 - g[i]) * uPrev[i] + c2[i] * lap) / (1 + g[i]);
+        }
+      }
+      f.u = uPrev;
+      f.uPrev = u;
+
+      const gain = 0.3 * (s.freq / 6);
+      const drive = gain * Math.sin(2 * Math.PI * s.freq * t);
+      const newU = f.u;
+      for (let y = 1; y < GH - 1; y++) newU[y * GW + SRC_X] += drive;
+
+      // detector: peak-hold envelope with slow decay along the screen line
+      const sx = screenXCells();
+      const env = envRef.current;
+      for (let y = 0; y < GH; y++) {
+        const v = Math.abs(f.u[y * GW + sx]);
+        env[y] = Math.max(env[y] * 0.997, v);
+      }
+    }
   };
 
-  const yToPx = (yM: number) => {
-    const g = geom();
-    return g.midY - yM * g.pxPerM;
-  };
-
-  const draw = () => {
+  const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const s = simRef.current;
-    const g = geom();
-    ctx.clearRect(0, 0, g.w, g.h);
 
-    const lM = s.lambdaNm * 1e-9;
-    const aMet = s.aMm * 1e-3;
-    const [cr, cg, cb] = wavelengthToRGB(s.lambdaNm);
-    const laser = `rgb(${cr}, ${cg}, ${cb})`;
+    if (!offscreenRef.current) {
+      offscreenRef.current = document.createElement('canvas');
+      offscreenRef.current.width = GW;
+      offscreenRef.current.height = GH;
+    }
+    const off = offscreenRef.current;
+    const offCtx = off.getContext('2d');
+    if (!offCtx) return;
+    if (!imageRef.current) imageRef.current = offCtx.createImageData(GW, GH);
+    const img = imageRef.current;
+    const data = img.data;
 
-    const slitGapPx = 34; // schematic slit separation on screen (not to scale)
-    const s1y = g.midY + slitGapPx / 2;
-    const s2y = g.midY - slitGapPx / 2;
+    const f = fieldRef.current;
+    for (let i = 0; i < GW * GH; i++) {
+      const p = i * 4;
+      const cx = i % GW;
+      if (cx <= SRC_X) {
+        data[p] = 27; data[p + 1] = 42; data[p + 2] = 65; data[p + 3] = 255;
+        continue;
+      }
+      if (f.wall[i]) {
+        data[p] = 184; data[p + 1] = 130; data[p + 2] = 61; data[p + 3] = 255;
+        continue;
+      }
+      const raw = f.u[i] * 1.15;
+      const mag = Math.min(1, Math.abs(raw));
+      const v = Math.sign(raw) * Math.pow(mag, 0.65);
+      const baseR = 205;
+      const baseG = 224;
+      const baseB = 218;
+      if (v >= 0) {
+        const k = v;
+        data[p] = baseR + (250 - baseR) * k;
+        data[p + 1] = baseG + (250 - baseG) * k;
+        data[p + 2] = baseB + (247 - baseB) * k;
+      } else {
+        const k = -v;
+        data[p] = baseR + (27 - baseR) * k;
+        data[p + 1] = baseG + (62 - baseG) * k;
+        data[p + 2] = baseB + (88 - baseB) * k;
+      }
+      data[p + 3] = 255;
+    }
+    offCtx.putImageData(img, 0, 0);
 
-    // ---- incoming plane wave (left of the slits) ----
-    ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.45)`;
-    ctx.lineWidth = 1.6;
-    const inSpacing = 14;
-    const inOffset = (phaseRef.current * 40) % inSpacing;
-    for (let x = g.slitX - 8 - inOffset; x > 14; x -= inSpacing) {
+    const rect = canvas.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
+    const px = (cells: number) => (cells / GW) * w;
+    const py = (cells: number) => (cells / GH) * h;
+    ctx.imageSmoothingEnabled = true;
+    ctx.clearRect(0, 0, w, h);
+    ctx.drawImage(off, 0, 0, w, h);
+
+    // 10 cm grid
+    ctx.strokeStyle = 'rgba(27, 42, 65, 0.16)';
+    ctx.lineWidth = 1;
+    ctx.font = '500 9px ui-monospace, SFMono-Regular, Menlo, monospace';
+    ctx.fillStyle = 'rgba(27, 42, 65, 0.45)';
+    for (let cm = 10; cm < GW * CM_PER_CELL; cm += 10) {
+      const x = (cm / (GW * CM_PER_CELL)) * w;
       ctx.beginPath();
-      ctx.moveTo(x, g.midY - 74);
-      ctx.lineTo(x, g.midY + 74);
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+      ctx.fillText(`${cm}`, x + 2, h - 4);
+    }
+    for (let cm = 10; cm < GH * CM_PER_CELL; cm += 10) {
+      const y = (cm / (GH * CM_PER_CELL)) * h;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
       ctx.stroke();
     }
-    ctx.fillStyle = '#4a5a72';
-    ctx.font = '500 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('monochromatic light', 14, g.midY - 84);
 
-    // ---- barrier with two slits ----
-    ctx.strokeStyle = '#1b2a41';
-    ctx.lineWidth = 5;
+    const s = simRef.current;
+    const sx = screenXCells();
+    const sxPx = px(sx + 0.5);
+
+    // ---- screen line (the detector) ----
+    ctx.strokeStyle = '#2e7d6b';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([7, 5]);
     ctx.beginPath();
-    ctx.moveTo(g.slitX, 16);
-    ctx.lineTo(g.slitX, s2y - 7);
-    ctx.moveTo(g.slitX, s2y + 7);
-    ctx.lineTo(g.slitX, s1y - 7);
-    ctx.moveTo(g.slitX, s1y + 7);
-    ctx.lineTo(g.slitX, g.h - 16);
+    ctx.moveTo(sxPx, py(2));
+    ctx.lineTo(sxPx, py(GH - 2));
     ctx.stroke();
-    ctx.fillStyle = '#1b2a41';
-    ctx.font = '600 11px Georgia, serif';
-    ctx.textAlign = 'right';
-    ctx.fillText('S₂', g.slitX - 9, s2y + 4);
-    ctx.fillText('S₁', g.slitX - 9, s1y + 4);
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#2e7d6b';
+    ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('screen', sxPx, py(2) + 12);
 
-    // a-bracket between slits
-    ctx.strokeStyle = '#b8823d';
+    // ---- intensity profile hugging the screen line ----
+    const env = envRef.current;
+    const { peaks } = measureFringeSpacing(env);
+    let envMax = 0;
+    for (let y = SIDE_SPONGE; y < GH - SIDE_SPONGE; y++) envMax = Math.max(envMax, env[y]);
+    if (envMax > 0.05) {
+      const profW = Math.min(w - sxPx - 8, w * 0.09);
+      ctx.beginPath();
+      ctx.moveTo(sxPx, py(SIDE_SPONGE));
+      for (let y = SIDE_SPONGE; y < GH - SIDE_SPONGE; y++) {
+        ctx.lineTo(sxPx + (env[y] / envMax) * profW, py(y + 0.5));
+      }
+      ctx.lineTo(sxPx, py(GH - SIDE_SPONGE));
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(184, 130, 61, 0.4)';
+      ctx.fill();
+      ctx.strokeStyle = '#b8823d';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+
+      // fringe-spacing bracket between the first two detected maxima
+      if (peaks.length >= 2) {
+        const b0 = py(peaks[0] + 0.5);
+        const b1 = py(peaks[1] + 0.5);
+        const bx = sxPx + profW + 8;
+        ctx.strokeStyle = '#1b2a41';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(bx - 5, b0);
+        ctx.lineTo(bx + 3, b0);
+        ctx.moveTo(bx - 5, b1);
+        ctx.lineTo(bx + 3, b1);
+        ctx.moveTo(bx - 1, b0);
+        ctx.lineTo(bx - 1, b1);
+        ctx.stroke();
+        ctx.fillStyle = '#1b2a41';
+        ctx.font = 'italic 700 12px Georgia, serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('x', bx + 6, (b0 + b1) / 2 + 4);
+      }
+      // mark detected maxima on the profile
+      ctx.fillStyle = '#b34a3c';
+      peaks.forEach((yy) => {
+        ctx.beginPath();
+        ctx.arc(sxPx + (env[yy] / envMax) * profW, py(yy + 0.5), 3, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    // ---- a bracket at the slits ----
+    const halfSep = (s.aCm / CM_PER_CELL) / 2;
+    const bxPx = px(BARRIER_X);
+    ctx.strokeStyle = '#8f6428';
     ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.moveTo(g.slitX + 10, s2y);
-    ctx.lineTo(g.slitX + 22, s2y);
-    ctx.moveTo(g.slitX + 10, s1y);
-    ctx.lineTo(g.slitX + 22, s1y);
-    ctx.moveTo(g.slitX + 16, s2y);
-    ctx.lineTo(g.slitX + 16, s1y);
+    ctx.moveTo(bxPx - 14, py(GH / 2 - halfSep));
+    ctx.lineTo(bxPx - 22, py(GH / 2 - halfSep));
+    ctx.moveTo(bxPx - 14, py(GH / 2 + halfSep));
+    ctx.lineTo(bxPx - 22, py(GH / 2 + halfSep));
+    ctx.moveTo(bxPx - 18, py(GH / 2 - halfSep));
+    ctx.lineTo(bxPx - 18, py(GH / 2 + halfSep));
     ctx.stroke();
     ctx.fillStyle = '#8f6428';
     ctx.font = 'italic 700 12px Georgia, serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(`a = ${s.aMm.toFixed(2)} mm`, g.slitX + 24, g.midY + 4);
-
-    // ---- circular wavelets from each slit (spacing ∝ λ, animated) ----
-    const waveSpacing = 10 + (s.lambdaNm - LAMBDA_MIN) * 0.04;
-    const wOffset = (phaseRef.current * 40) % waveSpacing;
-    ctx.lineWidth = 1.1;
-    for (const sy of [s1y, s2y]) {
-      ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.3)`;
-      for (let r = wOffset; r < 120; r += waveSpacing) {
-        ctx.beginPath();
-        ctx.arc(g.slitX, sy, r, -Math.PI / 2.25, Math.PI / 2.25);
-        ctx.stroke();
-      }
-    }
-
-    // ---- screen with the true intensity pattern ----
-    const screenW = 26;
-    ctx.fillStyle = '#111a28';
-    ctx.fillRect(g.screenX, 14, screenW, g.h - 28);
-    for (let py = 16; py < g.h - 16; py += 1) {
-      const yM = (g.midY - py) / g.pxPerM;
-      const d = pathDifference(aMet, s.dM, yM);
-      const I = Math.pow(Math.cos((Math.PI * d) / lM), 2);
-      ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${(0.08 + 0.92 * I).toFixed(3)})`;
-      ctx.fillRect(g.screenX + 2, py, screenW - 4, 1.2);
-    }
-    ctx.fillStyle = '#4a5a72';
-    ctx.font = '500 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('screen', g.screenX + screenW / 2, g.h - 4);
-
-    // fringe-spacing bracket between the centre and first bright fringe
-    const xM = (lM * s.dM) / aMet;
-    const b0 = yToPx(0);
-    const b1 = yToPx(xM);
-    ctx.strokeStyle = '#faf7f0';
-    ctx.lineWidth = 1.4;
-    ctx.beginPath();
-    ctx.moveTo(g.screenX + screenW + 6, b0);
-    ctx.lineTo(g.screenX + screenW + 14, b0);
-    ctx.moveTo(g.screenX + screenW + 6, b1);
-    ctx.lineTo(g.screenX + screenW + 14, b1);
-    ctx.moveTo(g.screenX + screenW + 10, b0);
-    ctx.lineTo(g.screenX + screenW + 10, b1);
-    ctx.stroke();
-    ctx.fillStyle = '#1b2a41';
-    ctx.font = 'italic 700 12px Georgia, serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(`x = ${(xM * 1e3).toFixed(2)} mm`, g.screenX + screenW + 18, (b0 + b1) / 2 + 4);
-
-    // ---- rays from both slits to the draggable probe ----
-    const probePy = yToPx(s.probeYmm * 1e-3);
-    const clampedPy = Math.max(20, Math.min(g.h - 20, probePy));
-    const dashLen = 7;
-    ctx.setLineDash([dashLen, dashLen]);
-    ctx.lineDashOffset = -phaseRef.current * 55;
-    ctx.strokeStyle = laser;
-    ctx.lineWidth = 1.8;
-    for (const sy of [s1y, s2y]) {
-      ctx.beginPath();
-      ctx.moveTo(g.slitX, sy);
-      ctx.lineTo(g.screenX + 2, clampedPy);
-      ctx.stroke();
-    }
-    ctx.setLineDash([]);
-
-    // probe marker
-    ctx.fillStyle = isBrightAt(s) ? '#2e7d6b' : '#b34a3c';
-    ctx.beginPath();
-    ctx.arc(g.screenX + 1, clampedPy, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#faf7f0';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = '#1b2a41';
-    ctx.font = '700 11px Georgia, serif';
     ctx.textAlign = 'right';
-    ctx.fillText('P  (drag me)', g.screenX - 8, clampedPy - 10);
+    ctx.fillText(`a = ${s.aCm} cm`, bxPx - 26, py(GH / 2) + 4);
 
-    // ---- axis + D bracket ----
-    ctx.strokeStyle = '#8a94a3';
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(g.slitX, g.midY);
-    ctx.lineTo(g.screenX, g.midY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    const dy = g.h - 22;
+    // ---- D bracket along the bottom ----
+    const dyPx = h - 16;
     ctx.strokeStyle = '#4a5a72';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(g.slitX, dy - 5);
-    ctx.lineTo(g.slitX, dy + 5);
-    ctx.moveTo(g.screenX, dy - 5);
-    ctx.lineTo(g.screenX, dy + 5);
-    ctx.moveTo(g.slitX, dy);
-    ctx.lineTo(g.screenX, dy);
+    ctx.moveTo(bxPx, dyPx - 5);
+    ctx.lineTo(bxPx, dyPx + 5);
+    ctx.moveTo(sxPx, dyPx - 5);
+    ctx.lineTo(sxPx, dyPx + 5);
+    ctx.moveTo(bxPx, dyPx);
+    ctx.lineTo(sxPx, dyPx);
     ctx.stroke();
     ctx.fillStyle = '#4a5a72';
-    ctx.font = 'italic 700 12px Georgia, serif';
+    ctx.font = 'italic 700 11.5px Georgia, serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`D = ${s.dM.toFixed(2)} m`, (g.slitX + g.screenX) / 2, dy - 8);
-    ctx.font = '500 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillText('geometry not to scale — the numbers are exact', (g.slitX + g.screenX) / 2, 24);
+    ctx.fillText(`D = ${s.dCm} cm`, (bxPx + sxPx) / 2, dyPx - 8);
 
-    // ---- technical overlay ----
     if (s.showTechnical) {
-      const d = pathDifference(aMet, s.dM, s.probeYmm * 1e-3);
-      const approx = (aMet * (s.probeYmm * 1e-3)) / s.dM;
       ctx.textAlign = 'left';
       ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
       ctx.fillStyle = '#1b2a41';
+      const m = measureFringeSpacing(env);
+      const lam = V_DEEP / s.freq;
+      const pred = (lam * s.dCm) / s.aCm;
       const lines = [
-        `Δ exact  = |S₂P| − |S₁P| = ${(d * 1e6).toFixed(4)} µm`,
-        `Δ approx = a·y/D          = ${(approx * 1e6).toFixed(4)} µm`,
-        `small-angle error ${(Math.abs(1 - approx / d) * 100).toFixed(4)}%`,
-        `I(P) ∝ cos²(πΔ/λ) = ${Math.pow(Math.cos((Math.PI * d) / lM), 2).toFixed(3)}`,
+        `same engine as the ripple tank: u_tt = c²·∇²u, ${GW}×${GH} cells, ${STEPS_PER_SEC} steps/s`,
+        `λ = v/f = ${lam.toFixed(1)} cm   predicted x = λD/a = ${pred.toFixed(1)} cm`,
+        m.xCm !== null ? `measured x (peak spacing on the detector) = ${m.xCm.toFixed(1)} cm` : 'measured x: detector integrating…',
+        `x = λD/a assumes D ≫ a — push D down or a up and watch the mismatch grow`,
       ];
-      lines.forEach((line, idx) => ctx.fillText(line, 14, g.h - 76 + idx * 15));
+      lines.forEach((line, idx) => ctx.fillText(line, 12, 20 + idx * 15));
     }
   };
 
-  const isBrightAt = (s: { lambdaNm: number; aMm: number; dM: number; probeYmm: number }) => {
-    const d = pathDifference(s.aMm * 1e-3, s.dM, s.probeYmm * 1e-3);
-    const n = d / (s.lambdaNm * 1e-9);
-    return Math.abs(n - Math.round(n)) < 0.25;
-  };
-
-  const loop = (t: number) => {
-    if (lastTimeRef.current === null) lastTimeRef.current = t;
-    const dt = Math.min(0.05, (t - lastTimeRef.current) / 1000);
-    lastTimeRef.current = t;
-    phaseRef.current += dt;
-    draw();
+  const loop = () => {
+    const s = simRef.current;
+    if (!s.paused) {
+      s.acc += s.speed * STEPS_PER_FRAME;
+      const whole = Math.floor(s.acc);
+      s.acc -= whole;
+      for (let k = 0; k < whole; k++) stepPhysics();
+      if (s.strobe) {
+        const cycle = Math.floor(timeRef.current * s.freq);
+        if (cycle !== lastStrobeCycleRef.current) {
+          lastStrobeCycleRef.current = cycle;
+          render();
+        }
+      } else {
+        render();
+      }
+      const m = measureFringeSpacing(envRef.current);
+      setMeasured(m.xCm);
+      setPeakCount(m.peaks.length);
+    }
     rafRef.current = requestAnimationFrame(loop);
   };
 
-  // ---- probe dragging along the screen ----
-  const probeFromPointer = (clientY: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    const rect = canvas.getBoundingClientRect();
-    const g = geom();
-    const py = clientY - rect.top;
-    const yM = (g.midY - py) / g.pxPerM;
-    const lim = g.ySpanM * 0.98;
-    return Math.max(-lim, Math.min(lim, yM)) * 1e3; // mm
+  const resetDetector = () => {
+    envRef.current = new Float32Array(GH);
   };
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
-    draggingRef.current = true;
-    const y = probeFromPointer(e.clientY);
-    if (y !== null) setProbe(y);
-  };
-  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    if (!draggingRef.current) return;
-    const y = probeFromPointer(e.clientY);
-    if (y !== null) setProbe(y);
-  };
-  const handlePointerUp = () => {
-    draggingRef.current = false;
+  const handleFreq = (f: number) => {
+    setFreq(f);
+    simRef.current.freq = f;
+    resetDetector(); // the fringe pattern changes, let the detector re-form
   };
 
-  const setProbe = (yMm: number) => {
-    setProbeYmm(yMm);
-    simRef.current.probeYmm = yMm;
+  const handleA = (a: number) => {
+    setACm(a);
+    simRef.current.aCm = a;
+    // moving the slits physically rebuilds the barrier
+    fieldRef.current = buildField(a);
+    timeRef.current = 0;
+    lastStrobeCycleRef.current = -1;
+    resetDetector();
   };
-  const setLambda = (nm: number) => {
-    setLambdaNm(nm);
-    simRef.current.lambdaNm = nm;
+
+  const handleD = (d: number) => {
+    setDCm(d);
+    simRef.current.dCm = d;
+    resetDetector(); // the screen line moves; re-integrate there
   };
-  const setA = (mm: number) => {
-    setAMm(mm);
-    simRef.current.aMm = mm;
+
+  const handlePause = () => {
+    const next = !simRef.current.paused;
+    simRef.current.paused = next;
+    setPaused(next);
+    if (!next) lastStrobeCycleRef.current = -1;
   };
-  const setD = (m: number) => {
-    setDM(m);
-    simRef.current.dM = m;
+
+  const handleStrobe = () => {
+    const next = !simRef.current.strobe;
+    simRef.current.strobe = next;
+    setStrobe(next);
+    lastStrobeCycleRef.current = -1;
   };
 
   useEffect(() => {
@@ -363,7 +469,7 @@ export function DoubleSlitSimulator() {
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
       canvas.getContext('2d')?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      draw();
+      render();
     };
     resize();
     window.addEventListener('resize', resize);
@@ -376,125 +482,135 @@ export function DoubleSlitSimulator() {
   }, []);
 
   const variables = [
-    { symbol: 'x', name: 'Fringe spacing', def: 'The distance between the centres of two adjacent bright fringes on the screen.' },
-    { symbol: 'λ', name: 'Wavelength', def: 'Of the light used. Must be monochromatic (a single wavelength), or the fringes of different colours land in different places and wash out.' },
-    { symbol: 'D', name: 'Slit-to-screen distance', def: 'From the double slit to the screen. Bigger D spreads the pattern out.' },
-    { symbol: 'a', name: 'Slit separation', def: 'Between the centres of the two slits. SMALLER a gives WIDER fringes — they are inversely related.' },
+    { symbol: 'x', name: 'Fringe spacing', def: 'Distance between adjacent lines of biggest ripples on the screen. Measured live from the detector, in cm.' },
+    { symbol: 'λ', name: 'Wavelength', def: 'Of the water waves: λ = v/f, with v = 30 cm/s fixed by the water. The frequency slider is your wavelength dial.' },
+    { symbol: 'D', name: 'Slit-to-screen distance', def: 'From the barrier to the dashed detector line. Bigger D spreads the fringes out.' },
+    { symbol: 'a', name: 'Slit separation', def: 'Between the centres of the two slits. Smaller a gives WIDER fringes — they are inversely related.' },
   ];
 
   return (
     <div className="double-slit-lab flex flex-col gap-5">
-      {/* ---- Apparatus: full width ---- */}
+      {/* ---- Tank: full width ---- */}
       <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Young Double-Slit Bench</span>
-          <span className={`font-mono text-[11px] tracking-wide uppercase font-bold ${isBright ? 'text-[#2e7d6b]' : isDark ? 'text-[#b34a3c]' : 'text-[#4a5a72]'}`}>
-            {isBright ? `bright fringe · n = ${nNearest}` : isDark ? 'dark fringe' : `Δ = ${nExact.toFixed(2)} λ`}
+          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            Double-Slit Ripple Tank · {Math.round(GW * CM_PER_CELL)} × {Math.round(GH * CM_PER_CELL)} cm
+          </span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            {paused ? 'paused' : strobe ? 'strobe' : 'live'}
           </span>
         </div>
-        <canvas
-          ref={canvasRef}
-          className="block w-full touch-none cursor-ns-resize"
-          style={{ height: 470 }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
-        <div className="px-4 pb-2 -mt-1">
+        <div className="px-4 pt-2">
+          <canvas ref={canvasRef} className="block w-full rounded border border-[#e4ddcc]" style={{ aspectRatio: '176 / 104' }} />
+        </div>
+        <div className="px-4 pb-2 pt-2">
           <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-            <span className="text-[#2e7d6b] font-semibold">Drag P along the screen</span> and watch the path difference
-            pass through whole numbers of λ (bright) and half numbers (dark). The{' '}
-            <span className="text-[#8f6428] font-semibold">x bracket</span> marks one fringe spacing — check it against
-            x = λD/a as you move the sliders.
+            Same tank, same physics as the ripple tank — dedicated to one experiment.{' '}
+            <span className="text-[#b8823d] font-semibold">Brass</span> = the double-slit barrier (the a slider moves the
+            slits). <span className="text-[#2e7d6b] font-semibold">Dashed green line</span> = the detector screen (the D
+            slider moves it). The <span className="text-[#b8823d] font-semibold">brass profile</span> on its right is the
+            integrated wave intensity — its <span className="text-[#b34a3c] font-semibold">red dots</span> are the bright
+            fringes the sim itself detects.
           </p>
         </div>
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3] grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-3">
-          <div className="flex items-center gap-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Wavelength λ</label>
-            <input
-              type="range"
-              min={LAMBDA_MIN}
-              max={LAMBDA_MAX}
-              step={5}
-              value={lambdaNm}
-              onChange={(e) => setLambda(parseFloat(e.target.value))}
-              className="flex-1"
-            />
-            <span className="font-mono text-[13px] w-16 text-right">{lambdaNm} nm</span>
+        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-3 mb-3">
+            <div className="flex items-center gap-3">
+              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Dipper f</label>
+              <input type="range" min={4} max={12} step={0.5} value={freq}
+                onChange={(e) => handleFreq(parseFloat(e.target.value))} className="flex-1" />
+              <span className="font-mono text-[13px] w-16 text-right">{freq.toFixed(1)} Hz</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Slit sep. a</label>
+              <input type="range" min={6} max={20} step={1} value={aCm}
+                onChange={(e) => handleA(parseFloat(e.target.value))} className="flex-1" />
+              <span className="font-mono text-[13px] w-16 text-right">{aCm} cm</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Distance D</label>
+              <input type="range" min={15} max={45} step={1} value={dCm}
+                onChange={(e) => handleD(parseFloat(e.target.value))} className="flex-1" />
+              <span className="font-mono text-[13px] w-16 text-right">{dCm} cm</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Slit sep. a</label>
-            <input
-              type="range"
-              min={0.2}
-              max={1.0}
-              step={0.05}
-              value={aMm}
-              onChange={(e) => setA(parseFloat(e.target.value))}
-              className="flex-1"
-            />
-            <span className="font-mono text-[13px] w-16 text-right">{aMm.toFixed(2)} mm</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Distance D</label>
-            <input
-              type="range"
-              min={0.5}
-              max={2.0}
-              step={0.05}
-              value={dM}
-              onChange={(e) => setD(parseFloat(e.target.value))}
-              className="flex-1"
-            />
-            <span className="font-mono text-[13px] w-16 text-right">{dM.toFixed(2)} m</span>
-          </div>
-          <div className="lg:col-span-3">
-            <button
-              onClick={() => {
-                const next = !showTechnical;
-                setShowTechnical(next);
-                simRef.current.showTechnical = next;
-              }}
-              className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
-                showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
-              }`}
-            >
-              {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
+
+          <div className="flex flex-wrap gap-2 mb-3">
+            <button onClick={handlePause}
+              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+              {paused ? '▶ Resume' : '⏸ Pause'}
             </button>
+            <button onClick={handleStrobe}
+              className={`flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border ${
+                strobe ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+              }`}>
+              {strobe ? '✓ Stroboscope' : '◉ Stroboscope'}
+            </button>
+            <div className="flex items-center gap-2 flex-1 min-w-40">
+              <span className="text-[13px] text-[#4a5a72]">Speed</span>
+              {[0.25, 0.5, 1].map((sp) => (
+                <button key={sp}
+                  onClick={() => { setSpeed(sp); simRef.current.speed = sp; }}
+                  className={`flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border ${
+                    speed === sp ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  }`}>
+                  {sp === 0.25 ? '¼×' : sp === 0.5 ? '½×' : '1×'}
+                </button>
+              ))}
+            </div>
           </div>
+
+          <button
+            onClick={() => {
+              const next = !showTechnical;
+              setShowTechnical(next);
+              simRef.current.showTechnical = next;
+            }}
+            className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
+              showTechnical ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+            }`}>
+            {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
+          </button>
         </div>
       </div>
 
-      {/* ---- Notebook row, under the full-width bench ---- */}
+      {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="bg-white border border-[#e4ddcc] rounded p-4">
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
           <div className="mt-3 space-y-2">
             <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Fringe spacing x = λD/a</span>
-              <span className="font-mono text-[13px] font-bold text-[#1b2a41]">{fringeSpacingMm.toFixed(2)} mm</span>
+              <span className="text-[12.5px] text-[#4a5a72]">Wavelength λ = v/f</span>
+              <span className="font-mono text-[13px] text-[#1b2a41]">{lambdaCm.toFixed(1)} cm</span>
             </div>
             <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Probe position y</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{probeYmm.toFixed(2)} mm</span>
+              <span className="text-[12.5px] text-[#4a5a72]">Predicted x = λD/a</span>
+              <span className="font-mono text-[13px] font-bold text-[#1b2a41]">{predictedX.toFixed(1)} cm</span>
             </div>
             <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Path difference Δ</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{(deltaM * 1e6).toFixed(3)} µm</span>
+              <span className="text-[12.5px] text-[#4a5a72]">Exact wave theory</span>
+              <span className="font-mono text-[13px] text-[#1b2a41]">
+                {exactX !== null ? `${exactX.toFixed(1)} cm` : '—'}
+              </span>
             </div>
             <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Δ in wavelengths</span>
-              <span className={`font-mono text-[13px] font-bold ${isBright ? 'text-[#2e7d6b]' : isDark ? 'text-[#b34a3c]' : 'text-[#1b2a41]'}`}>
-                {nExact.toFixed(2)} λ
+              <span className="text-[12.5px] text-[#4a5a72]">Measured x (detector)</span>
+              <span className="font-mono text-[13px] font-bold text-[#2e7d6b]">
+                {measured !== null ? `${measured.toFixed(1)} cm` : 'integrating…'}
+              </span>
+            </div>
+            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
+              <span className="text-[12.5px] text-[#4a5a72]">Measured vs theory</span>
+              <span className="font-mono text-[13px] text-[#1b2a41]">
+                {measured !== null && exactX !== null ? `${((measured / exactX) * 100).toFixed(0)}%` : '—'}
               </span>
             </div>
           </div>
           <p className="text-[11.5px] text-[#4a5a72] mt-2.5 leading-snug">
-            Bright where Δ = nλ (waves arrive in step), dark where Δ = (n + ½)λ (crest meets trough).
+            Three numbers, one story: the formula x = λD/a is a far-field approximation; the exact row solves the true
+            path-difference geometry (no approximation); and the measured row is read off the actual wave field. Measured
+            should track the exact theory closely — the gap to the formula is its small print, made visible.
           </p>
         </div>
 
@@ -502,20 +618,21 @@ export function DoubleSlitSimulator() {
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
           <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Halve the slit separation a — the fringe spacing doubles.
-              They are inversely related, which surprises most people the first time.
+              <strong className="text-[#1b2a41]">1.</strong> Watch the slits move as you slide a — then halve a and see
+              the fringes spread to double the spacing. Inversely related.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Slide λ from red to violet with everything else fixed —
-              shorter wavelength, tighter fringes. This is how the experiment measures λ itself.
+              <strong className="text-[#1b2a41]">2.</strong> Slide the screen out with D and watch the same fringes fan
+              out wider: x grows in proportion to D.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Park P on the 2nd bright fringe, then change D — P stays
-              on a bright fringe only if you also track how x grows with D.
+              <strong className="text-[#1b2a41]">3.</strong> Raise f: shorter λ, tighter fringes. Rearranged, λ = xa/D —
+              this experiment is a way to MEASURE a wavelength.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">4.</strong> Open the technical details and check how tiny the
-              small-angle error is — that is why x = λD/a is safe to use here.
+              <strong className="text-[#1b2a41]">4.</strong> x = λD/a assumes D is much bigger than a. Set a = 20 cm and
+              D = 15 cm: the formula drifts far from the exact and measured rows, which stay together. Restore D ≫ a and
+              all three converge. Formulas have small print; this tank is small enough to show you where it is.
             </p>
           </div>
         </div>
@@ -526,7 +643,7 @@ export function DoubleSlitSimulator() {
               x = λD / a
             </div>
             <div className="italic text-[14px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
-              bright fringes where Δ = nλ
+              bright fringes where the path difference = nλ
             </div>
           </div>
           <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">

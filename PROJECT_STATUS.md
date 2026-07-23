@@ -71,14 +71,20 @@ Last updated: 2026-07-23 (double-slit lab + full-width sim layout)
     it: launches one-way left-to-right, transparent to returning waves
     (a hard source line makes the tank a resonant cavity). Playback speed
     control (1/4x, 1/2x, 1x) via a substep accumulator.
-  - `/simulations/double-slit` — equation-focused Young companion (14.3
-    extension): light-based, exact path difference |S2P|-|S1P| (no
-    small-angle shortcut; overlay shows the approximation error), true
-    cos^2(pi*delta/lambda) screen pattern in the actual spectral colour,
-    draggable probe P, live fringe-spacing bracket, x = lambda*D/a with
-    lambda/a/D sliders. Second sim registered under topic 14.3 - the
+  - `/simulations/double-slit` — Young companion (14.3 extension),
+    REBUILT per user feedback to be the same wave engine as the ripple
+    tank (the first light-based version auto-scaled the view so the a/D
+    sliders visibly did nothing). Now: the a slider physically moves the
+    slits, the D slider physically moves a detector line, f is the
+    wavelength dial. A detector integrates the wave field along the
+    screen and MEASURES fringe spacing, displayed as a three-way
+    comparison: formula x = lambda*D/a vs exact path-difference theory
+    (bisection, no small-angle) vs measured. Node-verified: in the
+    strained regime (a=20, D=15) formula says 3.8 cm, exact says 5.0,
+    field measures 5.0 - the sim validates wave theory and exposes the
+    formula's far-field small print. Second sim under topic 14.3; the
     chapter page was upgraded to group sims per topic (was a Map that
-    silently overwrote; now shows one labelled button per sim).
+    silently overwrote; now one labelled button per sim).
   - Layout: ripple-tank and double-slit pages use a full-width layout
     (max-w-[1600px], canvas card full width, notebook cards in a
     lg:grid-cols-3 row below). Older sims keep the two-column layout.
