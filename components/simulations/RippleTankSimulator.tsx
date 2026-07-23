@@ -34,7 +34,7 @@ const G_RIGHT = 0.35; // beach strength, far wall
 const G_TB = 0.22; // beach strength, top/bottom (softer: less waveguide focusing)
 const SRC_X = 10; // the dipper housing occupies x <= SRC_X
 
-type SceneKey = 'open' | 'reflection' | 'narrow-gap' | 'wide-gap' | 'refraction' | 'two-point';
+type SceneKey = 'open' | 'reflection' | 'narrow-gap' | 'wide-gap' | 'double-slit' | 'refraction' | 'two-point';
 
 interface Scene {
   key: SceneKey;
@@ -72,6 +72,13 @@ const SCENES: Scene[] = [
     lesson: '14.3',
     blurb: 'The gap is several wavelengths wide.',
     watch: 'Most of the wave passes straight on, with only gentle curling at the edges. Compare with the narrow gap: same physics, but a gap much larger than λ produces far less spreading.',
+  },
+  {
+    key: 'double-slit',
+    name: 'Double slit',
+    lesson: 'extension',
+    blurb: 'Plane waves meet a barrier with two narrow gaps, each about one wavelength wide.',
+    watch: 'Each gap diffracts into semicircles — that is the narrow-gap scene. But now there are two coherent sets, and they interfere: lines of extra-large ripples alternate with calm lines, a central maximum flanked by side fringes. This is the famous Young double-slit experiment, done with water — compare it with the two-point scene and notice the slits behave exactly like two dippers. Historically, this experiment is what settled that light is a wave.',
   },
   {
     key: 'refraction',
@@ -152,6 +159,11 @@ function buildField(scene: SceneKey): Field {
         const half = scene === 'narrow-gap' ? 5 : 22; // gap ≈ 5 cm vs ≈ 22 cm
         const bx = Math.round(GW * 0.5);
         if (Math.abs(x - bx) < 2 && Math.abs(y - GH / 2) > half) wall[i] = 1;
+      } else if (scene === 'double-slit') {
+        // two λ-wide gaps, centres 13 cm apart — behaves as two coherent sources
+        const bx = Math.round(GW * 0.5);
+        const inGap = Math.abs(y - (GH / 2 - 13)) <= 3 || Math.abs(y - (GH / 2 + 13)) <= 3;
+        if (Math.abs(x - bx) < 2 && !inGap) wall[i] = 1;
       }
     }
   }

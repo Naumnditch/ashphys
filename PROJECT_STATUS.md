@@ -56,8 +56,9 @@ Last updated: 2026-07-23 (ripple tank simulation)
     centre of gravity ("find the mass of the ruler"), and a mystery-mass
     challenge. Registered under topic 4.2, sim_type 'force_diagram'.
   - `/simulations/ripple-tank` — the 2D wave equation (FDTD, 176x104 grid,
-    120 steps/s) for 14.1-14.3: six scenes (plane waves, angled reflector,
-    narrow/wide gap diffraction, refracting shelf, two-point interference),
+    120 steps/s) for 14.1-14.3: seven scenes (plane waves, angled reflector,
+    narrow/wide gap diffraction, Young double slit, refracting shelf,
+    two-point interference),
     stroboscope, absorbing beach edges, 10 cm measuring grid. Scaled to a
     real tank: v = 30 cm/s deep / 18 cm/s shelf. Reflection/diffraction/
     refraction all EMERGE from the solver, nothing scripted. Registered
