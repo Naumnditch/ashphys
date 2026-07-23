@@ -23,6 +23,12 @@ const G = 9.8; // N/kg (Cambridge 0625 value)
 const BEAM_LEN = 1.0; // metres — a metre rule
 const NOTCH = 0.05; // hanging positions every 5 cm
 const MAX_TILT = 0.21; // rad, ≈ 12° end stops
+// The beam sits in a cradle slightly BELOW the rotation axis, like a real
+// demonstration balance. Tilting therefore lifts the load system's centre of
+// gravity, giving a restoring moment — this is why equal masses settle level,
+// and why a small imbalance produces a small steady tilt instead of neutral
+// equilibrium at any angle.
+const PIVOT_DROP = 0.02; // metres
 
 const TRAY_MASSES = [0.02, 0.05, 0.1, 0.2]; // kg
 
@@ -66,7 +72,7 @@ export function BalanceBeamSimulator() {
 
   const [placed, setPlaced] = useState<PlacedWeight[]>([]);
   const [pivot, setPivot] = useState(0.5); // metres from the left end
-  const [beamMass, setBeamMass] = useState(0);
+  const [beamMass, setBeamMass] = useState(0.1);
   const [mystery, setMystery] = useState<Mystery | null>(null);
   const [showTechnical, setShowTechnical] = useState(false);
   const [balanced, setBalanced] = useState(false);
@@ -75,7 +81,7 @@ export function BalanceBeamSimulator() {
   const simRef = useRef({
     placed: [] as PlacedWeight[],
     pivot: 0.5,
-    beamMass: 0,
+    beamMass: 0.1,
     mystery: null as Mystery | null,
     showTechnical: false,
     theta: 0,
@@ -87,7 +93,10 @@ export function BalanceBeamSimulator() {
   const netTorque = (theta: number) => {
     const s = simRef.current;
     let tau = 0;
-    const arm = (pos: number) => (pos - s.pivot) * Math.cos(theta); // + when load is right of pivot
+    // horizontal offset of an attachment point that sits at (pos) along the
+    // beam and PIVOT_DROP below the axis: shrinks with tilt AND gains a
+    // restoring −h·sinθ term
+    const arm = (pos: number) => (pos - s.pivot) * Math.cos(theta) - PIVOT_DROP * Math.sin(theta);
     s.placed.forEach((wt) => {
       tau += wt.mass * G * arm(wt.pos);
     });
@@ -100,12 +109,13 @@ export function BalanceBeamSimulator() {
   const inertia = () => {
     const s = simRef.current;
     let I = 0.004; // hanger + fixings floor
+    const h2 = PIVOT_DROP * PIVOT_DROP;
     s.placed.forEach((wt) => {
-      I += wt.mass * Math.pow(wt.pos - s.pivot, 2);
+      I += wt.mass * (Math.pow(wt.pos - s.pivot, 2) + h2);
     });
-    if (s.mystery) I += s.mystery.mass * Math.pow(s.mystery.pos - s.pivot, 2);
+    if (s.mystery) I += s.mystery.mass * (Math.pow(s.mystery.pos - s.pivot, 2) + h2);
     const c = BEAM_LEN / 2 - s.pivot;
-    I += s.beamMass * ((BEAM_LEN * BEAM_LEN) / 12 + c * c);
+    I += s.beamMass * ((BEAM_LEN * BEAM_LEN) / 12 + c * c + h2);
     return I;
   };
 
@@ -129,9 +139,10 @@ export function BalanceBeamSimulator() {
     const g = geom();
     const px = g.beamXpx(s.pivot);
     const dx = (pos - s.pivot) * g.scale;
+    const hpx = PIVOT_DROP * g.scale;
     return {
-      x: px + dx * Math.cos(s.theta),
-      y: g.pivotTopY + dx * Math.sin(s.theta),
+      x: px + dx * Math.cos(s.theta) - hpx * Math.sin(s.theta),
+      y: g.pivotTopY + dx * Math.sin(s.theta) + hpx * Math.cos(s.theta),
     };
   };
 
@@ -202,6 +213,7 @@ export function BalanceBeamSimulator() {
     ctx.save();
     ctx.translate(px, g.pivotTopY);
     ctx.rotate(s.theta);
+    ctx.translate(0, PIVOT_DROP * g.scale);
     const halfL = -s.pivot * g.scale;
     const halfR = (BEAM_LEN - s.pivot) * g.scale;
     ctx.fillStyle = '#efe7d2';
@@ -356,7 +368,7 @@ export function BalanceBeamSimulator() {
 
   const balancedNow = () => {
     const s = simRef.current;
-    return Math.abs(s.theta) < 0.012 && Math.abs(s.omega) < 0.02 && Math.abs(netTorque(s.theta)) < 0.004;
+    return Math.abs(s.theta) < 0.012 && Math.abs(s.omega) < 0.02 && Math.abs(netTorque(0)) < 0.004;
   };
 
   // ---------- animation ----------
