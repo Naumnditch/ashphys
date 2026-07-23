@@ -433,7 +433,7 @@ export function RippleTankSimulator() {
 
   return (
     <div className="ripple-tank-lab">
-      <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-5">
+      <div className="flex flex-col gap-5">
         {/* ---- Tank ---- */}
         <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
           <div className="flex justify-between items-baseline px-4 pt-3">
@@ -545,8 +545,8 @@ export function RippleTankSimulator() {
           </div>
         </div>
 
-        {/* ---- Notebook ---- */}
-        <div className="flex flex-col gap-5">
+        {/* ---- Notebook: a row of cards under the full-width tank ---- */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="bg-white border border-[#e4ddcc] rounded p-4">
             <div className="flex justify-between items-baseline">
               <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>

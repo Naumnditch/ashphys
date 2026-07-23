@@ -99,7 +99,15 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
     getAdjacentChapters(chapter.chapter_number),
   ]);
 
-  const simByTopic = new Map(simulations.filter((s) => s.topic_id).map((s) => [s.topic_id, s]));
+  // a lesson can have more than one simulation — group, don't overwrite
+  const simsByTopic = new Map<string, typeof simulations>();
+  for (const s of simulations) {
+    if (!s.topic_id) continue;
+    const arr = simsByTopic.get(s.topic_id) || [];
+    arr.push(s);
+    simsByTopic.set(s.topic_id, arr);
+  }
+  const simShortName = (title: string) => title.split(':')[0].trim();
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -122,7 +130,7 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
           </h2>
           <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
             {topics.map((topic) => {
-              const sim = simByTopic.get(topic.id);
+              const sims = simsByTopic.get(topic.id) || [];
               const hasPractice = topicsWithPractice.has(topic.id);
               return (
                 <li
@@ -140,14 +148,16 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
                         🎯 Practice
                       </Link>
                     )}
-                    {sim && (
+                    {sims.map((sim) => (
                       <Link
+                        key={sim.id}
                         href={sim.url_path}
                         className="text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-full whitespace-nowrap flex items-center gap-1.5"
                       >
-                        <SimulationIcon className="w-3.5 h-3.5" /> Launch Simulation
+                        <SimulationIcon className="w-3.5 h-3.5" />
+                        {sims.length > 1 ? simShortName(sim.title) : 'Launch Simulation'}
                       </Link>
-                    )}
+                    ))}
                   </span>
                 </li>
               );

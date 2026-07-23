@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { query } from '@/lib/db/client';
-import { RippleTankSimulator } from '@/components/simulations/RippleTankSimulator';
+import { DoubleSlitSimulator } from '@/components/simulations/DoubleSlitSimulator';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,7 +11,7 @@ async function getSimContext() {
        FROM simulations s
        JOIN chapters c ON c.id = s.chapter_id
        LEFT JOIN topics t ON t.id = s.topic_id
-       WHERE s.url_path = '/simulations/ripple-tank'
+       WHERE s.url_path = '/simulations/double-slit'
        LIMIT 1`
     );
     return result.rows[0] || null;
@@ -20,7 +20,7 @@ async function getSimContext() {
   }
 }
 
-export default async function RippleTankSimulationPage() {
+export default async function DoubleSlitSimulationPage() {
   const ctx = await getSimContext();
 
   return (
@@ -44,13 +44,13 @@ export default async function RippleTankSimulationPage() {
 
         <div className="mb-6">
           <div className="font-mono text-xs tracking-wide uppercase text-[#8f6428] mb-1.5">
-            {ctx ? `Chapter ${ctx.chapter_number} · Properties of Waves — Lessons 14.1–14.3` : 'Simulation'}
+            {ctx ? `Chapter ${ctx.chapter_number} · Properties of Waves — Lesson 14.3 (extension)` : 'Simulation'}
           </div>
           <h1
             className="text-2xl sm:text-3xl font-semibold text-[#1b2a41]"
             style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.01em' }}
           >
-            {ctx?.title || 'Ripple Tank: Waves, Reflection, Diffraction & Refraction'}
+            {ctx?.title || 'Double-Slit Lab: Measuring the Fringe Spacing'}
           </h1>
           {ctx?.description && (
             <p
@@ -62,7 +62,7 @@ export default async function RippleTankSimulationPage() {
           )}
         </div>
 
-        <RippleTankSimulator />
+        <DoubleSlitSimulator />
       </div>
     </div>
   );
