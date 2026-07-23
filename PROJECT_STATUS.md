@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-23 (balance beam simulation)
+Last updated: 2026-07-23 (ripple tank simulation)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-23 (balance beam simulation)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **8 interactive simulations**, each a real physics engine (not a canned
+- **9 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -55,11 +55,20 @@ Last updated: 2026-07-23 (balance beam simulation)
     end stops), live CW/ACW moments ledger, adjustable beam mass at its
     centre of gravity ("find the mass of the ruler"), and a mystery-mass
     challenge. Registered under topic 4.2, sim_type 'force_diagram'.
+  - `/simulations/ripple-tank` — the 2D wave equation (FDTD, 176x104 grid,
+    120 steps/s) for 14.1-14.3: six scenes (plane waves, angled reflector,
+    narrow/wide gap diffraction, refracting shelf, two-point interference),
+    stroboscope, absorbing beach edges, 10 cm measuring grid. Scaled to a
+    real tank: v = 30 cm/s deep / 18 cm/s shelf. Reflection/diffraction/
+    refraction all EMERGE from the solver, nothing scripted. Registered
+    under topic 14.3. Numerics verified against numpy (lambda within ~3%%
+    of v/f; grid dispersion).
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
   question, streak-based mastery (5 correct in a row), wrong answers surface
-  a "revise this" link back to the lesson + its simulation. 50 original
-  practice questions seeded across 10 lessons — 5 each for the 6 original
-  sim lessons, plus 13.2/13.3 (refraction/TIR) and 4.1/4.2 (moments).
+  a "revise this" link back to the lesson + its simulation. 65 original
+  practice questions seeded across 13 lessons — 5 each for the 6 original
+  sim lessons, 13.2/13.3 (refraction/TIR), 4.1/4.2 (moments), and all of
+  chapter 14 (14.1/14.2/14.3, waves).
   Green "🎯 Practice" button appears on chapter pages for lessons that have
   questions.
 - **Teacher accounts**: signup requires school name + message, starts
