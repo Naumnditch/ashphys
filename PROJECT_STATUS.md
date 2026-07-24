@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (half-life lab)
+Last updated: 2026-07-24 (pressure in liquids)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-24 (half-life lab)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **12 interactive simulations**, each a real physics engine (not a canned
+- **13 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -116,7 +116,18 @@ Last updated: 2026-07-24 (half-life lab)
     technical overlay compares measured activity vs lambda*N. sim_type
     'graph_builder'. Chapter 23 questions seeded (problems 1-10: 5x
     topic 23.2, 5x topic 23.3).
-  - Layout: ripple-tank, double-slit, gas-laws, and half-life pages use a full-width layout
+  - `/simulations/pressure-in-liquids` — p = rho*g*h bench (5.4 & 5.5,
+    registered under topic 5.5 5c5e1c9b): 2 m tank, draggable probe
+    whose measurements land as colour-tagged dots on a live p-h chart
+    (persist across liquid switches for slope comparison), 5 liquids,
+    3 gravities (Moon/Earth/Jupiter), gauge-vs-absolute toggle
+    (+101.3 kPa), Torricelli wall spouts at 0.5/1.0/1.5 m with
+    v = sqrt(2gh) droplet jets (analytic kinematics, no engine).
+    Technical panel notes the rho-independence of jet speed. sim_type
+    'force_diagram'. Ch5 questions extended: problems 6-15 (5x topic
+    5.4 conceptual, 5x topic 5.5 calculations); ch5 problems 1-5 were
+    the spring sim's.
+  - Layout: ripple-tank, double-slit, gas-laws, half-life, and pressure-in-liquids pages use a full-width layout
     (max-w-[1600px], canvas card full width, notebook cards in a
     lg:grid-cols-3 row below). Older sims keep the two-column layout.
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
