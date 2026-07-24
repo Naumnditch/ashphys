@@ -37,6 +37,10 @@ const DT = 1 / 120;
 const SUBSTEPS = 2;
 const SPEED_SCALE = 90; // at T = 300 K, vrms = SPEED_SCALE * sqrt(2)
 const THERMO_RATE = 0.02; // soft heat-bath relaxation per substep
+const PISTON_MOBILITY = 0.025; // overdamped free piston: v = mobility * (p_gas - p_ext) * H
+const PISTON_VMAX = 60;
+
+type GasMode = 'boyle' | 'pressure' | 'charles';
 
 interface Particle {
   x: number;
@@ -71,6 +75,8 @@ export function GasLawsSimulator() {
   const partsRef = useRef<Particle[]>(makeGas(160, 300, 400));
   const draggingRef = useRef(false);
 
+  const [mode, setMode] = useState<GasMode>('boyle');
+  const [pExt, setPExt] = useState(15);
   const [bathT, setBathT] = useState(300);
   const [nTarget, setNTarget] = useState(160);
   const [pistonX, setPistonX] = useState(400);
@@ -79,6 +85,8 @@ export function GasLawsSimulator() {
   const [readout, setReadout] = useState({ p: 0, tKin: 300, pv: 0, nkt: 0 });
 
   const simRef = useRef({
+    mode: 'boyle' as GasMode,
+    pExt: 15,
     bathT: 300,
     pistonX: 400,
     pistonV: 0,
@@ -90,14 +98,19 @@ export function GasLawsSimulator() {
     impulseT: 0,
     pSmooth: 0,
     tKin: 300,
-    // p–V trail for the chart
-    trail: [] as { v: number; p: number }[],
+    // measured trail for the chart (axes depend on mode)
+    trail: [] as { x: number; y: number }[],
     trailClock: 0,
   });
 
   const stepPhysics = () => {
     const s = simRef.current;
     const parts = partsRef.current;
+    if (s.mode === 'charles' && s.pSmooth > 0) {
+      // overdamped free piston: moves until bombardment balances the load
+      s.pistonV = Math.max(-PISTON_VMAX, Math.min(PISTON_VMAX, PISTON_MOBILITY * (s.pSmooth - s.pExt) * BOX_H));
+      s.pistonX = Math.max(PISTON_MIN, Math.min(PISTON_MAX, s.pistonX + s.pistonV * DT));
+    }
     const px = s.pistonX;
     const pv = s.pistonV;
 
@@ -177,12 +190,14 @@ export function GasLawsSimulator() {
       s.impulseT = 0;
     }
 
-    // p–V trail sample twice per second
+    // measured trail sample twice per second — axes depend on the law under test
     s.trailClock += DT;
     if (s.trailClock > 0.5 && s.pSmooth > 0) {
       s.trailClock = 0;
       const area = (s.pistonX - X0) * BOX_H;
-      s.trail.push({ v: area, p: s.pSmooth });
+      if (s.mode === 'boyle') s.trail.push({ x: area, y: s.pSmooth });
+      else if (s.mode === 'pressure') s.trail.push({ x: s.tKin, y: s.pSmooth });
+      else s.trail.push({ x: s.tKin, y: area });
       if (s.trail.length > 120) s.trail.shift();
     }
   };
@@ -240,7 +255,32 @@ export function GasLawsSimulator() {
     ctx.fillStyle = '#4a5a72';
     ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('drag the piston', s.pistonX + 7, Y0 - 12);
+    if (s.mode === 'charles') {
+      ctx.fillText('free piston — floats on the gas', s.pistonX + 7, Y0 - 12);
+      // external load arrows pressing the piston inward
+      ctx.strokeStyle = '#8f6428';
+      ctx.fillStyle = '#8f6428';
+      ctx.lineWidth = 2;
+      for (const fy of [Y0 + 60, Y0 + BOX_H / 2, Y0 + BOX_H - 60]) {
+        ctx.beginPath();
+        ctx.moveTo(s.pistonX + 62, fy);
+        ctx.lineTo(s.pistonX + 24, fy);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(s.pistonX + 20, fy);
+        ctx.lineTo(s.pistonX + 30, fy - 5);
+        ctx.lineTo(s.pistonX + 30, fy + 5);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.font = 'italic 700 11.5px Georgia, serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`p_ext = ${s.pExt}`, s.pistonX + 24, Y0 + BOX_H / 2 - 12);
+      ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+    } else {
+      ctx.fillText('drag the piston', s.pistonX + 7, Y0 - 12);
+    }
 
     // volume label inside the box
     ctx.fillStyle = 'rgba(27, 42, 65, 0.55)';
@@ -317,7 +357,7 @@ export function GasLawsSimulator() {
     ctx.fillStyle = '#2e7d6b';
     ctx.fillText('— bath setpoint', tx, ty0 - 8);
 
-    // ---- p–V chart ----
+    // ---- law chart: axes depend on mode ----
     const cx0 = 700;
     const cy0 = 60;
     const cw = 280;
@@ -327,25 +367,53 @@ export function GasLawsSimulator() {
     ctx.strokeStyle = '#1b2a41';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(cx0, cy0, cw, ch);
-    const vMin = areaOf(PISTON_MIN) * 0.92;
-    const vMax = areaOf(PISTON_MAX) * 1.04;
-    const pMaxChart = 42;
-    const vToX = (v: number) => cx0 + ((v - vMin) / (vMax - vMin)) * cw;
-    const pToY = (p: number) => cy0 + ch - (Math.min(p, pMaxChart) / pMaxChart) * ch;
 
-    // theory isotherm p = NkT/V at the bath temperature
+    const vMinC = areaOf(PISTON_MIN) * 0.92;
+    const vMaxC = areaOf(PISTON_MAX) * 1.04;
+    const pMaxChart = 42;
+    const tMaxChart = 650;
+    const n = partsRef.current.length;
+    const areaNow = areaOf(s.pistonX);
+
+    let xLo = 0;
+    let xHi = 1;
+    let yHi = 1;
+    let chartTitle = '';
+    let xTag = '';
+    let yTag = '';
+    let theory: (x: number) => number = () => 0;
+    if (s.mode === 'boyle') {
+      xLo = vMinC; xHi = vMaxC; yHi = pMaxChart;
+      chartTitle = 'pressure–volume  (dots: measured · dashes: pV = NkT)';
+      xTag = 'V →'; yTag = 'p →';
+      theory = (v: number) => (n * kB300 * (s.bathT / 300)) / v;
+    } else if (s.mode === 'pressure') {
+      xLo = 0; xHi = tMaxChart; yHi = pMaxChart;
+      chartTitle = 'pressure–temperature  (line passes through absolute zero)';
+      xTag = 'T (K) →'; yTag = 'p →';
+      theory = (t: number) => (n * kB300 * (t / 300)) / areaNow;
+    } else {
+      xLo = 0; xHi = tMaxChart; yHi = vMaxC;
+      chartTitle = 'volume–temperature  (line passes through absolute zero)';
+      xTag = 'T (K) →'; yTag = 'V →';
+      theory = (t: number) => (n * kB300 * (t / 300)) / s.pExt / 1; // V = NkT / p_ext
+    }
+    const vToX = (x: number) => cx0 + ((x - xLo) / (xHi - xLo)) * cw;
+    const pToY = (y: number) => cy0 + ch - (Math.min(y, yHi) / yHi) * ch;
+
+    // theory curve for the current settings
     ctx.strokeStyle = '#2e7d6b';
     ctx.lineWidth = 1.8;
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
     let started = false;
-    for (let px2 = PISTON_MIN; px2 <= PISTON_MAX; px2 += 4) {
-      const v = areaOf(px2);
-      const p = (partsRef.current.length * kB300 * (s.bathT / 300)) / v;
-      if (!started) {
-        ctx.moveTo(vToX(v), pToY(p));
-        started = true;
-      } else ctx.lineTo(vToX(v), pToY(p));
+    for (let k = 0; k <= 90; k++) {
+      const x = xLo + ((xHi - xLo) * k) / 90;
+      if (s.mode === 'boyle' && x < vMinC * 0.99) continue;
+      const y = theory(x);
+      if (y > yHi * 1.02) { started = false; continue; }
+      if (!started) { ctx.moveTo(vToX(x), pToY(y)); started = true; }
+      else ctx.lineTo(vToX(x), pToY(y));
     }
     ctx.stroke();
     ctx.setLineDash([]);
@@ -355,22 +423,22 @@ export function GasLawsSimulator() {
       const age = idx / Math.max(1, s.trail.length - 1);
       ctx.fillStyle = `rgba(184, 130, 61, ${0.15 + 0.75 * age})`;
       ctx.beginPath();
-      ctx.arc(vToX(pt.v), pToY(pt.p), age > 0.98 ? 5 : 3, 0, Math.PI * 2);
+      ctx.arc(vToX(pt.x), pToY(pt.y), age > 0.98 ? 5 : 3, 0, Math.PI * 2);
       ctx.fill();
     });
 
     ctx.fillStyle = '#1b2a41';
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('pressure–volume  (dots: measured · dashes: pV = NkT)', cx0 + cw / 2, cy0 - 8);
+    ctx.fillText(chartTitle, cx0 + cw / 2, cy0 - 8);
     ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.fillStyle = '#4a5a72';
     ctx.textAlign = 'left';
-    ctx.fillText('V →', cx0 + cw - 28, cy0 + ch + 14);
+    ctx.fillText(xTag, cx0 + cw - 46, cy0 + ch + 14);
     ctx.save();
     ctx.translate(cx0 - 8, cy0 + 24);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText('p →', 0, 0);
+    ctx.fillText(yTag, 0, 0);
     ctx.restore();
 
     // ---- technical overlay: emergent Maxwell-Boltzmann ----
@@ -428,11 +496,14 @@ export function GasLawsSimulator() {
   const loop = () => {
     const s = simRef.current;
     if (!s.paused) {
-      // piston velocity from drag motion (per physics step)
-      s.pistonV = (s.pistonX - s.lastPistonX) / (DT * SUBSTEPS);
+      if (s.mode !== 'charles') {
+        // piston velocity from drag motion (per physics step)
+        s.pistonV = (s.pistonX - s.lastPistonX) / (DT * SUBSTEPS);
+      }
       s.lastPistonX = s.pistonX;
       for (let k = 0; k < SUBSTEPS; k++) stepPhysics();
-      s.pistonV = 0;
+      if (s.mode !== 'charles') s.pistonV = 0;
+      else setPistonX(s.pistonX);
       render();
       const area = areaOf(s.pistonX);
       setReadout({
@@ -459,7 +530,7 @@ export function GasLawsSimulator() {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
     const ix = ((e.clientX - rect.left) / rect.width) * IW;
-    if (Math.abs(ix - simRef.current.pistonX) < 70) {
+    if (simRef.current.mode !== 'charles' && Math.abs(ix - simRef.current.pistonX) < 70) {
       (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
       draggingRef.current = true;
     }
@@ -503,6 +574,19 @@ export function GasLawsSimulator() {
     simRef.current.trail = [];
   };
 
+  const handleMode = (m: GasMode) => {
+    setMode(m);
+    simRef.current.mode = m;
+    simRef.current.trail = [];
+    simRef.current.pistonV = 0;
+    simRef.current.lastPistonX = simRef.current.pistonX;
+  };
+
+  const handlePExt = (v: number) => {
+    setPExt(v);
+    simRef.current.pExt = v;
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const resize = () => {
@@ -523,6 +607,18 @@ export function GasLawsSimulator() {
   }, []);
 
   const agreement = readout.nkt > 0 ? (readout.pv / readout.nkt) * 100 : 0;
+
+  const lawFormula: Record<GasMode, { main: string; sub: string }> = {
+    boyle: { main: 'p₁V₁ = p₂V₂', sub: "at constant temperature (Boyle's law)" },
+    pressure: { main: 'p₁ / T₁ = p₂ / T₂', sub: 'at constant volume — T in kelvin (the pressure law)' },
+    charles: { main: 'V₁ / T₁ = V₂ / T₂', sub: "at constant pressure — T in kelvin (Charles's law)" },
+  };
+
+  const lawHint: Record<GasMode, string> = {
+    boyle: 'The bath holds T fixed while you set V and the gas answers with p.',
+    pressure: 'The piston stays where you put it (fixed V); heat the bath and the gas answers with p. The dashed line aims straight at absolute zero.',
+    charles: 'The piston floats freely under a fixed external load (fixed p); heat the bath and the gas answers with V. Kelvin makes the line pass through the origin.',
+  };
 
   const variables = [
     { symbol: 'p', name: 'Pressure', def: 'Force per unit wall length from particle bombardment. Not programmed — measured from the impulse of every collision with the walls.' },
@@ -565,6 +661,24 @@ export function GasLawsSimulator() {
         </div>
 
         <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {([
+              ['boyle', "Boyle's Law", 'constant T'],
+              ['pressure', 'Pressure Law', 'constant V'],
+              ['charles', "Charles's Law", 'constant p'],
+            ] as [GasMode, string, string][]).map(([m, label, cond]) => (
+              <button
+                key={m}
+                onClick={() => handleMode(m)}
+                className={`flex-1 min-w-36 text-[12.5px] font-semibold px-3 py-2 rounded border ${
+                  mode === m ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                }`}
+              >
+                {label} <span className={mode === m ? 'opacity-80' : 'text-[#4a5a72]'}>· {cond}</span>
+              </button>
+            ))}
+          </div>
+          <p className="text-[11.5px] text-[#4a5a72] leading-snug mb-3">{lawHint[mode]}</p>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-3 mb-3">
             <div className="flex items-center gap-3">
               <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Bath temp. T</label>
@@ -572,12 +686,21 @@ export function GasLawsSimulator() {
                 onChange={(e) => handleBathT(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{bathT} K</span>
             </div>
-            <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Volume</label>
-              <input type="range" min={PISTON_MIN} max={PISTON_MAX} step={2} value={pistonX}
-                onChange={(e) => handleVolumeSlider(parseFloat(e.target.value))} className="flex-1" />
-              <span className="font-mono text-[13px] w-16 text-right">{(areaOf(pistonX) / 1000).toFixed(0)}k u²</span>
-            </div>
+            {mode !== 'charles' ? (
+              <div className="flex items-center gap-3">
+                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Volume</label>
+                <input type="range" min={PISTON_MIN} max={PISTON_MAX} step={2} value={pistonX}
+                  onChange={(e) => handleVolumeSlider(parseFloat(e.target.value))} className="flex-1" />
+                <span className="font-mono text-[13px] w-16 text-right">{(areaOf(pistonX) / 1000).toFixed(0)}k u²</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Load p_ext</label>
+                <input type="range" min={10} max={26} step={1} value={pExt}
+                  onChange={(e) => handlePExt(parseFloat(e.target.value))} className="flex-1" />
+                <span className="font-mono text-[13px] w-16 text-right">{pExt} u</span>
+              </div>
+            )}
             <div className="flex items-center gap-3">
               <span className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Particles N</span>
               <button onClick={() => handleN(-40)}
@@ -677,16 +800,26 @@ export function GasLawsSimulator() {
               <strong className="text-[#1b2a41]">5.</strong> Open the speed distribution: the histogram isn't drawn from
               a formula — it's counted from the particles, and collisions alone push it onto the red theory curve.
             </p>
+            <p>
+              <strong className="text-[#1b2a41]">6.</strong> Switch to the Pressure Law, clear the trail, then sweep the
+              bath from 100 K to 600 K at fixed volume. The dots form a straight line aimed at the origin — extend it
+              backwards and it hits p = 0 at T = 0: absolute zero, discovered by extrapolation.
+            </p>
+            <p>
+              <strong className="text-[#1b2a41]">7.</strong> Switch to Charles's Law: the piston now floats on the gas
+              under a fixed load. Heat the bath and watch the gas physically push the piston out — the V–T dots make a
+              straight line through the origin. This only works with kelvin: that's WHY the gas laws use it.
+            </p>
           </div>
         </div>
 
         <div className="bg-white border border-[#e4ddcc] rounded p-4">
           <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
             <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
-              p₁V₁ = p₂V₂
+              {lawFormula[mode].main}
             </div>
             <div className="italic text-[14px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
-              at constant temperature (Boyle's law)
+              {lawFormula[mode].sub}
             </div>
           </div>
           <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">

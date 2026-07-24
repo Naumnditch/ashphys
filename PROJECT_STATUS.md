@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (gas laws kinetic theory sim)
+Last updated: 2026-07-24 (gas laws sim: all three laws)
 
 ---
 
@@ -98,8 +98,14 @@ Last updated: 2026-07-24 (gas laws kinetic theory sim)
     chart with theory isotherm + measured trail, speed-coloured
     particles, technical overlay = emergent Maxwell-Boltzmann histogram
     vs Rayleigh curve. sim_type enum has no 'particle' - used
-    'collision'. 10 questions seeded (ch9 problems 1-10: 5x topic 9.3,
-    5x topic 9.5).
+    'collision'. THREE MODES: Boyle (kinematic piston, p-V chart vs
+    isotherm), Pressure Law (fixed V, p-T chart, line through absolute
+    zero), Charles (overdamped free piston v = 0.025*(p_gas-p_ext)*H
+    clamped +-60, node-verified V/T constant +-3% and settle within
+    2-8% of V=NkT/p_ext; p_ext slider 10-26; V-T chart through origin).
+    Trail is mode-aware {x,y}; formula card/hints/Try This switch per
+    mode. 15 questions seeded (ch9 problems 1-15: 5x topic 9.3, 10x
+    topic 9.5 incl pressure law, Charles, kelvin, absolute zero).
   - Layout: ripple-tank, double-slit, and gas-laws pages use a full-width layout
     (max-w-[1600px], canvas card full width, notebook cards in a
     lg:grid-cols-3 row below). Older sims keep the two-column layout.
