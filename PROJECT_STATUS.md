@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-23 (double-slit lab + full-width sim layout)
+Last updated: 2026-07-24 (gas laws kinetic theory sim)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-23 (double-slit lab + full-width sim layout)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **10 interactive simulations**, each a real physics engine (not a canned
+- **11 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -85,7 +85,22 @@ Last updated: 2026-07-23 (double-slit lab + full-width sim layout)
     formula's far-field small print. Second sim under topic 14.3; the
     chapter page was upgraded to group sims per topic (was a Map that
     silently overwrote; now one labelled button per sim).
-  - Layout: ripple-tank and double-slit pages use a full-width layout
+  - `/simulations/gas-laws` — Gas in a Box (9.3 & 9.5, registered under
+    topic 9.5 aedaea73): hard-disc molecular dynamics, N up to 280 with
+    pairwise elastic collisions. Pressure is MEASURED from wall-impulse
+    accounting (nothing scripted); node-verified pV constancy 97.7%
+    across full compression and pressure law ratio 3.09 vs 3.00. Physics
+    radius R=2 chosen deliberately: R=3 gave 90% constancy from excluded
+    volume (real-gas effect). Draggable piston with moving-wall
+    reflection (2u_p - v) -> honest adiabatic heating on fast
+    compression, soft bath thermostat (rate 0.02/substep) relaxes back.
+    Dial gauge, thermometer (bath setpoint vs measured T_kin), live p-V
+    chart with theory isotherm + measured trail, speed-coloured
+    particles, technical overlay = emergent Maxwell-Boltzmann histogram
+    vs Rayleigh curve. sim_type enum has no 'particle' - used
+    'collision'. 10 questions seeded (ch9 problems 1-10: 5x topic 9.3,
+    5x topic 9.5).
+  - Layout: ripple-tank, double-slit, and gas-laws pages use a full-width layout
     (max-w-[1600px], canvas card full width, notebook cards in a
     lg:grid-cols-3 row below). Older sims keep the two-column layout.
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
