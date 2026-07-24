@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (gas laws sim: all three laws)
+Last updated: 2026-07-24 (half-life lab)
 
 ---
 
@@ -33,7 +33,7 @@ Last updated: 2026-07-24 (gas laws sim: all three laws)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **11 interactive simulations**, each a real physics engine (not a canned
+- **12 interactive simulations**, each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay
@@ -106,7 +106,17 @@ Last updated: 2026-07-24 (gas laws sim: all three laws)
     Trail is mode-aware {x,y}; formula card/hints/Try This switch per
     mode. 15 questions seeded (ch9 problems 1-15: 5x topic 9.3, 10x
     topic 9.5 incl pressure law, Charles, kelvin, absolute zero).
-  - Layout: ripple-tank, double-slit, and gas-laws pages use a full-width layout
+  - `/simulations/half-life` — Half-Life Lab (23.2 & 23.3, registered
+    under topic 23.3 97e38b4a): stochastic decay, each nucleus rolls
+    P = 1 - e^(-lambda*dt) per frame (exact), nothing exponential
+    programmed. Grid of 100/400/900 brass nuclei with decay flashes,
+    one ringed 'watched' nucleus (unpredictability), measured N-t curve
+    vs dashed theory N0*2^(-t/T-half), red dots + printed intervals at
+    each measured halving, live activity counter (1s sliding window),
+    technical overlay compares measured activity vs lambda*N. sim_type
+    'graph_builder'. Chapter 23 questions seeded (problems 1-10: 5x
+    topic 23.2, 5x topic 23.3).
+  - Layout: ripple-tank, double-slit, gas-laws, and half-life pages use a full-width layout
     (max-w-[1600px], canvas card full width, notebook cards in a
     lg:grid-cols-3 row below). Older sims keep the two-column layout.
 - **Practice engine** (IXL/Khan-style): `/practice/[topicId]`. Question-by-
