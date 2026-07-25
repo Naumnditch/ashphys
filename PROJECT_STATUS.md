@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (past papers section - infra only, no copyrighted content)
+Last updated: 2026-07-24 (past papers: upload pipeline added)
 
 ---
 
@@ -60,6 +60,28 @@ Last updated: 2026-07-24 (past papers section - infra only, no copyrighted conte
   edit/delete. API routes: POST+GET /api/admin/past-papers, DELETE
   /api/admin/past-papers/[id]. Same admin-only auth pattern as
   teacher-applications.
+- UPLOAD PIPELINE (added this session): Supabase Storage bucket
+  `past-papers` created directly via SQL against storage.buckets
+  (public=true, 20MB limit, application/pdf only — no supabase-js
+  dependency added, matches the project's raw-pg-only style). New
+  route POST /api/admin/past-papers/upload (multipart file + path) ->
+  Storage REST API (POST .../storage/v1/object/past-papers/<path>)
+  using SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (server-side only,
+  bypasses RLS) -> returns the public URL
+  (.../storage/v1/object/public/past-papers/<path>). Admin form's URL
+  text inputs replaced with file pickers that upload on selection and
+  auto-fill the URL field; path is auto-slugged from
+  year/session/paper/variant (e.g. 2020-oct-nov/paper-4-v2-qp.pdf).
+  BLOCKED ON USER: SUPABASE_SERVICE_ROLE_KEY is a secret Claude has no
+  MCP access to (by design) — user must copy it from Supabase
+  dashboard (Project Settings > API > service_role) into Vercel env
+  vars alongside SUPABASE_URL (already known:
+  https://uolwvcszclviqrtyxwgl.supabase.co), then redeploy, before
+  upload buttons will work in production. .env.example updated with
+  both vars and the exact project URL.
+  COPYRIGHT NOTE STILL APPLIES: Claude built the pipeline but does
+  not upload any real exam content itself — user uploads their own
+  legitimately-downloaded PDFs through this form.
 - ONE TEST ROW seeded: 2020 Oct/Nov Paper 4 Variant 2, metadata only
   (no QP/MS urls, explanation_status='coming_soon'). Waiting on user
   to paste in their own real PDF links via the admin form to complete

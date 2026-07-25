@@ -14,8 +14,8 @@ export default async function AdminPastPapersPage() {
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Past Papers</h1>
       <p className="text-gray-500 text-sm mb-8">
-        {papers.length} {papers.length === 1 ? 'entry' : 'entries'}. Question-paper and mark-scheme fields take a URL —
-        upload the PDF to storage first, then paste its link here.
+        {papers.length} {papers.length === 1 ? 'entry' : 'entries'}. Choose a PDF for the question paper and mark
+        scheme — each uploads straight to storage and the link fills in automatically.
       </p>
       <PastPaperManager initialPapers={papers} />
     </div>

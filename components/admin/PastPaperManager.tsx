@@ -44,6 +44,33 @@ export function PastPaperManager({ initialPapers }: { initialPapers: PastPaper[]
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<'qp' | 'ms' | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const handleUpload = async (kind: 'qp' | 'ms', file: File) => {
+    setUploading(kind);
+    setUploadError(null);
+    try {
+      const path = `${form.year}-${slug(form.session)}/paper-${form.paper_number}-v${form.variant}-${kind}.pdf`;
+      const body = new FormData();
+      body.set('file', file);
+      body.set('path', path);
+      const res = await fetch('/api/admin/past-papers/upload', { method: 'POST', body });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setUploadError(data.error || 'Upload failed');
+        return;
+      }
+      if (kind === 'qp') setForm((f) => ({ ...f, question_paper_url: data.url }));
+      else setForm((f) => ({ ...f, mark_scheme_url: data.url }));
+    } catch {
+      setUploadError('Network error during upload');
+    } finally {
+      setUploading(null);
+    }
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -156,26 +183,60 @@ export function PastPaperManager({ initialPapers }: { initialPapers: PastPaper[]
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Question Paper URL</label>
-            <input
-              type="text"
-              placeholder="https://…/qp.pdf (leave blank until you have it)"
-              value={form.question_paper_url}
-              onChange={(e) => setForm({ ...form, question_paper_url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <label className="block text-xs font-medium text-gray-500 mb-1">Question Paper (PDF)</label>
+            <div className="flex items-center gap-2">
+              <label className="flex-shrink-0 cursor-pointer text-xs font-semibold px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">
+                {uploading === 'qp' ? 'Uploading…' : 'Choose PDF'}
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  disabled={uploading !== null}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUpload('qp', f);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              {form.question_paper_url ? (
+                <a href={form.question_paper_url} target="_blank" rel="noopener noreferrer" className="text-xs text-green-700 underline truncate">
+                  ✓ uploaded — view
+                </a>
+              ) : (
+                <span className="text-xs text-gray-400">no file yet</span>
+              )}
+            </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">Mark Scheme URL</label>
-            <input
-              type="text"
-              placeholder="https://…/ms.pdf"
-              value={form.mark_scheme_url}
-              onChange={(e) => setForm({ ...form, mark_scheme_url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
-            />
+            <label className="block text-xs font-medium text-gray-500 mb-1">Mark Scheme (PDF)</label>
+            <div className="flex items-center gap-2">
+              <label className="flex-shrink-0 cursor-pointer text-xs font-semibold px-3 py-2 rounded-lg border border-gray-300 hover:bg-gray-50">
+                {uploading === 'ms' ? 'Uploading…' : 'Choose PDF'}
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  disabled={uploading !== null}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUpload('ms', f);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              {form.mark_scheme_url ? (
+                <a href={form.mark_scheme_url} target="_blank" rel="noopener noreferrer" className="text-xs text-green-700 underline truncate">
+                  ✓ uploaded — view
+                </a>
+              ) : (
+                <span className="text-xs text-gray-400">no file yet</span>
+              )}
+            </div>
           </div>
         </div>
+        {uploadError && <p className="text-sm text-red-600 mb-3">{uploadError}</p>}
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1">Explanation Status</label>
