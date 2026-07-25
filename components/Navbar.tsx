@@ -45,6 +45,7 @@ export async function Navbar() {
           <CurriculumDropdown chapters={chapters} />
           <Link className="text-sm hover:underline hidden lg:inline-block" href="/about">About Us</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/resources">Resources</Link>
+          <Link className="text-sm hover:underline hidden xl:inline-block" href="/past-papers">Past Papers</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/contact">Contact</Link>
           <SearchBar />
           {user ? (

@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (pressure in liquids)
+Last updated: 2026-07-24 (past papers section - infra only, no copyrighted content)
 
 ---
 
@@ -33,7 +33,42 @@ Last updated: 2026-07-24 (pressure in liquids)
   Physics (0625) textbook table of contents. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
-- **13 interactive simulations**, each a real physics engine (not a canned
+- **13 interactive simulations**
+
+### Past Papers section (NEW - infrastructure only)
+- COPYRIGHT NOTE: Cambridge explicitly does not permit hosting past
+  exam papers on third-party websites (confirmed via their own help
+  centre). User made an informed decision to proceed as a "mirror"
+  (like Save My Exams etc) at their own risk. Claude built ONLY the
+  infrastructure - schema, admin CRUD, public browsing page - and
+  declined to personally source/reproduce any real exam content.
+  User uploads their own PDFs (paste URL after hosting elsewhere -
+  no file-upload pipeline built, no Supabase Storage wired up yet).
+- DB table `past_papers`: syllabus_code (default '0625'), year
+  (>=2020), session (Feb/Mar | May/Jun | Oct/Nov), paper_number (1-6),
+  variant (1-3), question_paper_url, mark_scheme_url,
+  explanation_status (coming_soon|published), explanation_video_url
+  (YouTube link - YOUTUBE_API_KEY already in .env.example),
+  explanation_notes. Unique on (syllabus_code, year, session,
+  paper_number, variant).
+- Public page `/past-papers`: year+paper-number filter pills, grouped
+  by year/session, lab-notebook styling. "Explanation: Coming Soon"
+  badge when no video; QP/MS show as greyed-out labels (not links)
+  when url is null - never a broken link.
+- Admin `/admin/past-papers`: form to add/update by
+  year/session/paper/variant (upsert on the unique key), list with
+  edit/delete. API routes: POST+GET /api/admin/past-papers, DELETE
+  /api/admin/past-papers/[id]. Same admin-only auth pattern as
+  teacher-applications.
+- ONE TEST ROW seeded: 2020 Oct/Nov Paper 4 Variant 2, metadata only
+  (no QP/MS urls, explanation_status='coming_soon'). Waiting on user
+  to paste in their own real PDF links via the admin form to complete
+  the test, then confirm before bulk-importing sessions since 2020.
+- STILL TODO if user confirms: bulk-import UI/script for many papers
+  at once (currently one-at-a-time only), file-upload-to-storage
+  pipeline (currently URL-paste only, no Supabase Storage bucket
+  wired up), YouTube embed player on the public page (currently just
+  a link out) instead of iframe embed., each a real physics engine (not a canned
   animation), registered in the `simulations` table with a `topic_id` linking
   it to its exact lesson:
   - `/simulations/pendulum` — damped oscillation, force vectors, technical overlay

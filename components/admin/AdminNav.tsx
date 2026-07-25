@@ -9,6 +9,7 @@ const ADMIN_NAV = [
   { href: '/admin/users', label: 'Users' },
   { href: '/admin/sections', label: 'Sections' },
   { href: '/admin/curriculum', label: 'Curriculum' },
+  { href: '/admin/past-papers', label: 'Past Papers' },
 ];
 
 export function AdminNav() {
