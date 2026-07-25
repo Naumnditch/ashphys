@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   const topic = topicResult.rows[0];
 
   const problemsResult = await query(
-    `SELECT id, question_text, answer_type, explanation, difficulty_level, "order"
+    `SELECT id, question_text, question_image_url, answer_type, explanation, difficulty_level, "order"
      FROM problems WHERE topic_id = $1 ORDER BY "order" ASC`,
     [params.topicId]
   );
@@ -48,6 +48,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   const questions = problemsResult.rows.map((p) => ({
     id: p.id,
     questionText: p.question_text,
+    imageUrl: p.question_image_url,
     answerType: p.answer_type,
     difficultyLevel: p.difficulty_level,
     options: optionsByProblem[p.id] || [],

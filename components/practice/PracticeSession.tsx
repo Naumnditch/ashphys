@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { SimulationIcon } from '@/components/icons/SimulationIcon';
+import { MomentumDiagram } from '@/components/practice/MomentumDiagrams';
 
 interface Option {
   id: string;
@@ -13,6 +14,7 @@ interface Option {
 interface Question {
   id: string;
   questionText: string;
+  imageUrl?: string | null;
   answerType: 'multiple_choice' | 'numeric' | 'free_text';
   difficultyLevel: number;
   options: Option[];
@@ -209,6 +211,13 @@ export function PracticeSession({ topicId }: { topicId: string }) {
 
       {/* Question card */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-5">
+        {current.imageUrl && current.imageUrl.startsWith('diagram:') && (
+          <MomentumDiagram diagramKey={current.imageUrl} />
+        )}
+        {current.imageUrl && !current.imageUrl.startsWith('diagram:') && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={current.imageUrl} alt="" className="w-full max-w-md mx-auto mb-5 rounded border border-gray-200" />
+        )}
         <p className="text-[17px] text-gray-900 leading-relaxed mb-6">{current.questionText}</p>
 
         {current.answerType === 'multiple_choice' && (

@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (past papers: upload pipeline added)
+Last updated: 2026-07-24 (momentum questions with diagrams)
 
 ---
 
@@ -34,6 +34,32 @@ Last updated: 2026-07-24 (past papers: upload pipeline added)
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
 - **13 interactive simulations**
+
+### Momentum practice questions with diagrams (NEW)
+- `question_image_url` column existed in schema but was never wired to
+  the frontend before this session - now is, end to end.
+- Diagrams are ORIGINAL SVG, drawn as React components (not external
+  image files) - components/practice/MomentumDiagrams.tsx. Referenced
+  from question_image_url as an internal key like
+  "diagram:momentum-stick-1" rather than a URL; PracticeSession.tsx
+  checks the "diagram:" prefix and renders <MomentumDiagram> for those,
+  falls back to a plain <img> for any real external URL (so the column
+  stays generically useful later). No file hosting needed for these.
+  Diagram style: trolley rectangles on wheels, BEFORE/AFTER panels
+  split by a dashed divider, teal arrows for given velocities, brass
+  for the unknown-being-solved-for in the after panel (red-tinted).
+  8 diagram keys built: momentum-stick-1/2, momentum-explosion-1,
+  momentum-separate-1, momentum-headon-1, momentum-recoil-1,
+  momentum-wall-1, momentum-oblique-1.
+- 8 questions seeded across topic 3.5 Momentum (problems 6,7,8,9,11:
+  sticking collision both directions solved-for, explosion/recoil,
+  non-sticking separate velocities, gun recoil) and topic 3.6 Vectors
+  (problems 10,12,13: head-on opposite-direction collision, wall
+  bounce momentum-CHANGE with the subtract-speeds-not-momenta trap,
+  oblique collision with sign-handling on both sides). All 8 verified
+  independently via node arithmetic before shipping. Chapter 3
+  previously had problems 1-5 (Newton's second law sim); now 1-13
+  (skipped nothing, just picked next available numbers 6-13).
 
 ### Past Papers section (NEW - infrastructure only)
 - COPYRIGHT NOTE: Cambridge explicitly does not permit hosting past
