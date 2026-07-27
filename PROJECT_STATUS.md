@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-27 (Shopier: fixed auto-submit race, credentials located)
+Last updated: 2026-07-27 (Shopier: callback now returns 200 instead of redirect; 509 order-creation error unresolved)
 
 ---
 
@@ -104,12 +104,46 @@ Last updated: 2026-07-27 (Shopier: fixed auto-submit race, credentials located)
   commit; separated `loading` (server call in flight -> "Starting
   checkout...") from `redirecting` (form found + submit fired ->
   "Redirecting to Shopier...") so a stuck state is now diagnosable.
-- STILL TO VERIFY: user has not yet completed a full successful test
-  payment end to end. Once they do, Shopier's OSB Testi tool (Ek
-  Ozellikler > Siparis Bildirimi > OSB Testi) needs an existing order
-  number from Siparisler to test the callback delivery - can't be
-  used productively until at least one real (even failed) checkout
-  attempt has created an order in Shopier's own system.
+- BUG FOUND AND FIXED #2 (2026-07-27): callback route was responding
+  to Shopier with an HTTP redirect (3xx) to /payments/result, which
+  works fine for a real browser but almost certainly fails Shopier's
+  OSB test tool / any server-to-server notification check, since those
+  virtually never follow redirects and just check the immediate status
+  code. Rewrote to ALWAYS return 200 OK (a resultPage() helper: 200 +
+  a tiny HTML body with a meta-refresh, so a real shopper's browser
+  still lands on /payments/result, but Shopier's automated check sees
+  200 immediately). Also added a GET handler returning plain 200 OK,
+  in case their test pings with GET before/instead of POST - genuinely
+  unknown which method OSB uses, no public spec exists. Unknown-order
+  callbacks (e.g. for purchases made through Shopier's own storefront
+  rather than our API) now also return 200 rather than erroring, since
+  there's nothing wrong with not recognizing an order we didn't create.
+- UNRESOLVED: 509 "Dukkanda siparis olusturulamamaktadir" still blocks
+  checkout via api_pay4.php entirely - confirmed NOT a signature/code
+  problem (Shopier's own branded error page renders, meaning the
+  request reached their server and was parsed; a bad signature shows a
+  different, more specific error per other users' reports). Dashboard
+  diagnostics so far: Hesap Ozeti shows "null adet" for Toplam Siparis
+  (a raw placeholder leaking through - suggests incomplete account
+  setup) and 0.00 across all sales figures. Checked Dukkan Yonetimi
+  submenu, no obvious "register my own website for API payments" entry
+  found. Working theory: either (a) account still mid-activation
+  (Shopier docs mention up to 24h approval after signup, and mention a
+  step during onboarding to declare "Kendi Internet Sitem" as the
+  payment channel - unclear if this user's account completed that
+  step), or (b) some other account-level gate. User has emailed
+  hello@shopier.com with the error code; awaiting their reply is
+  probably the fastest path now rather than more menu-guessing.
+  IMPORTANT: user also completed a real 10 TL purchase of the
+  "ashphys kurs" product via Shopier's own native storefront (NOT via
+  our API) specifically to generate a real order number (307538405)
+  for the OSB test tool - that product/order exists in their Shopier
+  account, unrelated to our shopier_orders table.
+- The 200-vs-redirect fix might resolve the "Test basarisiz" OSB
+  result on its own even before the 509 issue is fixed, since the OSB
+  test targets an EXISTING order (like 307538405) rather than going
+  through api_pay4.php - worth the user retrying OSB Testi again after
+  this deploy, independent of resolving 509.
 - STILL TODO once confirmed working: wire a real (non-admin) student
   checkout flow using subscription_plans pricing instead of the
   admin-only test amount; payment_logs currently writes NULL for

@@ -14,10 +14,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db/client';
 import { verifyShopierCallback } from '@/lib/shopier/client';
 
+function resultPage(status: string, orderId?: string) {
+  const dest = `/payments/result?status=${status}${orderId ? `&orderId=${orderId}` : ''}`;
+  // 200 OK with a meta-refresh: Shopier's server-to-server notification
+  // (including the OSB test tool) almost certainly checks the immediate
+  // HTTP status and does not follow redirects, so this endpoint must
+  // answer 200 no matter what. A real shopper's browser still gets
+  // bounced on to the proper results page via the meta-refresh.
+  const html = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=${dest}"></head><body>OK</body></html>`;
+  return new NextResponse(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+}
+
+// Some webhook/notification testers ping with a plain GET first to check
+// reachability before sending the real POST — answer that too, just in case.
+export async function GET() {
+  return new NextResponse('OK', { status: 200 });
+}
+
 export async function POST(req: NextRequest) {
   const apiSecret = process.env.SHOPIER_API_SECRET;
   if (!apiSecret) {
-    return NextResponse.json({ success: false, error: 'Not configured' }, { status: 500 });
+    return new NextResponse('Not configured', { status: 200 });
   }
 
   const form = await req.formData();
@@ -35,19 +52,27 @@ export async function POST(req: NextRequest) {
   const rawBody: Record<string, string> = {};
   form.forEach((v, k) => { rawBody[k] = String(v); });
 
-  if (!fields.platform_order_id || !verifyShopierCallback(fields, apiSecret)) {
-    // Log the attempt either way — a bad signature is worth knowing about
+  // Always log the raw callback, signature outcome included — this is
+  // the only way to see exactly what Shopier's OSB test actually sends,
+  // since there's no public spec for its payload shape.
+  const signatureValid = !!fields.platform_order_id && verifyShopierCallback(fields, apiSecret);
+
+  if (!signatureValid) {
     await query(
       `UPDATE shopier_orders SET status = 'failed', raw_callback = $2, updated_at = now()
        WHERE platform_order_id = $1`,
       [fields.platform_order_id, JSON.stringify({ ...rawBody, signatureValid: false })]
     );
-    return NextResponse.redirect(new URL(`/payments/result?status=invalid`, req.url));
+    return resultPage('invalid');
   }
 
   const orderResult = await query(`SELECT * FROM shopier_orders WHERE platform_order_id = $1`, [fields.platform_order_id]);
   if (orderResult.rows.length === 0) {
-    return NextResponse.redirect(new URL(`/payments/result?status=unknown`, req.url));
+    // A real, valid, signed notification for an order we don't have a row
+    // for (e.g. a purchase made through Shopier's own storefront rather
+    // than our checkout) — still acknowledge with 200 so Shopier considers
+    // the notification delivered; there's just nothing to update locally.
+    return resultPage('unknown', fields.platform_order_id);
   }
   const order = orderResult.rows[0];
 
@@ -86,7 +111,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(
-    new URL(`/payments/result?status=${newStatus}&orderId=${fields.platform_order_id}`, req.url)
-  );
+  return resultPage(newStatus, fields.platform_order_id);
 }
