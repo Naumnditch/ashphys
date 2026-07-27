@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (Shopier payment integration - awaiting API keys)
+Last updated: 2026-07-27 (Shopier: fixed auto-submit race, credentials located)
 
 ---
 
@@ -74,15 +74,42 @@ Last updated: 2026-07-24 (Shopier payment integration - awaiting API keys)
   amount input (default 1.00 TRY), hidden auto-submit form pattern.
   Explicitly warns there is no Shopier sandbox - any test is a REAL
   charge.
-- BLOCKED ON USER: (1) SHOPIER_API_KEY + SHOPIER_API_SECRET must be
-  added to Vercel env vars (Ozellestirmeler > API Bilgileri or Hesap
-  Yonetimi > Kisisel Erisim Anahtari in the Shopier panel - the exact
-  menu path has moved around across Shopier UI versions per search
-  results). (2) The callback URL above must be pasted into that same
-  Shopier panel screen, or successful payments won't return to the
-  site or get recorded. Both are one-time setup steps only the user
-  can do. .env.example updated with both vars and a note about the
-  panel-configured callback URL.
+- CREDENTIAL LOCATION RESOLVED (2026-07-27): NOT under
+  Ozellestirmeler > API Bilgileri (that menu doesn't exist in current
+  Shopier UI) and NOT the "Kisisel Erisim Anahtari" / PAT under Hesap
+  Yonetimi (that's a SEPARATE newer developer/app-store platform,
+  issues a single token, unrelated to the payment gateway - confirmed
+  by screenshot, user had already generated one for something else).
+  The actual pair lives under Ek Ozellikler > Siparis Bildirimi
+  (Otomatik Siparis Bildirimi / OSB) screen: "OSB Kullanici Adi" =
+  SHOPIER_API_KEY, "OSB Sifresi" = SHOPIER_API_SECRET. Same screen has
+  the Bildirim URL field (protocol dropdown + URL) where
+  ashphys.org/api/payments/shopier/callback must be pasted and saved -
+  this IS the panel-side callback config, just relocated from where
+  older guides describe it. Screen shows a banner that OSB is a
+  legacy feature vs newer Webhooks - fine for now, revisit if Shopier
+  actually deprecates it. User has now located + saved both.
+- BUG FOUND AND FIXED (2026-07-27): TestPaymentPortal's auto-submit
+  used setTimeout(fn, 0) after setFields/setPaymentUrl to submit the
+  hidden form - a real race against React's render commit. If the
+  timeout fired before the form existed in the DOM,
+  formRef.current?.submit() was a silent no-op (optional chaining
+  swallows the null case) - button stuck forever on "Redirecting to
+  Shopier..." with zero error, exactly what the user hit. Also that
+  button text was misleadingly shown the INSTANT the button was
+  clicked (loading=true), before the checkout API call had even
+  returned, so it didn't distinguish "waiting on our server" from
+  "actually navigating." Fixed: submit only inside a useEffect keyed
+  on [fields, paymentUrl], which React guarantees runs after DOM
+  commit; separated `loading` (server call in flight -> "Starting
+  checkout...") from `redirecting` (form found + submit fired ->
+  "Redirecting to Shopier...") so a stuck state is now diagnosable.
+- STILL TO VERIFY: user has not yet completed a full successful test
+  payment end to end. Once they do, Shopier's OSB Testi tool (Ek
+  Ozellikler > Siparis Bildirimi > OSB Testi) needs an existing order
+  number from Siparisler to test the callback delivery - can't be
+  used productively until at least one real (even failed) checkout
+  attempt has created an order in Shopier's own system.
 - STILL TODO once confirmed working: wire a real (non-admin) student
   checkout flow using subscription_plans pricing instead of the
   admin-only test amount; payment_logs currently writes NULL for

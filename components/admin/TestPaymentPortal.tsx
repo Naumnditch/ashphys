@@ -1,14 +1,25 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function TestPaymentPortal() {
   const [amount, setAmount] = useState('1.00');
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [fields, setFields] = useState<Record<string, string> | null>(null);
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
+
+  // Submits only once the hidden form has actually been committed to the
+  // DOM — a setTimeout(0) here would race React's render and could try to
+  // submit a form that doesn't exist yet, failing completely silently.
+  useEffect(() => {
+    if (fields && paymentUrl && formRef.current) {
+      setRedirecting(true);
+      formRef.current.submit();
+    }
+  }, [fields, paymentUrl]);
 
   const handlePay = async () => {
     setLoading(true);
@@ -27,8 +38,6 @@ export function TestPaymentPortal() {
       }
       setFields(data.fields);
       setPaymentUrl(data.paymentUrl);
-      // submit on the next tick, once the hidden form has rendered with the new fields
-      setTimeout(() => formRef.current?.submit(), 0);
     } catch {
       setError('Network error — please try again');
       setLoading(false);
@@ -55,8 +64,13 @@ export function TestPaymentPortal() {
         disabled={loading}
         className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
       >
-        {loading ? 'Redirecting to Shopier…' : `Pay ${amount} TRY with Shopier`}
+        {redirecting ? 'Redirecting to Shopier…' : loading ? 'Starting checkout…' : `Pay ${amount} TRY with Shopier`}
       </button>
+      {loading && !redirecting && (
+        <p className="text-xs text-gray-400 mt-2">
+          If this sits here more than a few seconds, something's wrong server-side — check the browser console.
+        </p>
+      )}
 
       {/* Hidden auto-submitting form — Shopier's classic gateway expects a real form POST, not fetch/JSON */}
       {fields && paymentUrl && (
