@@ -83,30 +83,42 @@ export function buildShopierFormFields(
   };
 }
 
-export interface ShopierCallbackFields {
-  status: string;
-  platform_order_id: string;
-  payment_id: string;
-  installment: string;
-  random_nr: string;
-  total_order_value: string;
-  currency: string;
-  signature: string;
+/**
+ * OSB (Otomatik Sipariş Bildirimi) — the ACTUAL notification contract,
+ * taken verbatim from Shopier's own "OSB örnek kodunu görüntüle" example
+ * (not reverse-engineered — this is straight from their panel). Totally
+ * different shape from the classic-gateway callback fields above:
+ *  - incoming POST fields are just `res` (base64 JSON) and `hash`
+ *  - hash = hex HMAC-SHA256 of (res + osbUsername), keyed with osbSecret
+ *    — HEX, not base64, and no random_nr/currency concatenation at all
+ *  - the only valid success response is the literal text "success"
+ */
+export interface ShopierOsbOrder {
+  email: string;
+  orderid: string;
+  currency: number; // 0 TRY, 1 USD, 2 EUR
+  price: string;
+  buyername: string;
+  buyersurname: string;
+  productcount: string;
+  productid: string;
+  productlist: string;
+  chartdetails: string;
+  customernote: string;
+  istest: string; // '0' live, '1' test
 }
 
-/** Verifies a callback's signature using the values Shopier itself sent. */
-export function verifyShopierCallback(fields: ShopierCallbackFields, apiSecret: string): boolean {
-  const expected = buildSignature(
-    fields.random_nr,
-    fields.platform_order_id,
-    fields.total_order_value,
-    parseInt(fields.currency, 10),
-    apiSecret
-  );
+export function verifyOsbHash(res: string, osbUsername: string, hash: string, osbSecret: string): boolean {
+  const expected = crypto.createHmac('sha256', osbSecret).update(res + osbUsername, 'utf8').digest('hex');
   const a = Buffer.from(expected);
-  const b = Buffer.from(fields.signature || '');
+  const b = Buffer.from(hash || '');
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
+}
+
+export function decodeOsbPayload(res: string): ShopierOsbOrder {
+  const json = Buffer.from(res, 'base64').toString('utf8');
+  return JSON.parse(json);
 }
 
 export function generatePlatformOrderId(): string {

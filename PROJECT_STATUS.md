@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-27 (Shopier: callback now returns 200 instead of redirect; 509 order-creation error unresolved)
+Last updated: 2026-07-27 (Shopier: callback rewritten to match REAL OSB contract from official example code)
 
 ---
 
@@ -139,11 +139,53 @@ Last updated: 2026-07-27 (Shopier: callback now returns 200 instead of redirect;
   our API) specifically to generate a real order number (307538405)
   for the OSB test tool - that product/order exists in their Shopier
   account, unrelated to our shopier_orders table.
-- The 200-vs-redirect fix might resolve the "Test basarisiz" OSB
-  result on its own even before the 509 issue is fixed, since the OSB
-  test targets an EXISTING order (like 307538405) rather than going
-  through api_pay4.php - worth the user retrying OSB Testi again after
-  this deploy, independent of resolving 509.
+- MAJOR CORRECTION (2026-07-27): user pasted Shopier's own "OSB ornek
+  kodunu goruntule" PHP example code (first-party, from inside their
+  panel - NOT reverse-engineered like everything else researched this
+  session). It revealed the callback contract was completely wrong:
+    * incoming fields are just `res` (base64 JSON) + `hash` - NOT the
+      7-field classic-gateway shape (status/platform_order_id/
+      payment_id/random_nr/total_order_value/currency/signature) that
+      was built from reverse-engineered gists/PHP SDKs
+    * hash = HEX hmac_sha256(res + OSB_USERNAME, key=OSB_SECRET) - hex
+      output (raw_output=false in PHP), NOT base64, and signs
+      `res+username` not a field concatenation
+    * only fires on SUCCESS - no status field to branch on at all
+    * the ONLY valid acknowledgement is the literal plain-text string
+      "success" - not JSON, not HTML, not "OK". This explains why the
+      earlier 200-with-meta-refresh-HTML fix likely still failed the
+      OSB test even though the status-code part was right.
+  Rewrote lib/shopier/client.ts (verifyOsbHash, decodeOsbPayload
+  replacing the old verifyShopierCallback/ShopierCallbackFields
+  entirely - confirmed unused elsewhere before deleting) and the whole
+  callback route to match exactly: reads res+hash, hex HMAC verify,
+  decodes base64 JSON payload {email,orderid,currency,price,
+  buyername,buyersurname,productcount,productid,productlist,
+  chartdetails,customernote,istest}, responds with EXACTLY "success"
+  (plain text, 200) on valid signature, "missing parameter"/""/"bad
+  payload" otherwise (mirroring the PHP example's own responses).
+  Self-verified the hex HMAC translation in node (64-char valid hex,
+  matches hash_hmac(...,false) semantics exactly).
+  IMPORTANT ARCHITECTURE CORRECTION: this URL is NOT also the page a
+  shopper's browser lands on after paying (that was a wrong assumption
+  carried from older classic-gateway docs) - OSB is a pure
+  server-to-server notification. The /payments/result page built
+  earlier is now unreferenced/orphaned - harmless, left in place, not
+  cleaned up.
+  ORDER CORRELATION CAVEAT: whether Shopier's `orderid` in the OSB
+  payload equals the `platform_order_id` WE supply when creating an
+  order via api_pay4.php is UNCONFIRMED - no successful api_pay4.php
+  order has occurred yet (509 still blocks it). Callback tries to
+  match by platform_order_id and gracefully logs+acknowledges
+  regardless if no match is found (e.g. native-storefront purchases
+  like the manual "ashphys kurs" test buy). Revisit this mapping once
+  a real order actually completes.
+  STILL SEPARATE AND UNRESOLVED: the 509 "Dukkanda siparis
+  olusturulamamaktadir" checkout-creation error. This OSB fix only
+  addresses the notification/acknowledgement contract - it does NOT
+  fix order creation via api_pay4.php. Leading theory remains the
+  Entegrasyonlar > Modul Yonetimi > Kayitli Alan Adlari domain
+  registration step (user has not yet confirmed checking this).
 - STILL TODO once confirmed working: wire a real (non-admin) student
   checkout flow using subscription_plans pricing instead of the
   admin-only test amount; payment_logs currently writes NULL for
