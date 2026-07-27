@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-07-24 (momentum questions with diagrams)
+Last updated: 2026-07-24 (Shopier payment integration - awaiting API keys)
 
 ---
 
@@ -34,6 +34,62 @@ Last updated: 2026-07-24 (momentum questions with diagrams)
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
 - **13 interactive simulations**
+
+### Shopier payment integration (NEW - awaiting API keys from user)
+- Shopier is NOT REST/JSON - it's a classic form-post gateway. Browser
+  is redirected with a signed HTML form to
+  https://www.shopier.com/ShowProduct/api_pay4.php; Shopier POSTs the
+  result back to ONE callback URL configured inside the Shopier panel
+  itself (Ozellestirmeler > API Bilgileri > Geri Donus URL) - NOT a
+  per-request field, NOT an env var. That URL must be set to
+  https://ashphys.org/api/payments/shopier/callback inside Shopier's
+  own dashboard by the user - Claude cannot do this part.
+- Signature (both directions): base64(HMAC-SHA256(random_nr +
+  platform_order_id + total_order_value + currency_code, api_secret)).
+  Reverse-engineered from Shopier's own PHP examples (no official
+  public spec exists) - self-verified round-trip in node (44-char b64,
+  32-byte digest) before shipping.
+- lib/shopier/client.ts: buildShopierFormFields, verifyShopierCallback
+  (timingSafeEqual), generatePlatformOrderId/generateRandomNr.
+  currency codes are Shopier's own (TRY=0, USD=1, EUR=2), NOT ISO 4217.
+- DB table shopier_orders: platform_order_id (unique), student_id,
+  plan_id, billing_cycle, is_test, amount, currency, random_nr,
+  status (pending/success/failed/cancelled), shopier_payment_id,
+  installment, raw_callback jsonb.
+- POST /api/payments/shopier/checkout (admin-only for now): creates a
+  pending order, returns signed form fields for the client to
+  auto-submit (real form POST, not fetch - Shopier's gateway requires
+  an actual browser form submission).
+- POST /api/payments/shopier/callback (PUBLIC - Shopier calls this
+  directly, no session): verifies HMAC before touching anything,
+  updates the order, logs to payment_logs, and on a REAL (non-test)
+  success upserts the subscriptions row (ON CONFLICT student_id,
+  extends end_date by 1 or 12 months per billing_cycle). This URL is
+  BOTH the server notification AND the page the shopper's browser
+  lands on, so it redirects to /payments/result?status=...&orderId=...
+  rather than returning JSON.
+- /payments/result: public results page, reads the order from DB,
+  shows success/failure with order details.
+- /admin/test-payment + components/admin/TestPaymentPortal.tsx:
+  amount input (default 1.00 TRY), hidden auto-submit form pattern.
+  Explicitly warns there is no Shopier sandbox - any test is a REAL
+  charge.
+- BLOCKED ON USER: (1) SHOPIER_API_KEY + SHOPIER_API_SECRET must be
+  added to Vercel env vars (Ozellestirmeler > API Bilgileri or Hesap
+  Yonetimi > Kisisel Erisim Anahtari in the Shopier panel - the exact
+  menu path has moved around across Shopier UI versions per search
+  results). (2) The callback URL above must be pasted into that same
+  Shopier panel screen, or successful payments won't return to the
+  site or get recorded. Both are one-time setup steps only the user
+  can do. .env.example updated with both vars and a note about the
+  panel-configured callback URL.
+- STILL TODO once confirmed working: wire a real (non-admin) student
+  checkout flow using subscription_plans pricing instead of the
+  admin-only test amount; payment_logs currently writes NULL for
+  subscription_id on test charges (intentional, no subscription to
+  attach) and the iyzico_payment_id column is reused to store the
+  shopier payment_id (no schema rename attempted - it's a generic
+  external-payment-id column despite the name).
 
 ### Momentum practice questions with diagrams (NEW)
 - `question_image_url` column existed in schema but was never wired to
