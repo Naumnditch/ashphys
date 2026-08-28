@@ -10,6 +10,7 @@ const ADMIN_NAV = [
   { href: '/admin/sections', label: 'Sections' },
   { href: '/admin/curriculum', label: 'Curriculum' },
   { href: '/admin/past-papers', label: 'Past Papers' },
+  { href: '/admin/booklets', label: 'Booklets' },
   { href: '/admin/test-payment', label: 'Test Payment' },
 ];
 

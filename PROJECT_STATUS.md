@@ -451,3 +451,36 @@ Two distinct visual systems, intentionally:
   (#2e7d6b), danger red (#b34a3c), plus violet/blue/magenta accents per-sim.
   Consistent across all 6 sims on purpose so the simulations section reads
   as one product.
+
+## Booklets section (2026-08-28)
+- School banned foreign books — user/teacher now writing original booklets
+  per chapter/lesson themselves. No copyright concern (own content).
+- Same architecture as past-papers, cloned directly: Storage bucket
+  `booklets` (public, PDF-only, 50MB cap — larger than past-papers'
+  20MB since teacher booklets may be more image-heavy), table `booklets`
+  (chapter_id required, topic_id nullable — null means whole-chapter
+  booklet, set means lesson-specific booklet, so both granularities
+  the user asked about are supported from one table).
+- Admin `/admin/booklets`: chapter dropdown -> topic dropdown (filtered
+  to that chapter, "Whole chapter" option) -> title/description -> file
+  picker that uploads on selection and auto-fills file_url + tracks
+  file_size_bytes. Storage path auto-slugged:
+  chapter-<N>/<lesson-slug>/<title-slug>.pdf (or chapter-<N>/<title-slug>.pdf
+  for whole-chapter booklets).
+- Public `/booklets`: grouped by chapter number, lab-notebook styling
+  matching past-papers/simulations. Only shows booklets with a real
+  file_url (no placeholder/dead links). Direct download links,
+  target=_blank.
+- Capacity check done this session: DB usage 12MB/500MB free tier
+  (2.4%, booklets add negligible metadata). Storage usage 0 bytes
+  (nothing uploaded yet through any pipeline, past-papers included).
+  Recommended Pro tier ($25/mo, 100GB storage) once booklets + past
+  papers are both actively used — free tier's ~500MB-1GB could get
+  tight with 89 lesson-level booklets at realistic sizes, Pro tier
+  removes the question entirely.
+- Nav links added (Navbar + AdminNav).
+- SESSION NOTE: this session's sandbox container had NO prior state
+  (fresh container, not a lost-work situation) - re-cloned from GitHub
+  successfully with the existing token; full git history intact
+  through commit 9e4bfe6. Token still active as of this session -
+  standing reminder to revoke stands.
