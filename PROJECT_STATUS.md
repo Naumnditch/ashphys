@@ -698,3 +698,64 @@ Two distinct visual systems, intentionally:
   chained already-isolated case.
 - Cleaned up a leftover unused target_ parameter from an earlier
   edit pass in playMove/finishAndMaybeFlip.
+
+## Equation Rearranger v4: operation forms in-line, not a floating pill (2026-08-28)
+- User provided two screenshots + a Manim example GIF showing the
+  correct mental model: the divisor/multiplier should visually form a
+  REAL fraction (or REAL new term) directly on the existing content of
+  BOTH sides, not appear as a separate floating annotation. Example:
+  F=ma isolating a should show F literally growing a fraction bar to
+  become F/m, while m*a simultaneously grows the same denominator to
+  become (m*a)/m, THEN the m/m cancels - not a detached "div m" pill.
+  Told the user plainly: not literally using the Manim Python library
+  (pre-rendered video, wrong fit for an interactive site) - matched
+  its visual language inside the existing live React/CSS system.
+- COMPLETE REWRITE of the animation model (4th major iteration of this
+  sim). New concept: `buildIntermediate(move, before)` constructs the
+  UNSIMPLIFIED state (operation injected into both sides, nothing
+  cancelled yet) - e.g. F=ma dividing by m literally produces
+  left={F, denom:[m]}, right={m*a, denom:[m]} as one real EqState,
+  fed straight into the EXISTING layoutSide/layoutEquation functions
+  (unchanged) - no separate overlay/pill rendering code needed at all
+  anymore, since the "operation" IS the equation now.
+- KEY SCHEME REDESIGNED: switched from `symbol` alone to
+  `symbol:role:side:index` (role=n/d, index=group or denom-array
+  position) because the unsimplified intermediate state can
+  transiently show the SAME symbol twice on one side (e.g. 'm' in
+  both the numerator "m*a" AND the newly-injected denominator) -
+  needed unique keys to avoid React key collisions and to precisely
+  target strikethrough/fade at the correct instance.
+- REAL BUG FOUND in this pass (caught in node before any TS/rendering
+  code): moves that clear a variable from a DENOMINATOR (e.g. V under
+  m in rho=m/V) need OPPOSITE injection treatment (inject into the
+  NUMERATOR) from moves that clear an extra NUMERATOR factor (inject
+  into the DENOMINATOR) - both were tagged the same generic
+  kind:'multiplicative' internally, which isn't the same as which way
+  to inject. Added an explicit `op: 'divide'|'multiply'|'addsub'`
+  field to Move (derivable from the already-correct opLabel prefix,
+  now made an explicit field instead of string-parsed) and branched
+  buildIntermediate on THAT, not on kind. Re-verified 20/20 with the
+  fix.
+- THREE-LAYER VERIFICATION before writing render code: (1) node
+  algebra check - does the unsimplified intermediate, once simplified
+  by removing the cancelling pair, equal the already-verified
+  move.stateAfter? 20/20 pass. (2) Hand-mirrored (not regex-
+  transpiled - tried that first, too unreliable) copy of the actual
+  TS buildIntermediate/varKey/layoutSide functions, checked that
+  EVERY cancelKey returned actually corresponds to a real token key
+  layoutEquation produces for the mid state - 21/21 moves across all
+  20 cases confirmed no silent key-mismatch (exactly the KIND of bug
+  that caused the previous round's visible glitches). (3) tsc + full
+  npm run build both clean.
+- Fade-in mechanism for injected tokens: render at opacity 0 on
+  mount, then flip a state flag via DOUBLE requestAnimationFrame
+  (ensures the browser paints the opacity:0 frame before flipping, so
+  the transition actually plays instead of being coalesced away) -
+  standard CSS-transition-fade-in-on-mount pattern, no library.
+- Removed STRIP_Y entirely / the whole floating-pill system - no
+  longer needed, everything renders in the equation's own
+  numerator/denominator rows. Container height reduced back down
+  (130px) since there's no separate annotation strip taking vertical
+  space anymore.
+- Chaining (baseState) and Reset button from the previous pass
+  retained unchanged - still correct, no changes needed there.
