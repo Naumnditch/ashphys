@@ -644,3 +644,57 @@ Two distinct visual systems, intentionally:
   (isHomeCancelling, isHomeSideOfActiveMove) that were computed but
   never referenced in the render output.
 - Same DB row/URL reused (/simulations/equation-rearranger).
+
+## Equation Rearranger v3.1: bug fixes from screenshot + chaining (2026-08-28)
+- User screenshot of p=rho*g*h clicking rho showed: (1) a bare
+  strikethrough line with NO letter visible where 'g' should be in
+  the main row, (2) a lone 'g' character floating at the bottom-left
+  of the screen instead of under a clear side, (3) requested smoother
+  no-jump transitions, (4) requested chaining (solve for a new
+  variable starting from the CURRENTLY DISPLAYED/rearranged equation,
+  not silently jumping back to the original) with an explicit Reset
+  button to return to the true original.
+- ROOT CAUSES FOUND:
+  1. The "cancelling home token" overlay div rendered the strikethrough
+     line but never actually rendered {activeMove.symbol} as its text
+     content - a straight-up missing-JSX-content bug.
+  2. The "opposite side" overlay (meant to show the operation applied,
+     then settle into place) was showing the BARE migrating symbol
+     (e.g. "g") for the ENTIRE annotate/strike/fade window instead of
+     the operation label (e.g. "div g") - conflated two different
+     things that should only converge at the 'settle' stage. Fixed by
+     giving the overlay a {content, isPill} pair that's opLabel+pill
+     styling during annotate/strike/fade, and bareSymbol+token styling
+     only during settle - same persistent element throughout, so the
+     transition is smooth (position/style/content all animate
+     together via one 900ms CSS transition), not a hard swap.
+  3. STRIP_Y=130 combined with a too-short 210px container caused the
+     annotation strip to sit near/past the container's bottom edge -
+     bumped STRIP_Y to 95, container height 210->260, verified with
+     manual pixel-margin arithmetic (denominator row bottom ~118px,
+     strip top ~170px, strip bottom ~191px, well inside 260px).
+     ALSO found and fixed a second contributing bug: the home-side
+     annotation pill was using `top: STRIP_Y` (missing the `+75` base
+     offset every other element uses), placing it 75px higher than
+     its opposite-side counterpart - real vertical misalignment bug,
+     not just a spacing issue.
+  4. Standardized ALL token transitions to a consistent 900ms
+     ease-in-out (previously 750/900ms mixed) so nothing settles
+     ahead of or behind anything else.
+- CHAINING implemented: new `baseState` (separate from the per-equation
+  `eq.initial`) is what solveFor() now derives from. It starts equal
+  to eq.initial, and updates to the just-completed derivation's final
+  (flipped) state once a derivation finishes - so clicking a NEW
+  variable continues from what's on screen. Reset button (relabelled
+  "Reset to original equation") explicitly restores baseState to
+  eq.initial; switching equations also resets it. Verified the
+  algebra engine needs no changes for this - isolateSteps() already
+  operates generically on whatever EqState it's given, confirmed by
+  hand-tracing a chained example (a=F/m, then click F -> correctly
+  derives F=a*m via a single "x m" denominator-clear move).
+  Also fixed a related bug: finalState's fallback (when a var is
+  already isolated, 0 moves) was hardcoded to eq.initial instead of
+  baseState - would have shown the WRONG "other side" text for a
+  chained already-isolated case.
+- Cleaned up a leftover unused target_ parameter from an earlier
+  edit pass in playMove/finishAndMaybeFlip.

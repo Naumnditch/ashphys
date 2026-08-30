@@ -225,7 +225,7 @@ const CELL_W = 46;
 const OP_W = 30;
 const ROW_H = 44;
 const BAR_GAP = 6;
-const STRIP_Y = 130;
+const STRIP_Y = 95;
 
 interface Token {
   key: string;
@@ -321,6 +321,7 @@ type Phase = 'idle' | 'animating' | 'flipping' | 'done';
 export function EquationRearrangerSimulator() {
   const [eqIdx, setEqIdx] = useState(0);
   const [target, setTarget] = useState<string | null>(null);
+  const [baseState, setBaseState] = useState<EqState>(EQUATIONS[0].initial); // the equation new derivations start from — chains forward unless Reset
   const [displayState, setDisplayState] = useState<EqState>(EQUATIONS[0].initial);
   const [phase, setPhase] = useState<Phase>('idle');
   const [subStage, setSubStage] = useState<SubStage>(null);
@@ -348,13 +349,16 @@ export function EquationRearrangerSimulator() {
       setCaption('Rearranging so the answer sits on the left…');
       setPhase('flipping');
       after(() => {
-        setDisplayState(mirror(lastState));
+        const mirrored = mirror(lastState);
+        setDisplayState(mirrored);
         after(() => {
           setPhase('done');
+          setBaseState(mirrored);
         }, FLIP_MS);
       }, 60);
     } else {
       setPhase('done');
+      setBaseState(lastState);
     }
   };
 
@@ -387,11 +391,11 @@ export function EquationRearrangerSimulator() {
 
   const solveFor = (symbol: string) => {
     clearTimers();
-    const { moves, finalIsLeft } = isolateSteps(eq.initial, symbol);
+    const { moves, finalIsLeft } = isolateSteps(baseState, symbol);
     movesRef.current = moves;
     finalIsLeftRef.current = finalIsLeft;
     setTarget(symbol);
-    setDisplayState(eq.initial);
+    setDisplayState(baseState);
     setSubStage(null);
     setActiveMove(null);
     if (moves.length > 0) {
@@ -400,13 +404,14 @@ export function EquationRearrangerSimulator() {
       after(() => playMove(0), 100);
     } else {
       setCaption(`${symbol} is already alone`);
-      finishAndMaybeFlip(eq.initial);
+      finishAndMaybeFlip(baseState);
     }
   };
 
   const reset = () => {
     clearTimers();
     setTarget(null);
+    setBaseState(eq.initial);
     setDisplayState(eq.initial);
     setPhase('idle');
     setSubStage(null);
@@ -418,6 +423,7 @@ export function EquationRearrangerSimulator() {
     clearTimers();
     setEqIdx(i);
     setTarget(null);
+    setBaseState(EQUATIONS[i].initial);
     setDisplayState(EQUATIONS[i].initial);
     setPhase('idle');
     setSubStage(null);
@@ -434,7 +440,7 @@ export function EquationRearrangerSimulator() {
   const overlayActive = !!activeMove && (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade' || subStage === 'settle');
   const mainTokens = layout.tokens.filter((t) => !(overlayActive && t.kind === 'var' && t.text === activeMove!.symbol));
 
-  let overlayRender: { x: number; y: number; opacity: number; color: string; fontSize: number } | null = null;
+  let overlayRender: { x: number; y: number; content: string; isPill: boolean; color: string; fontSize: number } | null = null;
   if (activeMove) {
     const isTargetSymbol = activeMove.symbol === target;
     const settledColor = isTargetSymbol ? RED : INK;
@@ -442,9 +448,11 @@ export function EquationRearrangerSimulator() {
     if (subStage === 'settle') {
       const settledLayout = layoutEquation(activeMove.stateAfter);
       const tok = settledLayout.tokens.find((t) => t.text === activeMove.symbol && t.kind === 'var');
-      overlayRender = { x: tok?.x ?? oppCenterX, y: tok?.y ?? 0, opacity: 1, color: settledColor, fontSize: 25 };
+      overlayRender = { x: tok?.x ?? oppCenterX, y: tok?.y ?? 0, content: activeMove.symbol, isPill: false, color: settledColor, fontSize: 25 };
     } else if (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade') {
-      overlayRender = { x: oppCenterX, y: STRIP_Y, opacity: 1, color: stripColor, fontSize: 19 };
+      // shows the OPERATION being applied here, not the bare symbol yet — this side has
+      // nothing to cancel it with, so it will survive and become real at 'settle'.
+      overlayRender = { x: oppCenterX, y: STRIP_Y, content: activeMove.opLabel, isPill: true, color: stripColor, fontSize: 15 };
     }
   }
 
@@ -452,7 +460,7 @@ export function EquationRearrangerSimulator() {
   const homeFading = subStage === 'fade';
 
   const finalMove = movesRef.current.length > 0 ? movesRef.current[movesRef.current.length - 1] : null;
-  const finalState = finalMove ? finalMove.stateAfter : eq.initial;
+  const finalState = finalMove ? finalMove.stateAfter : baseState;
   const finalDisplaySide = finalIsLeftRef.current ? finalState.right : finalState.left; // the side that ISN'T just [target]
   const rearrangedVal = target ? evalSide(finalDisplaySide, sampleVals) : 0;
   const checkVals = { ...sampleVals, [target || '']: rearrangedVal };
@@ -477,8 +485,8 @@ export function EquationRearrangerSimulator() {
           </span>
         </div>
 
-        <div className="flex justify-center items-center py-6 px-4" style={{ minHeight: 260 }}>
-          <div className="relative transition-[width] duration-700 ease-in-out" style={{ width: layout.totalWidth, height: 210 }}>
+        <div className="flex justify-center items-center py-6 px-4" style={{ minHeight: 300 }}>
+          <div className="relative transition-[width] duration-700 ease-in-out" style={{ width: layout.totalWidth, height: 260 }}>
             {mainTokens.map((tok) => {
               if (tok.kind === 'bar') {
                 return (
@@ -518,23 +526,28 @@ export function EquationRearrangerSimulator() {
               );
             })}
 
-            {/* the migrating token (home→opposite for this move): strip position while cancelling/annotating, settles into its real slot */}
-            {overlayRender && activeMove && (
+            {/* the surviving copy of the applied operation on the side that has nothing to cancel
+                it with: shown as an "op label" pill in the strip, then morphs — same element,
+                position/style/content all transitioning together — into a real settled token. */}
+            {overlayRender && (
               <div
-                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-[900ms] ease-in-out select-none italic font-bold"
+                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-[900ms] ease-in-out select-none italic"
                 style={{
                   left: overlayRender.x,
                   top: 75 + overlayRender.y,
-                  opacity: overlayRender.opacity,
+                  opacity: 1,
                   color: overlayRender.color,
                   fontSize: overlayRender.fontSize,
-                  fontFamily: 'Georgia, serif',
-                  background: subStage === 'settle' && overlayRender.color === RED ? 'rgba(179,74,60,0.12)' : 'transparent',
-                  borderRadius: 8,
-                  padding: '2px 6px',
+                  fontWeight: overlayRender.isPill ? 700 : 700,
+                  fontFamily: overlayRender.isPill ? 'ui-monospace, monospace' : 'Georgia, serif',
+                  fontStyle: overlayRender.isPill ? 'normal' : 'italic',
+                  background: overlayRender.isPill ? '#f6efdc' : 'rgba(179,74,60,0)',
+                  border: overlayRender.isPill ? '1px solid #e6d9b8' : '1px solid rgba(0,0,0,0)',
+                  borderRadius: overlayRender.isPill ? 6 : 8,
+                  padding: overlayRender.isPill ? '3px 8px' : '2px 6px',
                 }}
               >
-                {activeMove.symbol}
+                {overlayRender.content}
               </div>
             )}
 
@@ -543,7 +556,7 @@ export function EquationRearrangerSimulator() {
                 Present for the whole annotate→strike→fade run; gone once 'settle' begins. */}
             {activeMove && cancellingTokenPos && (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade') && (
               <div
-                className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-[750ms] ease-in-out"
+                className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-[900ms] ease-in-out"
                 style={{
                   left: cancellingTokenPos.x,
                   top: 75 + cancellingTokenPos.y,
@@ -555,19 +568,23 @@ export function EquationRearrangerSimulator() {
                   color: activeMove.symbol === target ? RED : INK,
                 }}
               >
+                {activeMove.symbol}
                 {showStrike && (
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-[2px]" style={{ background: RED, transform: 'translate(-50%,-50%) rotate(-8deg)' }} />
+                  <div
+                    className="absolute left-1/2 top-1/2 w-12 h-[2px] transition-opacity duration-300"
+                    style={{ background: RED, transform: 'translate(-50%,-50%) rotate(-8deg)' }}
+                  />
                 )}
               </div>
             )}
 
-            {/* annotation labels: applied to both sides */}
+            {/* the operation applied on the home side too — cancels together with the term above */}
             {homeAnnotationVisible && activeMove && (
               <div
-                className="absolute -translate-x-1/2 transition-all duration-[900ms] ease-in-out select-none"
+                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-[900ms] ease-in-out select-none"
                 style={{
                   left: homeCenterX,
-                  top: STRIP_Y,
+                  top: 75 + STRIP_Y,
                   opacity: homeAnnotationOpacity,
                   fontFamily: 'ui-monospace, monospace',
                   fontWeight: 700,
@@ -581,7 +598,10 @@ export function EquationRearrangerSimulator() {
               >
                 {activeMove.opLabel}
                 {showStrike && (
-                  <div className="absolute left-0 right-0 top-1/2 h-[2px]" style={{ background: RED, transform: 'translateY(-50%) rotate(-6deg)' }} />
+                  <div
+                    className="absolute left-0 right-0 top-1/2 h-[2px] transition-opacity duration-300"
+                    style={{ background: RED, transform: 'translateY(-50%) rotate(-6deg)' }}
+                  />
                 )}
               </div>
             )}
@@ -600,11 +620,16 @@ export function EquationRearrangerSimulator() {
 
         <div className="px-4 pb-5 flex flex-wrap items-center gap-2 border-t border-[#eee6d3] pt-4">
           {target && (
-            <button onClick={reset} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0]">
-              ↺ Reset
+            <button onClick={reset} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#b8823d] text-[#8f6428] bg-[#faf7f0] hover:bg-[#f0e5cc]">
+              ↺ Reset to original equation
             </button>
           )}
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1">equation:</span>
+          {target && (
+            <span className="text-[11px] text-[#a8a196] italic">
+              — clicking another variable now continues from what's on screen
+            </span>
+          )}
+          <span className="text-[11px] font-mono text-[#a8a196] mr-1 ml-auto">equation:</span>
           {EQUATIONS.map((e, i) => (
             <button
               key={e.id}
