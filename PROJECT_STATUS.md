@@ -484,3 +484,39 @@ Two distinct visual systems, intentionally:
   successfully with the existing token; full git history intact
   through commit 9e4bfe6. Token still active as of this session -
   standing reminder to revoke stands.
+
+## Prep Physics chapter (2026-08-28)
+- New chapter 0 "Prep Physics" (id 683a1a72-6900-4e3c-a063-dca54eb50d4a),
+  chapter_number=0/order=0 so it sorts above chapter 1 without renumbering
+  the other 25. course_id matches all other chapters (single course row).
+- 8 topics seeded (order 1-8): Rearranging Equations (6cb3f4b2...),
+  Standard Form & Sig Figs (04575a57...), Unit Prefixes (12a38624...),
+  Constant of Proportionality (1f4e68db...), Reading/Interpreting
+  Graphs (235adaf3...), Basic Trig for Physics (0e3dc753...), Geometric
+  Projections (87127372...), Order of Magnitude & Estimation
+  (d4129957...). User explicitly wants a simulation for EACH ("that is
+  VIP") - building one at a time, user reviews between each per their
+  stated preference.
+- `/simulations/equation-rearranger` (1st of 8, topic "Rearranging
+  Equations") SHIPPED: NOT a physical simulation - a guided algebra
+  trainer, deliberately different genre from every other sim on the
+  platform since the skill itself is symbolic manipulation, not a
+  phenomenon to model. 13 challenges across 6 real IGCSE formulas
+  (F=ma, rho=m/V, V=IR, P=E/t, p=rho*g*h, v=u+at), 1-2 steps each.
+  Step-by-step: student picks the correct legal operation from a
+  randomized-position pair (correct vs decoy), decoy always has a
+  specific written explanation of why it fails (not just "wrong").
+  On full isolation: editable "verify with numbers" panel computes
+  the target BOTH via the original relationship and the derived
+  final formula from the same sample values, shows them agreeing live.
+  All 13 rearrangements independently verified in node before writing
+  any UI code (6 equation families, spot-checked with real numbers).
+  sim_type 'graph_builder' (reused, no better enum value exists -
+  same workaround as gas-laws needing 'collision').
+- REMAINING 7 sims for this chapter, not yet built: Standard Form &
+  Sig Figs, Unit Prefixes, Constant of Proportionality, Reading Graphs,
+  Trig for Physics, Geometric Projections, Order of Magnitude. Topics
+  already exist in DB and show on /curriculum now (chapter 0, at the
+  top) even before their sims ship - curriculum page already supports
+  chapters/topics with no sim yet (shows no "Launch Simulation" button
+  until one is registered against that topic_id).
