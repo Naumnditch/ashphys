@@ -1,33 +1,33 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useRef, useState } from 'react';
 
 /**
- * Equation Rearranger — click any variable, watch it isolate.
+ * Equation Rearranger — a full worked derivation, animated Manim-style.
  *
- * Not a physical simulation — a symbolic-algebra one, built to the same
- * standard: the isolation engine below is a small, general two-phase
- * algorithm (additive clear, then multiplicative clear, with a
- * pre-phase for a target that starts inside a denominator), verified
- * against 13 known-correct answers across 6 real IGCSE formulas before
- * any rendering code was written. It is not 13 hand-scripted answers —
- * it derives the correct rearrangement for ANY variable in ANY of these
- * equations from the same three rules, live.
+ * Click a variable and the tool plays the real algebra, one operation at
+ * a time: the operation is applied to BOTH sides (labels fade in under
+ * each side), the matching pair on the variable's own side visibly
+ * cancels (strikethrough, then fades), and the surviving copy on the
+ * other side settles into its new position in the equation. Once every
+ * other variable has been cleared this way, the whole equation performs
+ * one final slow slide so the isolated variable ends up on the left.
  *
- * Every symbol is an individually positioned, individually animated
- * token. Clicking a variable recomputes the whole equation's layout in
- * up to two stages (additive clear, then multiplicative clear) and lets
- * CSS transitions carry each token smoothly to its new position and
- * role — the motion IS the explanation.
+ * The move sequence is not scripted per equation — it comes from a
+ * small general algebra engine (isolateSteps, below) that emits ONE
+ * move per term cleared. Verified against all 20 variable/equation
+ * combinations in this bank (structural isolation check + numeric
+ * balance check) before any animation code was written; two real bugs
+ * were caught and fixed in that process (see PROJECT_STATUS.md).
  */
 
 const INK = '#1b2a41';
 const MUTE = '#4a5a72';
 const BRASS = '#b8823d';
 const RED = '#b34a3c';
-const CREAM = '#faf7f0';
+const TEAL = '#2e7d6b';
 
-// ---------- algebra engine (ported from the verified node script) ----------
+// ---------- algebra engine ----------
 
 interface ProductGroup {
   sign: 1 | -1;
@@ -41,59 +41,94 @@ interface EqState {
   left: Side;
   right: Side;
 }
+interface Move {
+  kind: 'lift' | 'additive' | 'multiplicative';
+  symbol: string; // display label of what's being cleared, e.g. "m" or "a×t"
+  opLabel: string; // e.g. "÷ m", "− u", "× V"
+  homeIsLeft: boolean; // which side the target lives on JUST BEFORE this move
+  stateAfter: EqState;
+}
 
 function cloneSide(s: Side): Side {
   return { groups: s.groups.map((g) => ({ sign: g.sign, factors: [...g.factors] })), denom: [...s.denom] };
 }
 
-/** The verified two-phase isolation algorithm. Throws on an unsupported shape (none in this equation bank). */
-function isolate(state: EqState, target: string): { intermediate: EqState | null; final: EqState } {
+/** Emits the full ordered list of individual moves needed to isolate `target`. */
+function isolateSteps(state: EqState, target: string): { moves: Move[]; finalIsLeft: boolean } {
   let L = cloneSide(state.left);
   let R = cloneSide(state.right);
+  const moves: Move[] = [];
 
-  const inFactors = (s: Side) => s.groups.some((g) => g.factors.includes(target));
   const inDenom = (s: Side) => s.denom.includes(target);
-
-  // Pre-phase: target starts inside a denominator — clear the fraction.
   if (inDenom(L) || inDenom(R)) {
-    const home = inDenom(L) ? L : R;
-    const opp = inDenom(L) ? R : L;
+    const homeIsLeft = inDenom(L);
+    const home = homeIsLeft ? L : R;
+    const opp = homeIsLeft ? R : L;
     home.denom = home.denom.filter((d) => d !== target);
     opp.groups[0].factors.push(target);
+    moves.push({ kind: 'lift', symbol: target, opLabel: `× ${target}`, homeIsLeft, stateAfter: { left: cloneSide(L), right: cloneSide(R) } });
   }
 
   let home: 'L' | 'R' = L.groups.some((g) => g.factors.includes(target)) ? 'L' : 'R';
   const homeSide = () => (home === 'L' ? L : R);
   const oppSide = () => (home === 'L' ? R : L);
 
-  let intermediate: EqState | null = null;
-
-  // Phase 1: additive clear — target's home side has more than one summed group.
-  if (homeSide().groups.length > 1) {
+  while (homeSide().groups.length > 1) {
     const hs = homeSide();
     const os = oppSide();
-    const keep = hs.groups.filter((g) => g.factors.includes(target));
-    const move = hs.groups.filter((g) => !g.factors.includes(target));
-    hs.groups = keep;
-    os.groups = os.groups.concat(move.map((g) => ({ sign: (g.sign * -1) as 1 | -1, factors: g.factors })));
-    intermediate = { left: cloneSide(L), right: cloneSide(R) };
+    const moveGroup = hs.groups.find((g) => !g.factors.includes(target))!;
+    hs.groups = hs.groups.filter((g) => g !== moveGroup);
+    os.groups.push({ sign: (moveGroup.sign * -1) as 1 | -1, factors: moveGroup.factors });
+    const label = moveGroup.factors.join('×');
+    moves.push({
+      kind: 'additive',
+      symbol: label,
+      opLabel: `${moveGroup.sign > 0 ? '−' : '+'} ${label}`,
+      homeIsLeft: home === 'L',
+      stateAfter: { left: cloneSide(L), right: cloneSide(R) },
+    });
   }
 
-  // Phase 2: multiplicative clear.
-  {
+  while (homeSide().groups[0].factors.length > 1) {
     const hs = homeSide();
     const os = oppSide();
     const g = hs.groups[0];
-    const others = g.factors.filter((f) => f !== target);
-    g.factors = [target];
-    os.denom = os.denom.concat(others);
-    if (hs.denom.length > 0) {
-      os.groups[0].factors = os.groups[0].factors.concat(hs.denom);
-      hs.denom = [];
-    }
+    const factor = g.factors.find((f) => f !== target)!;
+    g.factors = g.factors.filter((f) => f !== factor);
+    os.denom.push(factor);
+    moves.push({ kind: 'multiplicative', symbol: factor, opLabel: `÷ ${factor}`, homeIsLeft: home === 'L', stateAfter: { left: cloneSide(L), right: cloneSide(R) } });
   }
 
-  return { intermediate, final: { left: L, right: R } };
+  while (homeSide().denom.length > 0) {
+    const hs = homeSide();
+    const os = oppSide();
+    const factor = hs.denom[0];
+    hs.denom = hs.denom.filter((d) => d !== factor);
+    os.groups[0].factors.push(factor);
+    moves.push({ kind: 'multiplicative', symbol: factor, opLabel: `× ${factor}`, homeIsLeft: home === 'L', stateAfter: { left: cloneSide(L), right: cloneSide(R) } });
+  }
+
+  return { moves, finalIsLeft: home === 'L' };
+}
+
+function evalSide(side: Side, values: Record<string, number>): number {
+  const groupVal = (g: ProductGroup) => g.sign * g.factors.reduce((p, f) => p * (values[f] ?? 0), 1);
+  const numerator = side.groups.reduce((sum, g) => sum + groupVal(g), 0);
+  const denominator = side.denom.reduce((p, f) => p * (values[f] ?? 1), 1);
+  return numerator / denominator;
+}
+
+function renderSideText(side: Side): string {
+  const num = side.groups
+    .map((g, i) => {
+      const term = g.factors.join(' × ');
+      if (i === 0) return g.sign < 0 ? `−${term}` : term;
+      return (g.sign < 0 ? '− ' : '+ ') + term;
+    })
+    .join(' ');
+  if (side.denom.length === 0) return num;
+  const wrapped = side.groups.length > 1 ? `(${num})` : num;
+  return `${wrapped} / ${side.denom.join(' × ')}`;
 }
 
 // ---------- equation bank ----------
@@ -190,6 +225,7 @@ const CELL_W = 46;
 const OP_W = 30;
 const ROW_H = 44;
 const BAR_GAP = 6;
+const STRIP_Y = 130;
 
 interface Token {
   key: string;
@@ -197,7 +233,7 @@ interface Token {
   x: number;
   y: number;
   kind: 'var' | 'op' | 'bar' | 'equals';
-  isTarget: boolean;
+  isLeftSide: boolean;
 }
 
 function linearize(groups: ProductGroup[]): { text: string; kind: 'var' | 'op' }[] {
@@ -212,21 +248,16 @@ function linearize(groups: ProductGroup[]): { text: string; kind: 'var' | 'op' }
   });
   return cells;
 }
-
 function cellsWidth(cells: { kind: 'var' | 'op' }[]): number {
   return cells.reduce((w, c) => w + (c.kind === 'var' ? CELL_W : OP_W), 0);
 }
 
-/** Lays out one side's tokens, centred within its own block; returns tokens + block width. */
-function layoutSide(side: Side, target: string, blockLeftX: number): { tokens: Token[]; width: number } {
+function layoutSide(side: Side, blockLeftX: number, isLeftSide: boolean): { tokens: Token[]; width: number; centerX: number } {
   const numCells = linearize(side.groups);
   const numWidth = cellsWidth(numCells);
-  const denomCells: { text: string; kind: 'var' | 'op' }[] = side.denom.map((f, i) => {
-    const arr: { text: string; kind: 'var' | 'op' }[] = [];
-    if (i > 0) arr.push({ text: '×', kind: 'op' });
-    arr.push({ text: f, kind: 'var' });
-    return arr;
-  }).flat();
+  const denomCells = side.denom
+    .map((f, i) => (i > 0 ? [{ text: '×', kind: 'op' as const }, { text: f, kind: 'var' as const }] : [{ text: f, kind: 'var' as const }]))
+    .flat();
   const denomWidth = cellsWidth(denomCells);
   const hasFraction = side.denom.length > 0;
   const blockWidth = Math.max(numWidth, hasFraction ? denomWidth : 0, CELL_W);
@@ -234,140 +265,206 @@ function layoutSide(side: Side, target: string, blockLeftX: number): { tokens: T
   const tokens: Token[] = [];
   let cx = blockLeftX + (blockWidth - numWidth) / 2;
   const numY = hasFraction ? -ROW_H / 2 - BAR_GAP : 0;
+  let opCount = 0;
   numCells.forEach((c) => {
     const w = c.kind === 'var' ? CELL_W : OP_W;
-    tokens.push({ key: c.text + '@' + cx, text: c.text, x: cx + w / 2, y: numY, kind: c.kind, isTarget: c.text === target });
+    const key = c.kind === 'var' ? c.text : `op-${opCount++}-${isLeftSide ? 'L' : 'R'}-num`;
+    tokens.push({ key, text: c.text, x: cx + w / 2, y: numY, kind: c.kind, isLeftSide });
     cx += w;
   });
 
   if (hasFraction) {
-    tokens.push({ key: 'bar', text: '', x: blockLeftX + blockWidth / 2, y: 0, kind: 'bar', isTarget: false });
+    tokens.push({ key: `bar-${isLeftSide ? 'L' : 'R'}`, text: '', x: blockLeftX + blockWidth / 2, y: 0, kind: 'bar', isLeftSide });
     let dx = blockLeftX + (blockWidth - denomWidth) / 2;
     const denomY = ROW_H / 2 + BAR_GAP;
+    let dOpCount = 0;
     denomCells.forEach((c) => {
       const w = c.kind === 'var' ? CELL_W : OP_W;
-      tokens.push({ key: c.text + '@d@' + dx, text: c.text, x: dx + w / 2, y: denomY, kind: c.kind, isTarget: c.text === target });
+      const key = c.kind === 'var' ? c.text : `op-${dOpCount++}-${isLeftSide ? 'L' : 'R'}-den`;
+      tokens.push({ key, text: c.text, x: dx + w / 2, y: denomY, kind: c.kind, isLeftSide });
       dx += w;
     });
   }
 
-  return { tokens, width: blockWidth };
+  return { tokens, width: blockWidth, centerX: blockLeftX + blockWidth / 2 };
 }
 
-function layoutEquation(state: EqState, target: string): { tokens: Token[]; totalWidth: number } {
-  const leftLayout = layoutSide(state.left, target, 0);
+function layoutEquation(state: EqState): { tokens: Token[]; totalWidth: number; leftCenterX: number; rightCenterX: number } {
+  const leftLayout = layoutSide(state.left, 0, true);
   const equalsW = 56;
-  const rightLayout = layoutSide(state.right, target, leftLayout.width + equalsW);
+  const rightLayout = layoutSide(state.right, leftLayout.width + equalsW, false);
   const totalWidth = leftLayout.width + equalsW + rightLayout.width;
-  const equalsToken: Token = { key: 'equals', text: '=', x: leftLayout.width + equalsW / 2, y: 0, kind: 'equals', isTarget: false };
-  return { tokens: [...leftLayout.tokens, equalsToken, ...rightLayout.tokens], totalWidth };
+  const equalsToken: Token = { key: 'equals', text: '=', x: leftLayout.width + equalsW / 2, y: 0, kind: 'equals', isLeftSide: false };
+  return {
+    tokens: [...leftLayout.tokens, equalsToken, ...rightLayout.tokens],
+    totalWidth,
+    leftCenterX: leftLayout.centerX,
+    rightCenterX: rightLayout.centerX,
+  };
 }
 
-// ---------- numeric evaluation (for the "verify with numbers" panel) ----------
-
-function evalSide(side: Side, values: Record<string, number>): number {
-  const groupVal = (g: ProductGroup) => g.sign * g.factors.reduce((p, f) => p * (values[f] ?? 0), 1);
-  const numerator = side.groups.reduce((sum, g) => sum + groupVal(g), 0);
-  const denominator = side.denom.reduce((p, f) => p * (values[f] ?? 1), 1);
-  return numerator / denominator;
+function mirror(state: EqState): EqState {
+  return { left: state.right, right: state.left };
 }
 
-function renderSideText(side: Side): string {
-  const num = side.groups
-    .map((g, i) => {
-      const term = g.factors.join(' × ');
-      if (i === 0) return g.sign < 0 ? `−${term}` : term;
-      return (g.sign < 0 ? '− ' : '+ ') + term;
-    })
-    .join(' ');
-  if (side.denom.length === 0) return num;
-  const wrapped = side.groups.length > 1 ? `(${num})` : num;
-  return `${wrapped} / ${side.denom.join(' × ')}`;
-}
+// ---------- animation durations (slow, deliberate — Manim-paced) ----------
+const ANNOTATE_DWELL = 1400; // labels fade in, then a beat before cancelling begins
+const STRIKE_MS = 550;
+const FADE_MS = 750;
+const SETTLE_MS = 1150;
+const GAP_MS = 550;
+const FLIP_MS = 1500;
 
-// ---------- component ----------
+type SubStage = 'annotate' | 'strike' | 'fade' | 'settle' | null;
+type Phase = 'idle' | 'animating' | 'flipping' | 'done';
 
 export function EquationRearrangerSimulator() {
   const [eqIdx, setEqIdx] = useState(0);
   const [target, setTarget] = useState<string | null>(null);
-  const [display, setDisplay] = useState<EqState>(EQUATIONS[0].initial);
-  const [phase, setPhase] = useState<'idle' | 'additive' | 'multiplicative' | 'done'>('idle');
-  const timeoutsRef = useState<{ current: ReturnType<typeof setTimeout>[] }>({ current: [] })[0];
+  const [displayState, setDisplayState] = useState<EqState>(EQUATIONS[0].initial);
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [subStage, setSubStage] = useState<SubStage>(null);
+  const [activeMove, setActiveMove] = useState<Move | null>(null);
+  const [caption, setCaption] = useState('Click any variable to isolate it');
+  const [sampleVals, setSampleVals] = useState<Record<string, number>>(EQUATIONS[0].sample);
+
+  const movesRef = useRef<Move[]>([]);
+  const finalIsLeftRef = useRef(true);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const eq = EQUATIONS[eqIdx];
 
   const clearTimers = () => {
-    timeoutsRef.current.forEach((t) => clearTimeout(t));
-    timeoutsRef.current = [];
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+  };
+  const after = (fn: () => void, delay: number) => {
+    const id = setTimeout(fn, delay);
+    timersRef.current.push(id);
+  };
+
+  const finishAndMaybeFlip = (lastState: EqState) => {
+    if (!finalIsLeftRef.current) {
+      setCaption('Rearranging so the answer sits on the left…');
+      setPhase('flipping');
+      after(() => {
+        setDisplayState(mirror(lastState));
+        after(() => {
+          setPhase('done');
+        }, FLIP_MS);
+      }, 60);
+    } else {
+      setPhase('done');
+    }
+  };
+
+  const playMove = (idx: number) => {
+    const move = movesRef.current[idx];
+    setActiveMove(move);
+    setSubStage('annotate');
+    setCaption(`Apply ${move.opLabel} to both sides`);
+    after(() => {
+      setSubStage('strike');
+      setCaption(`${move.symbol} cancels here`);
+      after(() => {
+        setSubStage('fade');
+        after(() => {
+          setSubStage('settle');
+          setDisplayState(move.stateAfter);
+          setCaption('Settling into place…');
+          after(() => {
+            setSubStage(null);
+            setActiveMove(null);
+            after(() => {
+              if (idx + 1 < movesRef.current.length) playMove(idx + 1);
+              else finishAndMaybeFlip(move.stateAfter);
+            }, GAP_MS);
+          }, SETTLE_MS);
+        }, FADE_MS);
+      }, STRIKE_MS);
+    }, ANNOTATE_DWELL);
   };
 
   const solveFor = (symbol: string) => {
     clearTimers();
-    const { intermediate, final } = isolate(eq.initial, symbol);
+    const { moves, finalIsLeft } = isolateSteps(eq.initial, symbol);
+    movesRef.current = moves;
+    finalIsLeftRef.current = finalIsLeft;
     setTarget(symbol);
-    setDisplay(eq.initial);
-    if (intermediate) {
-      setPhase('additive');
-      const t1 = setTimeout(() => {
-        setDisplay(intermediate);
-        const t2 = setTimeout(() => {
-          setPhase('multiplicative');
-          setDisplay(final);
-          const t3 = setTimeout(() => setPhase('done'), 900);
-          timeoutsRef.current.push(t3);
-        }, 1000);
-        timeoutsRef.current.push(t2);
-      }, 60);
-      timeoutsRef.current.push(t1);
+    setDisplayState(eq.initial);
+    setSubStage(null);
+    setActiveMove(null);
+    if (moves.length > 0) {
+      setPhase('animating');
+      setCaption(`Isolating ${symbol}…`);
+      after(() => playMove(0), 100);
     } else {
-      setPhase('multiplicative');
-      const t1 = setTimeout(() => {
-        setDisplay(final);
-        const t2 = setTimeout(() => setPhase('done'), 900);
-        timeoutsRef.current.push(t2);
-      }, 60);
-      timeoutsRef.current.push(t1);
+      setCaption(`${symbol} is already alone`);
+      finishAndMaybeFlip(eq.initial);
     }
   };
 
   const reset = () => {
     clearTimers();
     setTarget(null);
-    setDisplay(eq.initial);
+    setDisplayState(eq.initial);
     setPhase('idle');
+    setSubStage(null);
+    setActiveMove(null);
+    setCaption('Click any variable to isolate it');
   };
 
   const switchEquation = (i: number) => {
     clearTimers();
     setEqIdx(i);
     setTarget(null);
-    setDisplay(EQUATIONS[i].initial);
+    setDisplayState(EQUATIONS[i].initial);
     setPhase('idle');
+    setSubStage(null);
+    setActiveMove(null);
     setSampleVals(EQUATIONS[i].sample);
+    setCaption('Click any variable to isolate it');
   };
 
-  const { tokens, totalWidth } = useMemo(() => layoutEquation(display, target || ''), [display, target]);
-  const finalState = useMemo(() => (target ? isolate(eq.initial, target).final : null), [target, eq]);
+  const layout = layoutEquation(displayState);
+  const homeIsLeftForActive = activeMove?.homeIsLeft ?? true;
+  const homeCenterX = homeIsLeftForActive ? layout.leftCenterX : layout.rightCenterX;
+  const oppCenterX = homeIsLeftForActive ? layout.rightCenterX : layout.leftCenterX;
 
-  const [sampleVals, setSampleVals] = useState<Record<string, number>>(EQUATIONS[0].sample);
-  const otherKeys = eq.vars.map((v) => v.symbol).filter((s) => s !== target);
+  const overlayActive = !!activeMove && (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade' || subStage === 'settle');
+  const mainTokens = layout.tokens.filter((t) => !(overlayActive && t.kind === 'var' && t.text === activeMove!.symbol));
 
-  // Verification: take the value the rearranged formula gives, plug it back into the
-  // ORIGINAL (unrearranged) equation, and confirm both sides still balance — a direct
-  // proof that isolating the variable never changed the underlying physics.
-  const finalHome = finalState && finalState.left.groups.length === 1 && finalState.left.groups[0].factors[0] === target && finalState.left.denom.length === 0 ? 'right' : 'left';
-  const rearrangedVal = finalState ? evalSide(finalHome === 'right' ? finalState.right : finalState.left, sampleVals) : 0;
+  let overlayRender: { x: number; y: number; opacity: number; color: string; fontSize: number } | null = null;
+  if (activeMove) {
+    const isTargetSymbol = activeMove.symbol === target;
+    const settledColor = isTargetSymbol ? RED : INK;
+    const stripColor = isTargetSymbol ? RED : BRASS;
+    if (subStage === 'settle') {
+      const settledLayout = layoutEquation(activeMove.stateAfter);
+      const tok = settledLayout.tokens.find((t) => t.text === activeMove.symbol && t.kind === 'var');
+      overlayRender = { x: tok?.x ?? oppCenterX, y: tok?.y ?? 0, opacity: 1, color: settledColor, fontSize: 25 };
+    } else if (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade') {
+      overlayRender = { x: oppCenterX, y: STRIP_Y, opacity: 1, color: stripColor, fontSize: 19 };
+    }
+  }
+
+  const showStrike = subStage === 'strike';
+  const homeFading = subStage === 'fade';
+
+  const finalMove = movesRef.current.length > 0 ? movesRef.current[movesRef.current.length - 1] : null;
+  const finalState = finalMove ? finalMove.stateAfter : eq.initial;
+  const finalDisplaySide = finalIsLeftRef.current ? finalState.right : finalState.left; // the side that ISN'T just [target]
+  const rearrangedVal = target ? evalSide(finalDisplaySide, sampleVals) : 0;
   const checkVals = { ...sampleVals, [target || '']: rearrangedVal };
   const origLeftVal = target ? evalSide(eq.initial.left, checkVals) : 0;
   const origRightVal = target ? evalSide(eq.initial.right, checkVals) : 0;
   const balances = target ? Math.abs(origLeftVal - origRightVal) < 1e-6 : false;
+  const otherKeys = eq.vars.map((v) => v.symbol).filter((s) => s !== target);
 
-
-  const phaseLabel =
-    phase === 'additive' ? 'Moving added terms to the other side…' :
-    phase === 'multiplicative' ? 'Cancelling multiplied terms…' :
-    phase === 'done' ? `Isolated — ${target} = ${renderSideText(finalHome === 'right' ? finalState!.right : finalState!.left)}` :
-    'Click any variable to isolate it';
+  const homeAnnotationVisible = !!activeMove && (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade');
+  const homeAnnotationOpacity = subStage === 'fade' ? 0 : 1;
+  // exact position of the token that's about to cancel (before it's filtered out of mainTokens)
+  const cancellingTokenPos = activeMove ? layout.tokens.find((t) => t.text === activeMove.symbol && t.kind === 'var') : null;
 
   return (
     <div className="equation-rearranger flex flex-col gap-5">
@@ -380,39 +477,37 @@ export function EquationRearrangerSimulator() {
           </span>
         </div>
 
-        <div className="flex justify-center items-center py-14 px-4" style={{ minHeight: 180 }}>
-          <div
-            className="relative transition-[width] duration-500 ease-in-out"
-            style={{ width: totalWidth, height: 110 }}
-          >
-            {tokens.map((tok) => {
+        <div className="flex justify-center items-center py-6 px-4" style={{ minHeight: 260 }}>
+          <div className="relative transition-[width] duration-700 ease-in-out" style={{ width: layout.totalWidth, height: 210 }}>
+            {mainTokens.map((tok) => {
               if (tok.kind === 'bar') {
                 return (
                   <div
                     key={tok.key}
-                    className="absolute transition-all duration-700 ease-in-out"
-                    style={{ left: tok.x - 26, top: 55 + tok.y - 1, width: 52, height: 2, background: INK }}
+                    className="absolute transition-all duration-[900ms] ease-in-out"
+                    style={{ left: tok.x - 26, top: 75 + tok.y - 1, width: 52, height: 2, background: INK }}
                   />
                 );
               }
-              const clickable = tok.kind === 'var';
+              const isTargetTok = tok.text === target;
+              const clickable = tok.kind === 'var' && (phase === 'idle' || phase === 'done');
               return (
                 <button
                   key={tok.key}
                   onClick={clickable ? () => solveFor(tok.text) : undefined}
                   disabled={!clickable}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ease-in-out select-none ${
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-[900ms] ease-in-out select-none ${
                     clickable ? 'cursor-pointer hover:scale-110' : 'cursor-default'
                   }`}
                   style={{
                     left: tok.x,
-                    top: 55 + tok.y,
+                    top: 75 + tok.y,
                     fontFamily: tok.kind === 'var' ? 'Georgia, serif' : 'inherit',
                     fontStyle: tok.kind === 'var' ? 'italic' : 'normal',
                     fontWeight: tok.kind === 'equals' ? 700 : tok.kind === 'var' ? 700 : 600,
                     fontSize: tok.kind === 'equals' ? 26 : tok.kind === 'var' ? 25 : 19,
-                    color: tok.isTarget ? RED : tok.kind === 'op' || tok.kind === 'equals' ? MUTE : INK,
-                    background: tok.isTarget ? 'rgba(179,74,60,0.12)' : 'transparent',
+                    color: isTargetTok ? RED : tok.kind === 'op' || tok.kind === 'equals' ? MUTE : INK,
+                    background: isTargetTok ? 'rgba(179,74,60,0.12)' : 'transparent',
                     borderRadius: 8,
                     padding: tok.kind === 'var' ? '2px 6px' : '2px 2px',
                     border: 'none',
@@ -422,6 +517,74 @@ export function EquationRearrangerSimulator() {
                 </button>
               );
             })}
+
+            {/* the migrating token (home→opposite for this move): strip position while cancelling/annotating, settles into its real slot */}
+            {overlayRender && activeMove && (
+              <div
+                className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-[900ms] ease-in-out select-none italic font-bold"
+                style={{
+                  left: overlayRender.x,
+                  top: 75 + overlayRender.y,
+                  opacity: overlayRender.opacity,
+                  color: overlayRender.color,
+                  fontSize: overlayRender.fontSize,
+                  fontFamily: 'Georgia, serif',
+                  background: subStage === 'settle' && overlayRender.color === RED ? 'rgba(179,74,60,0.12)' : 'transparent',
+                  borderRadius: 8,
+                  padding: '2px 6px',
+                }}
+              >
+                {activeMove.symbol}
+              </div>
+            )}
+
+            {/* home-side pre-existing token being cancelled: rendered at its EXACT real position
+                (from the pre-move layout, before this symbol was filtered out of mainTokens).
+                Present for the whole annotate→strike→fade run; gone once 'settle' begins. */}
+            {activeMove && cancellingTokenPos && (subStage === 'annotate' || subStage === 'strike' || subStage === 'fade') && (
+              <div
+                className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-[750ms] ease-in-out"
+                style={{
+                  left: cancellingTokenPos.x,
+                  top: 75 + cancellingTokenPos.y,
+                  opacity: homeFading ? 0 : 1,
+                  fontFamily: 'Georgia, serif',
+                  fontStyle: 'italic',
+                  fontWeight: 700,
+                  fontSize: 25,
+                  color: activeMove.symbol === target ? RED : INK,
+                }}
+              >
+                {showStrike && (
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-[2px]" style={{ background: RED, transform: 'translate(-50%,-50%) rotate(-8deg)' }} />
+                )}
+              </div>
+            )}
+
+            {/* annotation labels: applied to both sides */}
+            {homeAnnotationVisible && activeMove && (
+              <div
+                className="absolute -translate-x-1/2 transition-all duration-[900ms] ease-in-out select-none"
+                style={{
+                  left: homeCenterX,
+                  top: STRIP_Y,
+                  opacity: homeAnnotationOpacity,
+                  fontFamily: 'ui-monospace, monospace',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: BRASS,
+                  background: '#f6efdc',
+                  border: '1px solid #e6d9b8',
+                  borderRadius: 6,
+                  padding: '3px 8px',
+                }}
+              >
+                {activeMove.opLabel}
+                {showStrike && (
+                  <div className="absolute left-0 right-0 top-1/2 h-[2px]" style={{ background: RED, transform: 'translateY(-50%) rotate(-6deg)' }} />
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -431,16 +594,13 @@ export function EquationRearrangerSimulator() {
               phase === 'done' ? 'bg-[#e6f2ee] text-[#1b5c4d]' : 'bg-[#f6efdc] text-[#8f6428]'
             }`}
           >
-            {phaseLabel}
+            {caption}
           </span>
         </div>
 
         <div className="px-4 pb-5 flex flex-wrap items-center gap-2 border-t border-[#eee6d3] pt-4">
           {target && (
-            <button
-              onClick={reset}
-              className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0]"
-            >
+            <button onClick={reset} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0]">
               ↺ Reset
             </button>
           )}
@@ -465,15 +625,14 @@ export function EquationRearrangerSimulator() {
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">The Golden Rule</span>
           <div className="mt-2.5 space-y-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">Whatever you do to one side, you must do to the other.</strong> That
-              is why every term you don't click still moves — clearing a path for your target is a two-sided trade,
-              never a one-sided delete.
+              <strong className="text-[#1b2a41]">Whatever you do to one side, you must do to the other.</strong> Watch
+              the same operation appear under both sides at once — that is the rule, made visible.
             </p>
             <p>
-              A term that was <em>added</em> crosses the equals sign by flipping its sign. A term that was{' '}
-              <em>multiplying</em> crosses by dropping into a fraction's denominator on the other side.
+              Where the term already existed, it cancels away. Where it did not, it survives and becomes a permanent
+              new part of the equation.
             </p>
-            <p>Watch the colour: the variable you clicked stays highlighted the entire way, so you never lose track of it.</p>
+            <p>The variable you clicked stays red for the entire derivation — you can never lose track of it.</p>
           </div>
         </div>
 
@@ -481,28 +640,26 @@ export function EquationRearrangerSimulator() {
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
           <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Click every variable in F = ma one at a time. Notice a
-              single click, single move — the simplest case.
+              <strong className="text-[#1b2a41]">1.</strong> Click a in F = ma. One operation, one cancellation, one
+              settle — the simplest possible derivation.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Switch to ρ = m/V and click V. Watch it climb out of the
-              denominator on the right and land as a multiplier on the left, before the second move sends ρ across to
-              finish the job.
+              <strong className="text-[#1b2a41]">2.</strong> Switch to p = ρgh and click ρ. Two separate cancellations
+              happen in sequence — h clears first, then g — never both at once.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Switch to v = u + at and click a. Two moves happen in
-              sequence: u leaves first (as an added term, sign-flipped), then t leaves second (as a multiplied term,
-              dropping into a denominator) — the two-step split is exactly why this equation trips people up.
+              <strong className="text-[#1b2a41]">3.</strong> Switch to ρ = m/V and click V. Watch it start inside a
+              denominator, then lift out entirely as its own first move, before a second move finishes the job.
             </p>
           </div>
         </div>
 
         <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          {target && finalState ? (
+          {target ? (
             <>
               <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
                 <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
-                  {target} = {renderSideText(finalHome === 'right' ? finalState.right : finalState.left)}
+                  {target} = {renderSideText(finalDisplaySide)}
                 </div>
                 <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
                   {eq.name}

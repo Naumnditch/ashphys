@@ -589,3 +589,58 @@ Two distinct visual systems, intentionally:
   exactly one group (true for all 6 equations - none combine an
   additive opposite side with an incoming denominator-clear). Flagged
   for whoever adds equation #7 later.
+
+## Equation Rearranger v3: full Manim-style choreography (2026-08-28)
+- User wanted the actual worked derivation shown, not just a jump to
+  the answer: "divide by m in both sides in one slide, then cancel
+  both m's in the other slide, and then rearrange... slow and smooth,
+  exactly like manim simulations".
+- Engine restructured AGAIN: isolateSteps() now emits ONE MOVE PER
+  TERM CLEARED (not batched) - e.g. p=rho*g*h isolating rho gives
+  TWO separate moves (div h, then div g), each independently
+  animated/cancelled, matching the granularity requested. Two more
+  real bugs found and fixed in this pass (node-verified before any
+  TS/animation code): a target that starts already-alone in its
+  numerator but still stuck under a denominator (e.g. 'm' in
+  rho=m/V) was skipping the denominator-clear step entirely (the
+  multiplicative while-loop condition only checked "more than 1
+  factor in the group", never checked "does home side still have a
+  nonzero denom"). Fixed with a second while-loop. Re-verified full
+  20/20 (structural isolation check + numeric balance check) before
+  writing the TS port.
+- ANIMATION MODEL (per move): annotate (op label fades in under BOTH
+  sides, home side under the term's own side, opposite side under
+  the side that's GAINING it) -> strike (red strikethrough on the
+  home-side original token + its annotation twin) -> fade (both drop
+  to opacity 0) -> settle (the surviving OPPOSITE-side annotation
+  transitions position+color from strip into its real computed slot
+  in the updated layout, while ALL other tokens simultaneously
+  reflow via the same displayState update). Durations deliberately
+  slow: annotate dwell 1400ms, strike 550ms, fade 750ms, settle
+  1150ms, gap 550ms between moves, final flip 1500ms.
+- KEY DESIGN DECISION: the "opposite side" annotation is rendered as
+  ONE PERSISTENT overlay element throughout annotate->settle (not
+  handed off between two different code paths), with mainTokens
+  filtering that exact symbol out for the same window - avoids any
+  cross-render key-continuity fragility. Its target position during
+  'settle' is computed by running layoutEquation() on the SAME
+  stateAfter that mainTokens uses, guaranteeng the handoff position
+  matches exactly (no jump) when the overlay is dropped and mainTokens
+  takes over unfiltered.
+- The home-side cancelling token is rendered at its EXACT pre-move
+  position (looked up from the CURRENT layout.tokens before
+  filtering), not the block's center - matters when a side has
+  multiple factors (e.g. "m x a") so the strikethrough lands on the
+  right symbol, not between two symbols.
+- FINAL FLIP: after all moves complete, if the target didn't
+  naturally land on the left, the whole equation slides (via
+  mirror(state) + the same stable-key token system) so the isolated
+  variable always ends up on the left, matching the explicit request.
+- Fixed a real UX bug found during this build: clickable condition
+  was `!target` (only clickable before ANY variable had ever been
+  picked) - meant you could never try a second variable after the
+  first derivation finished. Fixed to `phase==='idle'||phase==='done'`.
+- Removed two dead/unused variables from an earlier design pass
+  (isHomeCancelling, isHomeSideOfActiveMove) that were computed but
+  never referenced in the render output.
+- Same DB row/URL reused (/simulations/equation-rearranger).
