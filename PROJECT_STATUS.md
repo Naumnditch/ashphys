@@ -759,3 +759,28 @@ Two distinct visual systems, intentionally:
   space anymore.
 - Chaining (baseState) and Reset button from the previous pass
   retained unchanged - still correct, no changes needed there.
+
+## Standard Form & Significant Figures sim (2026-08-28, 2nd of 8 Prep Physics sims)
+- /simulations/standard-form: step the decimal point through real
+  physics quantities' digits (Moon distance, speed of light, Sun
+  distance, Earth radius, hydrogen atom diameter, green light
+  wavelength, electron mass, radio wave period) - value pinned
+  mathematically constant at every marker position (compExponent =
+  trueExponent + (1-pos)), verified in node across the full bank at
+  every position before any UI code, not just at the correct spot.
+  "Snap to Standard Form" button jumps straight to pos=1; starting
+  position is deliberately non-standard-form so there's something to
+  actually do.
+- Second panel: round the same digits to N significant figures via
+  slider, showing kept vs greyed-out digits live. Rounding logic
+  (digit-string based, with proper carry-over handling e.g. 998 -> 10
+  needing an exponent+1 bump) independently verified against 9 cases
+  including the carry-over edge case before shipping.
+- Registered under topic_id 04575a57 (Standard Form & Significant
+  Figures, order 2 in chapter 0 Prep Physics). sim_type
+  'graph_builder' (reused enum value, no better fit exists).
+- No practice questions seeded yet for this topic - can add if
+  requested.
+- REMAINING Prep Physics sims not yet built: Unit Prefixes, Constant
+  of Proportionality, Reading and Interpreting Graphs, Basic Trig for
+  Physics, Geometric Projections, Order of Magnitude & Estimation.
