@@ -520,3 +520,72 @@ Two distinct visual systems, intentionally:
   top) even before their sims ship - curriculum page already supports
   chapters/topics with no sim yet (shows no "Launch Simulation" button
   until one is registered against that topic_id).
+
+## Equation Rearranger REBUILT as animated click-to-isolate (2026-08-28)
+- User rejected the button-quiz version, wanted genuine animation: click
+  ANY variable, watch it visually move/cross the equals sign in front of
+  the student, other variables redistributing to maintain the
+  relationship. "I NEED THE STUDENT TO SEE THE VARIABLE MOVE IN FRONT
+  OF HIS EYES" - full rebuild, not an iteration on the quiz version.
+- Built a GENERAL algebra engine (not 13 hand-scripted answers): Side =
+  {groups: [{sign,factors[]}], denom: [...]}. isolate(state, target)
+  runs three rules: (0) pre-phase - if target starts inside a
+  denominator, clear the fraction (move it to the opposite side's
+  numerator); (1) additive clear - if target's home side has >1 summed
+  group, move every OTHER group to the opposite side with sign flipped;
+  (2) multiplicative clear - move every other factor in target's group
+  to the opposite side's denominator, and if target's own side had a
+  denominator, multiply those factors onto the opposite side's
+  numerator. This derives correct rearrangements for ANY variable in
+  ANY of the 6 equations (F=ma, rho=m/V, V=IR, P=E/t, p=rho*g*h,
+  v=u+at), not just the ones explicitly tested.
+- VERIFICATION (before any UI code): node script tested all 13
+  previously-known targets (100% match against the old hand-verified
+  bank), found and fixed 2 real bugs in the process (a
+  denominator-starting-target case that threw "not found", and a
+  cosmetic paren-formatting issue). Then, after porting to TS, wrote a
+  SECOND independent verification mirroring the exact ported code
+  structure and tested ALL 20 variable/equation combinations
+  (previously-untested trivial cases like clicking F in F=ma included)
+  - 20/20 pass, checked by plugging the derived value back into the
+    ORIGINAL equation and confirming both sides balance (stronger check
+  than comparing two separately-computed numbers).
+- ANIMATION: tokens are individually absolutely-positioned spans (not
+  canvas), keyed by symbol text, with CSS transition on left/top -
+  React re-render with new layout-computed positions triggers smooth
+  animated movement automatically, no animation library needed (none
+  installed in this project; kept it that way). layoutEquation() is a
+  hand-rolled fixed-cell-width layout (CELL_W=46, OP_W=30) that
+  linearizes each side into numerator/denominator token rows with a
+  fraction bar when a denominator exists, computes total width, and
+  the whole assembly is centered via a flex parent + width-transitioning
+  inner div so token positions AND overall re-centering both animate
+  together.
+- TWO-STAGE animation sequencing for equations needing both phases
+  (only v=u+at in current bank): initial -> (1000ms) -> intermediate
+  (additive-cleared state, CSS-transitions tokens into place) -> pause
+  -> (900ms) -> final (multiplicative-cleared). Single-phase equations
+  just animate straight to final. Managed via chained setTimeout with
+  a timeoutsRef to cancel/prevent overlap if the user clicks a new
+  target mid-animation.
+- Clicking ANY variable at ANY time (including after already solved)
+  restarts the derivation fresh from eq.initial for the newly-clicked
+  target - no separate "reset" required to try a different variable,
+  though a Reset button is also present.
+- "Verify" panel: plug the DERIVED value back into the ORIGINAL
+  (unrearranged) equation using editable sample numbers for the other
+  variables, confirm both sides balance - live, for whatever numbers
+  the user tries.
+- Simulation DB row reused (same url_path /simulations/equation-
+  rearranger, same id) - description updated to describe the new
+  click-to-isolate mechanic instead of the old button-quiz.
+- KNOWN LIMITATION (documented, not hit by current bank): the engine
+  is not a full CAS. Two shortcuts taken deliberately because they're
+  safe for all 6 equations here: (a) home-side detection after the
+  pre-phase assumes target is in L if not immediately provable
+  otherwise (no throw) - safe because every click target is guaranteed
+  to come from an actual rendered token; (b) multiplying a cleared
+  denominator's factors onto the opposite side assumes that side has
+  exactly one group (true for all 6 equations - none combine an
+  additive opposite side with an incoming denominator-clear). Flagged
+  for whoever adds equation #7 later.
