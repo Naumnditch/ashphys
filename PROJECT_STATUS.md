@@ -784,3 +784,63 @@ Two distinct visual systems, intentionally:
 - REMAINING Prep Physics sims not yet built: Unit Prefixes, Constant
   of Proportionality, Reading and Interpreting Graphs, Basic Trig for
   Physics, Geometric Projections, Order of Magnitude & Estimation.
+
+## Optics Puzzle: Lenses & Mirrors (2026-08-28) - largest build of the session
+- User referenced prismrules.com (a paid $10 commercial indie game by
+  an independent dev named Alan) as inspiration for an optics puzzle
+  in the lens/mirror lessons. Explicitly did NOT scrape/embed/copy that
+  game - built an ORIGINAL implementation of the "drag optical elements
+  to guide light to a goal" genre, own code/levels/art, scoped to the
+  actual syllabus (13.1 reflection, 13.4 lenses) rather than the full
+  prism-dispersion scope of the reference game.
+- REAL RAY-TRACING ENGINE, not scripted per-level behavior. Three
+  physics primitives, independently verified in node BEFORE any
+  rendering code:
+  1. Plane mirror: standard vector reflection formula.
+  2. Curved mirror: reflection from the TRUE LOCAL NORMAL at the exact
+     arc-intersection point (not a principal-ray diagram) - verified to
+     reproduce the real paraxial focal length f=R/2 AND genuine
+     spherical aberration at larger ray heights, matching real spherical
+     mirror behavior beyond the simplified paraxial case.
+  3. Thin lens: paraxial ABCD transform theta_out = theta_in - h/f -
+     verified to reproduce ALL THREE classical principal-ray rules
+     (parallel->focus, through-center->undeviated, through-focus->
+     parallel) from ONE general formula, so it correctly bends ANY ray,
+     not just the 3 special textbook ones.
+- TWO REAL BUGS FOUND in the full port (caught before shipping, via a
+  hand-mirrored node re-verification of the actual TS source - same
+  practice as the equation rearranger):
+  1. Concave/convex mirror center-of-curvature had an extra unwanted
+     sign flip, placing C on the wrong side entirely (was giving focal
+     crossings ~350 instead of correct ~250 for a test case). Root
+     cause: `-sign*R` should have been `sign*R`.
+  2. Lens optical-axis perpendicular was a FIXED direction based only
+     on the lens's own angle, which happens to point backward relative
+     to the ray for some orientations, silently flipping the sign of
+     theta_in/theta_out and giving CONSTANT wrong crossings regardless
+     of ray height. Fixed by choosing whichever of the two valid
+     perpendiculars is aligned with the incoming ray direction, before
+     using it for both the intersection AND the angle decomposition.
+  Also caught and corrected an arithmetic mistake in my OWN test
+  expectations while debugging (confused R with f=R/2 in a comment) -
+  worth remembering that a "failing" verification can be the test
+  being wrong, not just the code; re-derived by hand before concluding
+  which one was actually wrong.
+- LEVEL SOLVABILITY independently verified via grid search (not just
+  "the engine works," but "each of the 6 levels as designed actually
+  has a real solution reachable by dragging/rotating the given
+  elements") - all 6 confirmed solvable (best-found distance to goal
+  effectively 0.0-0.2px against a 16px goal radius), including the
+  combo level which needed a fuller position+angle search after an
+  initial coarse angle-only sweep came up empty (search coarseness,
+  not an unsolvable level).
+- 6 original levels: plane mirror, concave mirror (converging),
+  convex mirror (diverging), convex lens (converging), concave lens
+  (diverging), mirror+lens combo. Canvas-based (matching ripple-tank/
+  gas-laws/half-life's rendering pattern), drag-to-move + a small
+  rotate-ring handle per element, real-time re-trace on every
+  pointer move (not pre-baked), animated flowing-dash beam (gold,
+  turns teal on goal hit).
+- Registered under Chapter 13 (Light), topic 13.4 Lenses (also covers
+  13.1 reflection). sim_type 'optics' (a real enum value, first sim
+  to use it).
