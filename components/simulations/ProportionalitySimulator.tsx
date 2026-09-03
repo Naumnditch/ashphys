@@ -125,6 +125,49 @@ function rearrangedFor(vars: VarDef[], responder: string): { num: string[]; den:
   return { num, den };
 }
 
+/**
+ * Accumulated factor for the responder, given each driver's applied factor.
+ * Kept as a raw fraction rather than a collapsed decimal so the history stays
+ * visible: doubling m then dividing a by 4 shows F as 2/4, not 0.5.
+ *   direct  (k=+1): numerator carries to numerator
+ *   inverse (k=-1): numerator and denominator swap over
+ * Verified in node against the worked example and 96 exhaustive cases —
+ * the original equation still balances after every allocation.
+ */
+function responderFactor(vars: VarDef[], responder: string, factors: Record<string, Factor>): Factor {
+  const eR = vars.find((v) => v.sym === responder)!.exp;
+  let num = 1;
+  let den = 1;
+  for (const v of vars) {
+    if (v.sym === responder) continue;
+    const f = factors[v.sym] ?? { num: 1, den: 1 };
+    if (relExponent(v.exp, eR) > 0) { num *= f.num; den *= f.den; }
+    else { num *= f.den; den *= f.num; }
+  }
+  return { num, den };
+}
+
+interface Factor { num: number; den: number; }
+
+/** Arrow whose length grows with how far the quantity has moved. */
+function Arrow({ ratio, color }: { ratio: number; color: string }) {
+  if (!isFinite(ratio) || ratio <= 0) return null;
+  const mag = Math.abs(Math.log(ratio));
+  if (mag < 0.02) return null;
+  const up = ratio > 1;
+  const h = Math.max(16, Math.min(52, 16 + mag * 40));
+  const head = 9;
+  return (
+    <svg width={16} height={h} viewBox={`0 0 16 ${h}`} className="transition-all duration-500 ease-out" style={{ overflow: 'visible' }}>
+      <line x1={8} y1={up ? h : 0} x2={8} y2={up ? head : h - head} stroke={color} strokeWidth={2.6} strokeLinecap="round" />
+      <polygon
+        points={up ? `8,0 2,${head} 14,${head}` : `8,${h} 2,${h - head} 14,${h - head}`}
+        fill={color}
+      />
+    </svg>
+  );
+}
+
 function formatVal(v: number): string {
   if (v === 0) return '0';
   const abs = Math.abs(v);
@@ -136,30 +179,65 @@ export function ProportionalitySimulator() {
   const [eqIdx, setEqIdx] = useState(0);
   const eq = EQUATIONS[eqIdx];
 
+  const [mode, setMode] = useState<'drag' | 'factors'>('drag');
   const [values, setValues] = useState<Record<string, number>>(() =>
     Object.fromEntries(EQUATIONS[0].vars.map((v) => [v.sym, v.base]))
   );
+  const [factors, setFactors] = useState<Record<string, Factor>>(() =>
+    Object.fromEntries(EQUATIONS[0].vars.map((v) => [v.sym, { num: 1, den: 1 }]))
+  );
+  const [entry, setEntry] = useState<Record<string, string>>({});
   const [responder, setResponder] = useState(EQUATIONS[0].vars[0].sym);
   const [lastDriver, setLastDriver] = useState<string | null>(null);
 
   const varOf = (sym: string) => eq.vars.find((v) => v.sym === sym)!;
 
+  const blankFactors = (e: EquationDef) => Object.fromEntries(e.vars.map((v) => [v.sym, { num: 1, den: 1 }]));
+
   const switchEquation = (i: number) => {
     setEqIdx(i);
     setValues(Object.fromEntries(EQUATIONS[i].vars.map((v) => [v.sym, v.base])));
+    setFactors(blankFactors(EQUATIONS[i]));
+    setEntry({});
     setResponder(EQUATIONS[i].vars[0].sym);
     setLastDriver(null);
   };
 
   const reset = () => {
     setValues(Object.fromEntries(eq.vars.map((v) => [v.sym, v.base])));
+    setFactors(blankFactors(eq));
+    setEntry({});
     setLastDriver(null);
   };
 
   const chooseResponder = (sym: string) => {
     setResponder(sym);
+    setFactors(blankFactors(eq));
+    setEntry({});
     setLastDriver(null);
   };
+
+  /** Apply a ×n or ÷n allocation, accumulating on top of what's already there. */
+  const applyFactor = (sym: string, divide: boolean) => {
+    const raw = parseFloat(entry[sym] ?? '');
+    if (!isFinite(raw) || raw <= 0) return;
+    setFactors((prev) => {
+      const cur = prev[sym] ?? { num: 1, den: 1 };
+      return {
+        ...prev,
+        [sym]: divide ? { num: cur.num, den: cur.den * raw } : { num: cur.num * raw, den: cur.den },
+      };
+    });
+    setLastDriver(sym);
+  };
+
+  const respFactor = responderFactor(eq.vars, responder, factors);
+  const netFactorOf = (sym: string): number => {
+    if (sym === responder) return respFactor.num / respFactor.den;
+    const f = factors[sym] ?? { num: 1, den: 1 };
+    return f.num / f.den;
+  };
+  const factorOf = (sym: string): Factor => (sym === responder ? respFactor : factors[sym] ?? { num: 1, den: 1 });
 
   const drag = (driverSym: string, newVal: number) => {
     if (driverSym === responder) return;
@@ -176,11 +254,12 @@ export function ProportionalitySimulator() {
     setLastDriver(driverSym);
   };
 
-  // symbol size scales with how far the value has moved from its baseline
+  /** how far this symbol has moved from its starting point, in the active mode */
+  const ratioOf = (sym: string) => (mode === 'drag' ? values[sym] / varOf(sym).base : netFactorOf(sym));
+
+  // symbol size scales with how far the quantity has moved from its baseline
   const sizeFor = (sym: string) => {
-    const v = varOf(sym);
-    const ratio = values[sym] / v.base;
-    const size = 34 * Math.pow(ratio, 0.38);
+    const size = 34 * Math.pow(ratioOf(sym), 0.38);
     return Math.max(17, Math.min(66, size));
   };
 
@@ -199,7 +278,7 @@ export function ProportionalitySimulator() {
 
   // ---- live graph of responder vs the variable being dragged ----
   const graph = (() => {
-    if (!lastDriver) return null;
+    if (mode !== 'drag' || !lastDriver) return null;
     const d = varOf(lastDriver);
     const r = varOf(responder);
     const k = relExponent(d.exp, r.exp);
@@ -229,6 +308,19 @@ export function ProportionalitySimulator() {
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{eq.name}</span>
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">solving for {responder}</span>
         </div>
+        <div className="flex gap-1.5 px-4 pt-3">
+          {([['drag', 'Drag the sliders'], ['factors', 'Enter factors']] as const).map(([m, label]) => (
+            <button
+              key={m}
+              onClick={() => { setMode(m); setLastDriver(null); }}
+              className={`text-[12.5px] font-semibold px-3.5 py-1.5 rounded-full border ${
+                mode === m ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
         {/* ---- the equation, rearranged for the chosen variable, sized by value ---- */}
         <div className="flex items-center justify-center gap-3 flex-wrap px-4" style={{ minHeight: 160 }}>
@@ -237,18 +329,34 @@ export function ProportionalitySimulator() {
             const symbol = (sym: string) => {
               const isDriver = sym === lastDriver;
               const isResp = sym === responder;
+              const color = isResp ? TEAL : isDriver ? RED : INK;
+              const f = factorOf(sym);
+              const showBadge = mode === 'factors' && (f.num !== 1 || f.den !== 1);
               return (
-                <span
-                  key={sym}
-                  className="italic font-bold transition-all duration-500 ease-out px-1.5 rounded"
-                  style={{
-                    fontFamily: 'Georgia, serif',
-                    fontSize: sizeFor(sym),
-                    color: isResp ? TEAL : isDriver ? RED : INK,
-                    background: isResp ? 'rgba(46,125,107,0.10)' : isDriver ? 'rgba(179,74,60,0.10)' : 'transparent',
-                  }}
-                >
-                  {sym}
+                <span key={sym} className="inline-flex items-center gap-1">
+                  <span
+                    className="italic font-bold transition-all duration-500 ease-out px-1.5 rounded"
+                    style={{
+                      fontFamily: 'Georgia, serif',
+                      fontSize: sizeFor(sym),
+                      color,
+                      background: isResp ? 'rgba(46,125,107,0.10)' : isDriver ? 'rgba(179,74,60,0.10)' : 'transparent',
+                    }}
+                  >
+                    {sym}
+                  </span>
+                  {showBadge && (
+                    <span className="inline-flex flex-col items-center leading-none font-mono font-bold" style={{ color }}>
+                      <span className="text-[13px]">{formatVal(f.num)}</span>
+                      {f.den !== 1 && (
+                        <>
+                          <span className="block w-full h-[1.5px] my-0.5 rounded" style={{ background: color }} />
+                          <span className="text-[13px]">{formatVal(f.den)}</span>
+                        </>
+                      )}
+                    </span>
+                  )}
+                  <Arrow ratio={ratioOf(sym)} color={color} />
                 </span>
               );
             };
@@ -302,11 +410,13 @@ export function ProportionalitySimulator() {
           </div>
         )}
 
-        {/* ---- sliders + graph ---- */}
+        {/* ---- controls + graph ---- */}
         <div className="px-4 pt-3 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5">
           <div className="space-y-3">
             {eq.vars.map((v) => {
               const isResponder = v.sym === responder;
+              const f = factorOf(v.sym);
+              const shownVal = mode === 'drag' ? values[v.sym] : v.base * netFactorOf(v.sym);
               return (
                 <div key={v.sym} className={`px-3 py-2.5 rounded border ${isResponder ? 'border-[#2e7d6b] bg-[#f2f9f7]' : 'border-[#eee6d3]'}`}>
                   <div className="flex items-center justify-between mb-1.5">
@@ -315,16 +425,22 @@ export function ProportionalitySimulator() {
                         {v.sym}
                       </span>
                       <span className="text-[11.5px] text-[#4a5a72]">{v.name}</span>
+                      {mode === 'factors' && (f.num !== 1 || f.den !== 1) && (
+                        <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: isResponder ? '#e6f2ee' : '#f6efdc', color: isResponder ? '#1b5c4d' : '#8f6428' }}>
+                          {f.den === 1 ? `× ${formatVal(f.num)}` : `${formatVal(f.num)} / ${formatVal(f.den)}`}
+                        </span>
+                      )}
                     </div>
                     <span className="font-mono text-[12.5px] font-bold" style={{ color: isResponder ? TEAL : INK }}>
-                      {formatVal(values[v.sym])} {v.unit}
+                      {formatVal(shownVal)} {v.unit}
                     </span>
                   </div>
+
                   {isResponder ? (
                     <div className="text-[11px] font-mono uppercase tracking-wide text-[#2e7d6b]">
                       responds automatically — this is what you are solving for
                     </div>
-                  ) : (
+                  ) : mode === 'drag' ? (
                     <input
                       type="range"
                       min={v.base * 0.25}
@@ -334,30 +450,92 @@ export function ProportionalitySimulator() {
                       onChange={(e) => drag(v.sym, parseFloat(e.target.value))}
                       className="w-full"
                     />
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        placeholder="value"
+                        value={entry[v.sym] ?? ''}
+                        onChange={(e) => setEntry((p) => ({ ...p, [v.sym]: e.target.value }))}
+                        className="w-24 border border-gray-300 rounded px-2 py-1 text-[12.5px] font-mono"
+                      />
+                      <button
+                        onClick={() => applyFactor(v.sym, false)}
+                        className="text-[13px] font-bold px-3 py-1 rounded border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]"
+                      >
+                        × multiply
+                      </button>
+                      <button
+                        onClick={() => applyFactor(v.sym, true)}
+                        className="text-[13px] font-bold px-3 py-1 rounded border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]"
+                      >
+                        ÷ divide
+                      </button>
+                    </div>
                   )}
                 </div>
               );
             })}
+            {mode === 'factors' && (
+              <p className="text-[11.5px] text-[#4a5a72] leading-snug">
+                Allocations stack up — each one keeps affecting the balance until you hit Reset, which returns every
+                factor to 1.
+              </p>
+            )}
           </div>
 
           <div>
             <div className="font-mono text-[10.5px] tracking-wide uppercase text-[#4a5a72] mb-2">
-              {relationship ? `${responder} against ${relationship.driver}` : 'graph appears once you drag'}
+              {mode === 'factors'
+                ? `net effect on ${responder}`
+                : relationship
+                ? `${responder} against ${relationship.driver}`
+                : 'graph appears once you drag'}
             </div>
-            <div className="border border-[#eee6d3] rounded bg-[#faf7f0] p-2">
-              {graph ? (
-                <svg viewBox={`0 0 ${graph.W} ${graph.H}`} className="w-full" style={{ display: 'block' }}>
-                  <line x1={0} y1={graph.H} x2={graph.W} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
-                  <line x1={0} y1={0} x2={0} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
-                  <path d={graph.path} fill="none" stroke={graph.isDirect ? TEAL : RED} strokeWidth={2.2} />
-                  <circle cx={graph.cx} cy={graph.cy} r={5} fill={graph.isDirect ? TEAL : RED} />
-                </svg>
-              ) : (
-                <div className="text-[11.5px] text-[#a8a196] text-center py-10">—</div>
-              )}
-            </div>
+            {mode === 'factors' ? (
+              <div className="border border-[#eee6d3] rounded bg-[#faf7f0] p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <span className="italic font-bold text-[22px]" style={{ fontFamily: 'Georgia, serif', color: TEAL }}>
+                    {responder}
+                  </span>
+                  <span className="text-[18px] text-[#4a5a72]">×</span>
+                  <span className="inline-flex flex-col items-center leading-none font-mono font-bold text-[#1b2a41]">
+                    <span className="text-[17px]">{formatVal(respFactor.num)}</span>
+                    {respFactor.den !== 1 && (
+                      <>
+                        <span className="block w-full h-[2px] my-1 rounded bg-[#1b2a41]" />
+                        <span className="text-[17px]">{formatVal(respFactor.den)}</span>
+                      </>
+                    )}
+                  </span>
+                </div>
+                <div className="text-[12.5px] font-mono text-[#4a5a72]">
+                  net × {formatVal(respFactor.num / respFactor.den)}
+                </div>
+                <div className="text-[12px] text-[#4a5a72] mt-2">
+                  {formatVal(varOf(responder).base)} → <strong className="text-[#1b2a41]">{formatVal(varOf(responder).base * (respFactor.num / respFactor.den))}</strong> {varOf(responder).unit}
+                </div>
+              </div>
+            ) : (
+              <div className="border border-[#eee6d3] rounded bg-[#faf7f0] p-2">
+                {graph ? (
+                  <svg viewBox={`0 0 ${graph.W} ${graph.H}`} className="w-full" style={{ display: 'block' }}>
+                    <line x1={0} y1={graph.H} x2={graph.W} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
+                    <line x1={0} y1={0} x2={0} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
+                    <path d={graph.path} fill="none" stroke={graph.isDirect ? TEAL : RED} strokeWidth={2.2} />
+                    <circle cx={graph.cx} cy={graph.cy} r={5} fill={graph.isDirect ? TEAL : RED} />
+                  </svg>
+                ) : (
+                  <div className="text-[11.5px] text-[#a8a196] text-center py-10">—</div>
+                )}
+              </div>
+            )}
             <p className="text-[11px] text-[#4a5a72] leading-snug mt-2">
-              {relationship
+              {mode === 'factors'
+                ? 'Each allocation carries into this fraction by the proportionality rule — multiplying a directly proportional variable multiplies the top, an inversely proportional one multiplies the bottom.'
+                : relationship
                 ? relationship.isDirect
                   ? 'A straight line through the origin — the signature of direct proportionality.'
                   : 'A curve that falls away and never touches either axis — the signature of inverse proportionality.'

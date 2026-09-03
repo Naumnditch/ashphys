@@ -981,3 +981,38 @@ Two distinct visual systems, intentionally:
   colouring.
 - Removed the now-dead static `layout` field from EquationDef and all
   5 equation definitions - the display is fully derived now.
+
+### Proportionality sim: arrows + factor-allocation tab (2026-08-28)
+- ARROWS: every symbol now carries an SVG arrow whose LENGTH scales with
+  |ln(ratio)| (clamped 16-52px) and whose direction is up/down by whether
+  the quantity rose or fell. Because the responder's value is already
+  derived from the proportionality relation, its arrow automatically
+  points the same way as the driver's for direct relationships and the
+  opposite way for inverse ones - no special-casing needed, it falls out
+  of the existing solver.
+- NEW "Enter factors" TAB alongside the drag tab. Per non-responder
+  variable: a number input + "x multiply" / "÷ divide" buttons.
+  Allocations ACCUMULATE (they keep affecting the balance) until Reset,
+  which returns every factor to 1 - exactly as the user specified.
+- Factors are kept as a RAW FRACTION {num, den}, deliberately NOT
+  collapsed to a decimal, so the history stays visible: the user's own
+  worked example (double m, then divide a by 4, solving for F) displays
+  F as 2 over 4, matching what they described. Badges render as a real
+  stacked fraction beside each symbol.
+- responderFactor() combines each driver's fraction by the relative
+  exponent: direct -> num*num, den*den; inverse -> num and den swap.
+- VERIFIED IN NODE BEFORE UI: (1) the user's exact worked example
+  reproduces step by step (1/1 -> 2/1 -> 2/4, net 0.5); (2) numeric
+  cross-check that base x factor equals the directly-computed m*a;
+  (3) the inverse case (same equation, solving for a instead) gives
+  1/2 as expected; (4) EXHAUSTIVE - 96 cases across all 5 equations x
+  every responder x 6 random factor sets, confirming the original
+  equation still balances after every allocation. All passed.
+- NOTE FOR FUTURE ME: the user described the a-divided-by-4 step as
+  being due to "inverse proportionality with a", but in F=ma solving
+  for F, F and a are DIRECTLY proportional - dividing a by 4 divides F
+  by 4, which is why the 4 lands in F's denominator. Their described
+  OUTCOME was exactly right; only the label was loose. Implemented the
+  physics correctly (the sim labels it "directly proportional") and
+  flagged it gently in chat rather than silently coding the wrong
+  relationship.
