@@ -844,3 +844,53 @@ Two distinct visual systems, intentionally:
 - Registered under Chapter 13 (Light), topic 13.4 Lenses (also covers
   13.1 reflection). sim_type 'optics' (a real enum value, first sim
   to use it).
+
+## Orthographic Projections sim (2026-08-28, 3rd of 8 Prep Physics sims)
+- User vision (with 3 reference images: SolidWorks orientation panel,
+  alloprof projection-box diagram, view-cube): interactive solid you
+  can tilt manually, with 4 sub-screens showing all projections at
+  once. Start with an engraved cube (different mark per face), then
+  simple shapes, then complex isometric-style solids. "Like SolidWorks
+  switching between projections, only the viewing part, no editing."
+- /simulations/projections. NO 3D LIBRARY in this project (checked
+  package.json - no three.js), so the 3D core is written from scratch:
+  rotY/rotX transforms, prism() extrusion of a 2D profile into a
+  closed solid, backface culling via transformed-normal z-sign,
+  painter's-algorithm depth sort, per-view auto-fit. Deliberately kept
+  dependency-free, consistent with the rest of the project.
+- VERIFIED IN NODE BEFORE ANY RENDERING CODE (4 checks):
+  1. Closure: every solid's edges each shared by exactly 2 faces
+     (cube 12 edges, L-block 18, stair 24, cylinder 96) - an open
+     solid would render with holes.
+  2. Projected size: 2x2x2 cube measures exactly 2x2 in all six named
+     views.
+  3. Backface culling: exactly 1 face visible from each axis-aligned
+     view, exactly 3 from isometric.
+  4. CRITICAL - face identity: each named view proven to show the face
+     it CLAIMS (TOP view's visible face has model normal (0,1,0), not
+     (0,-1,0), etc). Getting this backwards would silently teach
+     students projections inverted; asserted rather than assumed.
+- 6 shapes, rising difficulty: Engraved Cube (6 different marks:
+  circle/square/triangle/cross/hexagon/L - the L is deliberately
+  asymmetric so its ORIENTATION is readable, not just its identity),
+  Cylinder (circle vs rectangle - the classic case), Wedge, L-Block,
+  T-Block (top and bottom views differ - proves one view is not
+  enough), Stepped Block (staircase, matching the user's alloprof
+  reference image).
+- Engravings implemented as coplanar polygons offset outward by
+  epsilon=0.012 so painter's sort naturally draws them in front of
+  their host face. Each face has an explicit (origin, u, v, normal)
+  frame so 2D marks map correctly onto all 6 orientations.
+- Main view: drag to orbit (yaw/pitch, pitch clamped +-89deg to avoid
+  gimbal flip). 7 snap buttons (Front/Top/Right/Bottom/Left/Back/
+  Isometric) mirroring the SolidWorks orientation panel in the user's
+  reference image. 4 locked sub-views (Front/Top/Right/Bottom) render
+  through the SAME code path with fixed yaw/pitch - guarantees they
+  can never drift out of sync with the main view's geometry.
+- MISTAKE MADE AND CAUGHT: first INSERT used a topic_id typed from
+  memory rather than looked up - hit the FK constraint. Looked up the
+  real id (87127372-13c1-4275-ae86-1eea6bfc628a) and re-ran. Worth
+  remembering: always query ids, never recall them.
+- REMAINING Prep Physics sims: Unit Prefixes, Constant of
+  Proportionality, Reading and Interpreting Graphs, Basic Trig for
+  Physics, Order of Magnitude & Estimation.
