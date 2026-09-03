@@ -960,3 +960,24 @@ Two distinct visual systems, intentionally:
   one exercises the "two vars held constant" case).
 - REMAINING Prep Physics sims: Reading and Interpreting Graphs, Basic
   Trig for Physics, Order of Magnitude & Estimation.
+
+### Proportionality sim: live equation rearrangement (2026-08-28, follow-up)
+- User: picking "solve for X" should REARRANGE the displayed equation
+  so X is alone on the left and the rest move right - not just relabel.
+- rearrangedFor(vars, responder) added. Falls straight out of the SAME
+  exponents that already drive the physics: for each other variable,
+  relExponent(e_i, e_responder) > 0 -> numerator, < 0 -> denominator.
+  No separate algebra engine needed (unlike the standalone
+  EquationRearranger sim, which animates the step-by-step derivation;
+  here only the end state matters).
+- VERIFIED before wiring in: all 16 responder forms across the 5
+  equations matched hand-written expected strings (F=m×a, m=F/a,
+  a=F/m, rho=m/V, m=rho×V, V=m/rho, P=E/t, E=P×t, t=E/P, p=rho×g×h,
+  rho=p/(g×h), etc), AND each rearranged form cross-checked numerically
+  to reproduce the stored value of its responder.
+- Rendered as a real fraction stack (numerator row / bar / denominator
+  row) when a denominator exists, inline product otherwise. Every
+  symbol keeps its value-proportional sizing and driver/responder
+  colouring.
+- Removed the now-dead static `layout` field from EquationDef and all
+  5 equation definitions - the display is fully derived now.

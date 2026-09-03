@@ -45,8 +45,6 @@ interface EquationDef {
   display: string;
   name: string;
   vars: VarDef[];
-  /** rendered layout: tokens of the equation as it should appear */
-  layout: { text: string; isVar: boolean }[];
 }
 
 const EQUATIONS: EquationDef[] = [
@@ -59,7 +57,6 @@ const EQUATIONS: EquationDef[] = [
       { sym: 'm', name: 'mass', unit: 'kg', exp: -1, base: 2 },
       { sym: 'a', name: 'acceleration', unit: 'm/s²', exp: -1, base: 5 },
     ],
-    layout: [{ text: 'F', isVar: true }, { text: '=', isVar: false }, { text: 'm', isVar: true }, { text: '×', isVar: false }, { text: 'a', isVar: true }],
   },
   {
     id: 'vir',
@@ -70,7 +67,6 @@ const EQUATIONS: EquationDef[] = [
       { sym: 'I', name: 'current', unit: 'A', exp: -1, base: 4 },
       { sym: 'R', name: 'resistance', unit: 'Ω', exp: -1, base: 3 },
     ],
-    layout: [{ text: 'V', isVar: true }, { text: '=', isVar: false }, { text: 'I', isVar: true }, { text: '×', isVar: false }, { text: 'R', isVar: true }],
   },
   {
     id: 'rhomv',
@@ -81,7 +77,6 @@ const EQUATIONS: EquationDef[] = [
       { sym: 'm', name: 'mass', unit: 'kg', exp: -1, base: 24 },
       { sym: 'V', name: 'volume', unit: 'm³', exp: 1, base: 3 },
     ],
-    layout: [{ text: 'ρ', isVar: true }, { text: '=', isVar: false }, { text: 'm', isVar: true }, { text: '/', isVar: false }, { text: 'V', isVar: true }],
   },
   {
     id: 'pet',
@@ -92,7 +87,6 @@ const EQUATIONS: EquationDef[] = [
       { sym: 'E', name: 'energy', unit: 'J', exp: -1, base: 250 },
       { sym: 't', name: 'time', unit: 's', exp: 1, base: 5 },
     ],
-    layout: [{ text: 'P', isVar: true }, { text: '=', isVar: false }, { text: 'E', isVar: true }, { text: '/', isVar: false }, { text: 't', isVar: true }],
   },
   {
     id: 'pgh',
@@ -104,13 +98,31 @@ const EQUATIONS: EquationDef[] = [
       { sym: 'g', name: 'gravity', unit: 'N/kg', exp: -1, base: 9.8 },
       { sym: 'h', name: 'depth', unit: 'm', exp: -1, base: 2 },
     ],
-    layout: [{ text: 'p', isVar: true }, { text: '=', isVar: false }, { text: 'ρ', isVar: true }, { text: '×', isVar: false }, { text: 'g', isVar: true }, { text: '×', isVar: false }, { text: 'h', isVar: true }],
   },
 ];
 
 /** exponent linking driver to responder: responder scales as factor^k */
 function relExponent(eDriver: number, eResponder: number): number {
   return -eDriver / eResponder;
+}
+
+/**
+ * Rearranges the equation to put `responder` alone on the left.
+ * Falls straight out of the same exponents that drive the physics: any
+ * other variable whose relative exponent is +1 belongs in the numerator,
+ * −1 in the denominator. Verified against all 16 hand-derived forms
+ * (and cross-checked numerically) before being wired in.
+ */
+function rearrangedFor(vars: VarDef[], responder: string): { num: string[]; den: string[] } {
+  const eR = vars.find((v) => v.sym === responder)!.exp;
+  const num: string[] = [];
+  const den: string[] = [];
+  for (const v of vars) {
+    if (v.sym === responder) continue;
+    if (relExponent(v.exp, eR) > 0) num.push(v.sym);
+    else den.push(v.sym);
+  }
+  return { num, den };
 }
 
 function formatVal(v: number): string {
@@ -218,33 +230,52 @@ export function ProportionalitySimulator() {
           <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">solving for {responder}</span>
         </div>
 
-        {/* ---- the equation, sized by value ---- */}
-        <div className="flex items-center justify-center gap-3 flex-wrap" style={{ minHeight: 150 }}>
-          {eq.layout.map((tok, i) => {
-            if (!tok.isVar) {
+        {/* ---- the equation, rearranged for the chosen variable, sized by value ---- */}
+        <div className="flex items-center justify-center gap-3 flex-wrap px-4" style={{ minHeight: 160 }}>
+          {(() => {
+            const { num, den } = rearrangedFor(eq.vars, responder);
+            const symbol = (sym: string) => {
+              const isDriver = sym === lastDriver;
+              const isResp = sym === responder;
               return (
-                <span key={i} className="text-[24px] font-semibold" style={{ color: MUTE }}>
-                  {tok.text}
+                <span
+                  key={sym}
+                  className="italic font-bold transition-all duration-500 ease-out px-1.5 rounded"
+                  style={{
+                    fontFamily: 'Georgia, serif',
+                    fontSize: sizeFor(sym),
+                    color: isResp ? TEAL : isDriver ? RED : INK,
+                    background: isResp ? 'rgba(46,125,107,0.10)' : isDriver ? 'rgba(179,74,60,0.10)' : 'transparent',
+                  }}
+                >
+                  {sym}
                 </span>
               );
-            }
-            const isResponder = tok.text === responder;
-            const isDriver = tok.text === lastDriver;
-            return (
-              <span
-                key={i}
-                className="italic font-bold transition-all duration-500 ease-out px-1.5 rounded"
-                style={{
-                  fontFamily: 'Georgia, serif',
-                  fontSize: sizeFor(tok.text),
-                  color: isResponder ? TEAL : isDriver ? RED : INK,
-                  background: isResponder ? 'rgba(46,125,107,0.10)' : isDriver ? 'rgba(179,74,60,0.10)' : 'transparent',
-                }}
-              >
-                {tok.text}
-              </span>
+            };
+            const times = (i: number) => (
+              <span key={`x${i}`} className="text-[20px] font-semibold" style={{ color: MUTE }}>×</span>
             );
-          })}
+            const row = (syms: string[]) => (
+              <div className="flex items-center justify-center gap-1.5">
+                {syms.flatMap((s, i) => (i === 0 ? [symbol(s)] : [times(i), symbol(s)]))}
+              </div>
+            );
+            return (
+              <>
+                {symbol(responder)}
+                <span className="text-[26px] font-semibold" style={{ color: MUTE }}>=</span>
+                {den.length === 0 ? (
+                  row(num)
+                ) : (
+                  <div className="flex flex-col items-center gap-1">
+                    {row(num)}
+                    <div className="h-[2.5px] w-full min-w-[70px] rounded" style={{ background: INK }} />
+                    {row(den)}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         {relationship && (
