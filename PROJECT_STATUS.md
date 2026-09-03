@@ -894,3 +894,37 @@ Two distinct visual systems, intentionally:
 - REMAINING Prep Physics sims: Unit Prefixes, Constant of
   Proportionality, Reading and Interpreting Graphs, Basic Trig for
   Physics, Order of Magnitude & Estimation.
+
+## Unit Prefixes sim (2026-08-28, 4th of 8 Prep Physics sims)
+- /simulations/unit-prefixes, topic_id 12a38624 (looked up, not
+  recalled - see the projections entry's lesson).
+- Vertical ladder tera->pico (11 rungs incl. deci and centi, since
+  IGCSE leans on cm heavily and centi's 10^-2 breaks the
+  three-at-a-time pattern that trips students up - called out
+  explicitly in the Try This card). Click a rung: quantity
+  re-expresses, and it reports how many places the decimal moved and
+  the x10^n factor vs the PREVIOUS rung, so the movement is the
+  lesson rather than just the endpoint. "common" badges mark the
+  prefixes IGCSE actually uses.
+- 6 quantities, each with a note on why that conversion matters in a
+  real calculation (LED current mA->A for I=V/R, red light nm->m for
+  v=f*lambda, ultrasound us->s for d=vt, etc).
+- VERIFIED IN NODE BEFORE UI: (1) all 12 realistic conversions correct;
+  (2) round-trip integrity across all 121 prefix pairs; (3) value
+  invariance - every quantity reconstructs its exact original value
+  from every prefix rung.
+- DRILL: 10-item bank, 4 options each. Distractors are deliberately
+  the REAL student mistakes (converted the wrong direction, off by
+  10^3, forgot to convert entirely) rather than random numbers.
+  Verified in node that every item yields exactly ONE correct option
+  among 4 UNIQUE options - a distractor colliding with the correct
+  answer would be a silent grading bug. Options shuffled with a
+  seeded PRNG (deterministic per question index, so no hydration
+  mismatch between server and client render).
+- formatDecimal() written to avoid e-notation across the whole
+  working range (the point of the lesson is watching the decimal
+  point move, so 0.0000007 must render as digits, not 7e-7);
+  spot-verified against 8 awkward values.
+- REMAINING Prep Physics sims: Constant of Proportionality, Reading
+  and Interpreting Graphs, Basic Trig for Physics, Order of Magnitude
+  & Estimation.
