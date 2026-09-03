@@ -1016,3 +1016,35 @@ Two distinct visual systems, intentionally:
   physics correctly (the sim labels it "directly proportional") and
   flagged it gently in chat rather than silently coding the wrong
   relationship.
+
+## Reading and Interpreting Graphs sim (2026-08-28, 6th of 8 Prep Physics)
+- /simulations/graph-reading, topic_id 235adaf3 (looked up).
+- Two draggable handles on an SVG graph; gradient triangle drawn
+  between them (rise/run dashed legs + hypotenuse), area beneath
+  shaded. Both computed exactly and both LABELLED WITH THEIR PHYSICAL
+  MEANING for that specific graph - the core idea being that the same
+  two operations mean different things on different axes.
+- 4 scenarios: speed-time (gradient=acceleration, area=distance),
+  distance-time (gradient=speed, area=NOTHING), force-extension
+  (gradient=k, area=elastic PE, with a deliberate kink past the limit
+  of proportionality), voltage-current (gradient=R, area=NOTHING).
+- DELIBERATE TEACHING CHOICE: two scenarios have areaMeans=null and
+  the sim explicitly says the area has no standard physical meaning,
+  showing the number it *would* compute alongside the warning.
+  Knowing when NOT to calculate an area is as valuable as knowing how,
+  and students habitually compute areas because they can.
+- spansCorner() detects when the gradient triangle crosses a
+  breakpoint and warns that the reading is an AVERAGE gradient, not a
+  value at a point - a real subtlety students lose marks on.
+- areaBetween() splits at every breakpoint inside the interval before
+  summing trapezia (naive endpoint-only trapezium would be WRONG
+  across a kink). Verified in node: 19 hand-derived checks across all
+  4 graphs, including the spans-two-kinks case.
+- NOTE: one node check "failed" - my own inline expected-value
+  expression was wrong (wrote 5+20*6+... instead of the correct
+  trapezium 30+120+32=182); the hand-derived check on the next line
+  confirmed the CODE was right. Second time this session a failing
+  test turned out to be the test's fault, not the code's. Always
+  re-derive before assuming the code is broken.
+- REMAINING Prep Physics sims: Basic Trig for Physics, Order of
+  Magnitude & Estimation.
