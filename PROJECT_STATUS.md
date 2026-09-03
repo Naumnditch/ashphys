@@ -928,3 +928,35 @@ Two distinct visual systems, intentionally:
 - REMAINING Prep Physics sims: Constant of Proportionality, Reading
   and Interpreting Graphs, Basic Trig for Physics, Order of Magnitude
   & Estimation.
+
+## Constant of Proportionality sim (2026-08-28, 5th of 8 Prep Physics)
+- /simulations/proportionality, topic_id 1f4e68db (looked up).
+- User's spec: equation centre screen, draggable "key" per variable,
+  other variables physically grow/shrink by size according to direct
+  vs inverse proportionality. Implemented exactly that (font-size
+  scales with value^0.38, clamped 17-66px, 500ms eased transition) and
+  added a live graph showing the straight-line-through-origin vs
+  falling-curve signature.
+- CORE TEACHING POINT the sim is designed around: "F is proportional
+  to m" is an INCOMPLETE sentence - proportional while WHAT is held
+  constant? Solve for F, drag m -> direct. Solve for a, drag m ->
+  inverse. Same equation, opposite answer. The "solve for" selector
+  makes this switchable and the sim NAMES the relationship + lists
+  which vars are held every time.
+- GENERAL SOLVER, not scripted cases: each equation stored as a single
+  product relation PROD(var^exp) = k. F=ma is {F:+1, m:-1, a:-1};
+  rho=m/V is {rho:+1, m:-1, V:+1}. Response derived from exponents:
+  newResponder = oldResponder * factor^(-e_driver/e_responder), and
+  direct/inverse is simply the sign of that exponent. Adding a new
+  equation only requires its exponent map.
+- VERIFIED IN NODE BEFORE UI: 19 driver->responder pairs across 5
+  equations, each checked THREE ways - (1) direct/inverse label
+  matches hand-derived expectation, (2) the ORIGINAL equation still
+  balances numerically after the change (F == m*a etc, re-derived
+  independently per equation rather than trusting the generic
+  invariant), (3) doubling the driver scales the responder by exactly
+  2^k. All 19 passed.
+- 5 equations: F=ma, V=IR, rho=m/V, P=E/t, p=rho*g*h (the 4-variable
+  one exercises the "two vars held constant" case).
+- REMAINING Prep Physics sims: Reading and Interpreting Graphs, Basic
+  Trig for Physics, Order of Magnitude & Estimation.
