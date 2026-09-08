@@ -1087,3 +1087,46 @@ Two distinct visual systems, intentionally:
 - STILL OPEN (unchanged, not blocking revenue): the 509 own-website
   API error at Shopier's end, and PayTR's application. Both would only
   AUTOMATE what now works manually.
+
+### CORRECTION + bank transfer rail (2026-09-08)
+- CORRECTION TO THE ENTRY ABOVE: the claim that "Shopier's native
+  storefront works, revenue is not blocked" was WRONG and must not be
+  trusted. A completed checkout is only half the loop - the 10 TL from
+  the 27/07 test purchase NEVER reached the user's IBAN, six weeks and
+  ~6 Wednesday payout cycles later. Order #307538405 is confirmed
+  KAPALI (closed), so the "you must close the order to trigger payout"
+  theory (from Shopier's own help docs) was also wrong.
+- FOUR SYMPTOMS NOW POINT ONE WAY: 509 on api_pay4.php, OSB test never
+  emits an outbound request at all (proven via Vercel logs - zero
+  inbound POSTs ever), dashboard showing raw `null adet`, and a closed
+  order not paying out for 6 weeks. Read together: the account appears
+  not to be fully provisioned as a MERCHANT - buyer-side checkout
+  accepts cards, seller-side (payouts, API, notifications) does not
+  work. Advised user to check Tahsilatlar > Tahsilat Detayodetails for
+  whether the balance even exists, and whether an IBAN is registered
+  and verified at all, but also advised to STOP treating Shopier as
+  the plan.
+- LESSON FOR FUTURE ME: I twice declared a stage "working" from a
+  green light at one point in a pipeline (OSB test 200 response; the
+  completed checkout) without testing the END of the pipeline. The
+  user caught both. Verify the terminal outcome (money in the bank,
+  request actually received), not an intermediate success signal.
+- SHIPPED: bank transfer rail, the only path needing nobody's approval.
+  * `site_settings` key/value table (bank_transfer_enabled,
+    bank_account_name, bank_iban, bank_name, bank_note).
+  * lib/settings: getBankSettings() + paymentReference(userId) =
+    'ASH-' + first 6 hex of the uuid, uppercased. Stable per user
+    (derived, never stored), 16.7M keyspace - verified stable and
+    collision-free across sample ids.
+  * /admin/settings + POST /api/admin/settings (allowlisted keys
+    only): toggle, account holder, bank, IBAN, optional note. Warns
+    if the IBAN isn't TR + 26 chars.
+  * /pricing renders a bank-transfer card when enabled, showing the
+    account details and the LOGGED-IN STUDENT'S OWN reference code
+    prominently (prompts signup first if logged out, since the code
+    is what makes matching possible).
+  * Flow: student transfers with reference -> teacher matches it in
+    their bank -> grants access at /admin/access with the reference
+    recorded in access_grants.
+- USER ACTION: fill in IBAN + account name at /admin/settings and flip
+  the toggle on. That makes the site able to take money today.

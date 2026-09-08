@@ -12,6 +12,7 @@ const ADMIN_NAV = [
   { href: '/admin/past-papers', label: 'Past Papers' },
   { href: '/admin/booklets', label: 'Booklets' },
   { href: '/admin/access', label: 'Subscriber Access' },
+  { href: '/admin/settings', label: 'Payment Settings' },
   { href: '/admin/test-payment', label: 'Test Payment' },
 ];
 
