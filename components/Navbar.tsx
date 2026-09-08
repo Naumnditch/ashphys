@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { query } from '@/lib/db/client';
 import { CurriculumDropdown } from './CurriculumDropdown';
+import { NavDropdown } from './NavDropdown';
 import { SearchBar } from './SearchBar';
 import { getCurrentUser } from '@/lib/auth/session';
 
@@ -41,16 +42,51 @@ export async function Navbar() {
             />
           </Link>
         </div>
-        <nav className="flex items-center gap-3 sm:gap-4">
-          <Link className="text-sm hover:underline hidden lg:inline-block" href="/">Home</Link>
-          <CurriculumDropdown chapters={chapters} />
-          <Link className="text-sm hover:underline hidden lg:inline-block" href="/about">About Us</Link>
-          <Link className="text-sm hover:underline hidden xl:inline-block" href="/resources">Resources</Link>
-          <Link className="text-sm hover:underline hidden xl:inline-block" href="/past-papers">Past Papers</Link>
-          <Link className="text-sm hover:underline hidden xl:inline-block" href="/booklets">Booklets</Link>
-          <Link className="text-sm hover:underline hidden lg:inline-block" href="/courses">Courses</Link>
-          <Link className="text-sm hover:underline hidden lg:inline-block font-semibold text-blue-600" href="/pricing">Pricing</Link>
-          <Link className="text-sm hover:underline hidden xl:inline-block" href="/contact">Contact</Link>
+        <nav className="flex items-center gap-4 sm:gap-5">
+          <div className="hidden lg:block"><CurriculumDropdown chapters={chapters} /></div>
+
+          <div className="hidden lg:block">
+            <NavDropdown
+              label="Study Materials"
+              items={[
+                { href: '/past-papers', label: 'Past Papers', hint: 'With video walkthroughs' },
+                { href: '/booklets', label: 'Booklets', hint: 'Printable course notes' },
+                { href: '/resources', label: 'Resources' },
+              ]}
+            />
+          </div>
+
+          <Link className="text-sm hover:underline hidden lg:inline-block whitespace-nowrap" href="/courses">Courses</Link>
+          <Link className="text-sm hover:underline hidden md:inline-block font-semibold text-blue-600 whitespace-nowrap" href="/pricing">Pricing</Link>
+
+          <div className="hidden lg:block">
+            <NavDropdown
+              label="More"
+              items={[
+                { href: '/', label: 'Home' },
+                { href: '/about', label: 'About Us' },
+                { href: '/contact', label: 'Contact' },
+              ]}
+            />
+          </div>
+
+          {/* below lg the links above are hidden, so everything lives here */}
+          <div className="lg:hidden">
+            <NavDropdown
+              label="Menu"
+              items={[
+                { href: '/curriculum', label: 'Curriculum' },
+                { href: '/courses', label: 'Courses' },
+                { href: '/pricing', label: 'Pricing' },
+                { href: '/past-papers', label: 'Past Papers' },
+                { href: '/booklets', label: 'Booklets' },
+                { href: '/resources', label: 'Resources' },
+                { href: '/about', label: 'About Us' },
+                { href: '/contact', label: 'Contact' },
+              ]}
+            />
+          </div>
+
           <SearchBar />
           {user ? (
             <Link className="btn btn-primary text-sm whitespace-nowrap" href={dashboardHref(user)}>

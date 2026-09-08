@@ -1220,3 +1220,25 @@ Two distinct visual systems, intentionally:
   divs on either side) entirely, per request.
 - logo.png is referenced ONLY in Navbar.tsx - checked, no other file
   repeats the bad aspect ratio.
+
+### Navbar decluttered (2026-09-08)
+- Problem: 9 top-level links (Home, Curriculum, About Us, Resources,
+  Past Papers, Booklets, Courses, Pricing, Contact) + search + auth
+  buttons. "About Us" and "Past Papers" were wrapping onto two lines.
+- New components/NavDropdown.tsx - reusable grouped menu (click-outside
+  AND Escape to close, aria-expanded, optional hint line per item).
+  Mirrors the existing CurriculumDropdown pattern rather than
+  introducing a different one.
+- Restructured to 5 visible items: Curriculum (existing dropdown),
+  Study Materials (Past Papers / Booklets / Resources), Courses,
+  Pricing (kept blue + always visible from md up, since it's the
+  revenue path), More (Home / About Us / Contact).
+- whitespace-nowrap added so labels can never wrap again.
+- ALSO FIXED A PRE-EXISTING GAP: below lg, every nav link was hidden
+  with no menu at all, so phone users could not reach Courses,
+  Past Papers, Booklets etc. Added a "Menu" dropdown visible only
+  below lg containing all 8 links. Not a regression from this change -
+  it was already broken - but worth closing while in the file.
+- Verified every href in both menus resolves to a real page
+  (curriculum, courses, pricing, past-papers, booklets, resources,
+  about, contact all exist).
