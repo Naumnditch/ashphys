@@ -1200,3 +1200,23 @@ Two distinct visual systems, intentionally:
     hides the plan/months editors for them, since they don't apply.
 - Nav: "Courses" added to the public Navbar, "Engineering Courses" to
   AdminNav.
+
+### Navbar logo fixed (2026-09-08)
+- User: remove the decorative lines flanking the logo, and enlarge it -
+  "it is not visible".
+- ROOT CAUSE FOUND: /assets/logo.png is intrinsically 730x185 (a wide
+  ~4:1 banner), but the Navbar declared width={140} height={100}
+  (1.4:1). Completely wrong aspect ratio, which is why it rendered
+  small and squashed. My own first fix this session (190x136) repeated
+  the same mistake, and a second attempt (h-16 w-auto on a wrong
+  declared ratio) would have made it NARROWER than before - caught by
+  actually reading the PNG header for the real dimensions instead of
+  trusting the existing numbers.
+- FIXED: declared size now matches reality (730x185), rendered via
+  className w-[210px] sm:w-[270px] h-auto -> ~53px tall on mobile,
+  ~68px on desktop, correct proportions, meaningfully larger than the
+  original 140px width.
+- Removed the two flanking decorative bars (the black rule + end-cap
+  divs on either side) entirely, per request.
+- logo.png is referenced ONLY in Navbar.tsx - checked, no other file
+  repeats the bad aspect ratio.
