@@ -178,6 +178,13 @@ export default async function PricingPage() {
             </div>
 
             {bank.note && <p className="text-[12px] text-[#4a5a72] leading-snug mt-3">{bank.note}</p>}
+
+            <Link
+              href="/subscribe/verify"
+              className="block text-center text-[13px] font-semibold px-4 py-2.5 rounded-lg bg-[#2e7d6b] text-white hover:bg-[#256355] mt-4"
+            >
+              Already paid? Upload your receipt →
+            </Link>
           </div>
         )}
 
@@ -200,8 +207,10 @@ export default async function PricingPage() {
               checkout page.
             </li>
             <li>
-              <strong className="text-[#1b2a41]">3.</strong> Your access is activated within 24 hours — usually much
-              sooner. You will get an email once it is live.
+              <strong className="text-[#1b2a41]">3.</strong>{' '}
+              <Link href="/subscribe/verify" className="text-[#2e7d6b] underline font-semibold">Upload your receipt</Link>{' '}
+              so the payment can be matched to your account. Access is activated once it has been checked — usually
+              the same day.
             </li>
           </ol>
           <p className="text-[12px] text-[#a8a196] mt-4 leading-snug">

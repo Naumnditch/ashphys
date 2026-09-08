@@ -1130,3 +1130,35 @@ Two distinct visual systems, intentionally:
     recorded in access_grants.
 - USER ACTION: fill in IBAN + account name at /admin/settings and flip
   the toggle on. That makes the site able to take money today.
+
+### Receipt upload + approval flow (2026-09-08)
+- Closes the manual payment loop: student pays anywhere (bank transfer,
+  Shopier, cash), uploads proof, teacher approves, access granted.
+- PRIVACY DECISION: the `receipts` bucket is PRIVATE (public=false),
+  unlike booklets/past-papers. Receipts carry names, bank details and
+  amounts - a guessable public URL would leak one student's banking
+  info to anyone. Admin views go through SHORT-LIVED SIGNED URLs
+  (lib/storage/signed.ts, 600s default) generated server-side with the
+  service key. Accepts jpg/png/webp/pdf, 10MB cap.
+- `payment_requests` table: student_id, plan_id, months, amount_claimed,
+  reference, student_note, receipt_path, status
+  (pending/approved/rejected), admin_note, reviewed_by, reviewed_at.
+- STUDENT SIDE `/subscribe/verify` (auth-gated, redirects to login with
+  ?next=): shows their own payment reference again, pick plan +
+  duration + optional amount/note, attach receipt, submit. Plus a
+  history list of their own submissions with status badges and any
+  admin note. GUARD: only ONE pending request at a time (409
+  otherwise) so the queue can't be spammed.
+- ADMIN SIDE `/admin/payment-requests`: pending-first queue, each card
+  showing who/when/claimed amount/their stated plan, their note, a
+  "View receipt" signed link, and - importantly - EDITABLE plan +
+  months before approving, since what a student selects may not match
+  what they actually paid. Approve grants the subscription AND writes
+  an access_grants audit row AND marks the request approved in one
+  handler, so those three can never drift apart. Reject requires (or
+  at least prompts for) a reason.
+- Approve reuses the same GREATEST(end_date, now()) + months extension
+  logic as /admin/access, so early renewal still adds time.
+- /pricing now links to /subscribe/verify from both step 3 of the
+  explainer and a green CTA inside the bank-transfer card.
+- Nav: "Payment Receipts" added to AdminNav above Subscriber Access.
