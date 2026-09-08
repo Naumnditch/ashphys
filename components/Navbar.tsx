@@ -47,6 +47,7 @@ export async function Navbar() {
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/past-papers">Past Papers</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/booklets">Booklets</Link>
+          <Link className="text-sm hover:underline hidden lg:inline-block font-semibold text-blue-600" href="/pricing">Pricing</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/contact">Contact</Link>
           <SearchBar />
           {user ? (

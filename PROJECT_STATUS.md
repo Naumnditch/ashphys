@@ -1048,3 +1048,42 @@ Two distinct visual systems, intentionally:
   re-derive before assuming the code is broken.
 - REMAINING Prep Physics sims: Basic Trig for Physics, Order of
   Magnitude & Estimation.
+
+## PAYMENT GATE: real solution shipped (2026-08-28)
+- RESEARCH CONCLUSION (searched, not assumed): the international
+  merchant-of-record route is CLOSED for a Turkey-based individual.
+  Gumroad dropped PayPal payouts Oct 2024 and now pays via Stripe;
+  Stripe does not operate in Turkey (open "Gumroad for Turkey" feature
+  request confirms it's unsupported). PayPal banned in Turkey since
+  2016. Wise unavailable. Lemon Squeezy/Payhip/Sellfy/Podia all ride
+  the same Stripe Connect payout rail. So Gumroad/LemonSqueezy/Paddle
+  are NOT viable without a foreign entity + foreign bank account.
+- THE KEY REALISATION: Shopier's NATIVE STOREFRONT CHECKOUT ALREADY
+  WORKS. The user completed a real 10 TL purchase of their own
+  "ashphys kurs" product through it. Only api_pay4.php (own-website
+  API) is blocked by the 509 error. So revenue is NOT actually
+  blocked - only the automated integration is.
+- SHIPPED, works today with zero payment API:
+  * `subscription_plans` gained shopier_url_monthly / shopier_url_yearly.
+  * New `access_grants` audit table (student, plan, months, reference,
+    granted_by, timestamp) - every manual grant is logged.
+  * `/pricing` (public): plan cards reading live from subscription_plans,
+    "Subscribe monthly/yearly" buttons linking to the per-plan Shopier
+    product URL, graceful "Checkout link coming soon" when the URL is
+    null. Plus a 3-step "how subscribing works" explainer and a
+    fallback contact line.
+  * `/admin/access` + POST/PATCH /api/admin/access (+ /list): grant or
+    extend by student EMAIL, pick plan + duration (1/3/6/12 months),
+    optional payment reference. Extension uses
+    GREATEST(end_date, now()) + months so renewing early ADDS to
+    remaining time rather than discarding it. Revoke sets status
+    expired + tier free.
+  * Nav links added to Navbar (/pricing) and AdminNav (/admin/access).
+- USER ACTION NEEDED to go live: create one Shopier product per plan
+  (Plus monthly 99 TRY, Plus yearly 999, Pro monthly 179, Pro yearly
+  1799), install Shopier's "Dijital Urun Teslimati" app so buyers get
+  an instant receipt/instructions file, then paste each product URL
+  into subscription_plans.shopier_url_monthly/_yearly.
+- STILL OPEN (unchanged, not blocking revenue): the 509 own-website
+  API error at Shopier's end, and PayTR's application. Both would only
+  AUTOMATE what now works manually.
