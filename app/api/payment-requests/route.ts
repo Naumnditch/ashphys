@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   const form = await req.formData();
   const file = form.get('file') as File | null;
   const planId = String(form.get('planId') || '');
+  const courseId = String(form.get('courseId') || '');
   const months = parseInt(String(form.get('months') || '1'), 10);
   const amount = parseFloat(String(form.get('amount') || '')) || null;
   const reference = String(form.get('reference') || '').trim() || null;
@@ -68,9 +69,9 @@ export async function POST(req: NextRequest) {
   }
 
   await query(
-    `INSERT INTO payment_requests (student_id, plan_id, months, amount_claimed, reference, student_note, receipt_path)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-    [user.id, planId || null, Number.isFinite(months) ? months : 1, amount, reference, note, path]
+    `INSERT INTO payment_requests (student_id, plan_id, course_id, months, amount_claimed, reference, student_note, receipt_path)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [user.id, planId || null, courseId || null, Number.isFinite(months) ? months : 1, amount, reference, note, path]
   );
 
   return NextResponse.json({ success: true });
@@ -81,8 +82,11 @@ export async function GET() {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ success: false, error: 'Not signed in' }, { status: 401 });
   const res = await query(
-    `SELECT r.id, r.months, r.amount_claimed, r.reference, r.status, r.admin_note, r.created_at, p.name AS plan_name
-     FROM payment_requests r LEFT JOIN subscription_plans p ON p.id = r.plan_id
+    `SELECT r.id, r.months, r.amount_claimed, r.reference, r.status, r.admin_note, r.created_at,
+            p.name AS plan_name, c.title AS course_title
+     FROM payment_requests r
+     LEFT JOIN subscription_plans p ON p.id = r.plan_id
+     LEFT JOIN courses c ON c.id = r.course_id
      WHERE r.student_id = $1 ORDER BY r.created_at DESC`,
     [user.id]
   );

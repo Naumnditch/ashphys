@@ -34,7 +34,7 @@ export async function Navbar() {
             <div className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black" style={{ width: '2.7px', height: '10px' }}></div>
           </div>
           <Link href="/" className="text-xl font-semibold mx-1">
-            <Image src="/assets/logo.png" alt="AshPhys" width={140} height={100} />
+            <Image src="/assets/logo.png" alt="AshPhys" width={190} height={136} priority />
           </Link>
           <div className="bg-black flex-1 relative" style={{ height: '2.7px' }}>
             <div className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black" style={{ width: '2.7px', height: '10px' }}></div>
@@ -47,6 +47,7 @@ export async function Navbar() {
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/resources">Resources</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/past-papers">Past Papers</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/booklets">Booklets</Link>
+          <Link className="text-sm hover:underline hidden lg:inline-block" href="/courses">Courses</Link>
           <Link className="text-sm hover:underline hidden lg:inline-block font-semibold text-blue-600" href="/pricing">Pricing</Link>
           <Link className="text-sm hover:underline hidden xl:inline-block" href="/contact">Contact</Link>
           <SearchBar />

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import { query } from '@/lib/db/client';
 
-const ALLOWED = ['bank_transfer_enabled', 'bank_account_name', 'bank_iban', 'bank_name', 'bank_note'];
+const ALLOWED = ['bank_transfer_enabled', 'bank_account_name', 'bank_iban', 'bank_name', 'bank_note', 'usd_rate'];
 
 export async function POST(req: NextRequest) {
   const admin = await getCurrentUser();

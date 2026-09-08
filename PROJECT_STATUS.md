@@ -1162,3 +1162,41 @@ Two distinct visual systems, intentionally:
 - /pricing now links to /subscribe/verify from both step 3 of the
   explainer and a green CTA inside the bank-transfer card.
 - Nav: "Payment Receipts" added to AdminNav above Subscriber Access.
+
+## Engineering courses + USD pricing + bigger logo (2026-09-08)
+- LOGO: Navbar Image 140x100 -> 190x136 (same aspect ratio), added
+  priority since it's above the fold.
+- USD PRICING: `usd_rate` in site_settings (default 47.18, the rate the
+  user quoted), admin-editable at /admin/settings. Deliberately NOT a
+  live exchange feed - a stale-but-labelled number beats a page that
+  breaks when a rate API is down, and every figure is shown as
+  "approx." anyway. tryToUsd() formats sensibly across the range
+  (2 dp under $10, 1 dp under $100, 0 dp above). Shown under both
+  monthly and yearly plan prices and on course cards/detail pages.
+- ENGINEERING COURSES - a second, separate product line from the
+  physics subscription:
+  * `courses` (title, slug, category, summary, description, level,
+    price_try, status draft/published, order)
+  * `course_modules` (title, description, video_url, resource_url,
+    duration_minutes, is_free_preview, order)
+  * `course_enrollments` (student+course unique, granted_by,
+    expires_at NULL = lifetime)
+  * payment_requests gained a nullable course_id; months made nullable.
+  * PUBLIC /courses catalogue grouped by category with price in TRY +
+    approx USD and lesson count; /courses/[slug] detail with full
+    description, purchase panel (bank details + the student's own
+    reference), and a module list where locked lessons show a padlock
+    while is_free_preview lessons stay open - so a course can sell
+    itself with a sample.
+  * ADMIN /admin/courses: create/edit courses, publish/unpublish, and
+    manage lessons inline per course (add/edit/delete, mark free
+    preview). Slug auto-derived from title with a duplicate check.
+  * RECEIPT FLOW EXTENDED: /subscribe/verify now has a
+    subscription-vs-course switch (auto-selected via ?course=slug from
+    the course page). Admin approval branches: a course request
+    creates a course_enrollment with LIFETIME access and does NOT
+    touch the student's physics subscription - the two products stay
+    independent. Admin queue shows course requests distinctly and
+    hides the plan/months editors for them, since they don't apply.
+- Nav: "Courses" added to the public Navbar, "Engineering Courses" to
+  AdminNav.

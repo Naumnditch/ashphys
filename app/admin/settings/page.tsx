@@ -1,10 +1,10 @@
-import { getBankSettings } from '@/lib/settings';
+import { getBankSettings, getUsdRate } from '@/lib/settings';
 import { BankSettingsForm } from '@/components/admin/BankSettingsForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminSettingsPage() {
-  const bank = await getBankSettings();
+  const [bank, usdRate] = await Promise.all([getBankSettings(), getUsdRate()]);
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Payment Settings</h1>
@@ -13,7 +13,7 @@ export default async function AdminSettingsPage() {
         page along with their own reference code, then you confirm the transfer and grant access under Subscriber
         Access.
       </p>
-      <BankSettingsForm initial={bank} />
+      <BankSettingsForm initial={{ ...bank, usdRate: String(usdRate) }} />
     </div>
   );
 }

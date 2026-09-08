@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 
 interface Plan { id: string; name: string; price_monthly: string; price_yearly: string; tier_level: number; }
-interface ReqRow { id: string; months: number; amount_claimed: string | null; reference: string | null; status: string; admin_note: string | null; created_at: string; plan_name: string | null; }
+interface Course { id: string; title: string; slug: string; price_try: string; }
+interface ReqRow { id: string; months: number; amount_claimed: string | null; reference: string | null; status: string; admin_note: string | null; created_at: string; plan_name: string | null; course_title: string | null; }
 
-export function ReceiptUploadForm({ plans, reference }: { plans: Plan[]; reference: string }) {
+export function ReceiptUploadForm({ plans, courses, preselectedCourse, reference }: { plans: Plan[]; courses: Course[]; preselectedCourse?: string; reference: string }) {
+  const [kind, setKind] = useState<'plan' | 'course'>(preselectedCourse ? 'course' : 'plan');
+  const [courseId, setCourseId] = useState(preselectedCourse || courses[0]?.id || '');
   const [planId, setPlanId] = useState(plans[0]?.id ?? '');
   const [months, setMonths] = useState(1);
   const [amount, setAmount] = useState('');
@@ -31,8 +34,13 @@ export function ReceiptUploadForm({ plans, reference }: { plans: Plan[]; referen
     try {
       const body = new FormData();
       body.set('file', file);
-      body.set('planId', planId);
-      body.set('months', String(months));
+      if (kind === 'course') {
+        body.set('courseId', courseId);
+        body.set('months', '1');
+      } else {
+        body.set('planId', planId);
+        body.set('months', String(months));
+      }
       if (amount) body.set('amount', amount);
       if (note) body.set('note', note);
       const res = await fetch('/api/payment-requests', { method: 'POST', body });
@@ -67,19 +75,47 @@ export function ReceiptUploadForm({ plans, reference }: { plans: Plan[]; referen
           <div className="font-mono text-[20px] font-bold text-[#1b5c4d] tracking-wider">{reference}</div>
         </div>
 
+        {courses.length > 0 && (
+          <div className="flex gap-1.5 mb-4">
+            {([['plan', 'Physics subscription'], ['course', 'Engineering course']] as const).map(([k, label]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKind(k)}
+                className={`text-[12.5px] font-semibold px-3.5 py-1.5 rounded-full border ${
+                  kind === k ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="block text-xs font-medium text-[#4a5a72] mb-1">What did you pay for?</label>
-            <select value={planId} onChange={(e) => setPlanId(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[#4a5a72] mb-1">Duration paid for</label>
-            <select value={months} onChange={(e) => setMonths(parseInt(e.target.value, 10))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
-              {[1, 3, 6, 12].map((m) => <option key={m} value={m}>{m} month{m > 1 ? 's' : ''}</option>)}
-            </select>
-          </div>
+          {kind === 'course' ? (
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-[#4a5a72] mb-1">Which course did you pay for?</label>
+              <select value={courseId} onChange={(e) => setCourseId(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                {courses.map((c) => <option key={c.id} value={c.id}>{c.title} — {parseFloat(c.price_try).toFixed(0)} TRY</option>)}
+              </select>
+            </div>
+          ) : (
+            <>
+              <div>
+                <label className="block text-xs font-medium text-[#4a5a72] mb-1">What did you pay for?</label>
+                <select value={planId} onChange={(e) => setPlanId(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  {plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#4a5a72] mb-1">Duration paid for</label>
+                <select value={months} onChange={(e) => setMonths(parseInt(e.target.value, 10))} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                  {[1, 3, 6, 12].map((m) => <option key={m} value={m}>{m} month{m > 1 ? 's' : ''}</option>)}
+                </select>
+              </div>
+            </>
+          )}
           <div>
             <label className="block text-xs font-medium text-[#4a5a72] mb-1">Amount paid (TRY, optional)</label>
             <input type="number" step="any" min="0" value={amount} onChange={(e) => setAmount(e.target.value)}
@@ -129,7 +165,9 @@ export function ReceiptUploadForm({ plans, reference }: { plans: Plan[]; referen
               <div key={r.id} className="px-5 py-3">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="text-[13px] text-[#1b2a41]">
-                    {r.plan_name ?? 'Plan'} · {r.months} month{r.months > 1 ? 's' : ''}
+                    {r.course_title
+                      ? r.course_title
+                      : `${r.plan_name ?? 'Plan'} · ${r.months} month${r.months > 1 ? 's' : ''}`}
                     {r.amount_claimed ? ` · ${parseFloat(r.amount_claimed).toFixed(0)} TRY` : ''}
                   </div>
                   <span className={`text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${badge(r.status)}`}>

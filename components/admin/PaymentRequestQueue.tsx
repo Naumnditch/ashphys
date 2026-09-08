@@ -12,6 +12,8 @@ interface Req {
   last_name: string | null;
   plan_id: string | null;
   plan_name: string | null;
+  course_id: string | null;
+  course_title: string | null;
   months: number;
   amount_claimed: string | null;
   reference: string | null;
@@ -93,7 +95,7 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                     <div className="text-right text-xs text-gray-500">
                       {r.reference && <div>ref <span className="font-mono text-gray-800">{r.reference}</span></div>}
                       {r.amount_claimed && <div>claims {parseFloat(r.amount_claimed).toFixed(0)} TRY</div>}
-                      <div>says: {r.plan_name ?? '—'} · {r.months} mo</div>
+                      <div>{r.course_title ? `course: ${r.course_title}` : `says: ${r.plan_name ?? '—'} · ${r.months} mo`}</div>
                     </div>
                   </div>
 
@@ -108,6 +110,17 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                     <p className="text-[12.5px] text-red-600 mb-4">Receipt link unavailable — check storage settings.</p>
                   )}
 
+                  {r.course_id ? (
+                    <div className="mb-3">
+                      <div className="text-[12.5px] text-gray-700 bg-green-50 border border-green-200 rounded p-2.5 mb-2">
+                        Approving enrols this student in <strong>{r.course_title}</strong> with lifetime access. Their
+                        physics subscription is not affected.
+                      </div>
+                      <label className="block text-[11px] font-medium text-gray-500 mb-1">Note to student</label>
+                      <input type="text" value={st.note} onChange={(e) => setStateFor(r, { note: e.target.value })}
+                        placeholder="optional" className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
+                    </div>
+                  ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
                     <div>
                       <label className="block text-[11px] font-medium text-gray-500 mb-1">Grant plan</label>
@@ -129,6 +142,7 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                         placeholder="optional" className="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm" />
                     </div>
                   </div>
+                  )}
 
                   <div className="flex gap-2">
                     <button onClick={() => review(r, 'approve')} disabled={busy === r.id}
@@ -158,7 +172,7 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                   <div className="min-w-0">
                     <div className="text-[14px] text-gray-900">{name}</div>
                     <div className="text-xs text-gray-400">
-                      {r.plan_name ?? '—'} · {r.months} mo · {new Date(r.created_at).toLocaleDateString()}
+                      {r.course_title ?? `${r.plan_name ?? '—'} · ${r.months} mo`} · {new Date(r.created_at).toLocaleDateString()}
                       {r.admin_note ? ` · ${r.admin_note}` : ''}
                     </div>
                   </div>

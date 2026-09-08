@@ -7,14 +7,18 @@ import { ReceiptUploadForm } from '@/components/ReceiptUploadForm';
 
 export const dynamic = 'force-dynamic';
 
-export default async function VerifyPaymentPage() {
+export default async function VerifyPaymentPage({ searchParams }: { searchParams: { course?: string } }) {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login?next=/subscribe/verify');
 
-  const [plansRes, bank] = await Promise.all([
+  const [plansRes, coursesRes, bank] = await Promise.all([
     query(`SELECT id, name, price_monthly, price_yearly, tier_level FROM subscription_plans WHERE is_active AND tier_level > 0 ORDER BY tier_level`),
+    query(`SELECT id, title, slug, price_try FROM courses WHERE status = 'published' ORDER BY "order", created_at`),
     getBankSettings(),
   ]);
+  const preselectedCourse = searchParams.course
+    ? coursesRes.rows.find((c: any) => c.slug === searchParams.course)?.id ?? ''
+    : '';
 
   return (
     <div className="min-h-screen bg-[#faf7f0]" style={{ backgroundImage: 'radial-gradient(#e6ddc4 0.6px, transparent 0.6px)', backgroundSize: '18px 18px' }}>
@@ -28,7 +32,7 @@ export default async function VerifyPaymentPage() {
           activated once it has been checked. {bank.note}
         </p>
 
-        <ReceiptUploadForm plans={plansRes.rows} reference={paymentReference(user.id)} />
+        <ReceiptUploadForm plans={plansRes.rows} courses={coursesRes.rows} preselectedCourse={preselectedCourse} reference={paymentReference(user.id)} />
 
         <p className="text-[12px] text-[#a8a196] mt-6">
           Not paid yet? See the <Link href="/pricing" className="text-[#2e7d6b] underline font-semibold">plans and payment details</Link>.

@@ -12,10 +12,12 @@ export async function GET() {
     SELECT r.id, r.months, r.amount_claimed, r.reference, r.student_note, r.status,
            r.admin_note, r.created_at, r.receipt_path,
            u.id AS student_id, u.email, u.first_name, u.last_name,
-           p.id AS plan_id, p.name AS plan_name
+           p.id AS plan_id, p.name AS plan_name,
+           c.id AS course_id, c.title AS course_title
     FROM payment_requests r
     JOIN users u ON u.id = r.student_id
     LEFT JOIN subscription_plans p ON p.id = r.plan_id
+    LEFT JOIN courses c ON c.id = r.course_id
     ORDER BY (r.status = 'pending') DESC, r.created_at DESC
     LIMIT 100
   `);

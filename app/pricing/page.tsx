@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { query } from '@/lib/db/client';
 import { getCurrentUser } from '@/lib/auth/session';
-import { getBankSettings, paymentReference } from '@/lib/settings';
+import { getBankSettings, paymentReference, getUsdRate, tryToUsd } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,7 +28,7 @@ async function getPlans(): Promise<Plan[]> {
 }
 
 export default async function PricingPage() {
-  const [plans, user, bank] = await Promise.all([getPlans(), getCurrentUser(), getBankSettings()]);
+  const [plans, user, bank, usdRate] = await Promise.all([getPlans(), getCurrentUser(), getBankSettings(), getUsdRate()]);
   const reference = user ? paymentReference(user.id) : null;
 
   return (
@@ -65,9 +65,15 @@ export default async function PricingPage() {
                 <div className="mb-3">
                   <span className="text-[30px] font-bold text-[#1b2a41]">{isFree ? '0' : parseFloat(p.price_monthly).toFixed(0)}</span>
                   <span className="text-[13px] text-[#4a5a72] ml-1">TRY / month</span>
+                  {!isFree && (
+                    <div className="text-[12px] text-[#a8a196] mt-0.5">
+                      approx. ${tryToUsd(parseFloat(p.price_monthly), usdRate)} USD
+                    </div>
+                  )}
                   {!isFree && parseFloat(p.price_yearly) > 0 && (
-                    <div className="text-[12px] text-[#4a5a72] mt-0.5">
+                    <div className="text-[12px] text-[#4a5a72] mt-1.5 pt-1.5 border-t border-[#eee6d3]">
                       or {parseFloat(p.price_yearly).toFixed(0)} TRY / year
+                      <span className="text-[#a8a196]"> · approx. ${tryToUsd(parseFloat(p.price_yearly), usdRate)} USD</span>
                     </div>
                   )}
                 </div>

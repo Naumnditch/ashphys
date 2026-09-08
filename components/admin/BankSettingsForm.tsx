@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Props {
-  initial: { enabled: boolean; accountName: string; iban: string; bankName: string; note: string };
+  initial: { enabled: boolean; accountName: string; iban: string; bankName: string; note: string; usdRate: string };
 }
 
 export function BankSettingsForm({ initial }: Props) {
@@ -26,6 +26,7 @@ export function BankSettingsForm({ initial }: Props) {
           bank_iban: form.iban.replace(/\s+/g, '').toUpperCase(),
           bank_name: form.bankName.trim(),
           bank_note: form.note.trim(),
+          usd_rate: form.usdRate.trim(),
         }),
       });
       const d = await res.json();
@@ -89,6 +90,24 @@ export function BankSettingsForm({ initial }: Props) {
             A Turkish IBAN starts with TR and is 26 characters long — double-check this before publishing it.
           </p>
         )}
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-xs font-medium text-gray-500 mb-1">
+          Exchange rate — TRY per 1 USD
+        </label>
+        <input
+          type="number"
+          step="0.01"
+          min="1"
+          value={form.usdRate}
+          onChange={(e) => setForm({ ...form, usdRate: e.target.value })}
+          className="w-40 border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono"
+        />
+        <p className="text-xs text-gray-400 mt-1">
+          Used to show an approximate dollar price beside each lira price. Update it now and then — it is labelled
+          &ldquo;approx.&rdquo; on the site, so it does not need to be exact.
+        </p>
       </div>
 
       <div className="mb-4">

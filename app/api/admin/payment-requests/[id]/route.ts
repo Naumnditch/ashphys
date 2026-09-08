@@ -35,7 +35,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ success: true });
   }
 
-  // approve: the admin may correct the plan/duration the student selected
+  // A course purchase enrols the student in that one course (lifetime access)
+  // rather than touching their subscription — the two are separate products.
+  if (pr.course_id) {
+    await query(
+      `INSERT INTO course_enrollments (student_id, course_id, granted_by)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (student_id, course_id) DO UPDATE SET granted_by = EXCLUDED.granted_by, expires_at = NULL`,
+      [pr.student_id, pr.course_id, admin.id]
+    );
+    await query(
+      `UPDATE payment_requests SET status = 'approved', admin_note = $2, reviewed_by = $3, reviewed_at = now() WHERE id = $1`,
+      [params.id, adminNote || null, admin.id]
+    );
+    return NextResponse.json({ success: true, enrolledCourse: true });
+  }
+
+  // otherwise it's a subscription: the admin may correct the plan/duration chosen
   const finalPlanId = planId || pr.plan_id;
   const finalMonths = parseInt(String(months ?? pr.months), 10) || 1;
   if (!finalPlanId) {
