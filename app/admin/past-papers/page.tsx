@@ -1,5 +1,6 @@
 import { query } from '@/lib/db/client';
 import { PastPaperManager } from '@/components/admin/PastPaperManager';
+import { BulkPaperUpload } from '@/components/admin/BulkPaperUpload';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,7 @@ export default async function AdminPastPapersPage() {
         video link once a walkthrough is recorded. Entries with no files still appear to students with their buttons
         greyed out, so nothing ever shows as a broken link.
       </p>
+      <BulkPaperUpload />
       <PastPaperManager initialPapers={papers} />
     </div>
   );

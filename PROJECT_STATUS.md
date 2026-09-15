@@ -1274,3 +1274,31 @@ Two distinct visual systems, intentionally:
 - CONTAINER RESET AGAIN mid-session (second time) - re-cloned from
   GitHub at ab39a1c, no work lost. DB changes were unaffected since
   they are server-side.
+
+### Bulk past-paper uploader (2026-09-15)
+- User will source the PDFs themselves and asked me to file them into
+  the right slots. Agreed - that is exactly the split already stated
+  (they supply files, I build infrastructure). Their copyright risk
+  decision is unchanged and remains theirs.
+- ~670 files makes one-at-a-time impractical, so built a BULK
+  UPLOADER instead of doing it by hand.
+- lib/papers/filename.ts - parseCambridgeName(). Cambridge naming is
+  strict: 0625_s23_qp_42.pdf = syllabus 0625, May/Jun 2023, question
+  paper, Paper 4 Variant 2. s=May/Jun, w=Oct/Nov, m=Feb/Mar;
+  qp/ms. Verified against 10 cases (all session letters, both types,
+  uppercase, plus 4 malformed inputs that must return null).
+- POST /api/admin/past-papers/bulk: for each file, parse name -> look
+  up the matching past_papers row -> upload to the past-papers bucket
+  -> set question_paper_url or mark_scheme_url. NEVER GUESSES: an
+  unparseable name, non-PDF, oversized file, or missing slot is
+  skipped and REPORTED, because a mis-filed paper is worse than an
+  unfiled one.
+- components/admin/BulkPaperUpload.tsx: multi-select, uploads in
+  batches of 20 with a progress bar (one request with 670 files would
+  time out), then a green "filed" summary and an amber "skipped" list
+  with the reason for each.
+- BUILD CAUGHT A REAL BUG tsc MISSED: Next.js route files may only
+  export HTTP handlers, and I had exported parseCambridgeName from the
+  route. tsc --noEmit passed; `npm run build` failed with "not a valid
+  Route export field". Fixed by moving the parser to lib/. Reminder
+  that the full build is the real gate, not just typecheck.
