@@ -43,6 +43,7 @@ export function PastPaperManager({ initialPapers }: { initialPapers: PastPaper[]
   const [papers, setPapers] = useState(initialPapers);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [filter, setFilter] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState<'qp' | 'ms' | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -279,10 +280,26 @@ export function PastPaperManager({ initialPapers }: { initialPapers: PastPaper[]
       </div>
 
       {/* ---- Existing entries ---- */}
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">All Entries</h2>
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">All Entries</h2>
+        <input
+          type="text"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder="Filter — e.g. 2023 or Paper 4 or May"
+          className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-72"
+        />
+      </div>
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
         {papers.length === 0 && <div className="px-5 py-8 text-center text-sm text-gray-400">No papers added yet.</div>}
-        {papers.map((p) => (
+        {papers
+          .filter((p) => {
+            if (!filter.trim()) return true;
+            const hay = `${p.year} ${p.session} paper ${p.paper_number} variant ${p.variant} ${PAPER_LABELS[p.paper_number] ?? ''}`.toLowerCase();
+            return filter.toLowerCase().split(/\s+/).every((t) => hay.includes(t));
+          })
+          .slice(0, 80)
+          .map((p) => (
           <div key={p.id} className="px-5 py-3.5 flex items-center justify-between gap-4">
             <div className="min-w-0">
               <div className="font-medium text-gray-900 text-[14.5px]">
@@ -309,8 +326,11 @@ export function PastPaperManager({ initialPapers }: { initialPapers: PastPaper[]
               </button>
             </div>
           </div>
-        ))}
+          ))}
       </div>
+      <p className="text-xs text-gray-400 mt-2">
+        Showing up to 80 at a time — use the filter to narrow down.
+      </p>
     </div>
   );
 }

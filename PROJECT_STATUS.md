@@ -1242,3 +1242,35 @@ Two distinct visual systems, intentionally:
 - Verified every href in both menus resolves to a real page
   (curriculum, courses, pricing, past-papers, booklets, resources,
   about, contact all exist).
+
+### Past papers: card layout + score tracking + 2018-2025 grid (2026-09-15)
+- User asked me to scrape Save My Exams and rehost all papers from 2018.
+  DECLINED the scraping/rehosting (consistent with the earlier
+  position): that is Cambridge's copyrighted content, compiled and
+  served at a competitor's expense, being republished on a site the
+  user charges for. Built everything else.
+- WHAT I DID BUILD:
+  * past_papers gained tier, max_marks, paper_name. Dropped the
+    year>=2020 CHECK (it blocked 2018) and replaced with 2000-2100.
+  * SEEDED THE FULL METADATA GRID - 336 rows, 2018-2025, 24 sessions.
+    Labels only (year/session/paper/variant/marks/tier), which are not
+    copyrightable. Correct Cambridge 0625 structure: P1 MCQ Core 40,
+    P2 MCQ Extended 40, P3 Theory Core 80, P4 Theory Extended 80,
+    P5 Practical 40, P6 Alt-to-Practical 40. Feb/Mar = variant 2 only;
+    May/Jun and Oct/Nov = variants 1-3.
+  * new `paper_scores` table (student+paper unique) + POST
+    /api/paper-scores. Validates against the paper's max_marks and
+    DELETEs the row on an empty value rather than storing nulls.
+  * components/PastPaperCard.tsx - matches the user's reference
+    screenshot: title, session, tier chip + syllabus code (0625/NN),
+    dashed "Your score — / max" box that saves on blur and turns teal
+    when filled, then Question Paper / Mark Scheme / Video Solution
+    buttons. Missing files render as GREYED NON-LINKS, never broken
+    links; missing video shows "Video Solution — coming soon".
+  * /past-papers rebuilt as a 3-col card grid grouped by session,
+    with paper and year filter pills. Prompts sign-in for score saving.
+  * Admin manager: added a token-based filter box (e.g. "2023 paper 4")
+    and an 80-row display cap, since 336 rows was unusable.
+- CONTAINER RESET AGAIN mid-session (second time) - re-cloned from
+  GitHub at ab39a1c, no work lost. DB changes were unaffected since
+  they are server-side.
