@@ -24,6 +24,7 @@ interface Question {
   answerType: 'multiple_choice' | 'numeric' | 'free_text';
   difficultyLevel: number;
   options: Option[];
+  solutionId?: string | null;
 }
 
 interface Mastery {
@@ -383,6 +384,15 @@ export function PracticeSession({ topicId }: { topicId: string }) {
           )}
           {result.explanation && (
             <p className="text-sm text-gray-700 leading-relaxed">{result.explanation}</p>
+          )}
+
+          {current?.solutionId && (
+            <Link
+              href={`/solutions/${current.solutionId}`}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold bg-white border border-violet-300 text-violet-700 px-3 py-1.5 rounded-full hover:bg-violet-50"
+            >
+              ✨ View full interactive solution
+            </Link>
           )}
 
           {!result.isCorrect && (

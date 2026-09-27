@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-27 (Interactive solutions catalog: tier-gated worked solutions with a lifetime view cap for Free/Plus; see the last entry)
+Last updated: 2026-09-27 (Practice problems can link to a full interactive solution; first one seeded on Coulomb's law — see the last entry)
 
 ---
 
@@ -3148,5 +3148,15 @@ paywall; Pro is unlimited. Migration `solutions_catalog`.
   interactive HTML pasted in directly (or an external URL as a
   fallback) and a per-solution tier floor. `app/api/admin/solutions/`.
 - Wired into the Navbar's "Study Materials" dropdown and mobile menu.
-- Typecheck and `next build` both clean; no solutions have been seeded
-  yet — add some from `/admin/solutions` to populate the catalog.
+- Typecheck and `next build` both clean.
+- **Linked from practice** (2026-09-27, migration `problems_solution_id`):
+  `problems.solution_id` (nullable FK) lets a practice question point at
+  its full interactive solution. `GET /api/practice/[topicId]` returns
+  `solutionId` on a question only when the linked solution is published;
+  `PracticeSession.tsx` shows a "✨ View full interactive solution" link
+  to `/solutions/[id]` in the feedback panel once the student has
+  answered (right or wrong — the walkthrough is worth seeing either
+  way). First one seeded: **Four Charges on a Square** (Chapter 17,
+  Static Electricity, Coulomb's law, `tier_required = 'pro'`) — problem
+  `3eed062e-bec6-4312-bf1b-a83d5a607232`, solution
+  `a6c82b1e-babb-468c-a525-0e12faa74fac`.
