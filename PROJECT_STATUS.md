@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-27 (Practice problems can link to a full interactive solution; first one seeded on Coulomb's law — see the last entry)
+Last updated: 2026-09-27 (Practice problems can link to a full interactive solution; first one seeded on Coulomb's law; merged in the receipt-scanning auto-tier feature from master — see the last entry)
 
 ---
 
@@ -2074,7 +2074,6 @@ duplicating that data, per the explicit instruction this was built to.
   limitation noted throughout this file. Worth doing once deployed.
 - NOT PUSHED YET: same branch, same JWT_SECRET confirmation blocking
   the push as the two entries above.
-
 - MONETIZATION PASS: video solve requests, standalone 1-on-1 tutoring,
   hard tier-gated simulations/lessons, and a soft paywall popup — one
   spec, four parts plus a shared Part 0 helper. All server-side, all
@@ -3160,3 +3159,29 @@ paywall; Pro is unlimited. Migration `solutions_catalog`.
   Static Electricity, Coulomb's law, `tier_required = 'pro'`) — problem
   `3eed062e-bec6-4312-bf1b-a83d5a607232`, solution
   `a6c82b1e-babb-468c-a525-0e12faa74fac`.
+
+## Merged in `master`'s parallel work (2026-09-27)
+
+Production deploys from `master`, but 31 commits of work (Manim rearranger
+rewrite, QuestionMap progress bar, 3D simulation labs, messaging, the
+solutions catalog, practice-solution linking, and more) had only ever
+landed on `claude/charming-ride-usi05g`, never merged — so none of it
+was actually live. Meanwhile `master` had picked up its own commits this
+branch never had, most recently **receipt-scanning auto-tier-assignment**:
+`lib/receipts/analyze.ts` (Anthropic API reads the uploaded bank-transfer
+receipt), `lib/receipts/match-plan.ts` (matches the amount to a
+subscription plan), `lib/access/grant.ts` (shared grant/revoke, now used
+by the manual admin grant, receipt approval, and this auto-approval path
+alike), and `payment_requests.detected_amount/currency/plan/months/
+confidence/note/auto_approved`.
+
+Merged `master` into this branch: every simulation page's tier-gating,
+the Vector Addition simulator's label-position fix, the Manim rearranger,
+and QuestionMap all predated master's copies (master was branched from
+before those existed), so those resolved in this branch's favor. The
+admin access-grant routes took master's side — it had refactored the
+same logic into `lib/access/grant.ts`, which this branch's copies hadn't
+picked up. `components/admin/AdminNav.tsx` (the old top-bar nav) was
+already replaced by `AdminSidebar.tsx` on this branch, so its deletion
+stood. This merge, once pushed to `master`, is what actually puts
+everything on this branch live.

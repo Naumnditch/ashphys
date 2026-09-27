@@ -22,6 +22,12 @@ interface Req {
   admin_note: string | null;
   created_at: string;
   receiptUrl: string | null;
+  auto_approved: boolean;
+  detected_amount: string | null;
+  detected_currency: string | null;
+  detection_confidence: string | null;
+  detection_note: string | null;
+  detected_plan_name: string | null;
 }
 
 export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
@@ -42,7 +48,11 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
   };
   useEffect(() => { load(); }, []);
 
-  const stateFor = (r: Req) => edit[r.id] ?? { planId: r.plan_id ?? plans[0]?.id ?? '', months: r.months, note: '' };
+  const stateFor = (r: Req) => {
+    if (edit[r.id]) return edit[r.id];
+    const suggestedPlanId = r.detected_plan_name ? plans.find((p) => p.name === r.detected_plan_name)?.id : undefined;
+    return { planId: r.plan_id ?? suggestedPlanId ?? plans[0]?.id ?? '', months: r.months, note: '' };
+  };
   const setStateFor = (r: Req, patch: Partial<{ planId: string; months: number; note: string }>) =>
     setEdit((p) => ({ ...p, [r.id]: { ...stateFor(r), ...patch } }));
 
@@ -100,6 +110,20 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                   </div>
 
                   {r.student_note && <p className="text-[12.5px] text-gray-600 bg-gray-50 rounded p-2 mb-3">{r.student_note}</p>}
+
+                  {r.detected_amount ? (
+                    <p className={`text-[12.5px] rounded p-2 mb-3 border ${
+                      r.detected_plan_name ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-amber-50 border-amber-200 text-amber-800'
+                    }`}>
+                      🔍 Scanned: {parseFloat(r.detected_amount).toFixed(0)} {r.detected_currency || 'TRY'}
+                      {r.detected_plan_name
+                        ? ` — matches ${r.detected_plan_name}, but confidence was too low to auto-approve.`
+                        : " — didn't confidently match any plan price."}
+                      {r.detection_note ? ` (${r.detection_note})` : ''}
+                    </p>
+                  ) : (
+                    <p className="text-[12.5px] text-gray-400 mb-3">🔍 Could not read an amount off this receipt automatically.</p>
+                  )}
 
                   {r.receiptUrl ? (
                     <a href={r.receiptUrl} target="_blank" rel="noopener noreferrer"
@@ -176,11 +200,18 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
                       {r.admin_note ? ` · ${r.admin_note}` : ''}
                     </div>
                   </div>
-                  <span className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-full flex-shrink-0 ${
-                    r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
-                  }`}>
-                    {r.status}
-                  </span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {r.auto_approved && (
+                      <span className="text-[11px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                        auto
+                      </span>
+                    )}
+                    <span className={`text-[11px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                      r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
+                    }`}>
+                      {r.status}
+                    </span>
+                  </div>
                 </div>
               );
             })}

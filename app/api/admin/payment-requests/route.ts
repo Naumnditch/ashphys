@@ -10,13 +10,16 @@ export async function GET() {
   }
   const res = await query(`
     SELECT r.id, r.months, r.amount_claimed, r.reference, r.student_note, r.status,
-           r.admin_note, r.created_at, r.receipt_path,
+           r.admin_note, r.created_at, r.receipt_path, r.auto_approved,
+           r.detected_amount, r.detected_currency, r.detection_confidence, r.detection_note,
+           dp.name AS detected_plan_name,
            u.id AS student_id, u.email, u.first_name, u.last_name,
            p.id AS plan_id, p.name AS plan_name,
            c.id AS course_id, c.title AS course_title
     FROM payment_requests r
     JOIN users u ON u.id = r.student_id
     LEFT JOIN subscription_plans p ON p.id = r.plan_id
+    LEFT JOIN subscription_plans dp ON dp.id = r.detected_plan_id
     LEFT JOIN courses c ON c.id = r.course_id
     ORDER BY (r.status = 'pending') DESC, r.created_at DESC
     LIMIT 100

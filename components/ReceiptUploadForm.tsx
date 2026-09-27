@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 interface Plan { id: string; name: string; price_monthly: string; price_yearly: string; tier_level: number; }
 interface Course { id: string; title: string; slug: string; price_try: string; }
-interface ReqRow { id: string; months: number; amount_claimed: string | null; reference: string | null; status: string; admin_note: string | null; created_at: string; plan_name: string | null; course_title: string | null; }
+interface ReqRow { id: string; months: number; amount_claimed: string | null; reference: string | null; status: string; admin_note: string | null; created_at: string; plan_name: string | null; course_title: string | null; auto_approved: boolean; }
 
 export function ReceiptUploadForm({ plans, courses, preselectedCourse, reference }: { plans: Plan[]; courses: Course[]; preselectedCourse?: string; reference: string }) {
   const [kind, setKind] = useState<'plan' | 'course'>(preselectedCourse ? 'course' : 'plan');
@@ -48,7 +48,11 @@ export function ReceiptUploadForm({ plans, courses, preselectedCourse, reference
       if (!res.ok || !d.success) {
         setMsg({ ok: false, text: d.error || 'Could not submit' });
       } else {
-        setMsg({ ok: true, text: 'Receipt received — your access will be activated once it is checked.' });
+        setMsg(
+          d.autoApproved
+            ? { ok: true, text: `✓ Payment verified — your ${d.plan} access (${d.months} mo) is active now.` }
+            : { ok: true, text: 'Receipt received — your access will be activated once it is checked.' }
+        );
         setFile(null);
         setAmount('');
         setNote('');
@@ -171,7 +175,7 @@ export function ReceiptUploadForm({ plans, courses, preselectedCourse, reference
                     {r.amount_claimed ? ` · ${parseFloat(r.amount_claimed).toFixed(0)} TRY` : ''}
                   </div>
                   <span className={`text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${badge(r.status)}`}>
-                    {r.status === 'pending' ? 'awaiting review' : r.status}
+                    {r.status === 'pending' ? 'awaiting review' : r.auto_approved ? 'verified automatically' : r.status}
                   </span>
                 </div>
                 <div className="text-[11.5px] text-[#a8a196] mt-0.5">
