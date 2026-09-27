@@ -36,6 +36,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     title: 'Content',
     items: [
       { href: '/admin/curriculum', label: 'Curriculum', icon: 'curriculum' },
+      { href: '/admin/solutions', label: 'Interactive solutions', icon: 'solutions' },
       { href: '/admin/past-papers', label: 'Past papers', icon: 'papers' },
       { href: '/admin/booklets', label: 'Booklets', icon: 'booklets' },
       { href: '/admin/courses', label: 'Engineering courses', icon: 'courses' },

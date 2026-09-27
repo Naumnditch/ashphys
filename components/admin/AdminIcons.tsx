@@ -59,6 +59,13 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M12 6v14" />
     </>
   ),
+  solutions: (
+    <>
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.1v.2h6v-.2c0-.9.4-1.6 1-2.1A7 7 0 0 0 12 2Z" />
+    </>
+  ),
   courses: (
     <>
       <path d="m2 9 10-5 10 5-10 5Z" />
