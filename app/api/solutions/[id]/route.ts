@@ -34,6 +34,17 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ success: true, solution: body });
   }
 
+  if (user.role === 'admin') {
+    const body: SolutionDetailDTO = {
+      ...solution,
+      unlocked: true,
+      interactiveHtml: solution.interactiveHtml,
+      interactiveHtmlUrl: solution.interactiveHtmlUrl,
+      access: { allowed: true, reason: 'ok', viewsUsed: 0, viewLimit: null },
+    };
+    return NextResponse.json({ success: true, solution: body });
+  }
+
   const tier = await getUserTier(user.id);
   const access = await resolveSolutionAccess(user.id, tier, id, solution.tierRequired);
 
