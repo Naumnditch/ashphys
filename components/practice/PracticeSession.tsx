@@ -221,7 +221,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
 
   const streakNeeded = mastery.streakNeeded || 5;
 
-  if (mastery.mastered) {
+  if (mastery.mastered && !result) {
     return (
       <div className="text-center py-10">
         <div className="w-16 h-16 rounded-full bg-green-50 mx-auto mb-6 flex items-center justify-center text-3xl">
