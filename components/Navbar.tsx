@@ -50,6 +50,7 @@ export async function Navbar() {
             <NavDropdown
               label="Study Materials"
               items={[
+                { href: '/solutions', label: 'Solutions', hint: 'Interactive step-by-step walkthroughs' },
                 { href: '/past-papers', label: 'Past Papers', hint: 'With video walkthroughs' },
                 { href: '/booklets', label: 'Booklets', hint: 'Printable course notes' },
                 { href: '/resources', label: 'Resources' },
@@ -77,6 +78,7 @@ export async function Navbar() {
               label="Menu"
               items={[
                 { href: '/curriculum', label: 'Curriculum' },
+                { href: '/solutions', label: 'Solutions' },
                 { href: '/courses', label: 'Courses' },
                 { href: '/pricing', label: 'Pricing' },
                 { href: '/past-papers', label: 'Past Papers' },

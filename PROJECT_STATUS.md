@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-26 (Mailbox email delivery: address validation, automatic retries via Supabase pg_cron, delivery status, failure warnings, test email; see the last entry)
+Last updated: 2026-09-27 (Interactive solutions catalog: tier-gated worked solutions with a lifetime view cap for Free/Plus; see the last entry)
 
 ---
 
@@ -3104,3 +3104,49 @@ an email problem never undoes the on-site delivery.
   550 responses (37 checks), plus 21 unit tests.
 - **Still needed to actually send email**: a provider key in Vercel (none
   is set). `CRON_SECRET` is already set in Vercel production.
+
+## Interactive solutions catalog (2026-09-27)
+
+Showcases premium quality to drive upgrades: Free and Plus can each fully
+open a handful of interactive step-by-step problem solutions, then hit a
+paywall; Pro is unlimited. Migration `solutions_catalog`.
+
+- **Schema**: `solutions` (chapter, topic, problem_title, problem_number,
+  difficulty, `interactive_html` or `interactive_html_url`,
+  `static_preview` — always visible, even blocked —, description, tags,
+  `solution_type` interactive/static, `is_published`, `tier_required`
+  free/plus/pro — a per-solution floor independent of the view cap),
+  `solution_access_log` (one row per view/block/upgrade-click, `action` in
+  view_preview/view_full/blocked/attempted_upgrade), `user_solution_views`
+  (`views_count` — the cumulative *distinct* solutions cap counts against).
+  FKs point at this app's own `users` table (not Supabase `auth.users`,
+  which this project doesn't use).
+- **The gate** (`lib/solutions/`): `limits.ts` — Free 2, Plus 5, Pro
+  unlimited (`viewLimitFor`), plus the `tier_required` floor
+  (`tierRequiredRank`). `access.ts` — `resolveSolutionAccess()` is the
+  single call a detail fetch runs through: a solution already fully
+  viewed before is always free to reopen (checked via
+  `solution_access_log`); otherwise it atomically spends one view with a
+  guarded `UPDATE … WHERE views_count < limit`, so two concurrent requests
+  can't both slip through the last slot. Every attempt is logged
+  (view_full / blocked); `getViewStatus()` is the read-only version for
+  showing remaining views without spending one.
+- **API**: `GET /api/solutions` — published catalog + `viewer` (signed-in,
+  tier, views used/left). `GET /api/solutions/[id]` — the gate: returns
+  the static preview + `access` when blocked, the full
+  `interactive_html`/`interactive_html_url` when allowed. Fetching an
+  unlocked-for-the-first-time solution *is* the unlock. `POST
+  /api/solutions/[id]/interest` logs `attempted_upgrade` when a blocked
+  viewer clicks through to pricing.
+- **Student UI**: `/solutions` (catalog: search, chapter filter, a
+  views-remaining banner, tier/difficulty badges) and `/solutions/[id]`
+  (viewer: the interactive HTML in a sandboxed iframe, `allow-scripts
+  allow-same-origin`, or the external URL; blocked viewers get the
+  preview plus a lock card with reason-specific copy and a "See plans" /
+  "Sign in" CTA).
+- **Admin UI**: `/admin/solutions` — create/edit/publish/delete, with the
+  interactive HTML pasted in directly (or an external URL as a
+  fallback) and a per-solution tier floor. `app/api/admin/solutions/`.
+- Wired into the Navbar's "Study Materials" dropdown and mobile menu.
+- Typecheck and `next build` both clean; no solutions have been seeded
+  yet — add some from `/admin/solutions` to populate the catalog.
