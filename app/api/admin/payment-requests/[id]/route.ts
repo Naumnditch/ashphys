@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import { query } from '@/lib/db/client';
-import { billingCycleForMonths } from '@/lib/billing';
+import { grantSubscription } from '@/lib/access/grant';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const admin = await getCurrentUser();
@@ -59,29 +59,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ success: false, error: 'Choose a plan before approving' }, { status: 400 });
   }
 
-  const planRes = await query(`SELECT id, tier_level FROM subscription_plans WHERE id = $1`, [finalPlanId]);
-  if (planRes.rows.length === 0) {
-    return NextResponse.json({ success: false, error: 'Unknown plan' }, { status: 400 });
-  }
-  const tier = planRes.rows[0].tier_level > 0 ? 'premium' : 'free';
-
-  await query(
-    `INSERT INTO subscriptions (student_id, plan_id, tier, status, billing_cycle, start_date, end_date)
-     VALUES ($1, $2, $3::subscription_tier, 'active'::subscription_status, $4, now(), now() + ($5 || ' months')::interval)
-     ON CONFLICT (student_id) DO UPDATE SET
-       plan_id = EXCLUDED.plan_id,
-       tier = EXCLUDED.tier,
-       status = 'active'::subscription_status,
-       billing_cycle = EXCLUDED.billing_cycle,
-       end_date = GREATEST(COALESCE(subscriptions.end_date, now()), now()) + ($5 || ' months')::interval,
-       updated_at = now()`,
-    [pr.student_id, finalPlanId, tier, billingCycleForMonths(finalMonths), finalMonths]
-  );
-
-  await query(
-    `INSERT INTO access_grants (student_id, plan_id, months, reference, granted_by) VALUES ($1, $2, $3, $4, $5)`,
-    [pr.student_id, finalPlanId, finalMonths, pr.reference || `receipt:${params.id}`, admin.id]
-  );
+  await grantSubscription({
+    studentId: pr.student_id,
+    planId: finalPlanId,
+    months: finalMonths,
+    reference: pr.reference || `receipt:${params.id}`,
+    grantedBy: admin.id,
+  });
 
   await query(
     `UPDATE payment_requests SET status = 'approved', admin_note = $2, reviewed_by = $3, reviewed_at = now(),
