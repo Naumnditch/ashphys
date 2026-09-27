@@ -32,9 +32,12 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   }
 
   const problemsResult = await query(
-    `SELECT id, problem_number, question_text, question_image_url, answer_type, difficulty_level
-     FROM problems WHERE topic_id = $1
-     ORDER BY COALESCE(problem_number, "order"), "order"`,
+    `SELECT p.id, p.problem_number, p.question_text, p.question_image_url, p.answer_type, p.difficulty_level,
+            p.solution_id, s.is_published AS solution_published
+     FROM problems p
+     LEFT JOIN solutions s ON s.id = p.solution_id
+     WHERE p.topic_id = $1
+     ORDER BY COALESCE(p.problem_number, p."order"), p."order"`,
     [params.topicId]
   );
 
@@ -72,6 +75,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
     answerType: p.answer_type,
     difficultyLevel: p.difficulty_level,
     options: optionsByProblem[p.id] || [],
+    solutionId: p.solution_id && p.solution_published ? p.solution_id : null,
   }));
 
   const masteryResult = await query(
