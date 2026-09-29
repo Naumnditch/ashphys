@@ -6,11 +6,18 @@ import { NavDropdown } from './NavDropdown';
 import { SearchBar } from './SearchBar';
 import { getCurrentUser } from '@/lib/auth/session';
 import { MessagesNavLink } from './messages/MessagesNavLink';
+import { IGCSE_COURSE_CODE } from '@/lib/curricula';
 
 async function getChapters() {
   try {
     const result = await query(
-      `SELECT id, chapter_number, title FROM chapters WHERE status = 'published' ORDER BY chapter_number ASC`
+      // The dropdown lists the IGCSE coursebook's chapters; the other
+      // curricula are organised by syllabus unit on /curriculum instead.
+      `SELECT c.id, c.chapter_number, c.title
+       FROM chapters c JOIN courses co ON co.id = c.course_id
+       WHERE c.status = 'published' AND co.code = $1
+       ORDER BY c.chapter_number ASC`,
+      [IGCSE_COURSE_CODE]
     );
     return result.rows;
   } catch (err) {

@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-27 (Practice problems can link to a full interactive solution; first one seeded on Coulomb's law; merged in the receipt-scanning auto-tier feature from master — see the last entry)
+Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Physics side by side, with a curriculum selector, per-curriculum topic codes and question banks — see the "Multi-curriculum" entry. Its content seed must be run right after the deploy.)
 
 ---
 
@@ -23,17 +23,93 @@ Last updated: 2026-09-27 (Practice problems can link to a full interactive solut
 ## What's fully built and live
 
 - **Homepage / positioning**: platform-first, not tutoring-first. Markets
-  AshPhys as the only place needed to study physics, across IGCSE (marked
-  "Available Now" — the only one with real content), IB and HMH (marked
-  "Coming Soon" — honest, not yet built). Live stats and pricing tiers
+  AshPhys as the only place needed to study physics, across IGCSE, AS Level,
+  A Level and IB (all "Available Now" since 2026-09-29, each card links to
+  /curriculum?c=<id>) and HMH (still "Coming Soon"). Live stats and pricing tiers
   pulled from the DB, not hardcoded. Private tutoring is now a Pro-tier
   subscription perk, not a standalone headline CTA — `/book` still works,
   just isn't featured in the navbar anymore.
 - **Curriculum**: 25 chapters, 89 lessons, matching the real Cambridge IGCSE
-  Physics (0625) textbook table of contents. Browsable at `/curriculum`,
+  Physics (0625) textbook table of contents. Since 2026-09-29 also AS Level,
+  A Level (Cambridge 9702) and IB Physics — see "Multi-curriculum" below. Browsable at `/curriculum`,
   navbar has a dropdown too. Full-text site search in the navbar
   (`/api/search`) covers chapters, lessons, and simulations.
 - **13 interactive simulations**
+
+### Multi-curriculum: IGCSE, AS Level, A Level, IB (NEW 2026-09-29)
+- Four curricula live side by side: `igcse` (Cambridge 0625), `as` and
+  `a-level` (Cambridge 9702 — NOT 0625; the original brief said "0625 AS",
+  which is the IGCSE code), `ib` (IB DP Physics, first assessment 2025).
+  Constants + helpers: `lib/curricula/index.ts`; the syllabus structure
+  (unit/section codes and titles for all four) is `lib/curricula/syllabi.ts`.
+  Question-bank build priority: AS > A Level > IGCSE > IB (`priority` field).
+- DATA MODEL. A "lesson" is still a `topics` row (the `lessons` table is
+  empty and unused). New columns on `topics`: `curriculum_ids text[]`
+  (GIN-indexed, CHECK-constrained to the four ids), `topic_code` (IGCSE 0625
+  syllabus section, e.g. 1.5.2), `as_topic_code`, `a_level_topic_code`,
+  `ib_topic_code`, `syllabus_reference`. A lesson in several curricula has a
+  code in each. `problems` gained `curriculum_id` (default 'igcse' — every
+  pre-existing question is IGCSE), `topic_code`, `syllabus_cite`: each
+  curriculum has ITS OWN question bank on a shared lesson. Simulations are
+  untouched and shared (they hang off the lesson). New table
+  `user_preferences (user_id PK, selected_curriculum)`, RLS on, server-only.
+  Migration: `database/seeds/2026-09-29-multi-curriculum-schema.sql`
+  (additive; applied to Supabase as `multi_curriculum_schema`).
+- CONTENT. `database/seeds/2026-09-29-multi-curriculum-content.py` generates
+  `...-content.sql` (edit the .py, re-run it; never hand-edit the .sql). It:
+  tags all 101 existing lessons with curricula + codes; adds course
+  `9702` (25 chapters = syllabus units) and course `IB` (chapters 1/2/5 =
+  themes A/B/E) holding 76 new lessons, one per syllabus section no existing
+  lesson covered; shares existing lessons that have a simulation (e.g. 3.4
+  F=ma -> AS 3.1, 17.4 Coulomb -> A Level 18.3, 14.3 ripple tank -> AS 8.3)
+  and the Prep Physics maths lessons (-> 9702 "Mathematical requirements",
+  IB "Tool 3"); and seeds 87 questions: AS 42, A Level 25, IGCSE 10, IB 10.
+  Every answer is computed from the question's own numbers and all 71
+  numeric ones were run through the real grader (bare number, with unit, and
+  a wrong value rejected). The SQL ends with a validation block (every lesson
+  has a code for each curriculum it serves; every question belongs to a
+  curriculum its lesson serves). Idempotent — verified by running it twice
+  on a local replica. A Level = all AS lessons (same codes) + units 12–25.
+  **DEPLOY STEP: run the content SQL against Supabase straight after the
+  code deploys** (before that, the OLD Navbar/curriculum page would list the
+  new 9702/IB chapters, because they don't filter by course).
+- PAGES. `/curriculum?c=<id>`: gradient curriculum selector (URL is the
+  source of truth; choice also saved to localStorage `selectedCurriculum`,
+  cookie `ashphys_curriculum` and, logged in, `user_preferences`; no ?c ->
+  account, then cookie, then IGCSE; if only localStorage survives, the
+  selector restores it). IGCSE groups by coursebook chapter as before;
+  AS/A Level/IB group by syllabus unit in syllabus order (shared IGCSE
+  lessons sit in the unit they support, IGCSE book number stripped from the
+  title). `components/curriculum/LessonCard.tsx`: code chip, "9702 AS –
+  Topic 2.1 · Equations of motion", syllabus reference, per-curriculum
+  practice count, shared sim buttons. NEW `/lessons/[topicId]?c=`: the
+  lesson through one curriculum — code/section/reference, "Also in" chips,
+  shared simulations, that curriculum's practice bank + links to other
+  banks, notice if the lesson isn't in the requested curriculum.
+  `/curriculum/[chapterId]` now course-aware (Unit 12 / Theme B labels,
+  prev/next within the same course, practice links carry ?c).
+  `/practice/[topicId]?c=` and the worksheet PDF use that curriculum's bank;
+  with no ?c the student's saved curriculum is used if the lesson is in it,
+  else IGCSE — so every pre-existing link still opens the IGCSE bank
+  (`curriculumForTopic`). Mastery (5 in a row) stays per LESSON, not per
+  curriculum/bank. Navbar dropdown: four curriculum links + IGCSE chapters
+  only (scoped to course code 0625). Search: lesson hits go to /lessons.
+  Admin curriculum/booklets and the video-request form list IGCSE chapters
+  first and label 9702/IB ones with their course code.
+- API. `GET /api/lessons?curriculum=as` (public; 400 missing, 404 unknown),
+  `GET /api/questions?curriculumId=as&lessonId=<topic>` (login + tier, no
+  answers), `GET|POST /api/user/preferences`. Practice APIs accept
+  `?curriculum=`. Analytics: new `curriculum_select` event.
+- TESTS: `lib/curricula/__tests__/curricula.test.ts` (parsing, fallback
+  rules, code ordering, grouping, syllabus integrity, and every topic code
+  in the generated seed must exist in syllabi.ts).
+- KNOWN GAPS / NEXT: most new lessons are titles + syllabus references with
+  no simulation or questions yet (same as most IGCSE lessons); question
+  banks are starters (AS: 8 lessons, A Level: 5, IB: 2). The `courses`
+  table is overloaded: curriculum courses (0625/9702/IB) live in it, while
+  `lib/courses` + `/courses` expect paid-course columns (slug, price_try)
+  that the live table does not have — pre-existing, but if that feature is
+  ever migrated, filter the curriculum courses out of it.
 
 ### Shopier payment integration (NEW - awaiting API keys from user)
 - Shopier is NOT REST/JSON - it's a classic form-post gateway. Browser

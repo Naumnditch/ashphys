@@ -21,6 +21,7 @@ export const EVENT_TYPES = [
   'signup',
   'subscribe_click',
   'paywall_shown',
+  'curriculum_select',
 ] as const;
 
 export type AnalyticsEventType = (typeof EVENT_TYPES)[number];

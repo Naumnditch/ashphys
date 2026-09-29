@@ -71,7 +71,11 @@ function writeSkipped(topicId: string, statuses: Record<string, QuestionStatus>)
   }
 }
 
-export function PracticeSession({ topicId }: { topicId: string }) {
+export function PracticeSession({ topicId, curriculumId }: { topicId: string; curriculumId?: string }) {
+  // Each curriculum has its own question bank for a lesson, so skips are
+  // remembered per bank. IGCSE keeps the key it had before curricula existed.
+  const skipKey = curriculumId && curriculumId !== 'igcse' ? `${topicId}:${curriculumId}` : topicId;
+  const bankQuery = curriculumId ? `?curriculum=${encodeURIComponent(curriculumId)}` : '';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [topic, setTopic] = useState<TopicInfo | null>(null);
@@ -94,7 +98,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`/api/practice/${topicId}`);
+      const res = await fetch(`/api/practice/${topicId}${bankQuery}`);
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || 'Could not load practice questions.');
@@ -110,7 +114,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
       setSimulation(data.data.simulation);
       setMastery(data.data.mastery);
       const questions: Question[] = data.data.questions;
-      const skipped = readSkipped(topicId);
+      const skipped = readSkipped(skipKey);
       const initial: Record<string, QuestionStatus> = {};
       for (const q of questions) {
         initial[q.id] = q.lastResult ?? (skipped.has(q.id) ? 'skipped' : 'untried');
@@ -124,14 +128,19 @@ export function PracticeSession({ topicId }: { topicId: string }) {
       setError('Something went wrong. Please try again.');
       setLoading(false);
     }
-  }, [topicId]);
+  }, [topicId, bankQuery, skipKey]);
 
   useEffect(() => {
     loadQuestions();
   }, [loadQuestions]);
 
   useEffect(() => {
-    trackEvent({ eventType: 'practice_start', entityType: 'topic', entityId: topicId });
+    trackEvent({
+      eventType: 'practice_start',
+      entityType: 'topic',
+      entityId: topicId,
+      metadata: curriculumId ? { curriculum: curriculumId } : undefined,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topicId]);
 
@@ -176,7 +185,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
       setMastery(data.data.mastery);
       setStatuses((prev) => {
         const updated: Record<string, QuestionStatus> = { ...prev, [current.id]: data.data.isCorrect ? 'correct' : 'wrong' };
-        writeSkipped(topicId, updated);
+        writeSkipped(skipKey, updated);
         return updated;
       });
       setChecking(false);
@@ -201,7 +210,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
     // Skipping a question already answered just moves on; it keeps its result.
     if (updated[current.id] === 'untried') updated[current.id] = 'skipped';
     setStatuses(updated);
-    writeSkipped(topicId, updated);
+    writeSkipped(skipKey, updated);
     goTo(nextQuestionIndex(queue.map((q) => updated[q.id] ?? 'untried'), index));
   };
 
@@ -234,7 +243,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
         <p className="text-gray-400 text-sm mb-8">You&rsquo;ve got this one down.</p>
         <div className="flex items-center justify-center gap-3">
           <Link
-            href={`/curriculum/${topic.chapterId}`}
+            href={`/curriculum/${topic.chapterId}${curriculumId ? `?c=${curriculumId}` : ''}`}
             className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-lg font-semibold text-sm"
           >
             Back to Chapter
@@ -402,7 +411,7 @@ export function PracticeSession({ topicId }: { topicId: string }) {
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href={`/curriculum/${topic.chapterId}#topic-${topic.id}`}
+                  href={`/lessons/${topic.id}${curriculumId ? `?c=${curriculumId}` : ''}`}
                   className="text-xs font-semibold bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-50"
                 >
                   📖 Review the lesson

@@ -1,13 +1,21 @@
 /**
- * GET /api/practice/[topicId]
- * Returns the question set for a topic (without revealing correct
- * answers) plus the logged-in student's current mastery state.
+ * GET /api/practice/[topicId][?curriculum=as]
+ * Returns one curriculum's question set for a topic (without revealing
+ * correct answers) plus the logged-in student's current mastery state.
+ *
+ * A lesson can belong to several curricula, each with its own question bank.
+ * With no ?curriculum the student's saved curriculum is used when the lesson
+ * is part of it, otherwise IGCSE, so links from before curricula existed
+ * still open the IGCSE bank.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { query } from '@/lib/db/client';
+import { CURRICULA, curriculumForTopic } from '@/lib/curricula';
+import { getUserCurriculum } from '@/lib/curricula/queries';
+import { loadQuestionBank } from '@/lib/practice/questions';
 
 export async function GET(req: NextRequest, { params }: { params: { topicId: string } }) {
   const user = await getCurrentUser();
@@ -16,7 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   }
 
   const topicResult = await query(
-    `SELECT t.id, t.topic_name, t.required_tier, c.id as chapter_id, c.chapter_number, c.title as chapter_title
+    `SELECT t.id, t.topic_name, t.required_tier, t.curriculum_ids, c.id as chapter_id, c.chapter_number, c.title as chapter_title
      FROM topics t JOIN chapters c ON c.id = t.chapter_id
      WHERE t.id = $1`,
     [params.topicId]
@@ -31,29 +39,12 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
     return NextResponse.json({ success: false, error: 'This lesson requires a higher plan', locked: true, requiredTier: topic.required_tier }, { status: 403 });
   }
 
-  const problemsResult = await query(
-    `SELECT p.id, p.problem_number, p.question_text, p.question_image_url, p.answer_type, p.difficulty_level,
-            p.solution_id, s.is_published AS solution_published
-     FROM problems p
-     LEFT JOIN solutions s ON s.id = p.solution_id
-     WHERE p.topic_id = $1
-     ORDER BY COALESCE(p.problem_number, p."order"), p."order"`,
-    [params.topicId]
+  const curriculumId = curriculumForTopic(
+    topic.curriculum_ids,
+    req.nextUrl.searchParams.get('curriculum'),
+    await getUserCurriculum(user.id)
   );
-
-  const problemIds = problemsResult.rows.map((p) => p.id);
-  let optionsByProblem: Record<string, any[]> = {};
-  if (problemIds.length > 0) {
-    const optionsResult = await query(
-      `SELECT id, problem_id, option_text, option_letter, "order"
-       FROM problem_options WHERE problem_id = ANY($1) ORDER BY "order" ASC`,
-      [problemIds]
-    );
-    optionsByProblem = optionsResult.rows.reduce((acc: Record<string, any[]>, o) => {
-      (acc[o.problem_id] ||= []).push({ id: o.id, text: o.option_text, letter: o.option_letter });
-      return acc;
-    }, {});
-  }
+  const bank = await loadQuestionBank(params.topicId, curriculumId);
 
   // The student's latest answer to each question, so their progress map
   // survives a reload.
@@ -66,7 +57,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   );
   const lastCorrect = new Map<string, boolean>(latestResult.rows.map((r) => [r.problem_id, r.is_correct]));
 
-  const questions = problemsResult.rows.map((p, i) => ({
+  const questions = bank.map((p, i) => ({
     id: p.id,
     number: p.problem_number ?? i + 1,
     lastResult: lastCorrect.has(p.id) ? (lastCorrect.get(p.id) ? 'correct' : 'wrong') : null,
@@ -74,7 +65,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
     imageUrl: p.question_image_url,
     answerType: p.answer_type,
     difficultyLevel: p.difficulty_level,
-    options: optionsByProblem[p.id] || [],
+    options: p.options,
     solutionId: p.solution_id && p.solution_published ? p.solution_id : null,
   }));
 
@@ -106,6 +97,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
         chapterNumber: topic.chapter_number,
         chapterTitle: topic.chapter_title,
       },
+      curriculum: { id: curriculumId, name: CURRICULA[curriculumId].displayName },
       questions,
       mastery: {
         correctStreak: mastery.correct_streak,

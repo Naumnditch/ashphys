@@ -1,7 +1,8 @@
 /**
- * GET /api/practice/[topicId]/worksheet[?answers=1]
- * Downloads a topic's practice questions as a printable PDF. The answer key
- * (?answers=1) is only ever built for a teacher or admin.
+ * GET /api/practice/[topicId]/worksheet[?answers=1][&curriculum=as]
+ * Downloads one curriculum's practice questions for a topic as a printable
+ * PDF (IGCSE unless the lesson isn't IGCSE, as for the practice session).
+ * The answer key (?answers=1) is only ever built for a teacher or admin.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -9,6 +10,8 @@ import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { query } from '@/lib/db/client';
 import { logEvent } from '@/lib/analytics/track';
+import { CURRICULA, curriculumForTopic, lessonTitle, syllabusRefLabel, topicCodeFor } from '@/lib/curricula';
+import { getUserCurriculum } from '@/lib/curricula/queries';
 import {
   renderWorksheetPdf,
   worksheetFilename,
@@ -24,7 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   if (!user) return NextResponse.redirect(new URL('/auth/login', req.url));
 
   const topicResult = await query(
-    `SELECT t.id, t.topic_name, t.required_tier, c.chapter_number, c.title AS chapter_title
+    `SELECT t.id, t.topic_name, t.required_tier, t.curriculum_ids,
+            t.topic_code, t.as_topic_code, t.a_level_topic_code, t.ib_topic_code,
+            c.chapter_number, c.title AS chapter_title
      FROM topics t JOIN chapters c ON c.id = t.chapter_id
      WHERE t.id = $1`,
     [params.topicId]
@@ -40,13 +45,24 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
   const isStaff = user.role === 'teacher' || user.role === 'admin';
   const showAnswers = isStaff && req.nextUrl.searchParams.get('answers') === '1';
 
+  const curriculumId = curriculumForTopic(
+    topic.curriculum_ids,
+    req.nextUrl.searchParams.get('curriculum'),
+    await getUserCurriculum(user.id)
+  );
+  if (curriculumId !== 'igcse') {
+    // Name the worksheet the way this curriculum names the lesson.
+    topic.topic_name = `${lessonTitle(topic.topic_name, curriculumId)} (${CURRICULA[curriculumId].shortName})`;
+    topic.chapter_title = syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId));
+  }
+
   const problemsResult = await query(
     `SELECT id, problem_number, question_text, question_image_url, answer_type::text AS answer_type,
             answer_correct, answer_unit, difficulty_level
      FROM problems
-     WHERE topic_id = $1
+     WHERE topic_id = $1 AND curriculum_id = $2
      ORDER BY COALESCE(problem_number, "order"), "order"`,
-    [topic.id]
+    [topic.id, curriculumId]
   );
   const problems = problemsResult.rows as WorksheetProblem[];
   if (problems.length === 0) {
@@ -72,7 +88,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
     entityType: 'topic',
     entityId: topic.id,
     path: req.nextUrl.pathname,
-    metadata: { kind: showAnswers ? 'worksheet_answer_key' : 'worksheet' },
+    metadata: { kind: showAnswers ? 'worksheet_answer_key' : 'worksheet', curriculum: curriculumId },
   });
 
   const filename = worksheetFilename(topic.topic_name, showAnswers);

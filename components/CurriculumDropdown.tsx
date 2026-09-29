@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
+import { CURRICULUM_LIST } from '@/lib/curricula';
 
 interface Chapter {
   id: string;
@@ -49,6 +50,22 @@ export function CurriculumDropdown({ chapters }: { chapters: Chapter[] }) {
           >
             View Full Curriculum →
           </Link>
+          <div className="grid grid-cols-2 gap-1 p-2 border-b border-gray-100">
+            {CURRICULUM_LIST.map((c) => (
+              <Link
+                key={c.id}
+                href={`/curriculum?c=${c.id}`}
+                onClick={() => setOpen(false)}
+                className="text-xs font-semibold text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 rounded px-2 py-1.5"
+              >
+                {c.shortName}
+                <span className="block font-normal text-[10px] text-gray-400">
+                  {c.syllabusCode === 'IB' ? 'SL & HL' : `Cambridge ${c.syllabusCode}`}
+                </span>
+              </Link>
+            ))}
+          </div>
+          <p className="px-4 pt-2 text-[10px] font-semibold uppercase tracking-wide text-gray-400">IGCSE chapters</p>
           <ul className="py-1">
             {chapters.map((chapter) => (
               <li key={chapter.id}>

@@ -5,34 +5,40 @@ import { CurriculumTierManager } from '@/components/admin/CurriculumTierManager'
 
 export const dynamic = 'force-dynamic';
 
+// IGCSE chapters first, then the 9702 units and IB themes, labelled with their course.
+const COURSE_ORDER = `co.code = '0625' DESC, co.code`;
+const CHAPTER_TITLE = `CASE WHEN co.code = '0625' THEN c.title ELSE co.code || ' · ' || c.title END`;
+
 async function getChaptersWithCounts() {
   const result = await query(`
-    SELECT c.id, c.chapter_number, c.title,
+    SELECT c.id, c.chapter_number, ${CHAPTER_TITLE} AS title,
            (SELECT COUNT(*) FROM topics t WHERE t.chapter_id = c.id) as topic_count,
            (SELECT COUNT(*) FROM simulations s WHERE s.chapter_id = c.id) as simulation_count
-    FROM chapters c
-    ORDER BY c.chapter_number ASC
+    FROM chapters c JOIN courses co ON co.id = c.course_id
+    ORDER BY ${COURSE_ORDER}, c.chapter_number ASC
   `);
   return result.rows;
 }
 
 async function getSimulations() {
   const result = await query(`
-    SELECT s.id, s.title, s.url_path, s.sim_type, s.required_tier, c.chapter_number, c.title as chapter_title, t.topic_name
+    SELECT s.id, s.title, s.url_path, s.sim_type, s.required_tier, c.chapter_number, ${CHAPTER_TITLE} as chapter_title, t.topic_name
     FROM simulations s
     JOIN chapters c ON c.id = s.chapter_id
+    JOIN courses co ON co.id = c.course_id
     LEFT JOIN topics t ON t.id = s.topic_id
-    ORDER BY c.chapter_number ASC
+    ORDER BY ${COURSE_ORDER}, c.chapter_number ASC
   `);
   return result.rows;
 }
 
 async function getTopics() {
   const result = await query(`
-    SELECT t.id, t.topic_name, t.required_tier, c.chapter_number, c.title as chapter_title
+    SELECT t.id, t.topic_name, t.required_tier, c.chapter_number, ${CHAPTER_TITLE} as chapter_title
     FROM topics t
     JOIN chapters c ON c.id = t.chapter_id
-    ORDER BY c.chapter_number ASC, t."order" ASC
+    JOIN courses co ON co.id = c.course_id
+    ORDER BY ${COURSE_ORDER}, c.chapter_number ASC, t."order" ASC
   `);
   return result.rows;
 }

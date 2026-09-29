@@ -1,111 +1,107 @@
 import Link from 'next/link';
-import { query } from '@/lib/db/client';
-import { SimulationIcon } from '@/components/icons/SimulationIcon';
 import { getCurrentUser } from '@/lib/auth/session';
-import { getUserTier, tierName } from '@/lib/subscriptions/getUserTier';
+import { getUserTier } from '@/lib/subscriptions/getUserTier';
+import { CURRICULA, type CurriculumId } from '@/lib/curricula';
+import { getLessonsByCurriculum, resolveCurriculum } from '@/lib/curricula/queries';
+import { groupLessons, summarize, type LessonGroup } from '@/lib/curricula/lessons';
+import { CurriculumSelector } from '@/components/curriculum/CurriculumSelector';
+import { LessonCard } from '@/components/curriculum/LessonCard';
 
 export const dynamic = 'force-dynamic';
 
-interface TopicRow {
-  id: string;
-  chapter_id: string;
-  topic_name: string;
-  order: number;
-  required_tier: number;
-}
-
-interface ChapterRow {
-  id: string;
-  chapter_number: number;
-  title: string;
-  topics: TopicRow[];
-}
-
-async function getChaptersWithTopics(): Promise<ChapterRow[]> {
+async function loadGroups(curriculumId: CurriculumId): Promise<{ groups: LessonGroup[]; failed: boolean }> {
   try {
-    const chaptersResult = await query(
-      `SELECT id, chapter_number, title FROM chapters WHERE status = 'published' ORDER BY chapter_number ASC`
-    );
-    const topicsResult = await query(
-      `SELECT id, chapter_id, topic_name, "order", required_tier FROM topics ORDER BY chapter_id, "order" ASC`
-    );
-    const simsResult = await query(`SELECT topic_id FROM simulations WHERE topic_id IS NOT NULL`);
-    const simTopicIds = new Set(simsResult.rows.map((r: any) => r.topic_id));
-
-    return chaptersResult.rows.map((ch: any) => ({
-      ...ch,
-      topics: topicsResult.rows
-        .filter((t: any) => t.chapter_id === ch.id)
-        .map((t: any) => ({ ...t, hasSimulation: simTopicIds.has(t.id) })),
-    }));
+    return { groups: groupLessons(await getLessonsByCurriculum(curriculumId), curriculumId), failed: false };
   } catch (err) {
     console.error('Failed to load curriculum:', err);
-    return [];
+    return { groups: [], failed: true };
   }
 }
 
-export default async function CurriculumPage() {
+const INTROS: Record<CurriculumId, string> = {
+  igcse: 'Every chapter of the Cambridge IGCSE Physics coursebook, tagged with its 0625 syllabus section.',
+  as: 'The Cambridge International AS Level (9702, units 1–11), in syllabus order. Lessons that share an IGCSE simulation are listed under the AS topic they support.',
+  'a-level': 'The full Cambridge International A Level (9702): all of AS plus units 12–25, in syllabus order.',
+  ib: 'IB Diploma Physics (SL & HL, first assessment 2025), by theme and subtopic. HL-only subtopics are marked (HL).',
+};
+
+export default async function CurriculumPage({ searchParams }: { searchParams: { c?: string } }) {
   const user = await getCurrentUser();
-  const [chapters, tier] = await Promise.all([getChaptersWithTopics(), user ? getUserTier(user.id) : Promise.resolve(0)]);
+  const [{ curriculumId, source }, tier] = await Promise.all([
+    resolveCurriculum(searchParams.c, user?.id),
+    user ? getUserTier(user.id) : Promise.resolve(0),
+  ]);
+  const curriculum = CURRICULA[curriculumId];
+  const { groups, failed } = await loadGroups(curriculumId);
+  const summary = summarize(groups);
+  const effectiveTier = user?.role === 'admin' ? Number.MAX_SAFE_INTEGER : tier;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-10">
-        <h1 className="text-3xl font-bold mb-2">Physics 10 Curriculum</h1>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Physics Curriculum</h1>
         <p className="text-gray-600">
-          Cambridge IGCSE 0625 · Browse every chapter and lesson. Click a lesson to jump straight to it.
+          IGCSE, AS Level, A Level and IB Physics in one place. Simulations are shared by every curriculum; practice
+          questions are written for each one.
         </p>
       </div>
 
-      {chapters.length === 0 && (
+      <CurriculumSelector selectedCurriculum={curriculumId} source={source} />
+
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-900">{curriculum.name}</h2>
+        <p className="text-sm text-gray-600 mt-1">{INTROS[curriculumId]}</p>
+        {summary.lessons > 0 && (
+          <p className="text-xs text-gray-500 mt-2">
+            {summary.lessons} lessons · {summary.withSimulations} with simulations · {summary.questions}{' '}
+            {curriculum.shortName} practice questions across {summary.withQuestions} lessons
+          </p>
+        )}
+      </div>
+
+      {failed && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center text-gray-700">
+          We couldn&rsquo;t load the {curriculum.shortName} curriculum just now. Please refresh in a moment.
+        </div>
+      )}
+
+      {!failed && groups.length === 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center text-gray-700">
-          Curriculum is being set up. Check back soon.
+          <p className="font-medium">The {curriculum.name} lessons are being set up.</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Check back soon, or switch to another curriculum above — the simulations work in all of them.
+          </p>
         </div>
       )}
 
       <div className="space-y-6">
-        {chapters.map((chapter) => (
-          <div key={chapter.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-            <Link
-              href={`/curriculum/${chapter.id}`}
-              className="block px-5 py-3 bg-gray-50 hover:bg-gray-100 border-b border-gray-200"
-            >
-              <span className="text-sm text-gray-400 font-medium mr-2">{chapter.chapter_number}</span>
-              <span className="font-semibold text-gray-900">{chapter.title}</span>
-            </Link>
-            {chapter.topics.length > 0 && (
-              <ul className="divide-y divide-gray-100">
-                {chapter.topics.map((topic: any) => {
-                  const locked = tier < topic.required_tier;
-                  return (
-                    <li key={topic.id}>
-                      <Link
-                        href={`/curriculum/${chapter.id}#topic-${topic.id}`}
-                        className="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                      >
-                        <span className="flex items-center gap-1.5">
-                          {locked && <span title={`Requires ${tierName(topic.required_tier)}`}>🔒</span>}
-                          {topic.topic_name}
-                        </span>
-                        <span className="flex items-center gap-2 flex-shrink-0 ml-2">
-                          {locked && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full">
-                              {tierName(topic.required_tier)}
-                            </span>
-                          )}
-                          {topic.hasSimulation && (
-                            <span className="text-xs text-blue-600 font-medium flex items-center gap-1">
-                              <SimulationIcon className="w-3.5 h-3.5" /> Simulation
-                            </span>
-                          )}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
+        {groups.map((group) => (
+          <section
+            key={group.key}
+            id={`unit-${group.key}`}
+            className="border border-gray-200 rounded-lg overflow-hidden bg-white scroll-mt-24"
+          >
+            <header className="px-5 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span className="text-sm text-gray-400 font-medium">{group.label}</span>
+              {group.chapterId ? (
+                <Link href={`/curriculum/${group.chapterId}?c=${curriculumId}`} className="font-semibold text-gray-900 hover:underline">
+                  {group.title}
+                </Link>
+              ) : (
+                <span className="font-semibold text-gray-900">{group.title}</span>
+              )}
+              {group.level && (
+                <span className="ml-auto text-[10px] font-bold uppercase tracking-wide text-[#5a67d8] bg-[#eef0fd] px-2 py-0.5 rounded-full">
+                  {group.level}
+                </span>
+              )}
+            </header>
+            <ul className="divide-y divide-gray-100">
+              {group.lessons.map((lesson) => (
+                <LessonCard key={lesson.id} lesson={lesson} selectedCurriculum={curriculumId} tier={effectiveTier} />
+              ))}
+            </ul>
+          </section>
         ))}
       </div>
     </div>

@@ -49,16 +49,31 @@ const CURRICULA = [
     name: 'IGCSE Physics',
     detail: 'Cambridge 0625 — the complete syllabus',
     status: 'available',
+    href: '/curriculum?c=igcse',
+  },
+  {
+    name: 'AS Level Physics',
+    detail: 'Cambridge 9702 — units 1–11',
+    status: 'available',
+    href: '/curriculum?c=as',
+  },
+  {
+    name: 'A Level Physics',
+    detail: 'Cambridge 9702 — AS plus units 12–25',
+    status: 'available',
+    href: '/curriculum?c=a-level',
   },
   {
     name: 'IB Physics',
-    detail: 'SL & HL',
-    status: 'soon',
+    detail: 'SL & HL, first assessment 2025',
+    status: 'available',
+    href: '/curriculum?c=ib',
   },
   {
     name: 'HMH',
     detail: 'US curriculum',
     status: 'soon',
+    href: null,
   },
 ];
 
@@ -114,7 +129,7 @@ export default async function HomePage() {
             className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-600 mb-6 animate-fade-in-up"
             style={{ animationDelay: '0ms' }}
           >
-            IGCSE · IB · HMH — all under one roof
+            IGCSE · AS & A Level · IB — all under one roof
           </div>
 
           <h1
@@ -169,10 +184,14 @@ export default async function HomePage() {
             <h2 className="text-xl font-bold text-white mb-1">Wherever You&rsquo;re Studying, We&rsquo;ve Got It</h2>
             <p className="text-gray-400 text-sm">One platform, built to cover every major curriculum.</p>
           </Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {CURRICULA.map((c, i) => (
-              <Reveal key={c.name} delay={i * 100}>
-                <div className="bg-gray-800 border border-gray-700 rounded-xl p-5 h-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {CURRICULA.map((c, i) => {
+              const card = (
+                <div
+                  className={`bg-gray-800 border border-gray-700 rounded-xl p-5 h-full ${
+                    c.href ? 'transition-colors hover:border-gray-500' : ''
+                  }`}
+                >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-bold text-white">{c.name}</h3>
                     {c.status === 'available' ? (
@@ -187,8 +206,19 @@ export default async function HomePage() {
                   </div>
                   <p className="text-sm text-gray-400">{c.detail}</p>
                 </div>
-              </Reveal>
-            ))}
+              );
+              return (
+                <Reveal key={c.name} delay={i * 100}>
+                  {c.href ? (
+                    <Link href={c.href} className="block h-full">
+                      {card}
+                    </Link>
+                  ) : (
+                    card
+                  )}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

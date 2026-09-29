@@ -5,17 +5,31 @@ import { SimulationIcon } from '@/components/icons/SimulationIcon';
 import { ChapterViewTracker } from '@/components/analytics/ChapterViewTracker';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, tierName } from '@/lib/subscriptions/getUserTier';
+import {
+  CURRICULA,
+  chapterLabel,
+  curriculumForTopic,
+  defaultCurriculumForCourse,
+  syllabusRefLabel,
+  topicCodeFor,
+  topicInCurriculum,
+  tryParseCurriculum,
+  type CurriculumId,
+  type CurriculumTopicFields,
+} from '@/lib/curricula';
 
 export const dynamic = 'force-dynamic';
 
 interface ChapterDetail {
   id: string;
+  course_id: string;
+  course_code: string | null;
   chapter_number: number;
   title: string;
   learning_objectives: string | null;
 }
 
-interface TopicRow {
+interface TopicRow extends CurriculumTopicFields {
   id: string;
   topic_name: string;
   order: number;
@@ -32,7 +46,9 @@ interface SimRow {
 async function getChapter(id: string): Promise<ChapterDetail | null> {
   try {
     const result = await query(
-      `SELECT id, chapter_number, title, learning_objectives FROM chapters WHERE id = $1`,
+      `SELECT c.id, c.course_id, co.code AS course_code, c.chapter_number, c.title, c.learning_objectives
+       FROM chapters c JOIN courses co ON co.id = c.course_id
+       WHERE c.id = $1`,
       [id]
     );
     return result.rows[0] || null;
@@ -45,7 +61,9 @@ async function getChapter(id: string): Promise<ChapterDetail | null> {
 async function getTopics(chapterId: string): Promise<TopicRow[]> {
   try {
     const result = await query(
-      `SELECT id, topic_name, "order", required_tier FROM topics WHERE chapter_id = $1 ORDER BY "order" ASC`,
+      `SELECT id, topic_name, "order", required_tier, curriculum_ids,
+              topic_code, as_topic_code, a_level_topic_code, ib_topic_code
+       FROM topics WHERE chapter_id = $1 ORDER BY "order" ASC`,
       [chapterId]
     );
     return result.rows;
@@ -66,23 +84,28 @@ async function getSimulations(chapterId: string): Promise<SimRow[]> {
   }
 }
 
-async function getTopicsWithPractice(chapterId: string): Promise<Set<string>> {
+/** Question bank sizes per lesson and curriculum: "topicId:curriculum" -> count. */
+async function getQuestionCounts(chapterId: string): Promise<Map<string, number>> {
   try {
     const result = await query(
-      `SELECT DISTINCT topic_id FROM problems WHERE chapter_id = $1 AND topic_id IS NOT NULL`,
+      `SELECT p.topic_id, p.curriculum_id, COUNT(*)::int AS n
+       FROM problems p JOIN topics t ON t.id = p.topic_id
+       WHERE t.chapter_id = $1
+       GROUP BY p.topic_id, p.curriculum_id`,
       [chapterId]
     );
-    return new Set(result.rows.map((r: any) => r.topic_id));
+    return new Map(result.rows.map((r: any) => [`${r.topic_id}:${r.curriculum_id}`, r.n]));
   } catch {
-    return new Set();
+    return new Map();
   }
 }
 
-async function getAdjacentChapters(chapterNumber: number) {
+async function getAdjacentChapters(courseId: string, chapterNumber: number) {
   try {
     const result = await query(
-      `SELECT id, chapter_number, title FROM chapters WHERE chapter_number IN ($1, $2)`,
-      [chapterNumber - 1, chapterNumber + 1]
+      `SELECT id, chapter_number, title FROM chapters
+       WHERE course_id = $1 AND status = 'published' AND chapter_number IN ($2, $3)`,
+      [courseId, chapterNumber - 1, chapterNumber + 1]
     );
     const prev = result.rows.find((r: any) => r.chapter_number === chapterNumber - 1) || null;
     const next = result.rows.find((r: any) => r.chapter_number === chapterNumber + 1) || null;
@@ -92,18 +115,35 @@ async function getAdjacentChapters(chapterNumber: number) {
   }
 }
 
-export default async function ChapterDetailPage({ params }: { params: { chapterId: string } }) {
+export default async function ChapterDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { chapterId: string };
+  searchParams: { c?: string };
+}) {
   const chapter = await getChapter(params.chapterId);
   if (!chapter) notFound();
 
   const user = await getCurrentUser();
-  const [topics, simulations, topicsWithPractice, { prev, next }, tier] = await Promise.all([
+  const [topics, simulations, questionCounts, { prev, next }, tier] = await Promise.all([
     getTopics(chapter.id),
     getSimulations(chapter.id),
-    getTopicsWithPractice(chapter.id),
-    getAdjacentChapters(chapter.chapter_number),
+    getQuestionCounts(chapter.id),
+    getAdjacentChapters(chapter.course_id, chapter.chapter_number),
     user ? getUserTier(user.id) : Promise.resolve(0),
   ]);
+
+  // The curriculum this chapter is being read in: the one the link says, or
+  // the one its course belongs to. A lesson that isn't in that curriculum
+  // (an IGCSE-only lesson viewed from AS) falls back to one it is in.
+  const courseCurriculum = defaultCurriculumForCourse(chapter.course_code, chapter.chapter_number);
+  const curriculumId: CurriculumId = tryParseCurriculum(searchParams.c) ?? courseCurriculum;
+  const curriculumFor = (topic: TopicRow): CurriculumId =>
+    topicInCurriculum(topic, curriculumId) ? curriculumId : curriculumForTopic(topic.curriculum_ids, null, courseCurriculum);
+  const practiceCount = (topic: TopicRow) => questionCounts.get(`${topic.id}:${curriculumFor(topic)}`) ?? 0;
+  const hasAnyPractice = topics.some((t) => practiceCount(t) > 0);
+  const chapterHref = (id: string) => `/curriculum/${id}${searchParams.c ? `?c=${curriculumId}` : ''}`;
 
   // a lesson can have more than one simulation — group, don't overwrite
   const simsByTopic = new Map<string, typeof simulations>();
@@ -118,12 +158,12 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <ChapterViewTracker topicIds={topics.map((t) => t.id)} />
-      <Link href="/curriculum" className="text-sm text-blue-600 hover:underline mb-6 inline-block">
-        ← Back to full curriculum
+      <Link href={`/curriculum?c=${curriculumId}`} className="text-sm text-blue-600 hover:underline mb-6 inline-block">
+        ← Back to the {CURRICULA[curriculumId].shortName} curriculum
       </Link>
 
       <div className="mb-6">
-        <div className="text-sm text-gray-400 font-medium mb-1">Chapter {chapter.chapter_number}</div>
+        <div className="text-sm text-gray-400 font-medium mb-1">{chapterLabel(chapter.course_code, chapter.chapter_number)}</div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-3">{chapter.title}</h1>
         {chapter.learning_objectives && (
           <p className="text-gray-600 leading-relaxed">{chapter.learning_objectives}</p>
@@ -138,7 +178,9 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
           <ul className="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
             {topics.map((topic) => {
               const sims = simsByTopic.get(topic.id) || [];
-              const hasPractice = topicsWithPractice.has(topic.id);
+              const topicCurriculum = curriculumFor(topic);
+              const hasPractice = practiceCount(topic) > 0;
+              const code = topicCodeFor(topic, topicCurriculum);
               const locked = tier < topic.required_tier;
               return (
                 <li
@@ -146,19 +188,24 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
                   id={`topic-${topic.id}`}
                   className="px-4 py-3 scroll-mt-24 flex items-center justify-between gap-3"
                 >
-                  <span className="text-gray-800 flex items-center gap-2">
-                    {locked && <span title={`Requires ${tierName(topic.required_tier)}`}>🔒</span>}
-                    {topic.topic_name}
-                    {locked && (
-                      <span className="text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full">
-                        {tierName(topic.required_tier)}
-                      </span>
-                    )}
+                  <span className="min-w-0">
+                    <span className="text-gray-800 flex flex-wrap items-center gap-2">
+                      {locked && <span title={`Requires ${tierName(topic.required_tier)}`}>🔒</span>}
+                      <Link href={`/lessons/${topic.id}?c=${topicCurriculum}`} className="hover:text-blue-700 hover:underline">
+                        {topic.topic_name}
+                      </Link>
+                      {locked && (
+                        <span className="text-[10px] font-bold uppercase tracking-wide bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full">
+                          {tierName(topic.required_tier)}
+                        </span>
+                      )}
+                    </span>
+                    <span className="block text-xs italic text-gray-400 mt-0.5">{syllabusRefLabel(topicCurriculum, code)}</span>
                   </span>
                   <span className="flex-shrink-0 flex items-center gap-2">
                     {hasPractice && (
                       <Link
-                        href={`/practice/${topic.id}`}
+                        href={`/practice/${topic.id}?c=${topicCurriculum}`}
                         className="text-xs font-semibold text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-full whitespace-nowrap"
                       >
                         🎯 Practice
@@ -182,7 +229,7 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
         </div>
       )}
 
-      {simulations.length === 0 && topicsWithPractice.size === 0 && (
+      {simulations.length === 0 && !hasAnyPractice && (
         <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 text-center mb-8">
           <p className="text-gray-700 font-medium mb-1">📹 Video lessons & practice problems coming soon</p>
           <p className="text-sm text-gray-500">Your teacher is preparing content for this chapter.</p>
@@ -191,13 +238,13 @@ export default async function ChapterDetailPage({ params }: { params: { chapterI
 
       <div className="flex justify-between items-center border-t pt-4">
         {prev ? (
-          <Link href={`/curriculum/${prev.id}`} className="text-sm text-gray-600 hover:text-blue-600">
-            ← Chapter {prev.chapter_number}
+          <Link href={chapterHref(prev.id)} className="text-sm text-gray-600 hover:text-blue-600">
+            ← {chapterLabel(chapter.course_code, prev.chapter_number)}
           </Link>
         ) : <span />}
         {next ? (
-          <Link href={`/curriculum/${next.id}`} className="text-sm text-gray-600 hover:text-blue-600">
-            Chapter {next.chapter_number} →
+          <Link href={chapterHref(next.id)} className="text-sm text-gray-600 hover:text-blue-600">
+            {chapterLabel(chapter.course_code, next.chapter_number)} →
           </Link>
         ) : <span />}
       </div>
