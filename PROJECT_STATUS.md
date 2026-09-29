@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Physics side by side, with a curriculum selector, per-curriculum topic codes and question banks — see the "Multi-curriculum" entry. Its content seed must be run right after the deploy.)
+Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Physics side by side, with a curriculum selector, per-curriculum topic codes and question banks — see the "Multi-curriculum" entry. The content seed was applied to Supabase on 2026-09-29, ahead of the code reaching master.)
 
 ---
 
@@ -70,9 +70,14 @@ Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Phys
   has a code for each curriculum it serves; every question belongs to a
   curriculum its lesson serves). Idempotent — verified by running it twice
   on a local replica. A Level = all AS lessons (same codes) + units 12–25.
-  **DEPLOY STEP: run the content SQL against Supabase straight after the
-  code deploys** (before that, the OLD Navbar/curriculum page would list the
-  new 9702/IB chapters, because they don't filter by course).
+  **APPLIED to the live Supabase project on 2026-09-29** (via the SQL tool,
+  in 5 chunks; every table's row hash was checked against a local replica
+  that ran the file itself). Because it went in BEFORE the code reached
+  `master`, until that merge the deployed (old) code shows the new 9702/IB
+  chapters in the navbar and /curriculum (it doesn't filter by course) and
+  mixes the AS/A Level questions into lessons 3.4 and 23.3 (its practice
+  query doesn't filter by curriculum). Merging the branch fixes all of it.
+  Re-running the file is safe.
 - PAGES. `/curriculum?c=<id>`: gradient curriculum selector (URL is the
   source of truth; choice also saved to localStorage `selectedCurriculum`,
   cookie `ashphys_curriculum` and, logged in, `user_preferences`; no ?c ->
