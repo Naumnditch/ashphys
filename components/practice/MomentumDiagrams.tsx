@@ -5,7 +5,11 @@
  * Referenced from problems.question_image_url as an internal key
  * (e.g. "diagram:momentum-stick-1") rather than an external file URL, so
  * they render live in React and in the worksheet PDF with no asset hosting.
+ * The A Level circular motion and gravitation figures live in
+ * CircularGravityDiagrams.tsx and are merged in below.
  */
+
+import { CIRCULAR_GRAVITY_DIAGRAMS } from './CircularGravityDiagrams';
 
 const INK = '#1b2a41';
 const MUTE = '#4a5a72';
@@ -600,6 +604,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
 const DIAGRAMS: Record<string, React.ReactNode> = {
   ...COULOMB_DIAGRAMS,
   ...WORKSHEET_DIAGRAMS,
+  ...CIRCULAR_GRAVITY_DIAGRAMS,
   'momentum-stick-1': (
     <Frame>
       <Trolley x={40} y={70} width={70} mass="2 kg" arrow={{ label: '6 m/s', dir: 1, color: TEAL }} />

@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Physics side by side, with a curriculum selector, per-curriculum topic codes and question banks — see the "Multi-curriculum" entry. The content seed was applied to Supabase on 2026-09-29, ahead of the code reaching master.)
+Last updated: 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -77,7 +77,9 @@ Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Phys
   chapters in the navbar and /curriculum (it doesn't filter by course) and
   mixes the AS/A Level questions into lessons 3.4 and 23.3 (its practice
   query doesn't filter by curriculum). Merging the branch fixes all of it.
-  Re-running the file is safe.
+  Re-running the file is safe. (ed308ec had already been promoted to
+  production by hand on 2026-09-29; the branch reached `main`/`master` on
+  2026-09-30 together with the unit 12–13 banks below.)
 - PAGES. `/curriculum?c=<id>`: gradient curriculum selector (URL is the
   source of truth; choice also saved to localStorage `selectedCurriculum`,
   cookie `ashphys_curriculum` and, logged in, `user_preferences`; no ?c ->
@@ -110,11 +112,53 @@ Last updated: 2026-09-29 (Multi-curriculum: IGCSE, AS Level, A Level and IB Phys
   in the generated seed must exist in syllabi.ts).
 - KNOWN GAPS / NEXT: most new lessons are titles + syllabus references with
   no simulation or questions yet (same as most IGCSE lessons); question
-  banks are starters (AS: 8 lessons, A Level: 5, IB: 2). The `courses`
+  banks are starters (AS: 8 lessons, A Level: 11 since 2026-09-30, IB: 2). The `courses`
   table is overloaded: curriculum courses (0625/9702/IB) live in it, while
   `lib/courses` + `/courses` expect paid-course columns (slug, price_try)
   that the live table does not have — pre-existing, but if that feature is
   ever migrated, filter the curriculum courses out of it.
+
+### A Level circular motion & gravitation practice (NEW 2026-09-30)
+- 99 questions in the A Level (`curriculum_id='a-level'`) banks of the six
+  unit 12–13 lessons, from the owner's two worksheets ("Circular Motion and
+  Gravitation Notes" 1–5 with their worked examples and fill-ins, and the
+  exam-style sheet: spaceship, theme-park car, TV satellite, ball on a cord,
+  conical pendulum, London Eye, Discovery/Hubble, Phobos, skaters, hammer
+  throw, baggage belt, merry-go-round, whistle, Earth–Moon, ISS, orbit
+  change). Per lesson: 12.1 Radians and angular speed 9, 12.2 Circular
+  motion (the SHARED IGCSE 3.7 lesson — its IGCSE bank of 35 is untouched)
+  45, 13.1 Gravitational fields 5, 13.2 Gravitation and orbits (shared IGCSE
+  24.3) 22, 13.3 Field strength of a point mass 5, 13.4 Gravitational
+  potential 13. 49 numeric, 50 multiple choice, 82 with a figure ("explain"/"draw an arrow"
+  parts became MCQs whose wrong options are the usual misconceptions —
+  centrifugal force, velocity towards the centre, etc.).
+- `database/seeds/2026-09-30-a-level-circular-gravitation.py` generates the
+  `.sql` (edit the .py, never the .sql). Every answer and every number in
+  every explanation is computed from the question's own values; uuid5 ids;
+  idempotent; starts with a guard that all six lessons serve 'a-level'.
+  Tolerance 5% where a 2-s.f. answer would miss the default 2%, so the
+  worksheet keys' own 2-s.f. answers are accepted. g = 9.81 throughout (the
+  notes use 9.8). MCQ options are stored in a text-derived order so the right
+  answer isn't always A (the practice page doesn't shuffle; the older seeds
+  always put it first — worth fixing there some day).
+- SOURCE-KEY ISSUES handled: the 1450 kg satellite's key gives ΔEp =
+  +5.72 × 10⁹ J for a move to a LOWER orbit — stored as −5.72 × 10⁹ J,
+  sign-sensitive (a student typing the key's value gets "the sign is wrong").
+  The skater question omits Ana's mass; 55 kg is from the original exam's
+  opening ("Jon (mass 75 kg) … Ana (mass 55 kg)"). "Show that" parts ask for
+  the value instead so the answer isn't printed in the question.
+- FIGURES: 46 original SVGs in `components/practice/CircularGravityDiagrams.tsx`
+  (keys `circ-*` / `grav-*`, merged into `getDiagram`), lab-notebook palette;
+  the worksheets' photos (wheel, skaters, satellite, Phobos) are redrawn as
+  diagrams. They never show an answer arrow. They render in the practice page
+  and the worksheet PDF (serialiser identical to React — checked by
+  worksheetPdf.test.ts, which now covers these keys).
+- TEST: `lib/practice/__tests__/aLevelCircularGravitationSeed.test.ts` parses
+  the generated SQL and runs every numeric answer through the real grader
+  (bare, with unit, 3 s.f., 2 s.f. accepted; ±10% rejected; sign flips
+  rejected where sign-sensitive), checks the worksheet keys' printed answers
+  are accepted, every MCQ has 4 options with one right and the right slot
+  varies, and every figure key resolves.
 
 ### Shopier payment integration (NEW - awaiting API keys from user)
 - Shopier is NOT REST/JSON - it's a classic form-post gateway. Browser

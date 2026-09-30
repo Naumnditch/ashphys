@@ -3,6 +3,7 @@ import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import type { ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { getDiagram } from '@/components/practice/MomentumDiagrams';
+import { CIRCULAR_GRAVITY_DIAGRAMS } from '@/components/practice/CircularGravityDiagrams';
 import {
   renderWorksheetPdf,
   workingLines,
@@ -132,6 +133,8 @@ const DIAGRAM_KEYS = [
   'gravity-two-bodies', 'gravity-orbit',
   'coulomb-two-charges', 'coulomb-l-shape-origin', 'coulomb-l-shape-millicoulomb',
   'coulomb-l-shape-nanocoulomb', 'coulomb-l-shape-unit', 'coulomb-equilateral', 'coulomb-triangle-scalene',
+  // A Level 12.1–13.4 (2026-09-30 seed)
+  ...Object.keys(CIRCULAR_GRAVITY_DIAGRAMS),
 ];
 
 describe('toSvgMarkup', () => {
