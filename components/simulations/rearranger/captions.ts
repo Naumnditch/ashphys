@@ -36,6 +36,11 @@ const text = (s: string) => `\\text{${s}}`;
 export function operateCaption(move: Move): TaggedTex {
   const c = new Caption();
   switch (move.kind) {
+    case 'cross': {
+      const t = c.factor(move.movedFactor!);
+      const other = move.crossFactors!.map((f) => c.factor(f)).join(' ');
+      return c.done(`${text('Cross-multiply: ')} ${t} ${text(' and ')} ${other} ${text(' swap places')}`);
+    }
     case 'root':
       return c.done(text(move.degree === 2 || !move.degree ? 'Take the square root of both sides' : `Take the ${move.degree}th root of both sides`));
     case 'square':
@@ -60,6 +65,12 @@ export function cancelCaption(move: Move, targetTex: string, target: string): Ta
   switch (move.kind) {
     case 'negate':
       return null;
+    case 'cross': {
+      // The shortcut is the two ordinary moves rolled into one.
+      const t = c.factor(move.movedFactor!);
+      const other = move.crossFactors!.map((f) => c.factor(f)).join(' ');
+      return c.done(`${text('Same as multiplying by ')} ${t} ${text(', then dividing by ')} ${other}${text(': one step')}`);
+    }
     case 'root': {
       const t = c.symbol(target, targetTex);
       const p = move.degree ?? 2;

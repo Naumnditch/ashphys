@@ -21,7 +21,7 @@ import { MANIM, RED, YELLOW } from '@/lib/manim/colors';
 import { Glyph, Stroke, TexMob, rectanglePath, type GlyphInfo } from '@/lib/manim/mobject';
 import { FRAME_HEIGHT, ManimScene } from '@/lib/manim/scene';
 import { loadTexEngine, type TexEngine } from '@/lib/manim/tex';
-import { buildIntermediate, type EqState, type EquationDef, type Move } from './algebra';
+import { buildIntermediate, crossKeyMap, type EqState, type EquationDef, type Move } from './algebra';
 import { cancelCaption, operateCaption, plainCaption, textTex } from './captions';
 import { VAR_COLORS } from './palette';
 import { equationTex, glyphKeys, symbolTex, type TaggedTex } from './texFromState';
@@ -301,12 +301,39 @@ export class RearrangerScene {
     });
   }
 
+  /**
+   * Cross-multiplication: the target and the other side's product trade
+   * places across the equals sign along an arc, then a caption says this
+   * is the multiply-then-divide pair rolled into one step.
+   */
+  private async playCross(g: number, move: Move, from: TexMob, target: string) {
+    if (!(await this.play(g, ...this.swapCaption(operateCaption(move), true)))) return false;
+    const after = this.equationMob(move.stateAfter);
+    this.stage.world.add(after);
+    this.current = after;
+    const map = crossKeyMap(move);
+    if (
+      !(await this.play(
+        g,
+        new TransformMatching(from, after, { runTime: 1.8, keyMap: (k) => map.get(k) ?? k, pathArc: Math.PI / 2 }),
+        this.frameTo(after, 1.8)
+      ))
+    )
+      return false;
+    // Flash the two pieces that just crossed over, and say why it works.
+    const swapped = new Set(map.values());
+    const crossed = after.glyphs.filter((x) => !x.isRule && swapped.has(x.info.token));
+    const why = cancelCaption(move, symbolTex(target), target);
+    return this.play(g, ...(crossed.length ? [new Indicate(crossed, { scale: 1.2, runTime: 0.9 })] : []), ...(why ? this.swapCaption(why) : []), new Wait(0.8));
+  }
+
   /** One move of the derivation, from the settled `before` state. Resolves false if interrupted. */
   async playMove(move: Move, before: EqState, target: string) {
     const g = this.next();
     this.target = target;
     const from = this.current;
     if (!from) return false;
+    if (move.kind === 'cross') return this.playCross(g, move, from, target);
     const { mid, cancelKeys } = buildIntermediate(move, before);
 
     // 1. Say what we are about to do.

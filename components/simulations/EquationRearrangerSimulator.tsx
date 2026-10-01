@@ -31,6 +31,8 @@ type Tab = 'basic' | 'advanced';
 
 function stepText(move: Move): string {
   switch (move.kind) {
+    case 'cross':
+      return `Cross-multiply: swap ${move.symbol.replace(' ⇄ ', ' and ')}`;
     case 'root':
       return 'Square-root both sides';
     case 'square':

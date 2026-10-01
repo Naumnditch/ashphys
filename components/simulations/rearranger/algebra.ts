@@ -41,9 +41,9 @@ export interface EqState {
   left: Side;
   right: Side;
 }
-export type OpType = 'divide' | 'multiply' | 'addsub' | 'root' | 'square' | 'negate';
+export type OpType = 'divide' | 'multiply' | 'addsub' | 'root' | 'square' | 'negate' | 'cross';
 export interface Move {
-  kind: 'lift' | 'additive' | 'multiplicative' | 'root' | 'square' | 'negate';
+  kind: 'lift' | 'additive' | 'multiplicative' | 'root' | 'square' | 'negate' | 'cross';
   op: OpType;
   symbol: string; // display label, e.g. "m", "r²", "a×t", or the isolated target for root/square
   opLabel: string; // e.g. "÷ m", "× V", "− u", "√", "²"
@@ -59,6 +59,11 @@ export interface Move {
   movedDenomIndex?: number; // multiplicative 'multiply' (incl. lift): its index within home.denom before removal
   movedGroup?: ProductGroup; // additive
   movedGroupIndex?: number; // additive: its index within home.groups before removal
+  // cross-multiplication: the target (movedFactor, at movedDenomIndex in the
+  // denominator) and the lone product on the other side swap places. Those
+  // factors land in the denominator from index crossDenomBase onwards.
+  crossFactors?: Factor[];
+  crossDenomBase?: number;
 }
 
 export function cloneFactor(f: Factor): Factor {
@@ -111,6 +116,40 @@ export function isolateSteps(state: EqState, target: string): { moves: Move[]; f
     if (denomIdx !== -1) {
       const homeS = hs();
       const oppS = os();
+
+      // Cross-multiplication shortcut. When the target sits in a denominator
+      // and the other side is a single product (F = GMm/r², solve for r²),
+      // multiplying by the target and then dividing by that product is just
+      // the two swapping places: r² = GMm/F. One move instead of two.
+      const t = homeS.denom[denomIdx];
+      const oppGroup = oppS.groups[0];
+      const crossable =
+        t.kind === 'var' &&
+        t.symbol === target &&
+        oppS.groups.length === 1 &&
+        oppS.denom.length === 0 &&
+        oppGroup.sign === 1 &&
+        !oppGroup.factors.some((f) => containsTarget(f, target)) &&
+        !homeS.groups.some((g) => g.factors.some((f) => containsTarget(f, target))) &&
+        !homeS.denom.some((f, i) => i !== denomIdx && containsTarget(f, target));
+      if (crossable) {
+        const crossFactors = oppGroup.factors.map(cloneFactor);
+        const crossDenomBase = homeS.denom.length - 1;
+        homeS.denom.splice(denomIdx, 1);
+        homeS.denom.push(...oppGroup.factors);
+        oppS.groups = [{ sign: 1, factors: [t] }];
+        const moveLabel = factorLabel(t);
+        const withLabel = crossFactors.map(factorLabel).join('×');
+        moves.push({
+          kind: 'cross', op: 'cross', symbol: `${moveLabel} ⇄ ${withLabel}`, opLabel: '⇄',
+          homeIsLeft: home === 'L', stateAfter: cloneState(left, right),
+          movedFactor: cloneFactor(t), movedDenomIndex: denomIdx,
+          crossFactors, crossDenomBase,
+        });
+        home = home === 'L' ? 'R' : 'L';
+        continue;
+      }
+
       const [factor] = homeS.denom.splice(denomIdx, 1);
       oppS.groups[0].factors.push(factor);
       const label = factorLabel(factor);
@@ -236,11 +275,12 @@ export function buildIntermediate(move: Move, before: EqState): { mid: EqState; 
   const oppBefore = cloneSide(move.homeIsLeft ? before.right : before.left);
   const homeSideTag = move.homeIsLeft ? 'L' : 'R';
 
-  if (move.kind === 'negate') {
-    // No literal pair cancels here — both sides just get multiplied by −1
-    // to flip a leftover negative sign off the isolated term. Show the
-    // "before" state unchanged for operate/cancel; settle jumps straight
-    // to move.stateAfter, which already carries the flipped signs.
+  if (move.kind === 'negate' || move.kind === 'cross') {
+    // No literal pair cancels here. A negate multiplies both sides by −1 to
+    // flip a leftover sign; a cross-multiplication swaps two pieces across
+    // the equals sign directly (see crossKeyMap). Show the "before" state
+    // unchanged for operate/cancel; settle jumps straight to
+    // move.stateAfter.
     const mid: EqState = move.homeIsLeft ? { left: homeBefore, right: oppBefore } : { left: oppBefore, right: homeBefore };
     return { mid, cancelKeys: [] };
   }
@@ -294,6 +334,32 @@ export function buildIntermediate(move: Move, before: EqState): { mid: EqState; 
 
   const mid: EqState = move.homeIsLeft ? { left: homeBefore, right: oppBefore } : { left: oppBefore, right: homeBefore };
   return { mid, cancelKeys };
+}
+
+/**
+ * For a cross-multiplication move: which token of the "before" equation
+ * becomes which token of the "after" equation, so the stage can glide each
+ * piece across the equals sign (the target up from the denominator, the
+ * other side's product down into it) instead of fading one out and another in.
+ */
+export function crossKeyMap(move: Move): Map<string, string> {
+  const map = new Map<string, string>();
+  if (move.kind !== 'cross' || !move.movedFactor || !move.crossFactors) return map;
+  const homeTag = move.homeIsLeft ? 'L' : 'R';
+  const oppTag = move.homeIsLeft ? 'R' : 'L';
+  const base = move.crossDenomBase ?? 0;
+  const t = move.movedFactor;
+  map.set(varKey(factorTag(t), 'd', homeTag, move.movedDenomIndex ?? 0), varKey(factorTag(t), 'n', oppTag, 0));
+  move.crossFactors.forEach((f, j) => {
+    const from = varKey(factorTag(f), 'n', oppTag, 0);
+    const to = varKey(factorTag(f), 'd', homeTag, base + j);
+    if (f.kind === 'power') {
+      // A bracketed power or radical is never itself a token, only its open/close pieces are.
+      map.set(`${from}-open`, `${to}-open`);
+      map.set(`${from}-close`, `${to}-close`);
+    } else map.set(from, to);
+  });
+  return map;
 }
 
 export function factorValueNum(f: Factor, values: Record<string, number>): number {

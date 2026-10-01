@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -26,7 +26,14 @@ Last updated: 2026-09-30 (A Level units 12–13 practice banks: 99 questions wit
 - Interactive solutions are embedded in practice: any question with `problems.solution_id` shows an optional, collapsed "Interactive solution" button that loads the solution inline (tier/view-cap gating unchanged, views only spent on open). The standalone Solutions catalog, its navbar links and `GET /api/solutions` are removed; `/solutions` redirects to `/curriculum`. The duplicate card was the catalog joining `chapters` by number only (ch. 17 exists in IGCSE and 9702).
 - TODO (content): author an interactive solution for every question and link it via `problems.solution_id` (admin: /admin/solutions). Only "Four Charges on a Square" exists, linked to 2 questions.
 
-## What's fully built and live
+### Cross-multiplication in the Equation Rearranger (2026-10-01)
+- User's teaching trick, now built in and shown to students: when the variable being solved for is in a denominator and the other side is a single product, it and that product just SWAP across the equals sign (F = GMm/r² → r² = GMm/F) instead of "× r²" then "÷ F". Applies to every such equation in the bank (density, power, capacitance, V²/R, plate capacitance, gravitation/Coulomb/field strength) and mirrored orientations; pendulum g gets it too after ÷2π and squaring (4 moves → 3). Transformer (a proportion, other side has its own denominator) still uses the plain moves.
+- Engine: new move kind `cross` in `isolateSteps` (`rearranger/algebra.ts`), tried before the old "lift". `crossKeyMap(move)` maps before→after tokens so the stage glides the two pieces across along an arc (`playCross` in `RearrangerScene.ts`). Captions: "Cross-multiply: r² and F swap places", then "Same as multiplying by r², then dividing by F: one step".
+- Page: `/simulations/equation-rearranger` has a "Shortcut: cross-multiplication" card above the simulator with the F = GMm/r² example.
+- Tests: `rearranger/__tests__/cross.test.ts` (8 tests: when it applies / doesn't, every equation × variable × orientation and every chained pair put back into the ORIGINAL equation balances, token maps exist on screen). Full suite 372/372, tsc clean.
+- NOT done: proportions like the transformer equation (a/b = c/d) still use the plain moves; the Prep Physics practice questions' written explanations and the Proportionality sim's "solve for X" panel don't mention the shortcut yet.
+- Noticed, not touched: the `emc2` sample in the equation bank has E = 8.988e10 for m = 0.001 kg (m·c² is 8.988e13).
+
 
 - **Homepage / positioning**: platform-first, not tutoring-first. Markets
   AshPhys as the only place needed to study physics, across IGCSE, AS Level,

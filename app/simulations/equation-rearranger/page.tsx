@@ -9,6 +9,47 @@ import { LockedContent } from '@/components/subscriptions/LockedContent';
 
 export const dynamic = 'force-dynamic';
 
+const SANS = '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+
+/** A stacked fraction: top over a rule over bottom. */
+function Frac({ top, bottom }: { top: React.ReactNode; bottom: React.ReactNode }) {
+  return (
+    <span className="inline-flex flex-col items-center align-middle mx-1 leading-tight">
+      <span className="px-1">{top}</span>
+      <span className="border-t border-[#1b2a41] w-full text-center px-1">{bottom}</span>
+    </span>
+  );
+}
+
+/** The cross-multiplication shortcut, in words and one worked example, above the simulator. */
+function CrossMultiplyTip() {
+  return (
+    <aside
+      className="mb-6 max-w-2xl rounded-xl border border-[#e3c98f] bg-[#fff8e6] px-5 py-4"
+      style={{ fontFamily: SANS }}
+      aria-label="Cross-multiplication shortcut"
+    >
+      <div className="font-mono text-xs tracking-wide uppercase text-[#8f6428] mb-1.5">Shortcut: cross-multiplication</div>
+      <p className="text-[#1b2a41] text-sm leading-relaxed">
+        When the variable you want is <strong>in the denominator</strong> and the other side is a single term, don&apos;t multiply and then divide. Just{' '}
+        <strong>swap the two across the equals sign</strong>.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[#1b2a41]" style={{ fontFamily: 'Georgia, serif', fontSize: '1.25rem' }}>
+        <span>
+          <i>F</i> = <Frac top={<i>GMm</i>} bottom={<span><i>r</i>²</span>} />
+        </span>
+        <span aria-hidden="true" className="text-[#8f6428]">⟹</span>
+        <span>
+          <i>r</i>² = <Frac top={<i>GMm</i>} bottom={<i>F</i>} />
+        </span>
+      </div>
+      <p className="text-[#4a5a72] text-sm leading-relaxed mt-3">
+        <i>r</i>² and <i>F</i> traded places: one step instead of two. Try it below: click a variable under a fraction bar and watch the swap.
+      </p>
+    </aside>
+  );
+}
+
 async function getSimContext() {
   try {
     const result = await query(
@@ -71,6 +112,8 @@ export default async function EquationRearrangerSimulationPage() {
             </p>
           )}
         </div>
+
+        <CrossMultiplyTip />
 
         {allowed ? <EquationRearrangerSimulator /> : <LockedContent requiredTier={requiredTier} title={ctx?.title || 'This simulation'} />}
       </div>

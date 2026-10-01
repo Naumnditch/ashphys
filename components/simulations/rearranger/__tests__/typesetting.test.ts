@@ -52,7 +52,7 @@ function derive(start: EqState, target: string, label: string, out: Checked) {
     tex.layout(operateCaption(move).tex);
     const why = cancelCaption(move, symbolTex(target), target);
     if (why) tex.layout(why.tex);
-    if (move.kind !== 'negate') {
+    if (move.kind !== 'negate' && move.kind !== 'cross') {
       const tokens = new Set(keys.map((k) => k.token));
       // A radical has no closing glyph; everything else that cancels must be on screen.
       const found = cancelKeys.filter((k) => tokens.has(k));
