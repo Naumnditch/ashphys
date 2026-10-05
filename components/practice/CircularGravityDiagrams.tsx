@@ -1515,6 +1515,344 @@ function OrbitLower() {
   );
 }
 
+// ── Challenge Set (IGCSE 0625 chapters 16–17) ─────────────────────────────
+// Redrawn from the owner's challenge-set PDF. They label the givens only and
+// never show an answer (no tension, friction or force arrow, no result).
+
+function ChBallTable() {
+  return (
+    <Fig w={460} h={230}>
+      <Note x={16} y={24}>
+        frictionless table, view from above
+      </Note>
+      <Dashed cx={230} cy={125} r={80} />
+      <Dot x={230} y={125} r={3.5} />
+      <Line x1={230} y1={125} x2={310} y2={125} width={1.6} />
+      <T x={270} y={116} size={12} color={MUTE} bold>
+        r = 0.80 m
+      </T>
+      <Body x={310} y={125} r={10} fill={MASS} />
+      <T x={338} y={129} size={11.5} bold anchor="start">
+        ball, 0.50 kg
+      </T>
+      <Note x={230} y={222} anchor="middle">
+        3.0 revolutions in 2.0 s
+      </Note>
+    </Fig>
+  );
+}
+
+function ChCarBend({ radius, note }: { radius: string; note: string }) {
+  return (
+    <Fig w={460} h={240}>
+      <Note x={16} y={24}>
+        flat (unbanked) bend, view from above
+      </Note>
+      <circle cx={230} cy={125} r={80} fill="none" stroke="#cbc6bb" strokeWidth={30} />
+      <circle cx={230} cy={125} r={80} fill="none" stroke="#ffffff" strokeWidth={2} strokeDasharray="10 8" />
+      <Dot x={230} y={125} r={3.5} />
+      <Line x1={230} y1={125} x2={310} y2={125} color={MUTE} width={1.2} />
+      <T x={268} y={116} size={12} color={MUTE} bold>
+        {radius}
+      </T>
+      <rect x={298} y={116} width={26} height={18} rx={4} fill="#c8d6e5" stroke={INK} strokeWidth={1.4} />
+      <Note x={230} y={226} anchor="middle">
+        {note}
+      </Note>
+    </Fig>
+  );
+}
+
+function ChTurntable() {
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        turntable, view from above
+      </Note>
+      <circle cx={230} cy={112} r={96} fill={EARTH} stroke={INK} strokeWidth={1.6} />
+      <Dot x={230} y={112} r={3.5} />
+      <Turn cx={230} cy={112} r={70} from={200} to={320} color={BRASS} />
+      <T x={230} y={62} size={11.5} color={BRASS} bold>
+        45 rev/min
+      </T>
+      <Body x={280} y={112} r={8} fill={MASS} label="A" labelSize={10} />
+      <Body x={330} y={112} r={8} fill={MASS} label="B" labelSize={10} />
+      <Dim x1={230} y1={150} x2={280} y2={150} label="0.10 m" lx={255} ly={166} />
+      <Dim x1={230} y1={184} x2={330} y2={184} label="0.20 m" lx={280} ly={200} />
+      <Note x={230} y={238} anchor="middle">
+        both coins turn with the turntable
+      </Note>
+    </Fig>
+  );
+}
+
+function ChVertical() {
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        vertical circle, side view
+      </Note>
+      <Dashed cx={230} cy={130} r={86} />
+      <Dot x={230} y={130} r={3.5} />
+      <Line x1={230} y1={130} x2={230} y2={44} width={1.4} />
+      <Line x1={230} y1={130} x2={230} y2={216} width={1.4} />
+      <T x={218} y={92} size={12} color={MUTE} bold anchor="end">
+        r = 1.2 m
+      </T>
+      <Body x={230} y={44} r={10} fill={MASS} />
+      <Body x={230} y={216} r={10} fill={MASS} />
+      <Arrow x1={246} y1={44} x2={306} y2={44} color={TEAL} />
+      <T x={314} y={48} size={11.5} color={TEAL} bold anchor="start">
+        6.0 m/s
+      </T>
+      <Arrow x1={214} y1={216} x2={154} y2={216} color={TEAL} />
+      <T x={146} y={220} size={11.5} color={TEAL} bold anchor="end">
+        6.0 m/s
+      </T>
+      <T x={104} y={134} size={11.5} bold anchor="end">
+        ball, 0.50 kg
+      </T>
+    </Fig>
+  );
+}
+
+function ChConical() {
+  const [bx, by] = [315, 173];
+  return (
+    <Fig w={460} h={240}>
+      <Line x1={178} y1={26} x2={282} y2={26} width={3} />
+      {[188, 208, 228, 248, 268].map((x) => (
+        <line key={x} x1={x} y1={26} x2={x - 8} y2={16} stroke={INK} strokeWidth={1} />
+      ))}
+      <Line x1={230} y1={26} x2={230} y2={200} color={MUTE} width={1} dash="4 4" />
+      <ellipse cx={230} cy={173} rx={85} ry={16} fill="none" stroke={MUTE} strokeWidth={1.2} strokeDasharray="5 4" />
+      <Line x1={230} y1={26} x2={bx} y2={by} width={1.5} />
+      <AngleArc cx={230} cy={26} r={44} from={60} to={90} />
+      <T x={252} y={78} size={12} color={MUTE} bold anchor="start">
+        30°
+      </T>
+      <T x={286} y={92} size={11.5} color={MUTE} bold anchor="start">
+        L = 1.0 m
+      </T>
+      <Body x={bx} y={by} r={11} fill={MASS} />
+      <T x={bx + 18} y={by + 4} size={11.5} bold anchor="start">
+        0.20 kg
+      </T>
+      <Line x1={230} y1={173} x2={bx - 11} y2={by} color={MUTE} width={1.1} />
+      <T x={274} y={200} size={12} color={MUTE} bold>
+        r
+      </T>
+    </Fig>
+  );
+}
+
+function ChVerticalEnergy() {
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        vertical circle, side view
+      </Note>
+      <Dashed cx={230} cy={130} r={86} />
+      <Dot x={230} y={130} r={3.5} />
+      <Line x1={230} y1={130} x2={230} y2={44} width={1.4} />
+      <Line x1={230} y1={130} x2={230} y2={216} width={1.4} />
+      <T x={218} y={92} size={12} color={MUTE} bold anchor="end">
+        r = 0.90 m
+      </T>
+      <Body x={230} y={44} r={10} fill={MASS} />
+      <Body x={230} y={216} r={10} fill={MASS} />
+      <T x={256} y={40} size={11.5} color={MUTE} anchor="start">
+        top
+      </T>
+      <T x={256} y={232} size={11.5} color={MUTE} anchor="start">
+        bottom
+      </T>
+      <Note x={344} y={134} anchor="start">
+        the top is 2r above the bottom
+      </Note>
+    </Fig>
+  );
+}
+
+function ChPlanetX() {
+  return (
+    <Fig w={460} h={240}>
+      <Note x={16} y={24}>
+        surface (1) and height (2) above a planet
+      </Note>
+      <Body x={260} y={175} r={50} fill={EARTH} />
+      <T x={260} y={172} size={11.5} bold>
+        Planet X
+      </T>
+      <T x={260} y={190} size={10.5} color={MUTE}>
+        M = 4.0 × 10²⁴ kg
+      </T>
+      <Dim x1={150} y1={175} x2={150} y2={125} label="R = 5.0 × 10⁶ m" lx={142} ly={154} anchor="end" />
+      <Dim x1={150} y1={125} x2={150} y2={75} label="h = 5.0 × 10⁶ m" lx={142} ly={104} anchor="end" />
+      <Line x1={260} y1={125} x2={260} y2={75} color={MUTE} width={1} dash="2 3" />
+      <Dot x={260} y={125} r={4} color={BRASS} />
+      <Dot x={260} y={75} r={4} color={BRASS} />
+      <T x={276} y={129} size={13} bold anchor="start">
+        1
+      </T>
+      <T x={276} y={79} size={13} bold anchor="start">
+        2
+      </T>
+    </Fig>
+  );
+}
+
+function ChLeo({ label }: { label: string }) {
+  const cx = 200;
+  const cy = 125;
+  const [sx, sy] = at(cx, cy, 98, 318);
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        circular orbit (not to scale)
+      </Note>
+      <Dashed cx={cx} cy={cy} r={98} color={BRASS} dash="6 5" />
+      <Body x={cx} y={cy} r={58} fill={EARTH} />
+      <T x={cx} y={cy + 4} size={12} bold>
+        Earth
+      </T>
+      <Line x1={cx} y1={cy} x2={sx} y2={sy} color={MUTE} width={1.2} />
+      <T x={r1((cx + sx) / 2 - 6)} y={r1((cy + sy) / 2 + 14)} size={12} color={MUTE} bold anchor="end">
+        r = R + h
+      </T>
+      <Satellite x={sx} y={sy} />
+      <T x={330} y={120} size={11.5} bold anchor="start">
+        {label}
+      </T>
+      <Note x={330} y={138}>
+        above the surface
+      </Note>
+    </Fig>
+  );
+}
+
+function ChGeo() {
+  const cx = 200;
+  const cy = 125;
+  const [sx, sy] = at(cx, cy, 100, 320);
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        geostationary orbit, from above the north pole (not to scale)
+      </Note>
+      <Dashed cx={cx} cy={cy} r={100} color={BRASS} dash="6 5" />
+      <Body x={cx} y={cy} r={34} fill={EARTH} />
+      <T x={cx} y={cy + 4} size={11} bold>
+        Earth
+      </T>
+      <Turn cx={cx} cy={cy} r={48} from={200} to={300} color={BRASS} />
+      <Line x1={cx} y1={cy} x2={sx} y2={sy} color={MUTE} width={1} dash="2 3" />
+      <Satellite x={sx} y={sy} />
+      <T x={330} y={96} size={11.5} bold anchor="start">
+        period T = 24 h
+      </T>
+      <Note x={330} y={114}>
+        stays above the same
+      </Note>
+      <Note x={330} y={128}>
+        point on the equator
+      </Note>
+    </Fig>
+  );
+}
+
+function ChTwoOrbits() {
+  const cx = 230;
+  const cy = 125;
+  const [ax, ay] = at(cx, cy, 25, 340);
+  const [bx, by] = at(cx, cy, 100, 215);
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        two circular orbits, same planet
+      </Note>
+      <Dashed cx={cx} cy={cy} r={25} />
+      <Dashed cx={cx} cy={cy} r={100} />
+      <Body x={cx} y={cy} r={10} fill={EARTH} />
+      <Line x1={cx} y1={cy} x2={ax} y2={ay} color={MUTE} width={1.1} />
+      <Line x1={cx} y1={cy} x2={bx} y2={by} color={MUTE} width={1.1} />
+      <T x={r1(cx + 14)} y={r1(cy + 6)} size={11} color={MUTE} bold anchor="start">
+        r_A
+      </T>
+      <T x={r1((cx + bx) / 2 + 6)} y={r1((cy + by) / 2 - 8)} size={11.5} color={MUTE} bold anchor="start">
+        r_B = 4 r_A
+      </T>
+      <Satellite x={ax} y={ay} />
+      <Satellite x={bx} y={by} />
+      <T x={r1(ax + 22)} y={r1(ay - 4)} size={13} bold anchor="start">
+        A
+      </T>
+      <T x={r1(bx - 20)} y={r1(by - 10)} size={13} bold anchor="end">
+        B
+      </T>
+    </Fig>
+  );
+}
+
+function ChBalance() {
+  const earthX = 74;
+  const moonX = 410;
+  const craftX = 74 + (moonX - 74) * 0.9;
+  return (
+    <Fig w={460} h={190}>
+      <Note x={16} y={24}>
+        Earth–Moon line (not to scale)
+      </Note>
+      <Body x={earthX} y={84} r={36} fill={EARTH} label="Earth" labelSize={11} />
+      <Body x={moonX} y={84} r={12} fill={MOON} />
+      <T x={moonX} y={118} size={11} bold>
+        Moon
+      </T>
+      <Dot x={craftX} y={84} r={4.5} color={BRASS} />
+      <T x={craftX} y={66} size={11} bold>
+        craft
+      </T>
+      <Line x1={earthX} y1={124} x2={earthX} y2={138} color={MUTE} width={1} dash="2 3" />
+      <Line x1={craftX} y1={96} x2={craftX} y2={138} color={MUTE} width={1} dash="2 3" />
+      <Line x1={moonX} y1={100} x2={moonX} y2={166} color={MUTE} width={1} dash="2 3" />
+      <Dim x1={earthX} y1={134} x2={craftX} y2={134} label="x (from Earth)" lx={r1((earthX + craftX) / 2)} ly={128} />
+      <Dim x1={earthX} y1={162} x2={moonX} y2={162} label="d = 3.84 × 10⁸ m" lx={r1((earthX + moonX) / 2)} ly={156} />
+      <T x={230} y={60} size={11} color={MUTE}>
+        M_E = 81 M_M
+      </T>
+    </Fig>
+  );
+}
+
+function ChMoonPeriod() {
+  const cx = 160;
+  const cy = 125;
+  const [mx, my] = at(cx, cy, 98, 330);
+  return (
+    <Fig w={460} h={250}>
+      <Note x={16} y={24}>
+        the Moon’s orbit round the Earth (not to scale)
+      </Note>
+      <Dashed cx={cx} cy={cy} r={98} />
+      <Body x={cx} y={cy} r={34} fill={EARTH} />
+      <T x={cx} y={cy + 4} size={11} bold>
+        Earth
+      </T>
+      <Line x1={cx} y1={cy} x2={mx} y2={my} color={MUTE} width={1.1} />
+      <T x={r1((cx + mx) / 2 - 2)} y={r1((cy + my) / 2 + 16)} size={11.5} color={MUTE} bold>
+        r
+      </T>
+      <Body x={mx} y={my} r={10} fill={MOON} />
+      <T x={mx + 18} y={my - 4} size={11.5} bold anchor="start">
+        Moon
+      </T>
+      <T x={300} y={200} size={11.5} color={MUTE} bold anchor="start">
+        r = 3.84 × 10⁸ m
+      </T>
+    </Fig>
+  );
+}
+
 export const CIRCULAR_GRAVITY_DIAGRAMS: Record<string, ReactNode> = {
   // 12.1 Kinematics of uniform circular motion
   'circ-mass-on-string': <MassOnString />,
@@ -1565,4 +1903,18 @@ export const CIRCULAR_GRAVITY_DIAGRAMS: Record<string, ReactNode> = {
   'grav-asteroid': <AsteroidInfall />,
   'grav-escape': <EscapeRock />,
   'grav-orbit-lower': <OrbitLower />,
+  'circ-ch-ball-table': <ChBallTable />,
+  'circ-ch-car-bend': <ChCarBend radius="r = 50 m" note="car, 1200 kg · maximum friction (dry) 7200 N" />,
+  'circ-ch-flat-bend-mu': <ChCarBend radius="r = 40 m" note="friction limit = 0.85 × weight" />,
+  'circ-ch-turntable': <ChTurntable />,
+  'circ-ch-vertical': <ChVertical />,
+  'circ-ch-conical': <ChConical />,
+  'circ-ch-vertical-energy': <ChVerticalEnergy />,
+  'grav-ch-planet': <ChPlanetX />,
+  'grav-ch-leo': <ChLeo label="h = 600 km" />,
+  'grav-ch-leo-h': <ChLeo label="altitude h = ?" />,
+  'grav-ch-geo': <ChGeo />,
+  'grav-ch-two-orbits': <ChTwoOrbits />,
+  'grav-ch-balance': <ChBalance />,
+  'grav-ch-moon-period': <ChMoonPeriod />,
 };

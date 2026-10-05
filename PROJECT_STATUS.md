@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -130,6 +130,12 @@ Last updated: 2026-10-01 (cross-multiplication shortcut in the Equation Rearrang
   `lib/courses` + `/courses` expect paid-course columns (slug, price_try)
   that the live table does not have — pre-existing, but if that feature is
   ever migrated, filter the curriculum courses out of it.
+
+### Circular Motion & Gravitation Challenge Set (NEW 2026-10-06)
+- From the owner's PDF (IGCSE 0625 ch. 16-17, Physics 10, with teacher answer key): the 10 challenge questions plus 5 harder extension questions per lesson (difficulty 3, 3, 4, 4, 5). Each question has ONE numeric answer (its key quantity); the other parts of a PDF question are worked in the explanation.
+- Both curriculum banks of the two shared lessons got the same 10: 3.7 / 12.2 Circular motion IGCSE 35 -> 45, A Level 45 -> 55; 24.3 / 13.2 Gravitation IGCSE 7 -> 17, A Level 22 -> 32. Numbers continue after the existing ones (circular 36-45 / 46-55, gravitation 8-17 / 23-32).
+- `database/seeds/2026-10-06-circular-gravitation-challenge.py` generates the `.sql` (edit the .py, never the .sql). Answers computed in code; g = 9.8, G = 6.67e-11, Earth 5.97e24 kg / 6.37e6 m (the PDF's constants). uuid5 ids, idempotent. APPLIED to live Supabase 2026-10-06 (compact equivalent insert using extensions.uuid_generate_v5; row digest matches the file's ids/text/answers).
+- 14 new figures `circ-ch-*` / `grav-ch-*` in `components/practice/CircularGravityDiagrams.tsx` (givens only, never an answer). Test: `lib/practice/__tests__/circularGravitationChallengeSeed.test.ts`.
 
 ### A Level circular motion & gravitation practice (NEW 2026-09-30)
 - 99 questions in the A Level (`curriculum_id='a-level'`) banks of the six
