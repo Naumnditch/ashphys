@@ -5,6 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 import { SoftPaywallModal } from '@/components/paywall/SoftPaywallModal';
+import { HelpCta } from '@/components/HelpCta';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 
@@ -19,6 +20,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const user = await getCurrentUser();
   const tier = user ? await getUserTier(user.id) : 0;
   const paywallEligible = tier < TIER_PLUS;
+  // Staff don't need the student help prompt.
+  const showHelpCta = !user || user.role === 'student';
 
   return (
     <html lang="en">
@@ -27,6 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Navbar />
         <main className="container-max py-8 min-h-[70vh]">{children}</main>
         <Footer />
+        {showHelpCta && <HelpCta hasVideoAccess={tier >= TIER_PLUS} />}
         <SoftPaywallModal eligible={paywallEligible} />
       </body>
     </html>
