@@ -11,9 +11,16 @@ export default async function VerifyPaymentPage({ searchParams }: { searchParams
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login?next=/subscribe/verify');
 
+  // Paid courses are optional here. The live `courses` table is shared with the
+  // curriculum courses and may not have the paid-course columns (slug, price_try,
+  // order), so a failure must not take down the receipt upload page.
+  const emptyCourses = { rows: [] as any[] };
   const [plansRes, coursesRes, bank] = await Promise.all([
     query(`SELECT id, name, price_monthly, price_yearly, tier_level FROM subscription_plans WHERE is_active AND tier_level > 0 ORDER BY tier_level`),
-    query(`SELECT id, title, slug, price_try FROM courses WHERE status = 'published' ORDER BY "order", created_at`),
+    query(`SELECT id, title, slug, price_try FROM courses WHERE status = 'published' AND slug IS NOT NULL AND price_try IS NOT NULL ORDER BY "order", created_at`).catch((err: unknown) => {
+      console.error('[subscribe/verify] paid courses unavailable, continuing without them:', err);
+      return emptyCourses;
+    }),
     getBankSettings(),
   ]);
   const preselectedCourse = searchParams.course
