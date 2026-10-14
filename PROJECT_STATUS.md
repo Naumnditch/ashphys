@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-14, later (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-14, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,108 @@ Last updated: 2026-10-14, later (student dashboard rebuilt as a two-column tabbe
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Admin video requests: stuck on "Loading…" (FIXED 2026-10-14)
+
+**⚠️ Production needs action now.** On 2026-10-14 ~21:50 UTC the branch
+`claude/pensive-turing-v6nkea` (e6e76c7) was promoted to production
+(`dpl_GuziAqfwtXeR7RwbtZsrB8dbdreB`), but migrations
+`database/seeds/2026-10-14-01..05-*.sql` were never applied to the live database
+(checked: 0 RLS policies, no `lesson_videos`, no `video_requests.question_number`,
+no role `ashphys_user`). Besides this page, Vercel runtime errors show the
+student side failing on `role "ashphys_user" does not exist`: dashboard progress
+and request list, `/api/video-requests` (students cannot submit or list requests),
+and lesson-page videos. Fix: apply migrations 01–05 in order (psql loop in the
+sections below), or roll production back to `main` until they are. (A
+`claude/friendly-allen-1mudd4` production deploy two minutes earlier was
+superseded by this one, so its curriculum redesign is not live either.)
+
+**Root cause** (case 2 of the brief: the query throws and the error is
+swallowed, so loading never ends):
+- `GET /api/admin/video-requests` selected `r.question_number` and a
+  `lesson_videos` subquery, both added by migration 01, which production doesn't
+  have. Postgres raised `42703 column r.question_number does not exist` (Vercel
+  runtime errors, 2 occurrences, 21:50–21:51 UTC). The route had no try/catch,
+  so Next answered with a non-JSON 500.
+- `VideoRequestManager`'s loader was `fetch` → `await res.json()` →
+  `setLoading(false)` with no try/catch/finally. `res.json()` threw on the HTML
+  body, the promise rejected unhandled, and `setLoading(false)` never ran, so
+  "Loading…" stayed forever with no error and no list.
+- Ruled out: the admin check (server-side in `app/admin/layout.tsx` and again in
+  the route, never a client flag that stays null); RLS recursion (production has
+  no policies at all; in the migrations the only policy helper,
+  `app_is_admin()`, is SECURITY DEFINER with `search_path = public`, reads only
+  `users`, which has no policies, so nothing calls back); 42501 (the admin read
+  runs as the table owner). There is no `profiles` or `video_solve_requests`
+  table in this project: the tables are `users` and `video_requests`.
+- The admin save (`PATCH`) would also have failed in production, since it runs
+  under the `ashphys_user` role that doesn't exist yet.
+
+What changed:
+- `components/admin/useAdminVideoRequests.ts` (new): `loadAdminVideoRequests()`
+  never throws: network errors, non-JSON bodies and JSON errors become
+  `{kind:'error', message}`, and 401/403 become `{kind:'unauthorized'}`.
+  `useAdminVideoRequests()` uses try/catch/finally with a cancelled flag (unmount
+  or a newer load), and `setLoading(false)` is in `finally`. The fetch
+  implementation is kept in a ref so a changing prop can't restart the load (the
+  first version of this hook looped forever on an inline `fetchImpl`; the tests
+  caught it).
+- `components/admin/VideoRequestManager.tsx`: explicit states. Loading
+  (`role=status`); error (`role=alert`, the server's message, "Try again"); "Not
+  authorized" (`role=alert`, no rows); "No requests yet."; and the list. Each row
+  shows the student's name, email and short ID (`#22222222`, full ID on hover).
+  Saving reloads the list, so the row updates.
+- `app/api/admin/video-requests/route.ts`: works on both schemas via
+  `lib/db/schemaFeatures.ts` (cached 60 s, so applying the migrations takes effect
+  without a redeploy). Explicit columns, `ORDER BY r.created_at DESC` (was "open
+  first"), `studentId` in each row, 401 for no user and 403 for non-admins.
+  Every failure is a JSON `{success:false, error}`, and a failing screenshot link
+  no longer fails the whole list. `PATCH` before the migrations updates
+  status/link/note as the owner (`youtube_id` too once that column exists), and
+  "add to a lesson" returns 409 with an explanation. After the migrations it uses
+  the same RLS transaction as before.
+
+Tests & checks:
+- `components/admin/__tests__/VideoRequestManager.test.tsx` (12, jsdom). The loader
+  maps JSON errors, a non-JSON 500 (the original hang), network failures, and
+  401/403. The hook ends loading on error, a missing user, success and a non-JSON
+  body. The component shows the alert instead of "Loading…", "Not authorized" with
+  no rows, "No requests yet.", and a row with the student name and ID.
+- `app/api/admin/video-requests/__tests__/route.test.ts` (10). Non-admin → 403
+  "Not authorized" with no rows and no query; missing user → 401. The
+  pre-migration SQL doesn't mention `question_number` or `lesson_videos`, isn't
+  `SELECT *`, and orders by `created_at DESC`; the migrated SQL does include the
+  new columns. A query failure returns a JSON error. On PATCH: pre-migration
+  save, `youtube_id` once available, 409 for lesson attach, non-admin, bad link.
+- Full suite: 1481 passed, 20 DB tests skipped without `TEST_DATABASE_URL` (20/20
+  pass with it), 1 failed (the same pre-existing live-DNS messaging test). `tsc`
+  clean, `next build` clean, ESLint clean on the changed files.
+- Local run, twice: against a copy of the **current production schema**
+  (`ashphys_prodlike`, built from the live DDL snapshot) and against the migrated
+  replica. As admin, the list loads with no error; I opened a student's request,
+  set it fulfilled, pasted `https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=…`, added
+  a note and saved. The PATCH returned 200, the row badge changed to fulfilled,
+  and after a reload it was still fulfilled with the link stored as
+  `https://youtu.be/dQw4w9WgXcQ` (plus `youtube_id` on the migrated DB). A student
+  calling the admin API gets 403 "Not authorized" and no rows.
+
+Decisions (admin video requests fix, 2026-10-14):
+- **No RLS change and no migration.** The cause was schema drift plus an
+  unguarded loader, not recursion or a denial. `is_admin()` from the brief was not
+  added: `app_is_admin()` already exists (migration 03) and is
+  non-recursive, and it reads `users.role` because there is no Supabase Auth
+  `app_metadata`.
+- **The admin API degrades instead of requiring the migrations.** The admin is
+  verified server-side, so the pre-migration fallback (owner query, original
+  columns) is safe. Student-facing row-level-security paths deliberately do not
+  fall back, because that would silently skip RLS. They need the migrations.
+- **Order is newest first only** (the old "open first" ordering was dropped, per
+  the brief); the status chips still filter.
+- **Migrations were not run against production by this session.** They
+  create a role and RLS policies on the live database, the documented MCP
+  `execute_sql` hang on any `;` makes the multi-statement files impractical to
+  send that way, and this sandbox has no `DATABASE_URL`. This is the manual step
+  above.
 
 ### Student dashboard: two-column tabs (NEW 2026-10-14, not yet deployed)
 
