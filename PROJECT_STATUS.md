@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-14 (curriculum page redesigned as Khan-style chapter cards with a two-column lesson grid — see "Curriculum view redesign" below and "Decisions"). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,60 @@ Last updated: 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 que
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Curriculum view redesign (NEW 2026-10-14, not yet deployed)
+- `/curriculum?c=` now looks like a Khan Academy course page. Presentation only: same
+  queries, same routes, no table or column dropped or renamed. Data loading
+  (`getLessonsByCurriculum` + `groupLessons`) and the curriculum selector are unchanged.
+- `components/curriculum/ChapterCard.tsx` (client): one card per chapter/unit — `<section>`
+  with an `<h2>` holding a `<button aria-expanded aria-controls>` ("Chapter n" label + title,
+  chevron), the AS/A Level/IB level badge on the right. Starts expanded; collapsed chapters
+  are remembered in localStorage `ashphys-curriculum-collapsed:<userId|guest>` (a JSON list of
+  `<curriculum>:<unit key>`, read after mount so SSR markup matches, all access try/catch'd).
+  IGCSE cards keep a "Chapter overview →" link to `/curriculum/[chapterId]` (the old title link).
+- "Chapter mastery: X%" + info tooltip (role=tooltip, opens on hover/focus) only when the
+  student has a `topic_mastery` row for a lesson in that chapter; hidden otherwise (never 0%).
+  X = mastered lessons ÷ lessons in the chapter with practice questions in this curriculum
+  (plus any already mastered through another bank). New query `getLessonProgress()` in
+  `lib/curricula/queries.ts` (read-only, `topic_mastery`); the page passes each card only its
+  own lessons' rows.
+- Lessons: two columns from 900px (`min-[900px]:grid-cols-2`), one column below. On mobile
+  the two column wrappers are `display: contents` and each piece carries CSS `order`, so the
+  single column reads in the original lesson order. Layout logic is pure and tested:
+  `lib/curricula/courseLayout.ts` (`lessonKind`, `lessonNumber`, `subTopicGroups`,
+  `balanceColumns`, `chapterMastery`).
+- `components/curriculum/LessonRow.tsx`: one line per lesson — type icon, number, title
+  (truncated), muted right meta ("20 questions", plus a check when mastered or a progress
+  ring for best run ÷ 5 otherwise). The whole row is ONE link to the same route as before,
+  `/lessons/<id>?c=<curriculum>` (`lessonHref`, moved here from the deleted `LessonCard.tsx`),
+  with a focus ring. The per-row "Practice", simulation and "Open lesson →" buttons are
+  gone; the lesson page already links to that curriculum's practice bank, the other banks
+  and the shared simulations. The row's description moved into the link's `title` tooltip
+  (`topics.description`, else the syllabus reference) and `topics.description` is now shown
+  on `/lessons/[topicId]` too (newly selected in `LESSON_COLUMNS`). Rows are 40px tall
+  from 900px and at least 44px below. Icons are `role="img"` with aria-labels
+  (`components/curriculum/LessonIcons.tsx`).
+- Locked lessons (tier < `required_tier`, admins never locked) keep the same rule and the
+  same link; the right-hand meta is replaced by a lock icon labelled "Locked: requires Plus".
+  `tierName`/tier constants moved to DB-free `lib/subscriptions/tierNames.ts` (re-exported
+  from `getUserTier.ts`, so every existing import still works) because the row now renders
+  inside a client component.
+- No search/filter existed on the curriculum page (only the navbar site search, untouched),
+  so there was nothing to carry across the columns.
+- Tests: `lib/curricula/__tests__/courseLayout.test.tsx` (14): column balance property test
+  (500 random chapters: column row counts differ by at most one unsplit group, nothing lost or
+  reordered, only groups larger than half a chapter are split), sub-topic grouping, type and
+  number mapping, mastery hidden without data, the row links to `/lessons/<id>?c=as` and is
+  the only link, locked rows keep the link, and a Tailwind compile of the rendered card proving
+  one flex column below 900px and a two-column grid from `@media (min-width: 900px)`.
+- Verified 2026-10-14 against a local Postgres replica of the live AS chapters 1–3 + Maths
+  (exported read-only; one lesson locked and two practice records added locally only):
+  Chapter 1 Kinematics at 1280px = two columns of 4 rows, 40px rows; at 390px = one column,
+  44px rows, original order. Before/after HTML of the old and new page for the same student:
+  all 36 lessons keep the identical lesson link and lock state. Collapse survives a reload.
+  `next build`, `tsc --noEmit` clean; the repo-wide eslint count (32 pre-existing, none in
+  these files) is unchanged. NOTICED, not touched: the site navbar is ~411px wide at a
+  390px viewport (horizontal scroll on every page, e.g. /about), pre-existing.
 
 ### Dark mode (NEW 2026-10-14, not yet deployed)
 - Theme = light / dark / system. `data-theme` on `<html>` (set before first paint by the
@@ -738,6 +792,42 @@ Last updated: 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 que
   wiring yet): `subscription_plans` table seeded with Free / Plus (99 TRY/mo,
   999/yr) / Pro (179 TRY/mo, 1799/yr) — see that table for exact features.
   All hypothetical, easy to change before real money is involved.
+
+## Decisions
+
+Judgement calls that shape later work. Newest first.
+
+- **2026-10-14 — Curriculum view: lesson type is derived, not stored.** Lessons are
+  `topics` rows, which have no type column; the `lessons` table (the one with
+  `lesson_type`) is still empty. Row icon mapping: has a simulation → flask ("Simulation");
+  else has practice questions in this curriculum → pencil ("Practice set"); else → document
+  ("Reading"). Video → play icon ("Video lesson") is implemented but no lesson produces it:
+  **no video data exists on topics, so no current lesson maps to "video"**. Activity has no
+  data either and would use the document icon. Any future/unknown kind falls back to the
+  neutral document icon. A lesson with both a simulation and questions shows the flask and
+  still shows "{n} questions".
+- **2026-10-14 — Sub-topic headings** come from syllabus sections that two or more of a
+  chapter's lessons share (IB A.2 has 8, 9702 3.7 has 3). Lessons alone in their section
+  form one unnamed group (their section title is usually their own title), placed where its
+  first lesson was. A chapter that is all one section gets no headings. IGCSE gets no
+  sub-topic headings: its chapters are coursebook chapters whose lessons cite syllabus
+  sections out of order, so grouping would reorder the book. Effect today: 9702 Chapters
+  1–2 show no headings (every lesson its own section).
+- **2026-10-14 — Column balancing** counts lesson rows only (headings not counted). Groups go
+  in original order to the column with fewer rows (left on a tie). A group bigger than half
+  the chapter is split: its head fills the shorter column to half, the rest continues at the
+  top of the other column under the same heading marked "(continued)" (an unnamed group just
+  continues, with no heading). 9702 Chapter 1 (8 lessons, one unnamed group) therefore splits 4/4.
+- **2026-10-14 — Chapter mastery** = mastered lessons ÷ lessons that can be mastered in this
+  chapter (practice questions in this curriculum, or already mastered via another bank);
+  the 5-in-a-row rule is unchanged. Row ring = best run ÷ 5. Shown only to logged-in
+  students with at least one practice record in that chapter.
+- **2026-10-14 — Lesson number** = the curriculum's topic code (AS/A Level/IB); for IGCSE the
+  coursebook number is split off the title ("2.2 Distance-time graphs" → 2.2). Skills lessons
+  ("Maths", IB "Tool 3") show no number.
+- **2026-10-14 — Breakpoint 900px** via Tailwind's `min-[900px]:` variant rather than a new
+  named screen in `tailwind.config.ts`, so no other page's breakpoints move. The page
+  container widened from `max-w-4xl` to `max-w-5xl` to give the two columns room.
 
 ## Explicitly NOT built yet
 

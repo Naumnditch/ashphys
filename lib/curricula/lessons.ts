@@ -27,6 +27,8 @@ export interface LessonRow extends CurriculumTopicFields {
   order: number | null;
   required_tier: number;
   syllabus_reference: string | null;
+  /** `topics.description`; most lessons have none. */
+  description?: string | null;
   chapter_id: string;
   chapter_number: number;
   chapter_title: string;
@@ -43,6 +45,7 @@ export interface CurriculumLesson {
   /** The syllabus section the code points at, e.g. "Equations of motion". */
   sectionTitle: string | null;
   syllabusReference: string | null;
+  description: string | null;
   requiredTier: number;
   chapterId: string;
   chapterNumber: number;
@@ -73,6 +76,7 @@ export function toCurriculumLesson(row: LessonRow, curriculumId: CurriculumId): 
     topicCode,
     sectionTitle: found?.section.title ?? null,
     syllabusReference: row.syllabus_reference,
+    description: row.description ?? null,
     requiredTier: row.required_tier ?? 0,
     chapterId: row.chapter_id,
     chapterNumber: row.chapter_number,

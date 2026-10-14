@@ -1,11 +1,12 @@
-import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { CURRICULA, type CurriculumId } from '@/lib/curricula';
-import { getLessonsByCurriculum, resolveCurriculum } from '@/lib/curricula/queries';
+import { getLessonProgress, getLessonsByCurriculum, resolveCurriculum } from '@/lib/curricula/queries';
 import { groupLessons, summarize, type LessonGroup } from '@/lib/curricula/lessons';
 import { CurriculumSelector } from '@/components/curriculum/CurriculumSelector';
-import { LessonCard } from '@/components/curriculum/LessonCard';
+import { ChapterCard } from '@/components/curriculum/ChapterCard';
+import type { LessonProgress } from '@/lib/curricula/courseLayout';
+import { MASTERY_STREAK } from '@/lib/practice/attempts';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,12 +19,28 @@ async function loadGroups(curriculumId: CurriculumId): Promise<{ groups: LessonG
   }
 }
 
+/** The viewer's practice records on these lessons, or undefined when logged out or on failure (the page then hides mastery). */
+async function loadProgress(userId: string | undefined, groups: LessonGroup[]): Promise<Record<string, LessonProgress> | undefined> {
+  if (!userId) return undefined;
+  try {
+    return await getLessonProgress(userId, groups.flatMap((g) => g.lessons.map((l) => l.id)), MASTERY_STREAK);
+  } catch (err) {
+    console.error('Failed to load lesson progress:', err);
+    return undefined;
+  }
+}
+
 const INTROS: Record<CurriculumId, string> = {
   igcse: 'Every chapter of the Cambridge IGCSE Physics coursebook, tagged with its 0625 syllabus section.',
   as: 'The Cambridge International AS Level (9702), following the coursebook: chapters 1–15 plus the P1 practical skills. Lessons that share an IGCSE simulation are listed under the chapter they support.',
   'a-level': 'The full Cambridge International A Level (9702), following the coursebook: all of AS plus chapters 16–31 and the P2 practical skills.',
   ib: 'IB Diploma Physics (SL & HL, first assessment 2025), by theme and subtopic. HL-only subtopics are marked (HL).',
 };
+
+/** Just this chapter's records, so each client card gets only what it shows. */
+function progressFor(group: LessonGroup, progress: Record<string, LessonProgress>): Record<string, LessonProgress> {
+  return Object.fromEntries(group.lessons.filter((l) => progress[l.id]).map((l) => [l.id, progress[l.id]]));
+}
 
 export default async function CurriculumPage({ searchParams }: { searchParams: { c?: string } }) {
   const user = await getCurrentUser();
@@ -34,10 +51,11 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
   const curriculum = CURRICULA[curriculumId];
   const { groups, failed } = await loadGroups(curriculumId);
   const summary = summarize(groups);
+  const progress = await loadProgress(user?.id, groups);
   const effectiveTier = user?.role === 'admin' ? Number.MAX_SAFE_INTEGER : tier;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">Physics Curriculum</h1>
         <p className="text-gray-600">
@@ -74,34 +92,17 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
         </div>
       )}
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {groups.map((group) => (
-          <section
+          <ChapterCard
             key={group.key}
-            id={`unit-${group.key}`}
-            className="border border-gray-200 rounded-lg overflow-hidden bg-white scroll-mt-24"
-          >
-            <header className="px-5 py-3 bg-gray-50 border-b border-gray-200 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span className="text-sm text-gray-400 font-medium">{group.label}</span>
-              {group.chapterId ? (
-                <Link href={`/curriculum/${group.chapterId}?c=${curriculumId}`} className="font-semibold text-gray-900 hover:underline">
-                  {group.title}
-                </Link>
-              ) : (
-                <span className="font-semibold text-gray-900">{group.title}</span>
-              )}
-              {group.level && (
-                <span className="ml-auto text-[10px] font-bold uppercase tracking-wide text-h-5a67d8 bg-h-eef0fd px-2 py-0.5 rounded-full">
-                  {group.level}
-                </span>
-              )}
-            </header>
-            <ul className="divide-y divide-gray-100">
-              {group.lessons.map((lesson) => (
-                <LessonCard key={lesson.id} lesson={lesson} selectedCurriculum={curriculumId} tier={effectiveTier} />
-              ))}
-            </ul>
-          </section>
+            group={group}
+            curriculumId={curriculumId}
+            tier={effectiveTier}
+            progress={progress && progressFor(group, progress)}
+            masteryStreak={MASTERY_STREAK}
+            viewerId={user?.id}
+          />
         ))}
       </div>
     </div>
