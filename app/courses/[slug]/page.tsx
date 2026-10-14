@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCourseBySlug, getModules, isEnrolled } from '@/lib/courses';
 import { getCurrentUser } from '@/lib/auth/session';
+import { parseYouTubeId } from '@/lib/youtube/videoId';
+import { YouTubeEmbed } from '@/components/video/YouTubeEmbed';
 import { getUsdRate, tryToUsd, getBankSettings, paymentReference } from '@/lib/settings';
 
 export const dynamic = 'force-dynamic';
@@ -127,9 +129,18 @@ export default async function CourseDetailPage({ params }: { params: { slug: str
                         )}
                       </div>
                       {m.description && <p className="text-[12.5px] text-h-4a5a72 leading-snug mt-1">{m.description}</p>}
+                      {open && m.video_url && (() => {
+                        // YouTube lessons play on-site, no link out.
+                        const parsed = parseYouTubeId(m.video_url);
+                        return parsed.ok ? (
+                          <div className="mt-3 max-w-xl">
+                            <YouTubeEmbed youtubeId={parsed.id} title={m.title} />
+                          </div>
+                        ) : null;
+                      })()}
                       {open && (
                         <div className="flex gap-3 mt-2">
-                          {m.video_url && (
+                          {m.video_url && !parseYouTubeId(m.video_url).ok && (
                             <a href={m.video_url} target="_blank" rel="noopener noreferrer"
                               className="text-[12.5px] font-semibold text-h-2e7d6b underline">▶ Watch lesson</a>
                           )}

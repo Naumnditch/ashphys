@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,183 @@ Last updated: 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 que
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Lesson videos, student dashboard & hero request CTA (NEW 2026-10-14, not yet deployed)
+
+**Migrations are written but NOT applied to the live Supabase project.** Apply them
+(in order) before deploying this code — see "How to apply" below. Without them,
+lesson pages just show no videos and the dashboard shows a "couldn't load" note, but
+submitting a video request (which now runs under row-level security) fails, so the
+migrations are a hard prerequisite for the deploy.
+
+What shipped:
+- **Lesson videos.** Table `lesson_videos` (id, lesson_id → `topics`, youtube_id
+  CHECK `^[A-Za-z0-9_-]{11}$`, title, description, sort_order, is_published,
+  source_request_id → `video_requests`, created_at, updated_at; unique
+  (lesson_id, youtube_id)). `lib/youtube/videoId.ts` → `parseYouTubeId()` /
+  `extractYouTubeId()` accept youtu.be, watch?v=, embed/ (incl. youtube-nocookie),
+  shorts/, live/, /v/, m./music./www., with or without https and `si=`/`t=`/`list=`
+  params; everything else (other hosts, look-alikes, channels, playlists, bare ids,
+  wrong-length ids) is rejected with a readable error. `components/video/YouTubeEmbed.tsx`:
+  `https://www.youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&playsinline=1`,
+  16:9 (`aspect-video`), `loading="lazy"`, small "Open on YouTube" fallback link.
+  `/lessons/[topicId]` has a **Video lessons** section (published, sort_order);
+  Free tier/visitors see titles + a lock and upgrade link — the ids are never
+  rendered for them. Admin: `/admin/lesson-videos` (sidebar → Content): paste link
+  (validated live, embed preview before saving), lesson picker grouped by chapter,
+  title, description, order, published; list with rename/reorder/publish/remove.
+  API `app/api/admin/lesson-videos/route.ts`.
+- **Fulfilled requests → lessons.** `/admin/video-requests` editor validates the
+  link with the same parser (stored normalised as `https://youtu.be/{id}`), shows a
+  preview, and offers an optional "Also add this video to a lesson" picker (empty by
+  default; a one-click "Use the requested lesson" helper) plus "Publish on the lesson
+  page now" (off by default → draft). Creates or links the `lesson_videos` row
+  (`upsertLessonVideo(..., 'link')`): an existing row for the same lesson+video keeps
+  its title/order and only gains `source_request_id`.
+- **Student dashboard** `/dashboard` (server component now; login required by
+  middleware + page): progress overview (questions attempted, accuracy, lessons
+  visited, study days), current/longest streak, strengths & weaknesses (each weakness
+  links to its weakest lesson and to `/video-requests?lesson=<id>` prefilled), chapter
+  breakdown with per-lesson table (`<details>`), My video requests (newest first,
+  fulfilled ones play inline with the teacher's note), shortcuts. New students get a
+  "Start with a lesson" card instead of zeros. Success banner on `?request=sent`.
+  The stale placeholder tiles ("0 / 25", "Course Coming Soon … August 24, 2026") were removed.
+- **Data/aggregation in SQL**: `get_student_progress(student_id)` and
+  `get_student_streaks(student_id, now, tz)` return plain jsonb; `student_study_days()`
+  is the shared day set. `activity_events` (student_id, type lesson_view|video_view,
+  lesson_id, created_at) is fed by `POST /api/activity` (cookie-derived student,
+  30-min de-dupe per student/type/lesson): lesson page mount, and the first click
+  into an embed (window-blur trick, since iframe clicks are invisible).
+- **Hero CTA** (`components/home/VideoRequestCta.tsx`): "Stuck on a question? Tell
+  us, and we'll record the walkthrough." + subline + button. Opens a dialog
+  (portalled to `<body>`): visitors → log in / sign up; Free → Plus/Pro upgrade
+  prompt; Plus/Pro → form (lesson picker grouped by chapter, loaded from
+  `GET /api/video-requests/lessons` only when opened; question number OR screenshot
+  via the existing signed-upload flow; description ≤ 500 chars) → POST
+  `/api/video-requests` → redirect `/dashboard?request=sent`. On phones the CTA sits
+  directly under the headline (flex `order`), from `sm` up after the main buttons.
+  Verified above the fold at 375×667, 360×740, 390×844.
+- **No YouTube links for students** except the fallback: `GET /api/video-requests`
+  now returns `youtubeId` (fulfilled only), never the URL; `/video-requests` and the
+  dashboard share `components/video-requests/VideoRequestList.tsx` (embeds). Past
+  paper "Video Solution" and course-module videos now play inline when the URL is
+  YouTube (non-YouTube URLs keep their link). Admin pages still show raw links.
+- **Real row-level security** (`lib/db/rls.ts` → `withRlsContext(user, fn)`): see Decisions.
+
+Files: migrations `database/seeds/2026-10-14-0{1..4}-*.sql`; `lib/youtube/`,
+`lib/db/rls.ts`, `lib/videos/`, `lib/videoRequests/student.ts`, `lib/activity/`,
+`lib/dashboard/data.ts`; `components/video/`, `components/home/VideoRequestCta.tsx`,
+`components/admin/LessonVideoManager.tsx`, `components/analytics/ActivityTracker.tsx`,
+`components/video-requests/VideoRequestList.tsx`; `app/admin/lesson-videos/`,
+`app/api/activity/`, `app/api/admin/lesson-videos/`, `app/api/video-requests/lessons/`;
+edited: lesson page, dashboard, homepage, `/video-requests` (+ `?lesson=` prefill and
+a question-number field), admin video requests (API + manager), AdminSidebar,
+PastPaperCard, `courses/[slug]`.
+
+How to apply the migrations (in order; each is idempotent):
+```
+for f in database/seeds/2026-10-14-0{1,2,3,4}-*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
+```
+(or paste each file into the Supabase SQL editor / `apply_migration`, in order). Run
+as the same role the app connects as (`postgres`): migration 03 creates the NOLOGIN
+role `ashphys_user` and grants the connecting role `SET` on it. Note the "bare `;`
+hangs the MCP tool" gotcha above — these files contain semicolons, so prefer psql or
+the SQL editor over `execute_sql`. Then deploy.
+
+Tests & verification (2026-10-14):
+- `lib/youtube/__tests__/videoId.test.ts` — 61 tests (all formats, invalid input, URL builders).
+- `lib/dashboard/__tests__/dashboardDb.test.ts` — 17 DB tests, skipped unless
+  `TEST_DATABASE_URL` points at a throwaway Postgres 15+ (`npm run test:db`; loads
+  `database/tests/base-schema.sql` — a trimmed snapshot of the live tables — if the
+  DB is empty, then the migrations): Istanbul-midnight streak boundary (23:30 vs
+  00:30, alive at 23:59 "yesterday", dead at 00:01), current vs longest, the 5-attempt
+  threshold (5 counts, 4 doesn't, <2 qualifying → no labels, never both labels,
+  weakest lesson), and RLS isolation (each student sees only own rows in
+  practice_attempts / question_attempts / activity_events / video_requests; cannot
+  aggregate, insert for, or fulfil others; `users` unreadable; admins see all and
+  write lesson_videos; students/visitors see published videos only and cannot write).
+  Ran green against a local PG16 replica built from the live schema DDL (non-superuser
+  `postgres` owner, like Supabase).
+- Full suite: 1435 passed, 17 DB tests skipped, 1 failed — the pre-existing live-DNS
+  messaging test (`student@gmail.com` MX lookup), which fails in this sandbox without
+  any change. `tsc --noEmit` clean. `next build` clean (font-stub workaround, restored).
+- ESLint: the repo has no ESLint config, and adding `next/core-web-vitals` makes
+  `next build` fail on many pre-existing `react/no-unescaped-entities` errors in the
+  simulations, so no config was committed. All 31 new/changed TS files lint clean
+  (zero warnings) with `next/core-web-vitals` applied ad hoc.
+- Local walkthrough (Next dev + Playwright against the replica, all passed): admin
+  rejects a Vimeo link, previews and attaches a video to 3.7 Circular motion; Plus
+  student sees the nocookie lazy embed and only the fallback link; Free student sees
+  the lock and the video id is absent from the HTML; Free hero CTA → upgrade prompt;
+  Plus hero CTA → form validation → `/dashboard?request=sent`; admin fulfils with a
+  link + note and links it to the lesson as a draft (not shown on the lesson page);
+  dashboard plays it inline with the note. (YouTube itself is unreachable from the
+  sandbox, so the players render black there.)
+
+Decisions (2026-10-14):
+- **"Lesson" = `topics` row**, so `lesson_videos.lesson_id` → `topics(id)` (the
+  `lessons` table is still empty, unused schema).
+- **No new `question_attempts` table.** `practice_attempts` already records every
+  answer (append-only, source of truth since 2026-09-22). A `question_attempts`
+  *view* (`security_invoker`) exposes it in the requested shape (question_id,
+  lesson_id, attempted_at…). Chapter grouping uses the lesson's chapter, falling back
+  to the attempt's.
+- **`activity_events` instead of reusing `analytics_events`**: the latter has
+  anonymous rows, fires lesson_view for every topic *listed* on a chapter page, and is
+  due a 12-month prune.
+- **RLS that actually applies.** The app connects as the owner (bypasses RLS) with its
+  own JWT (no `auth.uid()`), so policies are written for a NOLOGIN role
+  `ashphys_user` and `current_setting('app.user_id')`; `withRlsContext` does
+  `BEGIN; SET LOCAL ROLE ashphys_user; set_config('app.user_id', …, true)` per
+  request. Admin = `users.role` looked up by a SECURITY DEFINER `app_is_admin()`, never
+  a client value. Policies are scoped `TO ashphys_user`, so Supabase's anon /
+  authenticated roles still see nothing. Read-only policies were added on topics,
+  chapters, courses (for joins) and student-own policies on the existing
+  practice_attempts and video_requests (plus admin UPDATE on video_requests). Owner
+  queries elsewhere are unchanged. The RPCs also refuse (42501) to aggregate anyone
+  but the caller unless admin.
+- **Video tier gate = the solve-request gate**: Plus/Pro (`getUserTier() >= TIER_PLUS`)
+  watch; Free and visitors get the lock; admins always see videos. Fulfilled request
+  videos on the dashboard are shown to whoever made the request (they were Plus when
+  they asked).
+- **Strengths/weaknesses**: chapters need ≥ 5 attempts; nothing is labelled until 2
+  chapters qualify; strengths = top min(2, ceil(n/2)), weaknesses = bottom
+  min(2, n − strengths) — exactly top 2 / bottom 2 from n ≥ 4, never both labels on one
+  chapter. Ties: accuracy, then more attempts, then chapter number. A weakness links to
+  its lowest-accuracy lesson.
+- **Streak**: a day counts if it has an attempt, lesson view or video view, in
+  Europe/Istanbul local date; alive if the last such day is today or yesterday.
+  "Lessons visited" = distinct lessons viewed or practised. "Study days" = distinct
+  such days.
+- **Request form**: the homepage form requires a lesson and a question number or a
+  screenshot (`requireQuestion`); the older `/video-requests` form stays optional-field.
+  New nullable column `video_requests.question_number`. Screenshot paths must sit
+  under the student's own folder.
+- **Fulfilment never auto-publishes**: attaching to a lesson is opt-in per save and
+  defaults to a draft.
+- **Migrations live in `database/seeds/` with a date prefix**, like every earlier
+  schema change (there is no separate migrations folder); numbered 01–04 for order.
+- **Not applied to production by this session**: they need to ship together with the
+  code; applying is listed as a manual step.
+- **Hero**: on phones the h1 is `text-3xl` (was 4xl) and the top padding `pt-8` (was
+  16) so the CTA fits above the fold; desktop unchanged apart from the CTA card.
+- **ashphyss (stale mirror) not touched** — per "Live site", Vercel builds `ashphys`.
+
+Unfinished / follow-ups:
+- Apply the four migrations, then deploy (manual).
+- Tiers for existing students are unchanged: video lessons and requests need an active
+  Plus/Pro `subscriptions` row (grant via `/admin/access`). Students without one see
+  the locks.
+- No lesson videos exist yet — attach them at `/admin/lesson-videos`.
+- Streak history starts now: lesson/video views before 2026-10-14 were not logged in
+  `activity_events` (practice attempts do count retroactively). Old `analytics_events`
+  lesson_view rows were deliberately not backfilled (see the coarse-event note above).
+- `video_view` is recorded on the first click into the player, not on actual playback
+  (no YouTube IFrame API).
+- Pre-existing, noticed while testing, not fixed: at 375px the homepage/dashboard
+  document is ~411px wide (navbar "Sign Up" button clipped) — same on the untouched
+  homepage; and after logging in, the navbar can still show "Sign In / Sign Up" until a
+  full reload (login uses `router.push` without `router.refresh()`).
 
 ### Dark mode (NEW 2026-10-14, not yet deployed)
 - Theme = light / dark / system. `data-theme` on `<html>` (set before first paint by the

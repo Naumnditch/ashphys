@@ -5,6 +5,9 @@
  * Server-side tier enforcement (Part 1): this is the actual gate, not the
  * /video-requests page's UI — a Plus/Pro-only feature must reject a free
  * user's request even if they reach this endpoint directly.
+ *
+ * Reads and writes run under row-level security (lib/videoRequests), and
+ * students only ever receive a fulfilled video's id, never its link.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,42 +15,21 @@ import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 import { getMaxOpenVideoRequests } from '@/lib/settings';
 import { query } from '@/lib/db/client';
-import { signedFileUrl } from '@/lib/storage/signed';
+import { createVideoRequest, getMyVideoRequests } from '@/lib/videoRequests/student';
 
 const OPEN_STATUSES = ['open', 'in_progress'];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_DESCRIPTION = 2000;
+const MAX_QUESTION_NUMBER = 40;
+
+const optionalUuid = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
 
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ success: false, error: 'Not authorized' }, { status: 401 });
   }
-
-  const result = await query(
-    `SELECT r.id, r.description, r.screenshot_path, r.status, r.youtube_url, r.admin_note, r.created_at,
-            t.topic_name, c.chapter_number, c.title AS chapter_title
-     FROM video_requests r
-     LEFT JOIN topics t ON t.id = r.topic_id
-     LEFT JOIN chapters c ON c.id = r.chapter_id
-     WHERE r.student_id = $1
-     ORDER BY r.created_at DESC`,
-    [user.id]
-  );
-
-  const requests = await Promise.all(
-    result.rows.map(async (r) => ({
-      id: r.id,
-      description: r.description,
-      status: r.status,
-      youtubeUrl: r.youtube_url,
-      adminNote: r.admin_note,
-      createdAt: r.created_at,
-      topicName: r.topic_name,
-      chapterNumber: r.chapter_number,
-      chapterTitle: r.chapter_title,
-      screenshotUrl: r.screenshot_path ? await signedFileUrl('video-request-screenshots', r.screenshot_path) : null,
-    }))
-  );
-
+  const requests = await getMyVideoRequests(user);
   return NextResponse.json({ success: true, requests });
 }
 
@@ -62,14 +44,39 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Video solve requests are available on Plus and Pro plans.' }, { status: 403 });
   }
 
-  const { description, topicId, chapterId, screenshotPath } = (await req.json()) as {
-    description?: string;
-    topicId?: string;
-    chapterId?: string;
-    screenshotPath?: string;
+  const body = (await req.json().catch(() => ({}))) as {
+    description?: unknown;
+    topicId?: unknown;
+    lessonId?: unknown;
+    chapterId?: unknown;
+    questionNumber?: unknown;
+    screenshotPath?: unknown;
+    requireQuestion?: unknown;
   };
-  if (!description || !description.trim()) {
+  const description = typeof body.description === 'string' ? body.description.trim() : '';
+  if (!description) {
     return NextResponse.json({ success: false, error: 'A description of the problem is required' }, { status: 400 });
+  }
+  if (description.length > MAX_DESCRIPTION) {
+    return NextResponse.json({ success: false, error: `Keep the description under ${MAX_DESCRIPTION} characters` }, { status: 400 });
+  }
+  const questionNumber = typeof body.questionNumber === 'string' && body.questionNumber.trim() ? body.questionNumber.trim() : null;
+  if (questionNumber && questionNumber.length > MAX_QUESTION_NUMBER) {
+    return NextResponse.json({ success: false, error: 'The question number is too long' }, { status: 400 });
+  }
+  // Screenshots are uploaded under the student's own folder (see ./upload);
+  // refuse a path pointing anywhere else.
+  const screenshotPath = typeof body.screenshotPath === 'string' && body.screenshotPath ? body.screenshotPath : null;
+  if (screenshotPath && !screenshotPath.startsWith(`${user.id}/`)) {
+    return NextResponse.json({ success: false, error: 'Invalid screenshot' }, { status: 400 });
+  }
+  const topicId = optionalUuid(body.lessonId) ?? optionalUuid(body.topicId);
+  // The homepage form asks for a lesson and for a question number or a screenshot.
+  if (body.requireQuestion === true) {
+    if (!topicId) return NextResponse.json({ success: false, error: 'Choose the lesson you are stuck on' }, { status: 400 });
+    if (!questionNumber && !screenshotPath) {
+      return NextResponse.json({ success: false, error: 'Add the question number or a screenshot of the question' }, { status: 400 });
+    }
   }
 
   const maxOpen = await getMaxOpenVideoRequests();
@@ -84,12 +91,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const inserted = await query(
-    `INSERT INTO video_requests (student_id, chapter_id, topic_id, description, screenshot_path)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [user.id, chapterId || null, topicId || null, description.trim(), screenshotPath || null]
-  );
+  const id = await createVideoRequest(user, {
+    description,
+    topicId,
+    chapterId: optionalUuid(body.chapterId),
+    questionNumber,
+    screenshotPath,
+  });
 
-  return NextResponse.json({ success: true, id: inserted.rows[0].id });
+  return NextResponse.json({ success: true, id });
 }

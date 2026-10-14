@@ -21,7 +21,7 @@ async function getChaptersAndTopics() {
   return { chapters: chapters.rows, topics: topics.rows };
 }
 
-export default async function VideoRequestsPage() {
+export default async function VideoRequestsPage({ searchParams }: { searchParams: { lesson?: string } }) {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login');
 
@@ -54,7 +54,7 @@ export default async function VideoRequestsPage() {
         Stuck on a problem? Describe it (optionally attach a screenshot) and a teacher will record a short video
         walking through the solution.
       </p>
-      <VideoRequestForm chapters={chapters} topics={topics} />
+      <VideoRequestForm chapters={chapters} topics={topics} initialTopicId={searchParams.lesson} />
     </div>
   );
 }
