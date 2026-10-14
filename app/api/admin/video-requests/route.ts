@@ -120,8 +120,8 @@ export async function PATCH(req: NextRequest) {
 
   const lessonVideo = await withRlsContext(admin, async (db) => {
     const updated = await db.query(
-      `UPDATE video_requests SET status = $2, youtube_url = $3, admin_note = $4, updated_at = now() WHERE id = $1`,
-      [id, status, youtubeUrl, adminNote?.trim() || null]
+      `UPDATE video_requests SET status = $2, youtube_url = $3, youtube_id = $5, admin_note = $4, updated_at = now() WHERE id = $1`,
+      [id, status, youtubeUrl, adminNote?.trim() || null, youtubeId]
     );
     if (updated.rowCount === 0) return undefined;
     if (!attachLessonId || !youtubeId) return null;

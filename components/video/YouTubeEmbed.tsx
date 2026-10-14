@@ -19,10 +19,13 @@ export function YouTubeEmbed({
   youtubeId,
   title = 'Video lesson',
   trackView,
+  autoplay = false,
 }: {
   youtubeId: string;
   title?: string;
   trackView?: { lessonId: string | null };
+  /** Start playing at once — only for players mounted by a click. Not lazy-loaded then. */
+  autoplay?: boolean;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const trackLessonId = trackView ? trackView.lessonId ?? '' : null;
@@ -52,9 +55,9 @@ export function YouTubeEmbed({
       <div className="relative w-full aspect-video overflow-hidden rounded-lg bg-black">
         <iframe
           ref={iframeRef}
-          src={youtubeEmbedUrl(youtubeId)}
+          src={youtubeEmbedUrl(youtubeId, { autoplay })}
           title={title}
-          loading="lazy"
+          loading={autoplay ? 'eager' : 'lazy'}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"

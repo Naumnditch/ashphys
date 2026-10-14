@@ -79,7 +79,7 @@ function RequestForm({ onDone }: { onDone: () => void }) {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error || 'Could not send your request');
       onDone();
-      router.push('/dashboard?request=sent');
+      router.push('/dashboard?tab=videos&request=sent');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Network error — please try again');
       setStatus('idle');

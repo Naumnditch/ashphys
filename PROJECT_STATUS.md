@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-14, later (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,150 @@ Last updated: 2026-10-14 (lesson videos, student dashboard, hero video-request C
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Student dashboard: two-column tabs (NEW 2026-10-14, not yet deployed)
+
+Replaces the single-column dashboard from the section below. **Needs migration
+`database/seeds/2026-10-14-05-video-request-ids-and-opens.sql`, applied after 01–04**
+(none of 01–05 are in production yet; checked 2026-10-14: 0 policies, no
+`lesson_videos`). Same psql loop as below, now `0{1,2,3,4,5}`.
+
+What changed:
+- **Layout** (`app/dashboard/page.tsx` → `components/dashboard/DashboardTabs.tsx`):
+  the page header (welcome, progress chips, My Devices / Log out) above a
+  two-column card filling the viewport (`h-[calc(100dvh-9.5rem)]`, min 34rem).
+  Left: a 280px vertical tab list. Right: the panel, scrolling on its own. Below
+  `lg` the list becomes one horizontal scrolling tab bar (the selected tab is
+  scrolled into view) and the panel fills the rest. Tab buttons are ≥ 44px; works
+  at 360px (checked).
+- **Tabs, in order**: Messages ✉️, Browse the Curriculum 📖, Join a Class 🏫,
+  Video Solve Requests 🎥, 1-on-1 Tutoring 🧑‍🏫, each with icon, title,
+  description, active state. Badges: unread messages (existing `useUnreadCount`),
+  ready videos (fulfilled, with a video, not opened). Each panel mounts the
+  existing feature component: `StudentInbox`; `LessonCard` (via
+  `CurriculumTab`); `JoinClassForm`; `VideoRequestForm`; the tutoring booking
+  flow (`TutoringPanel` → `TutoringBooking`). Only the active panel is mounted.
+- **Routing/state** (`lib/dashboard/tabs.ts`, pure): `?tab=messages|curriculum|
+  classes|videos|tutoring`. A valid param wins; an invalid one falls back to the
+  default; no param → last tab from localStorage (`ashphys:dashboard-tab`); else
+  `videos` if an unopened ready video exists, otherwise `messages`. Changing tabs
+  uses `history.replaceState` (no history entries; refresh keeps the tab).
+- **Old routes redirect** to the matching tab: `/dashboard/messages` (sent emails
+  link here; the `#m-<id>` fragment survives), `/dashboard/join-class`,
+  `/video-requests` (keeps `?lesson=`), `/tutoring`. In-app links (navbar mail
+  icon, help button, pricing teasers, unsubscribe pages, homepage CTA) now point at
+  `/dashboard?tab=…` directly.
+- **Video Solve Requests tab** (`VideosTab`, `VideoRequestsGrid`): the existing
+  request form (Free tier still gets the same upsell instead), then "Your requests"
+  newest first in a 1/2/3-column grid with All / Ready / In progress / Declined chips
+  (with counts). Cards: chapter + lesson, question (number + text), status badge,
+  date; declined cards show the admin note. Fulfilled cards show
+  `https://i.ytimg.com/vi/{id}/hqdefault.jpg` with a play icon, alt "Video for
+  <lesson>: <question>". Clicking swaps in the player (the form is hidden, not
+  unmounted; panel scrolls to top; focus on "← Back to requests"); the iframe is
+  created only then, `…youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&playsinline=1&autoplay=1`,
+  with the "Open on YouTube" fallback under it and the teacher's note.
+- **`useMyVideoRequests`** (`components/video-requests/useMyVideoRequests.ts`,
+  new — it did not exist before): GET `/api/video-requests`; a 401 inside the
+  loader → `signed-out`; loads on mount, again on window focus / tab visible;
+  `reload()` (called after a successful submit); server-rendered initial data.
+  Lives in the tab shell so the badge and the tab share it.
+- **Opened tracking**: table `video_request_opens (student_id, request_id,
+  youtube_id, opened_at)`, PK (student, request); `POST /api/video-requests/:id/opened`
+  on play. It remembers which video was opened, so if an admin swaps the video
+  the request counts as ready again.
+- **YouTube id on admin save**: new column `video_requests.youtube_id` (CHECK 11
+  chars), written by `PATCH /api/admin/video-requests` from the existing parser;
+  migration 05 backfills it from `youtube_url` (the 3 live rows are youtu.be
+  links). `youtube_url` is kept.
+- **Curriculum tab** (`CurriculumTab`): the student's curriculum (account →
+  cookie → IGCSE, with a switcher that saves the preference like /curriculum does),
+  chapters/units as a list with the student's accuracy; choosing one lists its
+  lessons (existing `LessonCard`) in the panel with "← All chapters". Strengths /
+  "Needs work" (revise + request-a-video links) and the "Start with a lesson" note
+  sit at the top.
+- **Tutoring tab** (`TutoringPanel`, moved from `/tutoring` unchanged plus "Your
+  bookings", `GET /api/tutoring/bookings`, refreshed on focus). "Book & Pay" opens
+  Shopier's payment page in a **new tab** (opened on the click so popup blockers
+  allow it; falls back to the same tab if blocked), so the dashboard stays open and
+  the booking shows up when the student comes back.
+
+Tests & checks (2026-10-14):
+- `lib/dashboard/__tests__/tabs.test.ts` (11): order, valid param, invalid → default
+  (not storage), storage when no param, corrupt storage, ready-video default.
+- `components/dashboard/__tests__/DashboardTabs.test.tsx` (8, jsdom): URL param →
+  active tab + URL/storage, invalid → default, storage, replaceState (no new history
+  entry), tablist/tab/tabpanel ARIA + arrow/Home/End keys, unread badge, ready badge
+  rising after a focus refetch.
+- `components/dashboard/__tests__/VideoRequestsGrid.test.tsx` (5, jsdom): fulfilled →
+  thumbnail with alt and no iframe; click → autoplay nocookie iframe, fallback link
+  only, back; nothing YouTube for unfulfilled; filters + decline note; card fields.
+- DB tests (+3, now 20, `npm run test:db`): another student's requests are invisible
+  even when asked for by id; a student can mark only their own video opened; id
+  CHECK + backfill.
+- New dev deps: `jsdom@25.0.1`, `@testing-library/react@16.1.0`,
+  `@testing-library/dom@10.4.0` (component tests opt in with `// @vitest-environment jsdom`).
+- Full suite: 1459 passed, 20 DB tests skipped without `TEST_DATABASE_URL`, 1 failed
+  = the same pre-existing live-DNS messaging test. `tsc` clean, `next build` clean
+  (font stub, restored), ESLint (`next/core-web-vitals`, ad hoc) clean on all 39
+  changed files.
+- Local walkthrough (Playwright, 37 checks, all pass): default tab = Videos with a
+  ready video; every tab by click, ArrowUp/Home; chapter → lessons → back; refresh,
+  storage and invalid-param fallbacks; the four old routes redirect; submit from
+  the tab appears under In progress; **admin fulfils it while the student's page
+  stays open; on focus the badge goes 1 → 2 and the new thumbnail is under Ready**;
+  click → iframe with autoplay, only the fallback link, teacher note; badge back to
+  1 and still 1 after reload; Book & Pay opens a new tab and the dashboard stays;
+  360px: 44px tabs in one scrolling row, panel inside the width.
+
+Decisions (dashboard tabs, 2026-10-14):
+- **Table/hook names in the brief vs this codebase**: there is no
+  `video_solve_requests` table (it is `video_requests`) and there was no
+  `useMyVideoRequests` hook (created). The brief's "select policy restricts reads to
+  `student_id = auth.uid()`" cannot hold here: there is no Supabase Auth, so
+  `auth.uid()` is always null. The equivalent, confirmed, is migration 03's
+  `video_requests_read`: `USING (student_id = app_current_user_id() OR app_is_admin())`
+  for the `ashphys_user` role, and every student read of requests goes through
+  `withRlsContext`. **No existing RLS policy was changed**; migration 05 only adds
+  policies on the new `video_request_opens` table (own read/insert/update; admin read).
+- **"Opened" in a table, not localStorage**, so the badge is right on every device.
+- **"In progress" chip = open + in_progress** (both still waiting); "Ready" =
+  fulfilled with a video (opened or not; unopened ones carry a "New" tag).
+- **`/curriculum` is NOT redirected**: it is the public, logged-out curriculum page
+  (navbar, search, SEO). Only the dashboard's own "View Curriculum" became a tab.
+- **Where the previous dashboard's progress went**: streak / answered / accuracy /
+  lessons chips in the header; strengths, needs-work and per-chapter accuracy in the
+  Curriculum tab. The per-lesson accuracy table was dropped (per-chapter accuracy is
+  shown when browsing). The SQL functions are unchanged.
+- **Free tier on the Videos tab** sees the same upsell as the old page, plus their
+  own earlier requests (the old page hid them; the previous dashboard showed them).
+- **Tutoring "without leaving the page"**: Shopier's payment page cannot be embedded
+  (it is a full-page form POST to Shopier), so it opens in a new tab and the
+  dashboard stays; `TutoringBooking` gained a `checkoutInNewTab` prop (default off).
+  The known 509 / OSB caveats above still apply to the payment itself.
+- **Moves, not rewrites**: `JoinClassForm` (from the join-class page; `onDone`
+  replaces "Go to Dashboard" when embedded; `autoFocus` dropped so opening the tab
+  doesn't steal focus from the tab list), `TutoringPanel` (from `/tutoring`),
+  `getVideoRequestFormOptions` (from `/video-requests`). `VideoRequestForm` lost its
+  built-in list (now the grid) and gained `onSubmitted`.
+- **Client-safe modules** (found while running it: `LessonCard` pulled `pg` into the
+  browser): tier constants/`tierName` → `lib/subscriptions/tiers.ts` (re-exported
+  from `getUserTier.ts`), request types/`readyVideoCount` →
+  `lib/videoRequests/types.ts`, `formatPercent`/`isNewStudent` → `lib/dashboard/format.ts`.
+- **Help button hidden on `/dashboard`** (both of its links are tabs there).
+- Removed `components/video-requests/VideoRequestList.tsx` (replaced by the grid).
+
+Unfinished / follow-ups (dashboard tabs):
+- Apply migrations 01–05 in order, then deploy (manual).
+- Tiers for existing students are unchanged; Plus/Pro is needed for the request form.
+- The tab height uses a fixed allowance for the navbar and page padding
+  (`100dvh - 9.5rem`); a much taller navbar would need that number adjusted.
+- Thumbnails/videos render black in this sandbox (no YouTube access); real
+  browsers load them.
+- Locally "Book & Pay" reports "Shopier is not configured" (no keys here); the
+  new-tab flow itself was verified.
+- Still pre-existing: navbar can show "Sign In / Sign Up" right after login until a
+  reload; the homepage is ~411px wide at 375px.
 
 ### Lesson videos, student dashboard & hero request CTA (NEW 2026-10-14, not yet deployed)
 
@@ -99,7 +243,7 @@ PastPaperCard, `courses/[slug]`.
 
 How to apply the migrations (in order; each is idempotent):
 ```
-for f in database/seeds/2026-10-14-0{1,2,3,4}-*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
+for f in database/seeds/2026-10-14-0{1,2,3,4,5}-*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
 ```
 (or paste each file into the Supabase SQL editor / `apply_migration`, in order). Run
 as the same role the app connects as (`postgres`): migration 03 creates the NOLOGIN

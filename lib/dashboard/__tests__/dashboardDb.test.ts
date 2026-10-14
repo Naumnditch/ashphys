@@ -354,20 +354,25 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
     });
 
     it('lets admins read everyone and write lesson_videos; students and visitors cannot write', async () => {
-      const { alice, admin, ch } = await twoStudents();
+      const { alice, bob, admin, ch } = await twoStudents();
       await as(admin, async () => {
-        expect(new Set(await owners(`SELECT student_id FROM practice_attempts`)).size).toBe(2);
-        expect(new Set(await owners(`SELECT student_id FROM video_requests`)).size).toBe(2);
+        // Both test students (the database may hold other rows too).
+        expect(await owners(`SELECT student_id FROM practice_attempts`)).toEqual(expect.arrayContaining([alice, bob]));
+        expect(await owners(`SELECT student_id FROM video_requests`)).toEqual(expect.arrayContaining([alice, bob]));
         await db.query(
           `INSERT INTO lesson_videos (lesson_id, youtube_id, title, is_published) VALUES ($1, 'dQw4w9WgXcQ', 'Draft', false), ($1, 'aaaaaaaaaaa', 'Live', true)`,
           [ch.lessonId]
         );
-        expect((await db.query(`SELECT title FROM lesson_videos ORDER BY title`)).rows.map((r) => r.title)).toEqual(['Draft', 'Live']);
+        expect(
+          (await db.query(`SELECT title FROM lesson_videos WHERE lesson_id = $1 ORDER BY title`, [ch.lessonId])).rows.map((r) => r.title)
+        ).toEqual(['Draft', 'Live']);
       });
       for (const viewer of [alice, null]) {
         await as(viewer, async () => {
           // Drafts are invisible; published videos are readable by anyone.
-          expect((await db.query(`SELECT title FROM lesson_videos`)).rows.map((r) => r.title)).toEqual(['Live']);
+          expect(
+            (await db.query(`SELECT title FROM lesson_videos WHERE lesson_id = $1`, [ch.lessonId])).rows.map((r) => r.title)
+          ).toEqual(['Live']);
           const upd = await db.query(`UPDATE lesson_videos SET title = 'hacked'`);
           expect(upd.rowCount).toBe(0);
           const del = await db.query(`DELETE FROM lesson_videos`);
@@ -395,4 +400,91 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
       ).rejects.toMatchObject({ code: '23514' });
     });
   });
+
+  // ------------------------------------------- dashboard video tab (migration 05)
+
+  describe('video requests on the dashboard', () => {
+    async function fulfilledPair() {
+      const alice = await makeUser();
+      const bob = await makeUser();
+      const ch = await makeChapter(await makeCourse(), 1);
+      const r = await db.query(
+        `INSERT INTO video_requests (student_id, topic_id, description, status, youtube_url, youtube_id)
+         VALUES ($1, $3, 'alice q', 'fulfilled', 'https://youtu.be/dQw4w9WgXcQ', 'dQw4w9WgXcQ'),
+                ($2, $3, 'bob q', 'fulfilled', 'https://youtu.be/9bZkp7q19f0', '9bZkp7q19f0')
+         RETURNING id, student_id`,
+        [alice, bob, ch.lessonId]
+      );
+      const aliceReq = r.rows.find((x) => x.student_id === alice).id as string;
+      const bobReq = r.rows.find((x) => x.student_id === bob).id as string;
+      return { alice, bob, aliceReq, bobReq };
+    }
+
+    // The query lib/videoRequests/student.ts getMyVideoRequests runs.
+    const myRequests = (studentId: string) =>
+      db.query(
+        `SELECT r.id, r.student_id, r.youtube_id, o.opened_at
+         FROM video_requests r
+         LEFT JOIN video_request_opens o ON o.request_id = r.id AND o.student_id = r.student_id
+         WHERE r.student_id = $1`,
+        [studentId]
+      );
+
+    it("returns only the student's own requests, even when asked for someone else's", async () => {
+      const { alice, bob } = await fulfilledPair();
+      await as(alice, async () => {
+        expect((await myRequests(alice)).rows.map((r) => r.student_id)).toEqual([alice]);
+        expect((await myRequests(bob)).rowCount).toBe(0);
+        expect((await db.query(`SELECT 1 FROM video_requests WHERE student_id = $1`, [bob])).rowCount).toBe(0);
+      });
+    });
+
+    it('lets a student mark only their own video opened', async () => {
+      const { alice, bob, aliceReq, bobReq } = await fulfilledPair();
+      await as(alice, () =>
+        db.query(`INSERT INTO video_request_opens (student_id, request_id, youtube_id) VALUES ($1, $2, 'dQw4w9WgXcQ')`, [alice, aliceReq])
+      );
+      expect((await as(alice, () => myRequests(alice))).rows[0].opened_at).not.toBeNull();
+      // Bob's request, in Alice's name or in Bob's: both refused.
+      await expect(
+        as(alice, () =>
+          db.query(`INSERT INTO video_request_opens (student_id, request_id, youtube_id) VALUES ($1, $2, '9bZkp7q19f0')`, [alice, bobReq])
+        )
+      ).rejects.toMatchObject({ code: '42501' });
+      await expect(
+        as(alice, () =>
+          db.query(`INSERT INTO video_request_opens (student_id, request_id, youtube_id) VALUES ($1, $2, '9bZkp7q19f0')`, [bob, bobReq])
+        )
+      ).rejects.toMatchObject({ code: '42501' });
+      // Bob sees none of Alice's opens.
+      expect((await as(bob, () => db.query(`SELECT 1 FROM video_request_opens`))).rowCount).toBe(0);
+    });
+
+    it('stores only valid 11-character ids and backfills them from existing links', async () => {
+      const { alice } = await fulfilledPair();
+      await db.query('SAVEPOINT bad_id');
+      await expect(
+        db.query(`UPDATE video_requests SET youtube_id = 'not-an-id' WHERE student_id = $1`, [alice])
+      ).rejects.toMatchObject({ code: '23514' });
+      await db.query('ROLLBACK TO SAVEPOINT bad_id');
+      const r = await db.query(
+        `INSERT INTO video_requests (student_id, description, status, youtube_url)
+         VALUES ($1, 'a', 'fulfilled', 'https://www.youtube.com/watch?v=a-B_c1D2e3F&si=x'),
+                ($1, 'b', 'fulfilled', 'https://youtube.com/shorts/dQw4w9WgXcQ?si=1'),
+                ($1, 'c', 'fulfilled', 'https://youtu.be/dQw4w9WgXcQX')
+         RETURNING id`,
+        [alice]
+      );
+      await db.query(readFileSync(path.join(root, 'database/seeds/2026-10-14-05-video-request-ids-and-opens.sql'), 'utf8'));
+      const ids = await db.query(`SELECT description, youtube_id FROM video_requests WHERE id = ANY($1) ORDER BY description`, [
+        r.rows.map((x) => x.id),
+      ]);
+      expect(ids.rows).toEqual([
+        { description: 'a', youtube_id: 'a-B_c1D2e3F' },
+        { description: 'b', youtube_id: 'dQw4w9WgXcQ' },
+        { description: 'c', youtube_id: null },
+      ]);
+    });
+  });
+
 });

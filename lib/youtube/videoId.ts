@@ -85,10 +85,20 @@ export function extractYouTubeId(input: unknown): string {
   return result.id;
 }
 
-/** Privacy-enhanced embed: no related videos from other channels, plays inline on iOS. */
-export function youtubeEmbedUrl(id: string): string {
+/**
+ * Privacy-enhanced embed: no related videos from other channels, plays inline
+ * on iOS. `autoplay` is for players created by a click (the click is the
+ * user gesture browsers require before playing).
+ */
+export function youtubeEmbedUrl(id: string, options: { autoplay?: boolean } = {}): string {
   if (!isValidYouTubeId(id)) throw new Error('Invalid YouTube id');
-  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`;
+  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1${options.autoplay ? '&autoplay=1' : ''}`;
+}
+
+/** Still frame for a click-to-play thumbnail (an image, not a link). */
+export function youtubeThumbnailUrl(id: string): string {
+  if (!isValidYouTubeId(id)) throw new Error('Invalid YouTube id');
+  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 }
 
 /** Used ONLY for the "Open on YouTube" fallback link. */

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { SimulationIcon } from '@/components/icons/SimulationIcon';
 import { CURRICULA, syllabusRefLabel, type CurriculumId } from '@/lib/curricula';
 import type { CurriculumLesson } from '@/lib/curricula/lessons';
-import { tierName } from '@/lib/subscriptions/getUserTier';
+import { tierName } from '@/lib/subscriptions/tiers';
 
 interface LessonCardProps {
   lesson: CurriculumLesson;

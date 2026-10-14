@@ -1,22 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { putFileToSignedUrl } from '@/lib/storage/directUpload';
-import { VideoRequestList } from '@/components/video-requests/VideoRequestList';
-import type { StudentVideoRequest } from '@/lib/videoRequests/student';
 
 interface Chapter { id: string; chapter_number: number; title: string; }
 interface Topic { id: string; chapter_id: string; topic_name: string; }
-type Req = StudentVideoRequest;
-
 export function VideoRequestForm({
   chapters,
   topics,
   initialTopicId,
+  onSubmitted,
 }: {
   chapters: Chapter[];
   topics: Topic[];
   initialTopicId?: string;
+  /** Called after a successful submit (the dashboard reloads "Your requests"). */
+  onSubmitted?: () => void;
 }) {
   // ?lesson=<id> (from a dashboard weakness) pre-selects that lesson.
   const initialTopic = topics.find((t) => t.id === initialTopicId);
@@ -29,18 +28,8 @@ export function VideoRequestForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const [requests, setRequests] = useState<Req[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const topicsForChapter = topics.filter((t) => t.chapter_id === chapterId);
-
-  const loadRequests = async () => {
-    const res = await fetch('/api/video-requests');
-    const data = await res.json();
-    if (data.success) setRequests(data.requests);
-    setLoading(false);
-  };
-  useEffect(() => { loadRequests(); }, []);
 
   const submit = async () => {
     if (!description.trim()) {
@@ -99,7 +88,7 @@ export function VideoRequestForm({
       setFile(null);
       setChapterId('');
       setTopicId('');
-      await loadRequests();
+      onSubmitted?.();
     } catch {
       setError('Network error — please try again');
     } finally {
@@ -108,7 +97,7 @@ export function VideoRequestForm({
   };
 
   return (
-    <div className="space-y-8">
+    <div>
       <div className="bg-white border border-gray-200 rounded-xl p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <div>
@@ -180,17 +169,6 @@ export function VideoRequestForm({
         >
           {uploading ? 'Uploading screenshot…' : submitting ? 'Submitting…' : 'Submit request'}
         </button>
-      </div>
-
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Your requests</h2>
-        {loading ? (
-          <p className="text-sm text-gray-400">Loading…</p>
-        ) : requests.length === 0 ? (
-          <p className="text-sm text-gray-400">No requests yet.</p>
-        ) : (
-          <VideoRequestList requests={requests} />
-        )}
       </div>
     </div>
   );

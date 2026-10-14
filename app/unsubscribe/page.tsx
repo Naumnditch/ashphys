@@ -24,7 +24,7 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
         ) : (
           <p className="mt-3 text-gray-600">
             This link isn&apos;t valid any more. If you&apos;re signed in, you can change email settings from your{' '}
-            <a href="/dashboard/messages" className="text-blue-700 underline">
+            <a href="/dashboard?tab=messages" className="text-blue-700 underline">
               messages page
             </a>
             .
