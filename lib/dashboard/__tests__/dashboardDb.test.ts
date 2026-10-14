@@ -34,6 +34,16 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
     if (!hasUsers.rows[0].ok) {
       await db.query(readFileSync(path.join(root, 'database/tests/base-schema.sql'), 'utf8'));
     }
+    // Supabase provides storage.buckets; a plain Postgres test database gets a
+    // minimal stand-in with the columns migration 06 writes.
+    const hasStorage = await db.query(`SELECT to_regclass('storage.buckets') IS NOT NULL AS ok`);
+    if (!hasStorage.rows[0].ok) {
+      await db.query(`CREATE SCHEMA IF NOT EXISTS storage`);
+      await db.query(
+        `CREATE TABLE storage.buckets (id text PRIMARY KEY, name text NOT NULL, public boolean DEFAULT false,
+                                       file_size_limit bigint, allowed_mime_types text[])`
+      );
+    }
     const dir = path.join(root, 'database/seeds');
     for (const file of readdirSync(dir).filter((f) => /^2026-10-14-.*\.sql$/.test(f)).sort()) {
       await db.query(readFileSync(path.join(dir, file), 'utf8'));
@@ -484,6 +494,16 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
         { description: 'b', youtube_id: 'dQw4w9WgXcQ' },
         { description: 'c', youtube_id: null },
       ]);
+    });
+  });
+
+
+  describe('screenshot bucket (migration 06)', () => {
+    it('is private and limited to 4 MB jpg/png/webp, and re-running keeps it that way', async () => {
+      await db.query(`UPDATE storage.buckets SET public = true, file_size_limit = NULL WHERE id = 'video-request-screenshots'`);
+      await db.query(readFileSync(path.join(root, 'database/seeds/2026-10-14-06-video-request-screenshots-bucket.sql'), 'utf8'));
+      const b = await db.query(`SELECT public, file_size_limit, allowed_mime_types FROM storage.buckets WHERE id = 'video-request-screenshots'`);
+      expect(b.rows[0]).toEqual({ public: false, file_size_limit: '4194304', allowed_mime_types: ['image/jpeg', 'image/png', 'image/webp'] });
     });
   });
 

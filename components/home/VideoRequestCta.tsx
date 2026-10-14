@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Modal } from '@/components/messages/Modal';
 import { LessonSelect } from '@/components/video/LessonSelect';
-import { putFileToSignedUrl } from '@/lib/storage/directUpload';
+import { submitVideoRequest } from '@/lib/videoRequests/submit';
+import { SCREENSHOT_ACCEPT } from '@/lib/videoRequests/screenshot';
 import type { LessonPickerGroup } from '@/lib/videos/lessonPicker';
 
 /** Who is looking — decided on the server with getUserTier (Plus and up may request). */
@@ -45,43 +46,21 @@ function RequestForm({ onDone }: { onDone: () => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!lessonId) return setError('Choose the lesson you are stuck on.');
-    if (!questionNumber.trim() && !file) return setError('Add the question number or a screenshot of the question.');
-    if (!description.trim()) return setError('Tell us briefly what you are stuck on.');
-
     try {
-      let screenshotPath: string | undefined;
-      if (file) {
-        setStatus('uploading');
-        const signRes = await fetch('/api/video-requests/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: file.name }),
-        });
-        const signData = await signRes.json();
-        if (!signRes.ok || !signData.success) throw new Error(signData.error || 'Could not start the upload');
-        const put = await putFileToSignedUrl(signData.signedUrl, file);
-        if (!put.ok) throw new Error(put.error);
-        screenshotPath = signData.path;
+      const result = await submitVideoRequest(
+        { description, lessonId, questionNumber, file, requireQuestion: true },
+        { onStep: (step) => setStatus(step === 'saving' ? 'submitting' : 'uploading') }
+      );
+      if (!result.ok) {
+        setError(result.error);
+        setStatus('idle');
+        return;
       }
-      setStatus('submitting');
-      const res = await fetch('/api/video-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lessonId,
-          questionNumber: questionNumber.trim() || undefined,
-          screenshotPath,
-          description,
-          requireQuestion: true,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Could not send your request');
       onDone();
       router.push('/dashboard?tab=videos&request=sent');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error — please try again');
+      console.error('[video request] unexpected failure', err);
+      setError('Could not save your request: something unexpected went wrong. Please try again.');
       setStatus('idle');
     }
   };
@@ -106,7 +85,7 @@ function RequestForm({ onDone }: { onDone: () => void }) {
           <label className="flex items-center gap-2 cursor-pointer text-sm border border-gray-300 rounded-lg px-3 py-2 hover:bg-gray-50">
             <span className="font-semibold">Choose image</span>
             <span className="text-gray-500 truncate">{file ? file.name : 'none'}</span>
-            <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <input type="file" accept={SCREENSHOT_ACCEPT} className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
           </label>
         </div>
       </div>

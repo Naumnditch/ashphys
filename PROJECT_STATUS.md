@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-14, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,137 @@ Last updated: 2026-10-14, latest (admin Video Solve Requests page stuck on "Load
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Video request submission: "Network error" (FIXED 2026-10-14)
+
+**Root cause.** The screenshot upload was not what failed; the request insert
+was. Production is running this branch's code without the 2026-10-14
+migrations (see the admin section below), so `POST /api/video-requests`
+(`createVideoRequest` → `withRlsContext` → `SET LOCAL ROLE ashphys_user`) threw
+`role "ashphys_user" does not exist`. Vercel recorded it 11 times on
+`/api/video-requests`, the last at 22:13 UTC; nothing for `/api/video-requests/upload`.
+The route had no try/catch, so Next answered with an HTML 500. Both forms did
+`await res.json()` on it, which threw, and the form's catch-all printed
+"Network error — please try again". The upload code itself only ever returned
+explicit messages. Storage was healthy: the `video-request-screenshots` bucket
+exists and is private, but had no size or type limit (`file_size_limit` and
+`allowed_mime_types` both null); its last object is from 10 Oct.
+
+What changed:
+- **One submit path for both forms** (`lib/videoRequests/submit.ts`, used by the
+  dashboard's `VideoRequestForm` and the homepage `VideoRequestCta`), in explicit
+  steps: validate (fields, jpg/png/webp) → compress only if over 4 MB (canvas,
+  ≤1600px wide, JPEG 0.8, `lib/videoRequests/screenshot.ts`) → upload → save.
+  Every failure names its step ("Image upload failed: …", "Could not save your
+  request: …", "Image is too large (max 4 MB)") and is logged in full with
+  `console.error('[video request] …')`. Raw storage or server details (keys,
+  paths, SQL) are never shown. A non-JSON response is a readable failure, not a
+  throw. If the upload fails but the request is still valid without the image
+  (the dashboard form, or the homepage form with a question number), the request
+  is saved and the student is told the image was skipped. The forms show errors
+  with `role="alert"`. After success the dashboard form calls `onSubmitted` →
+  `reload()`; the homepage form redirects to `/dashboard?tab=videos&request=sent`.
+- **`POST /api/video-requests/upload`** now takes `{ contentType, size }`, checks
+  type and size, mints the request id and returns `{ ok, requestId, path,
+  signedUrl }`. The path is `{student_id}/{request_id}-{timestamp}.{ext}`, with
+  the folder taken from the session. Bytes still go straight to Storage (Vercel's
+  ~4.5 MB body limit never applies).
+- **`POST /api/video-requests`** returns `{ ok: true, id }` or `{ ok: false, error }`
+  (`success` mirrors `ok` for old callers) and has try/catch around everything.
+  `student_id` comes from the session only (a body `student_id` is ignored). A
+  screenshot path must be one minted for this student (otherwise 400, and it is
+  never deleted), and its request id becomes the row id. If anything fails after
+  the upload (validation, the open-request cap, the insert), the uploaded file is
+  deleted (`lib/storage/deleteObject.ts`, service key, best effort). A double
+  submit returns the same row. `GET` also returns JSON errors.
+- **Student request reads and writes work on either schema.**
+  `lib/videoRequests/student.ts` uses the RLS transaction once migration 03's
+  `video_requests_insert_own` policy exists. Before that it runs the same queries
+  as the owner, always scoped by the session's student id (what production did
+  before 2026-10-14). It only selects `question_number`, `youtube_id` and the
+  opens join when those exist (`lib/db/schemaFeatures.ts` gained
+  `videoRequestRls` and `requestOpens`). The admin PATCH full path now also
+  requires the policies.
+- **Migration `2026-10-14-06-video-request-screenshots-bucket.sql`** (independent
+  of 01–05): ensures the bucket exists, private, `file_size_limit` 4 MB,
+  `allowed_mime_types` jpeg/png/webp. **Not applied to production.**
+
+Tests & checks:
+- `lib/videoRequests/__tests__/submit.test.ts` (15). No screenshot → no upload,
+  saves. Valid screenshot → upload, PUT, save with path and id. Oversized and
+  incompressible → "Image is too large (max 4 MB)" with no request sent.
+  Compression uploads the smaller JPEG. Wrong type. Storage rejection hides raw
+  details. 413 → size message. An optional image is skipped on upload failure; a
+  required one isn't. Non-JSON 500 → "Could not save your request: …" (the
+  original bug). Server reason passed through. Offline. Required fields. Plus the
+  path/size rules.
+- `app/api/video-requests/__tests__/route.test.ts` (7). Saves as the session
+  user even with a body `student_id`; a screenshot path is stored under its
+  minted id; another student's path is refused and not deleted; an insert failure
+  deletes the upload and returns a readable error without "ashphys_user";
+  validation-after-upload cleans up; Free tier and signed-out get JSON; homepage
+  rules.
+- `app/api/video-requests/upload/__tests__/route.test.ts` (5). The path format is
+  in the student's own folder, a client `path` is ignored, oversized and wrong
+  types are rejected, signing failures hide details, and the tier/login gate holds.
+- DB (`npm run test:db`, now 30). `lib/videoRequests/__tests__/studentDb.test.ts`
+  runs the real `createVideoRequest`/`getMyVideoRequests` in both RLS and
+  pre-migration modes: saves without/with a screenshot (path and minted id
+  stored, double submit idempotent), can't take over another student's id, and
+  lists only the student's own rows. RLS refuses an insert for another
+  `student_id` (42501). The dashboard DB test now also checks the bucket migration
+  (it creates a minimal `storage.buckets` when the database isn't Supabase).
+- Full suite 1508 passed, 30 DB tests skipped without `TEST_DATABASE_URL` (30/30
+  pass with it), 1 failed (the same pre-existing live-DNS test). `tsc`, ESLint
+  (16 changed files) and `next build` are clean.
+- Local run as the Plus student, against both the **production-like schema** (no
+  migrations) and the migrated replica, with a local stand-in for the Storage API
+  (there are no Supabase keys in the sandbox; it enforces the same 4 MB /
+  jpg-png-webp limits).
+  - A request without an image and one with a 1170×2532 phone screenshot both
+    saved and appeared under "Your requests" with no reload. The screenshot is at
+    `{student}/{request_id}-{ts}.png` with `request_id` = the row id.
+  - A 14.8 MB phone photo was compressed in Chromium to a 568 KB JPEG and saved.
+  - An incompressible 43 MB image got "Image is too large (max 4 MB)" and nothing
+    was uploaded.
+  - With the open-request cap reached, the uploaded file was deleted and the
+    student saw "Could not save your request: you already have 3 open video
+    requests…".
+  - "Network error" never appeared. One dev-mode run on a freshly started server
+    saw one extra page navigation; it didn't reproduce on rerun and there were no
+    page loads.
+
+Decisions (video request submission, 2026-10-14):
+- **No storage.objects policies.** The brief asks for "authenticated users insert
+  into their own folder", but there is no Supabase Auth here: students never talk
+  to Storage as `authenticated` (`auth.uid()` is null). Own-folder writes are
+  enforced by the server minting a signed upload URL for one exact path in the
+  session's folder, and own-file reads by signed read URLs minted only for the
+  requester's rows. With RLS on and no policies, anon/authenticated can't touch
+  the bucket. Migration 06 adds the size/type limits on the bucket instead.
+- **The student fallback reverses an earlier decision.** "Student RLS paths don't
+  fall back" left production unable to take requests at all. The fallback only
+  applies while migration 03's policies are absent, is exactly the pre-2026-10-14
+  behaviour, and still never takes the student id from the client.
+- **The request id is minted at upload time** so the storage path can carry it
+  (`{student}/{request_id}-{ts}.{ext}`) and the API can prove the file belongs to
+  the request being saved.
+- **The rollback (deleting an orphaned upload) happens on the server.** Students
+  have no delete rights on Storage, and the server holds the service key.
+- **"Save without the image"** only when the request still identifies the question
+  (any dashboard request; homepage requests that have a question number).
+- **Compression only above the limit.** Images ≤ 4 MB upload untouched (PNG
+  screenshots stay sharp).
+- **Old cached pages** that call the upload route with the former `{ path }` body
+  get "Image upload failed: use a JPG, PNG or WebP image" until they reload.
+
+Manual steps:
+1. Apply migrations 01–05 (still the main blocker for everything else on the
+   student side). Request submission no longer depends on them once this commit is
+   deployed.
+2. Apply `2026-10-14-06-video-request-screenshots-bucket.sql` to production
+   (Supabase SQL editor or psql). It is independent and idempotent.
+3. Deploy this commit.
 
 ### Admin video requests: stuck on "Loading…" (FIXED 2026-10-14)
 

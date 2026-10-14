@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   user: null as null | { id: string; role: string },
-  features: { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false },
+  features: { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false },
   query: vi.fn(),
 }));
 
@@ -26,7 +26,7 @@ const patch = (body: unknown) =>
 beforeEach(() => {
   mocks.query.mockReset();
   mocks.user = { id: 'admin-1', role: 'admin' };
-  mocks.features = { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false };
+  mocks.features = { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false };
 });
 
 describe('GET /api/admin/video-requests', () => {
@@ -71,7 +71,7 @@ describe('GET /api/admin/video-requests', () => {
   });
 
   it('selects the new columns once the migrations are applied', async () => {
-    mocks.features = { rlsRole: true, questionNumber: true, requestYoutubeId: true, lessonVideos: true };
+    mocks.features = { rlsRole: true, questionNumber: true, requestYoutubeId: true, lessonVideos: true, videoRequestRls: true, requestOpens: true };
     mocks.query.mockResolvedValueOnce({ rows: [] });
     await GET();
     const sql: string = mocks.query.mock.calls[0][0];
@@ -102,7 +102,7 @@ describe('PATCH /api/admin/video-requests', () => {
   });
 
   it('also stores youtube_id when that column exists', async () => {
-    mocks.features = { rlsRole: false, questionNumber: true, requestYoutubeId: true, lessonVideos: false };
+    mocks.features = { rlsRole: false, questionNumber: true, requestYoutubeId: true, lessonVideos: false, videoRequestRls: false, requestOpens: false };
     mocks.query.mockResolvedValueOnce({ rowCount: 1 });
     await patch({ id: REQ_ID, status: 'fulfilled', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ' });
     const [sql, params] = mocks.query.mock.calls[0];

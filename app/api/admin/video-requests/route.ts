@@ -154,7 +154,7 @@ export async function PATCH(req: NextRequest) {
     const features = await getSchemaFeatures();
 
     // Full path: migrations applied — one RLS transaction, can attach to a lesson.
-    if (features.rlsRole && features.lessonVideos && features.requestYoutubeId) {
+    if (features.rlsRole && features.videoRequestRls && features.lessonVideos && features.requestYoutubeId) {
       const lessonVideo = await withRlsContext(admin, async (db) => {
         const updated = await db.query(
           `UPDATE video_requests SET status = $2, youtube_url = $3, youtube_id = $5, admin_note = $4, updated_at = now() WHERE id = $1`,

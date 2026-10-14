@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { putFileToSignedUrl } from '@/lib/storage/directUpload';
+import { submitVideoRequest } from '@/lib/videoRequests/submit';
+import { SCREENSHOT_ACCEPT } from '@/lib/videoRequests/screenshot';
 
 interface Chapter { id: string; chapter_number: number; title: string; }
 interface Topic { id: string; chapter_id: string; topic_name: string; }
@@ -32,66 +33,41 @@ export function VideoRequestForm({
   const topicsForChapter = topics.filter((t) => t.chapter_id === chapterId);
 
   const submit = async () => {
-    if (!description.trim()) {
-      setError('Describe the problem you need help with');
-      return;
-    }
     setSubmitting(true);
     setError(null);
     setMsg(null);
     try {
-      let screenshotPath: string | undefined;
-      if (file) {
-        setUploading(true);
-        const signRes = await fetch('/api/video-requests/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: file.name }),
-        });
-        const signData = await signRes.json();
-        if (!signRes.ok || !signData.success) {
-          setError(signData.error || 'Could not start upload');
-          setSubmitting(false);
-          setUploading(false);
-          return;
-        }
-        const put = await putFileToSignedUrl(signData.signedUrl, file);
-        setUploading(false);
-        if (!put.ok) {
-          setError(put.error);
-          setSubmitting(false);
-          return;
-        }
-        screenshotPath = signData.path;
-      }
-
-      const res = await fetch('/api/video-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const result = await submitVideoRequest(
+        {
           description,
-          chapterId: chapterId || undefined,
-          topicId: topicId || undefined,
-          questionNumber: questionNumber || undefined,
-          screenshotPath,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Could not submit request');
-        setSubmitting(false);
+          lessonId: topicId || null,
+          chapterId: chapterId || null,
+          questionNumber,
+          file,
+        },
+        { onStep: (step) => setUploading(step === 'uploading' || step === 'compressing') }
+      );
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
-      setMsg('Request submitted — a teacher will record a video for you soon.');
+      setMsg(
+        result.imageSkipped
+          ? `Request saved without the image (${result.imageSkipped}). Describe the question in words if it matters.`
+          : 'Request submitted — a teacher will record a video for you soon.'
+      );
       setDescription('');
       setQuestionNumber('');
       setFile(null);
       setChapterId('');
       setTopicId('');
       onSubmitted?.();
-    } catch {
-      setError('Network error — please try again');
+    } catch (err) {
+      // submitVideoRequest reports every expected failure itself; this is a bug guard.
+      console.error('[video request] unexpected failure', err);
+      setError('Could not save your request: something unexpected went wrong. Please try again.');
     } finally {
+      setUploading(false);
       setSubmitting(false);
     }
   };
@@ -152,7 +128,7 @@ export function VideoRequestForm({
               Choose image
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={SCREENSHOT_ACCEPT}
                 className="hidden"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
@@ -160,8 +136,8 @@ export function VideoRequestForm({
             <span className="text-xs text-gray-400">{file ? file.name : 'no file chosen'}</span>
           </div>
         </div>
-        {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-        {msg && <p className="text-sm text-green-700 mb-3">{msg}</p>}
+        {error && <p role="alert" className="text-sm text-red-600 mb-3">{error}</p>}
+        {msg && <p role="status" className="text-sm text-green-700 mb-3">{msg}</p>}
         <button
           onClick={submit}
           disabled={submitting}

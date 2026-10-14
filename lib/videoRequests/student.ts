@@ -1,12 +1,22 @@
 /**
- * A student's own video requests, read and written under row-level
- * security (the policies only show / accept the caller's own rows).
+ * A student's own video requests: read, create, mark opened.
+ *
+ * With migration 03 applied every query runs under row-level security
+ * (withRlsContext: the policies only show / accept the caller's own rows).
+ * Before it, the same queries run as the owner, exactly like production did
+ * before 2026-10-14, and always scoped by the server-verified student id;
+ * the student id never comes from the request body. That fallback is what
+ * keeps submission working when code ships ahead of the migrations (the
+ * 2026-10-14 "Network error" incident, see PROJECT_STATUS.md).
  *
  * The stored YouTube link is reduced to its video id here and the link
  * itself never leaves the server: students get the on-site embed only.
  */
 
+import type { PoolClient } from 'pg';
+import { getPool } from '@/lib/db/client';
 import { withRlsContext } from '@/lib/db/rls';
+import { getSchemaFeatures, type SchemaFeatures } from '@/lib/db/schemaFeatures';
 import type { StudentVideoRequest } from '@/lib/videoRequests/types';
 import { signedFileUrl } from '@/lib/storage/signed';
 import { isValidYouTubeId, parseYouTubeId } from '@/lib/youtube/videoId';
@@ -14,16 +24,46 @@ import { isValidYouTubeId, parseYouTubeId } from '@/lib/youtube/videoId';
 export type { StudentVideoRequest, VideoRequestStatus } from '@/lib/videoRequests/types';
 export { readyVideoCount } from '@/lib/videoRequests/types';
 
+export const SCREENSHOT_BUCKET = 'video-request-screenshots';
+
+/** RLS when the policies exist, else an owner connection (callers always filter by student.id). */
+async function withStudentDb<T>(
+  student: { id: string },
+  features: SchemaFeatures,
+  fn: (db: PoolClient) => Promise<T>
+): Promise<T> {
+  if (features.rlsRole && features.videoRequestRls) return withRlsContext(student, fn);
+  const client = await getPool().connect();
+  try {
+    return await fn(client);
+  } finally {
+    client.release();
+  }
+}
+
+async function screenshotUrl(path: string | null): Promise<string | null> {
+  if (!path) return null;
+  try {
+    return await signedFileUrl(SCREENSHOT_BUCKET, path);
+  } catch (err) {
+    console.error('video requests: screenshot link failed', err);
+    return null;
+  }
+}
+
 export async function getMyVideoRequests(student: { id: string }): Promise<StudentVideoRequest[]> {
-  const rows = await withRlsContext(student, async (db) => {
+  const f = await getSchemaFeatures();
+  const rows = await withStudentDb(student, f, async (db) => {
     const result = await db.query(
-      `SELECT r.id, r.description, r.question_number, r.screenshot_path, r.status, r.youtube_url, r.youtube_id,
-              r.admin_note, r.created_at, r.topic_id, t.topic_name, c.chapter_number, c.title AS chapter_title,
-              o.opened_at, o.youtube_id AS opened_youtube_id
+      `SELECT r.id, r.description, r.screenshot_path, r.status, r.youtube_url, r.admin_note, r.created_at, r.topic_id,
+              ${f.questionNumber ? 'r.question_number' : 'NULL::text AS question_number'},
+              ${f.requestYoutubeId ? 'r.youtube_id' : 'NULL::text AS youtube_id'},
+              t.topic_name, c.chapter_number, c.title AS chapter_title,
+              ${f.requestOpens ? 'o.opened_at, o.youtube_id AS opened_youtube_id' : 'NULL::timestamptz AS opened_at, NULL::text AS opened_youtube_id'}
        FROM video_requests r
        LEFT JOIN topics t ON t.id = r.topic_id
        LEFT JOIN chapters c ON c.id = r.chapter_id
-       LEFT JOIN video_request_opens o ON o.request_id = r.id AND o.student_id = r.student_id
+       ${f.requestOpens ? 'LEFT JOIN video_request_opens o ON o.request_id = r.id AND o.student_id = r.student_id' : ''}
        WHERE r.student_id = $1
        ORDER BY r.created_at DESC`,
       [student.id]
@@ -64,13 +104,15 @@ export async function getMyVideoRequests(student: { id: string }): Promise<Stude
         topicName: r.topic_name,
         chapterNumber: r.chapter_number,
         chapterTitle: r.chapter_title,
-        screenshotUrl: r.screenshot_path ? await signedFileUrl('video-request-screenshots', r.screenshot_path) : null,
+        screenshotUrl: await screenshotUrl(r.screenshot_path),
       } satisfies StudentVideoRequest;
     })
   );
 }
 
 export interface NewVideoRequest {
+  /** Id minted by POST /api/video-requests/upload (it is in the screenshot path); otherwise generated here. */
+  id?: string | null;
   description: string;
   topicId: string | null;
   chapterId: string | null;
@@ -78,29 +120,54 @@ export interface NewVideoRequest {
   screenshotPath: string | null;
 }
 
-/** Inserts the request; a lesson's chapter is taken from the lesson itself. */
+/**
+ * Inserts the request for `student` (the session's user — never a body
+ * field); a lesson's chapter is taken from the lesson itself. Idempotent on
+ * the id: a double submit returns the row already saved.
+ */
 export async function createVideoRequest(student: { id: string }, input: NewVideoRequest): Promise<string> {
-  return withRlsContext(student, async (db) => {
+  const f = await getSchemaFeatures();
+  // Columns and parameters built together: an unreferenced $n makes Postgres fail.
+  const params: unknown[] = [student.id, input.chapterId, input.topicId, input.description, input.screenshotPath, input.id ?? null];
+  let extraCols = '';
+  let extraVals = '';
+  if (f.questionNumber) {
+    params.push(input.questionNumber);
+    extraCols = ', question_number';
+    extraVals = `, $${params.length}`;
+  }
+  return withStudentDb(student, f, async (db) => {
     const result = await db.query(
-      `INSERT INTO video_requests (student_id, chapter_id, topic_id, description, question_number, screenshot_path)
-       SELECT $1, COALESCE(t.chapter_id, $2::uuid), t.id, $4, $5, $6
+      `INSERT INTO video_requests (id, student_id, chapter_id, topic_id, description, screenshot_path${extraCols})
+       SELECT COALESCE($6::uuid, gen_random_uuid()), $1, COALESCE(t.chapter_id, $2::uuid), t.id, $4, $5${extraVals}
        FROM (SELECT $3::uuid AS id) wanted
        LEFT JOIN topics t ON t.id = wanted.id
+       ON CONFLICT (id) DO NOTHING
        RETURNING id`,
-      [student.id, input.chapterId, input.topicId, input.description, input.questionNumber, input.screenshotPath]
+      params
     );
-    return result.rows[0].id as string;
+    if (result.rows[0]) return result.rows[0].id as string;
+    // Same id already saved (double submit): fine only if it is this student's.
+    const existing = await db.query(`SELECT id FROM video_requests WHERE id = $1 AND student_id = $2`, [input.id, student.id]);
+    if (existing.rows[0]) return existing.rows[0].id as string;
+    throw new Error('request id already in use');
   });
 }
 
 /**
  * Records that the student opened their fulfilled video (clears it from the
- * "ready" badge). Row-level security only accepts the student's own request;
- * returns false when the request isn't theirs or doesn't exist.
+ * "ready" badge). Only the student's own fulfilled request counts; returns
+ * false otherwise, and when migration 05 (the opens table) isn't there yet.
  */
 export async function markVideoRequestOpened(student: { id: string }, requestId: string): Promise<boolean> {
-  return withRlsContext(student, async (db) => {
-    const visible = await db.query(`SELECT youtube_id, youtube_url, status FROM video_requests WHERE id = $1`, [requestId]);
+  const f = await getSchemaFeatures();
+  if (!f.requestOpens) return false;
+  return withStudentDb(student, f, async (db) => {
+    const visible = await db.query(
+      `SELECT ${f.requestYoutubeId ? 'youtube_id' : 'NULL::text AS youtube_id'}, youtube_url, status
+       FROM video_requests WHERE id = $1 AND student_id = $2`,
+      [requestId, student.id]
+    );
     const row = visible.rows[0];
     if (!row || row.status !== 'fulfilled') return false;
     const youtubeId = isValidYouTubeId(row.youtube_id)
