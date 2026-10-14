@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Orthographic Projections — a SolidWorks-style view explorer.
  *
@@ -22,12 +24,12 @@ import { useEffect, useRef, useState } from 'react';
  *    axis-aligned view, exactly three from an isometric angle
  */
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
-const PAPER = '#faf7f0';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
+const PAPER = 'rgb(var(--h-faf7f0))';
 
 // ---------- 3D core ----------
 
@@ -98,7 +100,7 @@ function regularPoly(n: number, r: number, rot = 0): [number, number][] {
 
 // ---------- shape library ----------
 
-const BODY = '#dfe7ea';
+const BODY = 'rgb(var(--h-dfe7ea))';
 
 function engravedCube(): Face[] {
   const s = 1.3;
@@ -109,15 +111,15 @@ function engravedCube(): Face[] {
     // FRONT (+Z): circle
     { o: O(0, 0, s), u: O(1, 0, 0), v: O(0, 1, 0), n: O(0, 0, 1), color: RED, shape: regularPoly(28, 0.62) },
     // BACK (−Z): square
-    { o: O(0, 0, -s), u: O(-1, 0, 0), v: O(0, 1, 0), n: O(0, 0, -1), color: '#7a6cae', shape: [[-0.55, -0.55], [0.55, -0.55], [0.55, 0.55], [-0.55, 0.55]] },
+    { o: O(0, 0, -s), u: O(-1, 0, 0), v: O(0, 1, 0), n: O(0, 0, -1), color: 'rgb(var(--h-7a6cae))', shape: [[-0.55, -0.55], [0.55, -0.55], [0.55, 0.55], [-0.55, 0.55]] },
     // RIGHT (+X): triangle
     { o: O(s, 0, 0), u: O(0, 0, -1), v: O(0, 1, 0), n: O(1, 0, 0), color: TEAL, shape: regularPoly(3, 0.72, Math.PI / 2) },
     // LEFT (−X): plus / cross
-    { o: O(-s, 0, 0), u: O(0, 0, 1), v: O(0, 1, 0), n: O(-1, 0, 0), color: '#c76b2e', shape: [[-0.2, -0.62], [0.2, -0.62], [0.2, -0.2], [0.62, -0.2], [0.62, 0.2], [0.2, 0.2], [0.2, 0.62], [-0.2, 0.62], [-0.2, 0.2], [-0.62, 0.2], [-0.62, -0.2], [-0.2, -0.2]] },
+    { o: O(-s, 0, 0), u: O(0, 0, 1), v: O(0, 1, 0), n: O(-1, 0, 0), color: 'rgb(var(--h-c76b2e))', shape: [[-0.2, -0.62], [0.2, -0.62], [0.2, -0.2], [0.62, -0.2], [0.62, 0.2], [0.2, 0.2], [0.2, 0.62], [-0.2, 0.62], [-0.2, 0.2], [-0.62, 0.2], [-0.62, -0.2], [-0.2, -0.2]] },
     // TOP (+Y): hexagon
     { o: O(0, s, 0), u: O(1, 0, 0), v: O(0, 0, -1), n: O(0, 1, 0), color: BRASS, shape: regularPoly(6, 0.62) },
     // BOTTOM (−Y): L-shape (deliberately asymmetric, so its orientation is readable)
-    { o: O(0, -s, 0), u: O(1, 0, 0), v: O(0, 0, 1), n: O(0, -1, 0), color: '#3f7fa6', shape: [[-0.55, -0.55], [0.15, -0.55], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.55], [-0.55, 0.55]] },
+    { o: O(0, -s, 0), u: O(1, 0, 0), v: O(0, 0, 1), n: O(0, -1, 0), color: 'rgb(var(--h-3f7fa6))', shape: [[-0.55, -0.55], [0.15, -0.55], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.55], [-0.55, 0.55]] },
   ];
   for (const f of frames) faces.push(mark(f.shape, f.o, f.u, f.v, f.n, f.color));
   return faces;
@@ -227,7 +229,7 @@ function drawShape(ctx: CanvasRenderingContext2D, w: number, h: number, shape: S
     ctx.closePath();
     ctx.fillStyle = entry.face.color;
     ctx.fill();
-    ctx.strokeStyle = entry.face.isMark ? 'rgba(27,42,65,0.35)' : INK;
+    ctx.strokeStyle = entry.face.isMark ? 'rgb(var(--h-1b2a41) / 0.35)' : INK;
     ctx.lineWidth = entry.face.isMark ? 1 : 1.6;
     ctx.stroke();
   }
@@ -254,7 +256,7 @@ export function ProjectionsSimulator() {
   const renderAll = () => {
     const mc = mainRef.current;
     if (mc) {
-      const ctx = mc.getContext('2d');
+      const ctx = themedContext(mc);
       const rect = mc.getBoundingClientRect();
       if (ctx && rect.width) {
         const sf = rect.width / MAIN_W;
@@ -265,7 +267,7 @@ export function ProjectionsSimulator() {
     for (const v of NAMED_VIEWS) {
       const c = subRefs.current[v.key];
       if (!c) continue;
-      const ctx = c.getContext('2d');
+      const ctx = themedContext(c);
       const rect = c.getBoundingClientRect();
       if (!ctx || !rect.width) continue;
       const sf = rect.width / SUB_W;
@@ -289,7 +291,9 @@ export function ProjectionsSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     return () => window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shapeIdx]);
 
@@ -318,10 +322,10 @@ export function ProjectionsSimulator() {
 
   return (
     <div className="projections-lab flex flex-col gap-5">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{shape.name}</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">{shape.name}</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             yaw {degrees(yaw)} · pitch {degrees(pitch)}
           </span>
         </div>
@@ -331,14 +335,14 @@ export function ProjectionsSimulator() {
           <div>
             <canvas
               ref={mainRef}
-              className="block w-full rounded border border-[#e4ddcc] touch-none cursor-grab active:cursor-grabbing"
+              className="block w-full rounded border border-h-e4ddcc touch-none cursor-grab active:cursor-grabbing"
               style={{ aspectRatio: `${MAIN_W} / ${MAIN_H}`, background: PAPER }}
               onPointerDown={onDown}
               onPointerMove={onMove}
               onPointerUp={onUp}
               onPointerCancel={onUp}
             />
-            <p className="text-[11.5px] text-[#4a5a72] leading-snug mt-2">
+            <p className="text-[11.5px] text-h-4a5a72 leading-snug mt-2">
               Drag to tilt the solid freely. The four views beside it are locked to their axes and update live.
             </p>
             <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -346,7 +350,7 @@ export function ProjectionsSimulator() {
                 <button
                   key={v.key}
                   onClick={() => snapTo(v)}
-                  className="text-[11px] font-semibold px-2.5 py-1 rounded border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0]"
+                  className="text-[11px] font-semibold px-2.5 py-1 rounded border border-h-d8cfb6 text-h-4a5a72 hover:bg-h-faf7f0"
                 >
                   {v.label}
                 </button>
@@ -357,28 +361,28 @@ export function ProjectionsSimulator() {
           {/* four locked orthographic views */}
           <div className="grid grid-cols-2 gap-3">
             {NAMED_VIEWS.map((v) => (
-              <div key={v.key} className="rounded border border-[#e4ddcc] overflow-hidden">
-                <div className="px-2 py-1 bg-[#faf7f0] border-b border-[#eee6d3]">
-                  <span className="font-mono text-[10px] tracking-widest uppercase text-[#8f6428] font-bold">{v.label}</span>
+              <div key={v.key} className="rounded border border-h-e4ddcc overflow-hidden">
+                <div className="px-2 py-1 bg-h-faf7f0 border-b border-h-eee6d3">
+                  <span className="font-mono text-[10px] tracking-widest uppercase text-h-8f6428 font-bold">{v.label}</span>
                 </div>
                 <canvas
                   ref={(el) => { subRefs.current[v.key] = el; }}
                   className="block w-full"
-                  style={{ aspectRatio: `${SUB_W} / ${SUB_H}`, background: '#ffffff' }}
+                  style={{ aspectRatio: `${SUB_W} / ${SUB_H}`, background: 'rgb(var(--h-ffffff))' }}
                 />
               </div>
             ))}
           </div>
         </div>
 
-        <div className="px-4 pb-5 pt-4 mt-1 border-t border-[#eee6d3] flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1">shape:</span>
+        <div className="px-4 pb-5 pt-4 mt-1 border-t border-h-eee6d3 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-mono text-h-a8a196 mr-1">shape:</span>
           {SHAPES.map((s, i) => (
             <button
               key={s.id}
               onClick={() => setShapeIdx(i)}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                i === shapeIdx ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                i === shapeIdx ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {s.name}
@@ -389,46 +393,46 @@ export function ProjectionsSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">This Shape</span>
-          <p className="mt-2.5 text-[12.5px] text-[#4a5a72] leading-snug">{shape.note}</p>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">This Shape</span>
+          <p className="mt-2.5 text-[12.5px] text-h-4a5a72 leading-snug">{shape.note}</p>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> On the engraved cube, tilt until you can see three faces
+              <strong className="text-h-1b2a41">1.</strong> On the engraved cube, tilt until you can see three faces
               at once — then check which symbol each locked view is showing. Every view names one specific face.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Switch to the cylinder. Front gives a circle, top and
+              <strong className="text-h-1b2a41">2.</strong> Switch to the cylinder. Front gives a circle, top and
               side give rectangles. The same solid, three different outlines.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Compare the T-block's top and bottom views. They are not
+              <strong className="text-h-1b2a41">3.</strong> Compare the T-block's top and bottom views. They are not
               the same — which is exactly why an engineering drawing needs more than one view to be unambiguous.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[17px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[17px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               one solid, many views
             </div>
-            <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[12.5px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               each view flattens one direction away
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             View Key
           </h2>
-          <div className="space-y-2 text-[12px] text-[#4a5a72] leading-snug">
-            <p><strong className="text-[#1b2a41]">Front</strong> — looking horizontally at the face nearest you</p>
-            <p><strong className="text-[#1b2a41]">Top</strong> — looking straight down from above</p>
-            <p><strong className="text-[#1b2a41]">Right</strong> — looking horizontally from the right-hand side</p>
-            <p><strong className="text-[#1b2a41]">Bottom</strong> — looking straight up from underneath</p>
+          <div className="space-y-2 text-[12px] text-h-4a5a72 leading-snug">
+            <p><strong className="text-h-1b2a41">Front</strong> — looking horizontally at the face nearest you</p>
+            <p><strong className="text-h-1b2a41">Top</strong> — looking straight down from above</p>
+            <p><strong className="text-h-1b2a41">Right</strong> — looking horizontally from the right-hand side</p>
+            <p><strong className="text-h-1b2a41">Bottom</strong> — looking straight up from underneath</p>
           </div>
         </div>
       </div>

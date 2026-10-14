@@ -40,7 +40,7 @@ export function AnnouncementTicker({ announcements, count = 3, now, interval = 5
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <a href="#whats-new-section" className="shrink-0 rounded-full bg-gray-900 text-white font-semibold px-2 py-0.5 hover:bg-black">
+      <a href="#whats-new-section" className="shrink-0 rounded-full bg-gray-900 text-on-ink font-semibold px-2 py-0.5 hover:bg-black">
         New
       </a>
       <Link key={a.id} href={a.href} className="flex min-w-0 items-center gap-2 text-gray-700 hover:text-gray-900 animate-fade-in-up" style={{ animationDuration: '0.5s' }}>

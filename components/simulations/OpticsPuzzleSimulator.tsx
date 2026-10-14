@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Optics Puzzle: Lenses & Mirrors — an original ray-tracing puzzle,
  * built for AshPhys's own optics curriculum (13.1 reflection, 13.4
@@ -30,12 +32,12 @@ import { useEffect, useRef, useState } from 'react';
  * not pre-baked per level.
  */
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
-const GOLD = '#e8b93a';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
+const GOLD = 'rgb(var(--h-e8b93a))';
 
 // ---------- geometry / ray-tracing core ----------
 
@@ -363,7 +365,7 @@ export function OpticsPuzzleSimulator() {
   const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
     const scaleFactor = rect.width / CANVAS_W;
@@ -371,7 +373,7 @@ export function OpticsPuzzleSimulator() {
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
     // background grid
-    ctx.strokeStyle = 'rgba(27,42,65,0.06)';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.06)';
     ctx.lineWidth = 1;
     for (let x = 0; x <= CANVAS_W; x += 20) {
       ctx.beginPath();
@@ -413,7 +415,7 @@ export function OpticsPuzzleSimulator() {
     ctx.stroke();
 
     // goal
-    ctx.fillStyle = won ? 'rgba(46,125,107,0.25)' : 'rgba(184,130,61,0.2)';
+    ctx.fillStyle = won ? 'rgb(var(--h-2e7d6b) / 0.25)' : 'rgb(var(--h-b8823d) / 0.2)';
     ctx.beginPath();
     ctx.arc(level.goal.x, level.goal.y, level.goalRadius, 0, Math.PI * 2);
     ctx.fill();
@@ -426,7 +428,7 @@ export function OpticsPuzzleSimulator() {
       drawElement(ctx, el);
       if (!el.locked) {
         const rh = rotateHandlePos(el);
-        ctx.fillStyle = '#faf7f0';
+        ctx.fillStyle = 'rgb(var(--h-faf7f0))';
         ctx.strokeStyle = MUTE;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -449,7 +451,7 @@ export function OpticsPuzzleSimulator() {
       ctx.lineTo(p2.x, p2.y);
       ctx.stroke();
       const n = { x: -axis.y, y: axis.x };
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.lineWidth = 1;
       for (let s = -1; s <= 1; s += 0.5) {
         const base = add(el.pos, scale(axis, s * el.length * 0.48));
@@ -475,7 +477,7 @@ export function OpticsPuzzleSimulator() {
       const n = { x: -axis.y, y: axis.x };
       const bulge = el.kind === 'convex' ? 12 : -8;
       ctx.strokeStyle = BRASS;
-      ctx.fillStyle = 'rgba(184,130,61,0.12)';
+      ctx.fillStyle = 'rgb(var(--h-b8823d) / 0.12)';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
@@ -497,6 +499,7 @@ export function OpticsPuzzleSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     const loop = (t: number) => {
       if (lastTimeRef.current === null) lastTimeRef.current = t;
       const dt = Math.min(0.05, (t - lastTimeRef.current) / 1000);
@@ -508,6 +511,7 @@ export function OpticsPuzzleSimulator() {
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -516,18 +520,18 @@ export function OpticsPuzzleSimulator() {
   return (
     <div className="optics-puzzle flex flex-col gap-5">
       {/* ---- Puzzle stage: full width ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{level.name}</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">{level.name}</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {won ? '✓ goal reached' : 'drag the element, ring rotates it'}
           </span>
         </div>
         <div className="px-4 pt-2">
           <canvas
             ref={canvasRef}
-            className="block w-full rounded border border-[#e4ddcc] touch-none cursor-grab active:cursor-grabbing"
-            style={{ aspectRatio: `${CANVAS_W} / ${CANVAS_H}`, background: '#faf7f0' }}
+            className="block w-full rounded border border-h-e4ddcc touch-none cursor-grab active:cursor-grabbing"
+            style={{ aspectRatio: `${CANVAS_W} / ${CANVAS_H}`, background: 'rgb(var(--h-faf7f0))' }}
             onPointerDown={handleDown}
             onPointerMove={handleMove}
             onPointerUp={handleUp}
@@ -535,19 +539,19 @@ export function OpticsPuzzleSimulator() {
           />
         </div>
         <div className="px-4 pb-2 pt-2">
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug">{level.concept}</p>
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug">{level.concept}</p>
         </div>
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3] flex flex-wrap items-center gap-2">
-          <button onClick={resetLevel} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3 flex flex-wrap items-center gap-2">
+          <button onClick={resetLevel} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-4a5a72 hover:bg-h-faf7f0">
             ↺ Reset Level
           </button>
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1 ml-auto">level:</span>
+          <span className="text-[11px] font-mono text-h-a8a196 mr-1 ml-auto">level:</span>
           {LEVELS.map((lv, i) => (
             <button
               key={lv.id}
               onClick={() => loadLevel(i)}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                i === levelIdx ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                i === levelIdx ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {lv.name}
@@ -558,12 +562,12 @@ export function OpticsPuzzleSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">How To Play</span>
-          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">How To Play</span>
+          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">Drag the body</strong> of the mirror or lens to reposition it.
-              <strong className="text-[#1b2a41]"> Drag the small ring</strong> beside it to rotate.
+              <strong className="text-h-1b2a41">Drag the body</strong> of the mirror or lens to reposition it.
+              <strong className="text-h-1b2a41"> Drag the small ring</strong> beside it to rotate.
             </p>
             <p>
               The gold beam is real ray-tracing — every reflection and refraction is computed from the actual
@@ -572,50 +576,50 @@ export function OpticsPuzzleSimulator() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">The Physics</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">The Physics</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">Mirrors</strong> reflect using the true local surface at the exact
+              <strong className="text-h-1b2a41">Mirrors</strong> reflect using the true local surface at the exact
               point the beam strikes it — angle of incidence equals angle of reflection, every time, on flat or
               curved glass alike.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">Lenses</strong> bend the beam according to its height above the
+              <strong className="text-h-1b2a41">Lenses</strong> bend the beam according to its height above the
               optical axis and the lens's focal length — the same rule produces every principal ray your textbook
               draws by hand, and every ray in between them too.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[19px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               θᵢ = θᵣ
             </div>
-            <div className="italic text-[13px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[13px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               angle of incidence = angle of reflection
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             Element Key
           </h2>
-          <div className="space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+          <div className="space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-1.5 rounded-full flex-shrink-0" style={{ background: INK }} />
-              <p><strong className="text-[#1b2a41]">Plane mirror</strong> — flat, simple reflection</p>
+              <p><strong className="text-h-1b2a41">Plane mirror</strong> — flat, simple reflection</p>
             </div>
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-1.5 rounded-full flex-shrink-0" style={{ background: TEAL }} />
-              <p><strong className="text-[#1b2a41]">Concave mirror</strong> — converges, real focus</p>
+              <p><strong className="text-h-1b2a41">Concave mirror</strong> — converges, real focus</p>
             </div>
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-1.5 rounded-full flex-shrink-0" style={{ background: RED }} />
-              <p><strong className="text-[#1b2a41]">Convex mirror</strong> — diverges, virtual focus</p>
+              <p><strong className="text-h-1b2a41">Convex mirror</strong> — diverges, virtual focus</p>
             </div>
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-1.5 rounded-full flex-shrink-0" style={{ background: BRASS }} />
-              <p><strong className="text-[#1b2a41]">Lens</strong> — bulges out (convex) or in (concave)</p>
+              <p><strong className="text-h-1b2a41">Lens</strong> — bulges out (convex) or in (concave)</p>
             </div>
           </div>
         </div>

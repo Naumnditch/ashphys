@@ -43,7 +43,7 @@ export default async function ProblemHealthPage() {
         </div>
         <a
           href="/api/teacher/analytics/export?view=problems"
-          className="text-sm font-semibold bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg self-start"
+          className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg self-start"
         >
           Export CSV
         </a>

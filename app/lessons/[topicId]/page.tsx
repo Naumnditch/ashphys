@@ -83,7 +83,7 @@ export default async function LessonPage({
         </p>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex flex-wrap items-center gap-3">
           {curriculumId !== 'igcse' && topicCode && topicCode !== 'Maths' && (
-            <span className="font-mono text-base font-semibold text-[#5a67d8] bg-[#eef0fd] px-2 py-0.5 rounded">{topicCode}</span>
+            <span className="font-mono text-base font-semibold text-h-5a67d8 bg-h-eef0fd px-2 py-0.5 rounded">{topicCode}</span>
           )}
           {title}
         </h1>
@@ -91,7 +91,7 @@ export default async function LessonPage({
           <p className="text-gray-600 mt-2">Syllabus section: {found.section.title}</p>
         )}
         {lesson.syllabus_reference && (
-          <p className="mt-4 text-gray-700 bg-gray-50 border-l-[3px] border-[#667eea] px-4 py-2 rounded-r">
+          <p className="mt-4 text-gray-700 bg-gray-50 border-l-[3px] border-h-667eea px-4 py-2 rounded-r">
             {lesson.syllabus_reference}
           </p>
         )}
@@ -104,7 +104,7 @@ export default async function LessonPage({
                 <Link
                   key={c}
                   href={`/lessons/${lesson.id}?c=${c}`}
-                  className="border border-gray-200 hover:border-[#667eea] hover:text-[#5a67d8] rounded-full px-2.5 py-1 text-gray-700"
+                  className="border border-gray-200 hover:border-h-667eea hover:text-h-5a67d8 rounded-full px-2.5 py-1 text-gray-700"
                 >
                   {CURRICULA[c].shortName}
                   {code && code !== 'Maths' && <span className="font-mono ml-1 text-gray-500">{code}</span>}

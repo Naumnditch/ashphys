@@ -90,7 +90,7 @@ export function HelpCta({ hasVideoAccess }: { hasVideoAccess: boolean }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="help-cta-panel"
-        className="flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+        className="flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-on-ink shadow-lg transition hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
       >
         <svg
           aria-hidden="true"

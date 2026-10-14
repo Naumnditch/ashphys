@@ -14,11 +14,11 @@ import { useState } from 'react';
  * checked to round-trip back to its starting value.
  */
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
 
 interface Prefix {
   sym: string;
@@ -190,22 +190,22 @@ export function UnitPrefixesSimulator() {
   return (
     <div className="unit-prefixes-lab flex flex-col gap-5">
       {/* ---- Ladder ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{q.label}</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">click any rung</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">{q.label}</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">click any rung</span>
         </div>
 
         <div className="px-4 py-8 flex flex-col items-center">
           <div className="text-center mb-1">
-            <span className="italic font-bold text-[38px] text-[#1b2a41]" style={{ fontFamily: 'Georgia, serif' }}>
+            <span className="italic font-bold text-[38px] text-h-1b2a41" style={{ fontFamily: 'Georgia, serif' }}>
               {formatDecimal(shown)}
             </span>
             <span className="italic font-bold text-[26px] ml-2" style={{ fontFamily: 'Georgia, serif', color: BRASS }}>
               {activePrefix}{q.baseUnit}
             </span>
           </div>
-          <div className="text-[11.5px] font-mono text-[#a8a196] mb-1">
+          <div className="text-[11.5px] font-mono text-h-a8a196 mb-1">
             always the same quantity: {formatDecimal(q.trueValue)} {q.baseUnit}
           </div>
           {stepInfo && (
@@ -225,23 +225,23 @@ export function UnitPrefixesSimulator() {
                   key={p.sym || 'base'}
                   onClick={() => pickPrefix(p.sym)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded border transition-colors ${
-                    isActive ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-white border-[#eee6d3] hover:bg-[#faf7f0]'
+                    isActive ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-white border-h-eee6d3 hover:bg-h-faf7f0'
                   }`}
                 >
-                  <span className={`font-mono text-[11px] w-12 text-right ${isActive ? 'text-white/70' : 'text-[#a8a196]'}`}>
+                  <span className={`font-mono text-[11px] w-12 text-right ${isActive ? 'text-white/70' : 'text-h-a8a196'}`}>
                     10{p.exp >= 0 ? '' : '⁻'}{Math.abs(p.exp)}
                   </span>
-                  <span className="italic font-bold text-[17px] w-8 text-center" style={{ fontFamily: 'Georgia, serif', color: isActive ? '#fff' : BRASS }}>
+                  <span className="italic font-bold text-[17px] w-8 text-center" style={{ fontFamily: 'Georgia, serif', color: isActive ? 'rgb(var(--h-ffffff))' : BRASS }}>
                     {p.sym || '—'}
                   </span>
-                  <span className={`text-[12px] w-20 text-left ${isActive ? 'text-white/80' : 'text-[#4a5a72]'}`}>
+                  <span className={`text-[12px] w-20 text-left ${isActive ? 'text-white/80' : 'text-h-4a5a72'}`}>
                     {p.name}
                   </span>
-                  <span className={`font-mono text-[12.5px] flex-1 text-right ${isActive ? 'text-white font-bold' : 'text-[#4a5a72]'}`}>
+                  <span className={`font-mono text-[12.5px] flex-1 text-right ${isActive ? 'text-white font-bold' : 'text-h-4a5a72'}`}>
                     {formatDecimal(val)} {p.sym}{q.baseUnit}
                   </span>
                   {p.common && !isActive && (
-                    <span className="text-[9px] font-mono uppercase tracking-wide text-[#2e7d6b] bg-[#e6f2ee] px-1.5 py-0.5 rounded">
+                    <span className="text-[9px] font-mono uppercase tracking-wide text-h-2e7d6b bg-h-e6f2ee px-1.5 py-0.5 rounded">
                       common
                     </span>
                   )}
@@ -251,14 +251,14 @@ export function UnitPrefixesSimulator() {
           </div>
         </div>
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3] flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1">quantity:</span>
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-mono text-h-a8a196 mr-1">quantity:</span>
           {QUANTITIES.map((qq, i) => (
             <button
               key={qq.id}
               onClick={() => switchQuantity(i)}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                i === qIdx ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                i === qIdx ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {qq.label}
@@ -268,24 +268,24 @@ export function UnitPrefixesSimulator() {
       </div>
 
       {/* ---- Drill ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Conversion Drill</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Conversion Drill</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {score.right} / {score.done} correct
           </span>
         </div>
         <div className="px-4 py-7 text-center">
-          <div className="italic text-[24px] text-[#1b2a41] mb-5" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="italic text-[24px] text-h-1b2a41 mb-5" style={{ fontFamily: 'Georgia, serif' }}>
             Convert {formatDecimal(drill.value)} {drill.from}{drill.unit} into {drill.to || ''}{drill.unit}
           </div>
           <div className="grid grid-cols-2 gap-2.5 max-w-md mx-auto">
             {drillOptions.map((opt) => {
               const isCorrect = opt === drillCorrect;
               const isPicked = picked === opt;
-              let cls = 'bg-white border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]';
-              if (picked !== null && isCorrect) cls = 'bg-[#e6f2ee] border-[#2e7d6b] text-[#1b5c4d] font-bold';
-              else if (isPicked) cls = 'bg-[#fbeae7] border-[#b34a3c] text-[#8f3626]';
+              let cls = 'bg-white border-h-d8cfb6 text-h-1b2a41 hover:bg-h-faf7f0';
+              if (picked !== null && isCorrect) cls = 'bg-h-e6f2ee border-h-2e7d6b text-h-1b5c4d font-bold';
+              else if (isPicked) cls = 'bg-h-fbeae7 border-h-b34a3c text-h-8f3626';
               return (
                 <button
                   key={opt}
@@ -300,12 +300,12 @@ export function UnitPrefixesSimulator() {
           </div>
           {picked !== null && (
             <div className="mt-5">
-              <div className="text-[12.5px] text-[#4a5a72] mb-3">
+              <div className="text-[12.5px] text-h-4a5a72 mb-3">
                 {picked === drillCorrect ? '✓ Correct — ' : '✕ Not quite — '}
                 {drill.from || 'the base unit'} is 10<sup>{expOf(drill.from)}</sup> and {drill.to || 'the base unit'} is
                 10<sup>{expOf(drill.to)}</sup>, so multiply by 10<sup>{expOf(drill.from) - expOf(drill.to)}</sup>.
               </div>
-              <button onClick={nextDrill} className="text-[12.5px] font-semibold px-4 py-2 rounded-full bg-[#1b2a41] text-white hover:bg-[#243a5e]">
+              <button onClick={nextDrill} className="text-[12.5px] font-semibold px-4 py-2 rounded-full bg-h-1b2a41 text-on-ink hover:bg-h-243a5e">
                 Next question →
               </button>
             </div>
@@ -315,49 +315,49 @@ export function UnitPrefixesSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Why It Matters</span>
-          <p className="mt-2.5 text-[12.5px] text-[#4a5a72] leading-snug">{q.note}</p>
-          <p className="mt-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
-            <strong className="text-[#1b2a41]">Every physics formula wants base units.</strong> Convert first, then
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Why It Matters</span>
+          <p className="mt-2.5 text-[12.5px] text-h-4a5a72 leading-snug">{q.note}</p>
+          <p className="mt-2.5 text-[12.5px] text-h-4a5a72 leading-snug">
+            <strong className="text-h-1b2a41">Every physics formula wants base units.</strong> Convert first, then
             calculate — never the other way round.
           </p>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Click from milli straight to kilo. The decimal jumps six
+              <strong className="text-h-1b2a41">1.</strong> Click from milli straight to kilo. The decimal jumps six
               places at once — a prefix change is never one step unless the rungs are adjacent.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Notice centi is only 10⁻², not 10⁻³. It breaks the
+              <strong className="text-h-1b2a41">2.</strong> Notice centi is only 10⁻², not 10⁻³. It breaks the
               three-at-a-time pattern, which is why cm → m trips people up.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> In the drill, look at the wrong answers before choosing —
+              <strong className="text-h-1b2a41">3.</strong> In the drill, look at the wrong answers before choosing —
               each one is a real mistake: converting the wrong way, missing by a thousand, or not converting at all.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[19px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               × 10<sup>(from − to)</sup>
             </div>
-            <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[12.5px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               subtract the exponents to get the factor
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             The Ones You Must Know
           </h2>
-          <div className="space-y-1.5 text-[12px] text-[#4a5a72]">
+          <div className="space-y-1.5 text-[12px] text-h-4a5a72">
             {PREFIXES.filter((p) => p.common && p.sym).map((p) => (
               <div key={p.sym} className="flex items-center gap-2">
-                <span className="italic font-bold w-5 text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>{p.sym}</span>
+                <span className="italic font-bold w-5 text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>{p.sym}</span>
                 <span className="w-14">{p.name}</span>
                 <span className="font-mono text-[11.5px]">10<sup>{p.exp}</sup></span>
               </div>

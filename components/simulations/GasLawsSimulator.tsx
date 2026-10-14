@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Gas in a Box — kinetic theory made honest.
  *
@@ -217,7 +219,7 @@ export function GasLawsSimulator() {
   const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
     const scale = rect.width / IW;
@@ -226,9 +228,9 @@ export function GasLawsSimulator() {
     const s = simRef.current;
 
     // ---- gas box ----
-    ctx.fillStyle = '#eef3f2';
+    ctx.fillStyle = 'rgb(var(--h-eef3f2))';
     ctx.fillRect(X0, Y0, s.pistonX - X0, BOX_H);
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 3;
     ctx.strokeRect(X0, Y0, s.pistonX - X0, BOX_H);
 
@@ -242,24 +244,24 @@ export function GasLawsSimulator() {
     }
 
     // piston: brass wall with handle
-    ctx.fillStyle = '#b8823d';
+    ctx.fillStyle = 'rgb(var(--h-b8823d))';
     ctx.fillRect(s.pistonX, Y0 - 4, 14, BOX_H + 8);
-    ctx.strokeStyle = '#8f6428';
+    ctx.strokeStyle = 'rgb(var(--h-8f6428))';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(s.pistonX, Y0 - 4, 14, BOX_H + 8);
-    ctx.fillStyle = '#8f6428';
+    ctx.fillStyle = 'rgb(var(--h-8f6428))';
     ctx.fillRect(s.pistonX + 14, Y0 + BOX_H / 2 - 5, 34, 10);
     ctx.beginPath();
     ctx.arc(s.pistonX + 52, Y0 + BOX_H / 2, 9, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     if (s.mode === 'charles') {
       ctx.fillText('free piston — floats on the gas', s.pistonX + 7, Y0 - 12);
       // external load arrows pressing the piston inward
-      ctx.strokeStyle = '#8f6428';
-      ctx.fillStyle = '#8f6428';
+      ctx.strokeStyle = 'rgb(var(--h-8f6428))';
+      ctx.fillStyle = 'rgb(var(--h-8f6428))';
       ctx.lineWidth = 2;
       for (const fy of [Y0 + 60, Y0 + BOX_H / 2, Y0 + BOX_H - 60]) {
         ctx.beginPath();
@@ -283,7 +285,7 @@ export function GasLawsSimulator() {
     }
 
     // volume label inside the box
-    ctx.fillStyle = 'rgba(27, 42, 65, 0.55)';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41) / 0.55)';
     ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`V = ${(areaOf(s.pistonX) / 1000).toFixed(1)} ×10³ u²   N = ${partsRef.current.length}`, X0 + 8, Y0 + 16);
@@ -294,15 +296,15 @@ export function GasLawsSimulator() {
     const gr = 62;
     ctx.beginPath();
     ctx.arc(gx, gy, gr, 0, Math.PI * 2);
-    ctx.fillStyle = '#faf7f0';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
     ctx.fill();
-    ctx.strokeStyle = '#b8823d';
+    ctx.strokeStyle = 'rgb(var(--h-b8823d))';
     ctx.lineWidth = 3;
     ctx.stroke();
     const P_FULL = 40; // dial full scale
     for (let k = 0; k <= 8; k++) {
       const ang = Math.PI * 0.75 + (k / 8) * Math.PI * 1.5;
-      ctx.strokeStyle = '#1b2a41';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
       ctx.lineWidth = k % 2 === 0 ? 2 : 1;
       ctx.beginPath();
       ctx.moveTo(gx + Math.cos(ang) * (gr - 10), gy + Math.sin(ang) * (gr - 10));
@@ -311,13 +313,13 @@ export function GasLawsSimulator() {
     }
     const pFrac = Math.min(1, s.pSmooth / P_FULL);
     const pAng = Math.PI * 0.75 + pFrac * Math.PI * 1.5;
-    ctx.strokeStyle = '#b34a3c';
+    ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(gx, gy);
     ctx.lineTo(gx + Math.cos(pAng) * (gr - 14), gy + Math.sin(pAng) * (gr - 14));
     ctx.stroke();
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.beginPath();
     ctx.arc(gx, gy, 4, 0, Math.PI * 2);
     ctx.fill();
@@ -325,36 +327,36 @@ export function GasLawsSimulator() {
     ctx.textAlign = 'center';
     ctx.fillText(`p = ${s.pSmooth.toFixed(1)}`, gx, gy + gr + 16);
     ctx.font = '500 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillText('measured from wall bombardment', gx, gy + gr + 30);
 
     // ---- thermometer: bath setpoint vs measured kinetic T ----
     const tx = 590;
     const ty0 = 260;
     const tH = 130;
-    ctx.fillStyle = '#faf7f0';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
     ctx.fillRect(tx - 9, ty0, 18, tH);
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(tx - 9, ty0, 18, tH);
     const tFrac = Math.min(1, s.tKin / 700);
-    ctx.fillStyle = '#b34a3c';
+    ctx.fillStyle = 'rgb(var(--h-b34a3c))';
     ctx.fillRect(tx - 6, ty0 + tH * (1 - tFrac), 12, tH * tFrac);
     const bathFrac = Math.min(1, s.bathT / 700);
-    ctx.strokeStyle = '#2e7d6b';
+    ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(tx - 16, ty0 + tH * (1 - bathFrac));
     ctx.lineTo(tx + 16, ty0 + tH * (1 - bathFrac));
     ctx.stroke();
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.font = '700 11px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.textAlign = 'center';
     ctx.fillText(`${Math.round(s.tKin)} K`, tx, ty0 + tH + 16);
     ctx.font = '500 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillText('gas temperature', tx, ty0 + tH + 30);
-    ctx.fillStyle = '#2e7d6b';
+    ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
     ctx.fillText('— bath setpoint', tx, ty0 - 8);
 
     // ---- law chart: axes depend on mode ----
@@ -362,9 +364,9 @@ export function GasLawsSimulator() {
     const cy0 = 60;
     const cw = 280;
     const ch = 320;
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = 'rgb(var(--h-ffffff))';
     ctx.fillRect(cx0, cy0, cw, ch);
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(cx0, cy0, cw, ch);
 
@@ -402,7 +404,7 @@ export function GasLawsSimulator() {
     const pToY = (y: number) => cy0 + ch - (Math.min(y, yHi) / yHi) * ch;
 
     // theory curve for the current settings
-    ctx.strokeStyle = '#2e7d6b';
+    ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
     ctx.lineWidth = 1.8;
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
@@ -421,18 +423,18 @@ export function GasLawsSimulator() {
     // measured trail
     s.trail.forEach((pt, idx) => {
       const age = idx / Math.max(1, s.trail.length - 1);
-      ctx.fillStyle = `rgba(184, 130, 61, ${0.15 + 0.75 * age})`;
+      ctx.fillStyle = `rgb(var(--h-b8823d) / ${0.15 + 0.75 * age})`;
       ctx.beginPath();
       ctx.arc(vToX(pt.x), pToY(pt.y), age > 0.98 ? 5 : 3, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(chartTitle, cx0 + cw / 2, cy0 - 8);
     ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, monospace';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.textAlign = 'left';
     ctx.fillText(xTag, cx0 + cw - 46, cy0 + ch + 14);
     ctx.save();
@@ -447,9 +449,9 @@ export function GasLawsSimulator() {
       const hy = Y0 + BOX_H - 116;
       const hw = 220;
       const hh = 104;
-      ctx.fillStyle = 'rgba(250, 247, 240, 0.93)';
+      ctx.fillStyle = 'rgb(var(--h-faf7f0) / 0.93)';
       ctx.fillRect(hx, hy, hw, hh);
-      ctx.strokeStyle = '#1b2a41';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
       ctx.lineWidth = 1;
       ctx.strokeRect(hx, hy, hw, hh);
       const bins = 18;
@@ -461,7 +463,7 @@ export function GasLawsSimulator() {
       }
       const hMax = Math.max(1, ...hist);
       for (let b = 0; b < bins; b++) {
-        ctx.fillStyle = 'rgba(46, 125, 107, 0.6)';
+        ctx.fillStyle = 'rgb(var(--h-2e7d6b) / 0.6)';
         const bh = (hist[b] / hMax) * (hh - 26);
         ctx.fillRect(hx + 6 + (b * (hw - 12)) / bins, hy + hh - 8 - bh, (hw - 12) / bins - 1, bh);
       }
@@ -475,7 +477,7 @@ export function GasLawsSimulator() {
         fs.push(fv);
         fMax = Math.max(fMax, fv);
       }
-      ctx.strokeStyle = '#b34a3c';
+      ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       fs.forEach((fv, b) => {
@@ -485,7 +487,7 @@ export function GasLawsSimulator() {
         else ctx.lineTo(xx, yy);
       });
       ctx.stroke();
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       ctx.font = '600 9.5px ui-monospace, SFMono-Regular, Menlo, monospace';
       ctx.textAlign = 'left';
       ctx.fillText('speed distribution: bars emerge from collisions,', hx + 6, hy + 12);
@@ -598,9 +600,11 @@ export function GasLawsSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -630,19 +634,19 @@ export function GasLawsSimulator() {
   return (
     <div className="gas-laws-lab flex flex-col gap-5">
       {/* ---- Apparatus: full width ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Kinetic Theory Bench · {nTarget} particles
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {paused ? 'paused' : 'live'}
           </span>
         </div>
         <div className="px-4 pt-2">
           <canvas
             ref={canvasRef}
-            className="block w-full rounded border border-[#e4ddcc] touch-none cursor-ew-resize"
+            className="block w-full rounded border border-h-e4ddcc touch-none cursor-ew-resize"
             style={{ aspectRatio: '1000 / 440' }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -651,16 +655,16 @@ export function GasLawsSimulator() {
           />
         </div>
         <div className="px-4 pb-2 pt-2">
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-            Every particle obeys Newton's laws; the <span className="text-[#b34a3c] font-semibold">pressure dial</span>{' '}
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+            Every particle obeys Newton's laws; the <span className="text-h-b34a3c font-semibold">pressure dial</span>{' '}
             reads nothing but the accumulated impact of particles on the walls. Squeeze the gas with the{' '}
-            <span className="text-[#8f6428] font-semibold">brass piston</span> and the measured dots on the{' '}
-            <span className="text-[#8f6428] font-semibold">p–V chart</span> trace out Boyle's hyperbola on their own.
+            <span className="text-h-8f6428 font-semibold">brass piston</span> and the measured dots on the{' '}
+            <span className="text-h-8f6428 font-semibold">p–V chart</span> trace out Boyle's hyperbola on their own.
             Particle colour shows speed: blue slow, red fast.
           </p>
         </div>
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="flex flex-wrap gap-2 mb-3">
             {([
               ['boyle', "Boyle's Law", 'constant T'],
@@ -671,45 +675,45 @@ export function GasLawsSimulator() {
                 key={m}
                 onClick={() => handleMode(m)}
                 className={`flex-1 min-w-36 text-[12.5px] font-semibold px-3 py-2 rounded border ${
-                  mode === m ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  mode === m ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
-                {label} <span className={mode === m ? 'opacity-80' : 'text-[#4a5a72]'}>· {cond}</span>
+                {label} <span className={mode === m ? 'opacity-80' : 'text-h-4a5a72'}>· {cond}</span>
               </button>
             ))}
           </div>
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug mb-3">{lawHint[mode]}</p>
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug mb-3">{lawHint[mode]}</p>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-3 mb-3">
             <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Bath temp. T</label>
+              <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Bath temp. T</label>
               <input type="range" min={100} max={600} step={10} value={bathT}
                 onChange={(e) => handleBathT(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{bathT} K</span>
             </div>
             {mode !== 'charles' ? (
               <div className="flex items-center gap-3">
-                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Volume</label>
+                <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Volume</label>
                 <input type="range" min={PISTON_MIN} max={PISTON_MAX} step={2} value={pistonX}
                   onChange={(e) => handleVolumeSlider(parseFloat(e.target.value))} className="flex-1" />
                 <span className="font-mono text-[13px] w-16 text-right">{(areaOf(pistonX) / 1000).toFixed(0)}k u²</span>
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Load p_ext</label>
+                <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Load p_ext</label>
                 <input type="range" min={10} max={26} step={1} value={pExt}
                   onChange={(e) => handlePExt(parseFloat(e.target.value))} className="flex-1" />
                 <span className="font-mono text-[13px] w-16 text-right">{pExt} u</span>
               </div>
             )}
             <div className="flex items-center gap-3">
-              <span className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Particles N</span>
+              <span className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Particles N</span>
               <button onClick={() => handleN(-40)}
-                className="flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+                className="flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
                 −40
               </button>
               <span className="font-mono text-[13px] w-10 text-center">{nTarget}</span>
               <button onClick={() => handleN(40)}
-                className="flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+                className="flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
                 +40
               </button>
             </div>
@@ -722,11 +726,11 @@ export function GasLawsSimulator() {
                 simRef.current.paused = next;
                 setPaused(next);
               }}
-              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
               {paused ? '▶ Resume' : '⏸ Pause'}
             </button>
             <button onClick={resetTrail}
-              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
               ⌫ Clear Chart Trail
             </button>
             <button
@@ -736,7 +740,7 @@ export function GasLawsSimulator() {
                 simRef.current.showTechnical = next;
               }}
               className={`flex-1 min-w-40 text-[12.5px] font-semibold px-3 py-2 rounded border ${
-                showTechnical ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                showTechnical ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}>
               {showTechnical ? '✓ Speed Distribution Shown' : '⚙ Show Speed Distribution'}
             </button>
@@ -746,96 +750,96 @@ export function GasLawsSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Live Readings</span>
           <div className="mt-3 space-y-2">
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Pressure p (measured)</span>
-              <span className="font-mono text-[13px] font-bold text-[#1b2a41]">{readout.p.toFixed(1)} u</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Pressure p (measured)</span>
+              <span className="font-mono text-[13px] font-bold text-h-1b2a41">{readout.p.toFixed(1)} u</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Gas temperature (measured)</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{Math.round(readout.tKin)} K</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Gas temperature (measured)</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{Math.round(readout.tKin)} K</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Product p × V</span>
-              <span className="font-mono text-[13px] font-bold text-[#2e7d6b]">{(readout.pv / 1000).toFixed(0)}k</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Product p × V</span>
+              <span className="font-mono text-[13px] font-bold text-h-2e7d6b">{(readout.pv / 1000).toFixed(0)}k</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Ideal-gas N·k·T</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{(readout.nkt / 1000).toFixed(0)}k</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Ideal-gas N·k·T</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{(readout.nkt / 1000).toFixed(0)}k</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Agreement pV / NkT</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{agreement > 0 ? `${agreement.toFixed(0)}%` : '—'}</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Agreement pV / NkT</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{agreement > 0 ? `${agreement.toFixed(0)}%` : '—'}</span>
             </div>
           </div>
-          <p className="text-[11.5px] text-[#4a5a72] mt-2.5 leading-snug">
+          <p className="text-[11.5px] text-h-4a5a72 mt-2.5 leading-snug">
             Watch p × V while you move the piston slowly: the product holds nearly constant while p and V change by more
             than double each. That constancy IS Boyle's law — and it emerges from nothing but Newton's laws.
           </p>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Clear the chart trail, then compress SLOWLY from full
+              <strong className="text-h-1b2a41">1.</strong> Clear the chart trail, then compress SLOWLY from full
               volume to minimum. The brass dots trace the green dashed hyperbola: p₁V₁ = p₂V₂, live.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Now slam the piston in fast and watch the thermometer: the
+              <strong className="text-h-1b2a41">2.</strong> Now slam the piston in fast and watch the thermometer: the
               red column jumps above the green bath marker. Compressing a gas does work on it and heats it — then the
               bath cools it back. That spike is why a bicycle pump gets hot.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Double the particles from 140 to 280 at fixed volume: the
+              <strong className="text-h-1b2a41">3.</strong> Double the particles from 140 to 280 at fixed volume: the
               dial doubles. Pressure is bombardment, and twice the particles means twice the hits.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">4.</strong> Heat the bath from 300 K to 600 K at fixed volume: particles
+              <strong className="text-h-1b2a41">4.</strong> Heat the bath from 300 K to 600 K at fixed volume: particles
               turn red, hit harder and more often, and p doubles — the pressure law.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">5.</strong> Open the speed distribution: the histogram isn't drawn from
+              <strong className="text-h-1b2a41">5.</strong> Open the speed distribution: the histogram isn't drawn from
               a formula — it's counted from the particles, and collisions alone push it onto the red theory curve.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">6.</strong> Switch to the Pressure Law, clear the trail, then sweep the
+              <strong className="text-h-1b2a41">6.</strong> Switch to the Pressure Law, clear the trail, then sweep the
               bath from 100 K to 600 K at fixed volume. The dots form a straight line aimed at the origin — extend it
               backwards and it hits p = 0 at T = 0: absolute zero, discovered by extrapolation.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">7.</strong> Switch to Charles's Law: the piston now floats on the gas
+              <strong className="text-h-1b2a41">7.</strong> Switch to Charles's Law: the piston now floats on the gas
               under a fixed load. Heat the bath and watch the gas physically push the piston out — the V–T dots make a
               straight line through the origin. This only works with kelvin: that's WHY the gas laws use it.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[22px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               {lawFormula[mode].main}
             </div>
-            <div className="italic text-[14px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[14px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               {lawFormula[mode].sub}
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             What Each Variable Means
           </h2>
           <div className="space-y-2.5">
             {variables.map((v) => (
               <div key={v.symbol} className="flex gap-3 items-start">
                 <div
-                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                  className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[16px] font-bold italic text-h-8f6428"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   {v.symbol}
                 </div>
-                <p className="text-[12px] text-[#4a5a72] leading-snug">
-                  <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                <p className="text-[12px] text-h-4a5a72 leading-snug">
+                  <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                 </p>
               </div>
             ))}

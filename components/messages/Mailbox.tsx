@@ -166,7 +166,7 @@ export function Mailbox({
           <button
             type="button"
             onClick={() => setCompose({ open: true, draft: null, recipients: [] })}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-gray-900 px-3.5 py-2 text-sm font-semibold text-white hover:bg-gray-800 sm:flex-none"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-gray-900 px-3.5 py-2 text-sm font-semibold text-on-ink hover:bg-gray-800 sm:flex-none"
           >
             <MailIcon name="pen" /> New message
           </button>
@@ -256,7 +256,7 @@ export function Mailbox({
 export function SendToast({ notice, onClose }: { notice: SendNotice; onClose: () => void }) {
   if (notice.tone === 'ok') {
     return (
-      <div role="status" className="fixed bottom-4 left-1/2 z-[60] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-center text-sm font-medium text-white shadow-lg animate-fade-in-up">
+      <div role="status" className="fixed bottom-4 left-1/2 z-[60] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-center text-sm font-medium text-on-ink shadow-lg animate-fade-in-up">
         {notice.title}
         {notice.detail && <span className="font-normal text-gray-300"> · {notice.detail}</span>}
       </div>

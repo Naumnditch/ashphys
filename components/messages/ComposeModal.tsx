@@ -128,7 +128,7 @@ export function ComposeModal({
               type="button"
               onClick={send}
               disabled={sending}
-              className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-50"
             >
               <MailIcon name="send" />
               {sending ? 'Sending…' : recipients.length > 1 ? `Send to ${recipients.length}` : 'Send'}

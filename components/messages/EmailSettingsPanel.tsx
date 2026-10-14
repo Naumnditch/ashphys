@@ -121,7 +121,7 @@ export function EmailSettingsPanel({ email, stats }: { email: EmailStatusSummary
                 type="button"
                 onClick={sendTest}
                 disabled={testing}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-[13px] font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gray-900 px-3 py-1.5 text-[13px] font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-50"
               >
                 <MailIcon name="send" className="h-3.5 w-3.5" />
                 {testing ? 'Sending…' : 'Send test email'}

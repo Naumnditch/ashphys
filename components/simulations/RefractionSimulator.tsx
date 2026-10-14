@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Refraction & Total Internal Reflection — an optics bench.
  *
@@ -26,11 +28,11 @@ interface Medium {
 }
 
 const MEDIA: Medium[] = [
-  { key: 'air', name: 'Air', n: 1.0, tint: 'rgba(250, 247, 240, 0)', label: 'n = 1.00' },
-  { key: 'water', name: 'Water', n: 1.33, tint: 'rgba(46, 125, 107, 0.10)', label: 'n = 1.33' },
-  { key: 'perspex', name: 'Perspex', n: 1.5, tint: 'rgba(74, 90, 114, 0.10)', label: 'n = 1.50' },
-  { key: 'glass', name: 'Glass', n: 1.52, tint: 'rgba(27, 42, 65, 0.12)', label: 'n = 1.52' },
-  { key: 'diamond', name: 'Diamond', n: 2.42, tint: 'rgba(122, 82, 179, 0.12)', label: 'n = 2.42' },
+  { key: 'air', name: 'Air', n: 1.0, tint: 'rgb(var(--h-faf7f0) / 0)', label: 'n = 1.00' },
+  { key: 'water', name: 'Water', n: 1.33, tint: 'rgb(var(--h-2e7d6b) / 0.10)', label: 'n = 1.33' },
+  { key: 'perspex', name: 'Perspex', n: 1.5, tint: 'rgb(var(--h-4a5a72) / 0.10)', label: 'n = 1.50' },
+  { key: 'glass', name: 'Glass', n: 1.52, tint: 'rgb(var(--h-1b2a41) / 0.12)', label: 'n = 1.52' },
+  { key: 'diamond', name: 'Diamond', n: 2.42, tint: 'rgb(var(--h-7a52b3) / 0.12)', label: 'n = 2.42' },
 ];
 
 const mediumByKey = (key: string): Medium => MEDIA.find((m) => m.key === key) || MEDIA[0];
@@ -97,7 +99,7 @@ export function RefractionSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const s = simRef.current;
@@ -127,13 +129,13 @@ export function RefractionSimulator() {
 
     // medium labels
     ctx.font = '600 12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.textAlign = 'left';
     ctx.fillText(`${topM.name}  ·  ${topM.label}`, 12, 20);
     ctx.fillText(`${botM.name}  ·  ${botM.label}`, 12, h - 12);
 
     // --- interface line ---
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, oy);
@@ -141,7 +143,7 @@ export function RefractionSimulator() {
     ctx.stroke();
 
     // --- normal (dashed vertical) ---
-    ctx.strokeStyle = '#8a94a3';
+    ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
     ctx.lineWidth = 1.4;
     ctx.setLineDash([6, 5]);
     ctx.beginPath();
@@ -150,12 +152,12 @@ export function RefractionSimulator() {
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.font = '500 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#8a94a3';
+    ctx.fillStyle = 'rgb(var(--h-8a94a3))';
     ctx.textAlign = 'center';
     ctx.fillText('normal', ox, oy - rayLen - 20);
 
     // --- protractor arcs etched around the point of incidence ---
-    ctx.strokeStyle = 'rgba(27, 42, 65, 0.22)';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.22)';
     ctx.lineWidth = 1;
     [0.32, 0.44].forEach((f) => {
       ctx.beginPath();
@@ -179,8 +181,8 @@ export function RefractionSimulator() {
     const reflX = ox + rayLen * Math.sin(i);
     const reflY = oy - rayLen * Math.cos(i);
 
-    const rayColor = (alpha: number) => `rgba(184, 130, 61, ${alpha})`;
-    const glow = (alpha: number) => `rgba(201, 146, 45, ${alpha * 0.35})`;
+    const rayColor = (alpha: number) => `rgb(var(--h-b8823d) / ${alpha})`;
+    const glow = (alpha: number) => `rgb(var(--h-c9922d) / ${alpha * 0.35})`;
 
     const drawRay = (x0: number, y0: number, x1: number, y1: number, intensity: number, arrow: boolean) => {
       const a = 0.25 + 0.75 * intensity;
@@ -219,7 +221,7 @@ export function RefractionSimulator() {
       const uy = (y1 - y0) / len;
       const spacing = 34 / n; // λ shrinks in the denser medium
       const offset = ((phaseRef.current % 1) + 1) % 1;
-      ctx.strokeStyle = `rgba(46, 125, 107, ${0.35 + 0.45 * intensity})`;
+      ctx.strokeStyle = `rgb(var(--h-2e7d6b) / ${0.35 + 0.45 * intensity})`;
       ctx.lineWidth = 1.6;
       for (let d = offset * spacing; d < len; d += spacing) {
         const px = x0 + ux * d;
@@ -252,35 +254,35 @@ export function RefractionSimulator() {
     const labelFont = '700 13px Georgia, serif';
 
     // angle of incidence i (between upward normal and incident ray, left side)
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.arc(ox, oy, rayLen * 0.2, -Math.PI / 2 - i, -Math.PI / 2);
     ctx.stroke();
     ctx.font = labelFont;
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.textAlign = 'center';
     const iMid = -Math.PI / 2 - i / 2;
     ctx.fillText(`i = ${s.incidentDeg.toFixed(0)}°`, ox + rayLen * 0.29 * Math.cos(iMid), oy + rayLen * 0.29 * Math.sin(iMid) + 4);
 
     if (!tir) {
       // angle of refraction r (between downward normal and refracted ray, right side)
-      ctx.strokeStyle = '#2e7d6b';
+      ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
       ctx.beginPath();
       ctx.arc(ox, oy, rayLen * 0.2, Math.PI / 2 - r, Math.PI / 2);
       ctx.stroke();
-      ctx.fillStyle = '#2e7d6b';
+      ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
       const rMid = Math.PI / 2 - r / 2;
       ctx.fillText(`r = ${(r / DEG).toFixed(1)}°`, ox + rayLen * 0.3 * Math.cos(rMid), oy + rayLen * 0.3 * Math.sin(rMid) + 4);
     } else {
-      ctx.fillStyle = '#b34a3c';
+      ctx.fillStyle = 'rgb(var(--h-b34a3c))';
       ctx.font = '700 14px Georgia, serif';
       ctx.fillText('Total internal reflection — no light escapes', ox, oy + 34);
     }
 
     // critical angle marker (dashed red ray in the top medium)
     if (critical !== null) {
-      ctx.strokeStyle = 'rgba(179, 74, 60, 0.6)';
+      ctx.strokeStyle = 'rgb(var(--h-b34a3c) / 0.6)';
       ctx.lineWidth = 1.4;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -288,7 +290,7 @@ export function RefractionSimulator() {
       ctx.lineTo(ox - rayLen * 0.66 * Math.sin(critical), oy - rayLen * 0.66 * Math.cos(critical));
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#b34a3c';
+      ctx.fillStyle = 'rgb(var(--h-b34a3c))';
       ctx.font = '600 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText(`c = ${(critical / DEG).toFixed(1)}°`, ox - rayLen * 0.72 * Math.sin(critical) - 30, oy - rayLen * 0.72 * Math.cos(critical));
@@ -299,12 +301,12 @@ export function RefractionSimulator() {
     ctx.save();
     ctx.translate(srcX, srcY);
     ctx.rotate(boxAng);
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.fillRect(-34, -11, 30, 22);
-    ctx.fillStyle = '#b8823d';
+    ctx.fillStyle = 'rgb(var(--h-b8823d))';
     ctx.fillRect(-6, -6, 6, 12); // aperture
     ctx.restore();
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '500 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('drag me', srcX - 30 * Math.cos(boxAng), srcY - 30 * Math.sin(boxAng) - 14);
@@ -313,7 +315,7 @@ export function RefractionSimulator() {
     if (s.showTechnical) {
       ctx.textAlign = 'right';
       ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
-      ctx.fillStyle = '#4a5a72';
+      ctx.fillStyle = 'rgb(var(--h-4a5a72))';
       const lines = [
         `n₁ sin i = ${(topM.n * Math.sin(i)).toFixed(3)}`,
         tir ? 'n₂ sin r — (no refracted ray)' : `n₂ sin r = ${(botM.n * Math.sin(r)).toFixed(3)}`,
@@ -329,7 +331,7 @@ export function RefractionSimulator() {
   const drawPlot = () => {
     const canvas = plotRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
     const w = rect.width;
@@ -343,7 +345,7 @@ export function RefractionSimulator() {
     const Y = (sR: number) => pad.t + (1 - Math.min(1, sR)) * ph;
 
     // frame + gridlines
-    ctx.strokeStyle = '#e4ddcc';
+    ctx.strokeStyle = 'rgb(var(--h-e4ddcc))';
     ctx.lineWidth = 1;
     for (let g = 0; g <= 1.001; g += 0.25) {
       ctx.beginPath();
@@ -355,12 +357,12 @@ export function RefractionSimulator() {
       ctx.lineTo(pad.l + pw, Y(g));
       ctx.stroke();
     }
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.4;
     ctx.strokeRect(pad.l, pad.t, pw, ph);
 
     ctx.font = '500 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.textAlign = 'center';
     [0, 0.5, 1].forEach((g) => ctx.fillText(g.toFixed(1), X(g), pad.t + ph + 14));
     ctx.fillText('sin i', pad.l + pw / 2, h - 4);
@@ -376,7 +378,7 @@ export function RefractionSimulator() {
     const topM = mediumByKey(simRef.current.topKey);
     const botM = mediumByKey(simRef.current.bottomKey);
     const k = topM.n / botM.n;
-    ctx.strokeStyle = 'rgba(46, 125, 107, 0.45)';
+    ctx.strokeStyle = 'rgb(var(--h-2e7d6b) / 0.45)';
     ctx.lineWidth = 1.4;
     ctx.setLineDash([5, 4]);
     ctx.beginPath();
@@ -390,7 +392,7 @@ export function RefractionSimulator() {
     const pts = pointsRef.current;
     const fit = fitThroughOrigin(pts);
     if (fit !== null) {
-      ctx.strokeStyle = '#1b2a41';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
       ctx.lineWidth = 1.8;
       ctx.beginPath();
       ctx.moveTo(X(0), Y(0));
@@ -399,11 +401,11 @@ export function RefractionSimulator() {
       ctx.stroke();
     }
     pts.forEach((p) => {
-      ctx.fillStyle = '#b8823d';
+      ctx.fillStyle = 'rgb(var(--h-b8823d))';
       ctx.beginPath();
       ctx.arc(X(p.sinI), Y(p.sinR), 4, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#faf7f0';
+      ctx.strokeStyle = 'rgb(var(--h-faf7f0))';
       ctx.lineWidth = 1.2;
       ctx.stroke();
     });
@@ -506,10 +508,12 @@ export function RefractionSimulator() {
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
 
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -533,8 +537,8 @@ export function RefractionSimulator() {
           onClick={() => onPick(m.key)}
           className={`text-[12px] font-medium px-2.5 py-1 rounded border ${
             current === m.key
-              ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-              : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+              ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+              : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
           }`}
         >
           {m.name}
@@ -547,10 +551,10 @@ export function RefractionSimulator() {
     <div className="refraction-lab">
       <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-5">
         {/* ---- Apparatus ---- */}
-        <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+        <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
           <div className="flex justify-between items-baseline px-4 pt-3">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Optics Bench</span>
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Optics Bench</span>
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
               {isTIR ? 'TIR' : `r = ${(rRad / DEG).toFixed(1)}°`}
             </span>
           </div>
@@ -564,17 +568,17 @@ export function RefractionSimulator() {
             onPointerCancel={handlePointerUp}
           />
           <div className="px-4 pb-2 -mt-1">
-            <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-              <span className="text-[#b8823d] font-semibold">Drag the ray box</span> to change the angle of incidence.{' '}
-              <span className="text-[#2e7d6b] font-semibold">Green ticks</span> are wavefronts — watch them squeeze together
+            <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+              <span className="text-h-b8823d font-semibold">Drag the ray box</span> to change the angle of incidence.{' '}
+              <span className="text-h-2e7d6b font-semibold">Green ticks</span> are wavefronts — watch them squeeze together
               in the slower medium.{' '}
-              <span className="text-[#b34a3c] font-semibold">Dashed red line</span> = critical angle (when it exists).
+              <span className="text-h-b34a3c font-semibold">Dashed red line</span> = critical angle (when it exists).
             </p>
           </div>
 
-          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Incidence (i)</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Incidence (i)</label>
               <input
                 type="range"
                 min={1}
@@ -588,18 +592,18 @@ export function RefractionSimulator() {
             </div>
 
             <div className="flex items-start gap-3 mb-2.5">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0 pt-1">Top medium</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0 pt-1">Top medium</label>
               {mediumButtons(topKey, handleTop)}
             </div>
             <div className="flex items-start gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0 pt-1">Bottom medium</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0 pt-1">Bottom medium</label>
               {mediumButtons(bottomKey, handleBottom)}
             </div>
 
             <div className="flex gap-2 mb-3">
               <button
                 onClick={handleSwap}
-                className="flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]"
+                className="flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2"
               >
                 ⇅ Swap media
               </button>
@@ -611,8 +615,8 @@ export function RefractionSimulator() {
                 }}
                 className={`flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                   showWavefronts
-                    ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]'
-                    : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b'
+                    : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
                 {showWavefronts ? '✓ Wavefronts' : 'Wavefronts'}
@@ -627,8 +631,8 @@ export function RefractionSimulator() {
               }}
               className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
                 showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
@@ -638,53 +642,53 @@ export function RefractionSimulator() {
 
         {/* ---- Data notebook ---- */}
         <div className="flex flex-col gap-5">
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Live Readings</span>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Angle of incidence i</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{incidentDeg.toFixed(1)}°</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Angle of incidence i</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{incidentDeg.toFixed(1)}°</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Angle of refraction r</span>
-                <span className={`font-mono text-[13px] ${isTIR ? 'text-[#b34a3c] font-bold' : 'text-[#2e7d6b]'}`}>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Angle of refraction r</span>
+                <span className={`font-mono text-[13px] ${isTIR ? 'text-h-b34a3c font-bold' : 'text-h-2e7d6b'}`}>
                   {isTIR ? 'TIR' : `${(rRad / DEG).toFixed(1)}°`}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">n₁ sin i</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{(top.n * Math.sin(iRad)).toFixed(3)}</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">n₁ sin i</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{(top.n * Math.sin(iRad)).toFixed(3)}</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">n₂ sin r</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{isTIR ? '—' : (bottom.n * Math.sin(rRad)).toFixed(3)}</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">n₂ sin r</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{isTIR ? '—' : (bottom.n * Math.sin(rRad)).toFixed(3)}</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Critical angle c</span>
-                <span className="font-mono text-[13px] text-[#b34a3c]">
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Critical angle c</span>
+                <span className="font-mono text-[13px] text-h-b34a3c">
                   {criticalDeg !== null ? `${criticalDeg.toFixed(1)}°` : 'none'}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Light reflected</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{(reflectance * 100).toFixed(1)}%</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Light reflected</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{(reflectance * 100).toFixed(1)}%</span>
               </div>
             </div>
             {criticalDeg === null && (
-              <p className="text-[11.5px] text-[#4a5a72] mt-2 leading-snug">
+              <p className="text-[11.5px] text-h-4a5a72 mt-2 leading-snug">
                 No critical angle here: light is entering a <em>denser</em> medium, so it always gets in. Try swapping the media.
               </p>
             )}
           </div>
 
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
             <div className="flex justify-between items-baseline">
-              <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+              <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
                 Measure n yourself
               </span>
-              <span className="font-mono text-[11px] text-[#4a5a72]">{recorded.length} pts</span>
+              <span className="font-mono text-[11px] text-h-4a5a72">{recorded.length} pts</span>
             </div>
-            <p className="text-[11.5px] text-[#4a5a72] mt-1.5 leading-snug">
+            <p className="text-[11.5px] text-h-4a5a72 mt-1.5 leading-snug">
               Set an angle, press <strong>Record point</strong>, repeat for 5+ angles. The gradient of your line is
               n₁/n₂ — exactly how the glass-block practical works.
             </p>
@@ -695,36 +699,36 @@ export function RefractionSimulator() {
                 disabled={isTIR}
                 className={`flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                   isTIR
-                    ? 'bg-[#f5f0e2] text-[#8a94a3] border-[#e4ddcc] cursor-not-allowed'
-                    : 'bg-[#b8823d] text-white border-[#b8823d] hover:bg-[#a06f2f]'
+                    ? 'bg-h-f5f0e2 text-h-8a94a3 border-h-e4ddcc cursor-not-allowed'
+                    : 'bg-h-b8823d text-on-ink border-h-b8823d hover:bg-h-a06f2f'
                 }`}
               >
                 ● Record point
               </button>
               <button
                 onClick={handleClearPoints}
-                className="text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]"
+                className="text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2"
               >
                 Clear
               </button>
             </div>
             {measuredRatio !== null && (
-              <div className="mt-2.5 bg-[#faf7f0] border border-[#eee6d3] rounded p-2.5">
-                <span className="text-[12.5px] text-[#4a5a72]">Your measured n₂/n₁ = </span>
-                <span className="font-mono text-[14px] font-bold text-[#1b2a41]">{measuredRatio.toFixed(3)}</span>
-                <span className="text-[12.5px] text-[#4a5a72]"> (true value {(bottom.n / top.n).toFixed(3)})</span>
+              <div className="mt-2.5 bg-h-faf7f0 border border-h-eee6d3 rounded p-2.5">
+                <span className="text-[12.5px] text-h-4a5a72">Your measured n₂/n₁ = </span>
+                <span className="font-mono text-[14px] font-bold text-h-1b2a41">{measuredRatio.toFixed(3)}</span>
+                <span className="text-[12.5px] text-h-4a5a72"> (true value {(bottom.n / top.n).toFixed(3)})</span>
               </div>
             )}
           </div>
 
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Variables</span>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Variables</span>
             <div className="mt-2 space-y-2">
               {variables.map((v) => (
                 <div key={v.symbol} className="flex gap-3">
-                  <span className="font-serif italic font-bold text-[15px] text-[#1b2a41] w-5 flex-shrink-0">{v.symbol}</span>
-                  <p className="text-[12px] text-[#4a5a72] leading-snug">
-                    <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                  <span className="font-serif italic font-bold text-[15px] text-h-1b2a41 w-5 flex-shrink-0">{v.symbol}</span>
+                  <p className="text-[12px] text-h-4a5a72 leading-snug">
+                    <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                   </p>
                 </div>
               ))}

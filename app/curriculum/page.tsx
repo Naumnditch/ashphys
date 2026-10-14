@@ -91,7 +91,7 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
                 <span className="font-semibold text-gray-900">{group.title}</span>
               )}
               {group.level && (
-                <span className="ml-auto text-[10px] font-bold uppercase tracking-wide text-[#5a67d8] bg-[#eef0fd] px-2 py-0.5 rounded-full">
+                <span className="ml-auto text-[10px] font-bold uppercase tracking-wide text-h-5a67d8 bg-h-eef0fd px-2 py-0.5 rounded-full">
                   {group.level}
                 </span>
               )}

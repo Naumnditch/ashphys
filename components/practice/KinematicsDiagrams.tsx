@@ -17,14 +17,14 @@
 
 import type { ReactNode } from 'react';
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
-const GRID = '#d8cfb6';
-const PAPER = '#faf7f0';
-const BORDER = '#e4ddcc';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
+const GRID = 'rgb(var(--h-d8cfb6))';
+const PAPER = 'rgb(var(--h-faf7f0))';
+const BORDER = 'rgb(var(--h-e4ddcc))';
 const SERIF = 'Georgia, serif';
 const MONO = 'ui-monospace, monospace';
 
@@ -688,9 +688,9 @@ export function RulerReading({
   const xB = marginX + edgeB * scale;
   return (
     <Frame width={width} height={height}>
-      <rect x={marginX - 10} y={rulerY} width={span + 20} height={26} fill="#f4efe0" stroke={INK} strokeWidth={1.2} />
+      <rect x={marginX - 10} y={rulerY} width={span + 20} height={26} fill="rgb(var(--h-f4efe0))" stroke={INK} strokeWidth={1.2} />
       {ticks}
-      <rect x={Math.min(xA, xB)} y={objY} width={Math.abs(xB - xA)} height={16} fill="#dbe7f0" stroke={TEAL} strokeWidth={1.8} />
+      <rect x={Math.min(xA, xB)} y={objY} width={Math.abs(xB - xA)} height={16} fill="rgb(var(--h-dbe7f0))" stroke={TEAL} strokeWidth={1.8} />
       <line x1={xA} y1={rulerY} x2={xA} y2={objY + 22} stroke={RED} strokeWidth={1} strokeDasharray="3 2" />
       <line x1={xB} y1={rulerY} x2={xB} y2={objY + 22} stroke={RED} strokeWidth={1} strokeDasharray="3 2" />
       <Txt x={(xA + xB) / 2} y={objY + 36} size={10.5} color={RED} bold>
@@ -711,8 +711,8 @@ export function MicrometerReading({ mainMm, thimbleHundredths, width = 460, heig
   const thimbleX = sleeveX + sleeveW - 30;
   return (
     <Frame width={width} height={height}>
-      <rect x={20} y={y - 18} width={sleeveX - 10} height={36} fill="#e7e2d4" stroke={INK} strokeWidth={1.4} />
-      <rect x={sleeveX} y={y - 14} width={sleeveW} height={28} fill="#f4efe0" stroke={INK} strokeWidth={1.4} />
+      <rect x={20} y={y - 18} width={sleeveX - 10} height={36} fill="rgb(var(--h-e7e2d4))" stroke={INK} strokeWidth={1.4} />
+      <rect x={sleeveX} y={y - 14} width={sleeveW} height={28} fill="rgb(var(--h-f4efe0))" stroke={INK} strokeWidth={1.4} />
       {Array.from({ length: 11 }).map((_, i) => (
         <g key={i}>
           <line x1={sleeveX + 14 + i * 20} y1={y - 14} x2={sleeveX + 14 + i * 20} y2={y - 14 + (i % 2 === 0 ? 10 : 6)} stroke={INK} strokeWidth={1} />
@@ -724,7 +724,7 @@ export function MicrometerReading({ mainMm, thimbleHundredths, width = 460, heig
         </g>
       ))}
       <line x1={sleeveX + 14 + 5 * 20} y1={y - 14} x2={sleeveX + 14 + 5 * 20} y2={y + 16} stroke={RED} strokeWidth={1.4} strokeDasharray="2 2" />
-      <rect x={thimbleX} y={y - 36} width={90} height={72} rx={8} fill="#eee8d8" stroke={INK} strokeWidth={1.6} />
+      <rect x={thimbleX} y={y - 36} width={90} height={72} rx={8} fill="rgb(var(--h-eee8d8))" stroke={INK} strokeWidth={1.6} />
       {Array.from({ length: 5 }).map((_, i) => (
         <Txt key={i} x={thimbleX + 45} y={y - 18 + i * 10} size={8} color={MUTE} mono>
           {((Math.round(thimbleHundredths / 5) * 5 - 10 + i * 5) % 50 + 50) % 50}
@@ -747,7 +747,7 @@ export function StopwatchReading({ seconds, width = 300, height = 180 }: { secon
   const angle = frac * 2 * Math.PI - Math.PI / 2;
   return (
     <Frame width={width} height={height}>
-      <circle cx={cx} cy={cy} r={r} fill="#f4efe0" stroke={INK} strokeWidth={2.2} />
+      <circle cx={cx} cy={cy} r={r} fill="rgb(var(--h-f4efe0))" stroke={INK} strokeWidth={2.2} />
       {Array.from({ length: 12 }).map((_, i) => {
         const a = (i / 12) * 2 * Math.PI - Math.PI / 2;
         return (
@@ -909,7 +909,7 @@ export function LightGateRamp({ gateDistanceCm, cardLengthCm, width = 460, heigh
           </Txt>
         </g>
       ))}
-      <rect x={gx(0.58) - 16} y={gy(0.58) - 13} width={32} height={13} fill="#dbe7f0" stroke={TEAL} strokeWidth={1.6} transform={`rotate(${(Math.atan2(rampY2 - rampY1, rampX2 - rampX1) * 180) / Math.PI} ${gx(0.58)} ${gy(0.58)})`} />
+      <rect x={gx(0.58) - 16} y={gy(0.58) - 13} width={32} height={13} fill="rgb(var(--h-dbe7f0))" stroke={TEAL} strokeWidth={1.6} transform={`rotate(${(Math.atan2(rampY2 - rampY1, rampX2 - rampX1) * 180) / Math.PI} ${gx(0.58)} ${gy(0.58)})`} />
       <line x1={gx(gate1)} y1={gy(gate1) + 20} x2={gx(gate2)} y2={gy(gate2) + 20} stroke={MUTE} strokeWidth={1} markerStart="url(#kin-dim-start)" markerEnd="url(#kin-dim-end)" />
       <Txt x={(gx(gate1) + gx(gate2)) / 2} y={(gy(gate1) + gy(gate2)) / 2 + 34} size={10.5} bold>
         {gateDistanceCm} cm
@@ -928,7 +928,7 @@ export function BallDropSetup({ heights, width = 300, height = 320 }: { heights:
   return (
     <Frame width={width} height={height}>
       <line x1={40} y1={groundY} x2={width - 20} y2={groundY} stroke={INK} strokeWidth={2.2} />
-      <circle cx={100} cy={topY - 6} r={10} fill="#dbe7f0" stroke={INK} strokeWidth={1.6} />
+      <circle cx={100} cy={topY - 6} r={10} fill="rgb(var(--h-dbe7f0))" stroke={INK} strokeWidth={1.6} />
       <line x1={100} y1={topY + 4} x2={100} y2={groundY} stroke={MUTE} strokeWidth={1} strokeDasharray="4 3" />
       {heights.map((h, i) => {
         const y = groundY - h * scale;

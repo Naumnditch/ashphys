@@ -91,11 +91,11 @@ export function AdminSidebar({ name, pending }: { name: string; pending: Pending
                     aria-current={active ? 'page' : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
                       active
-                        ? 'bg-gray-900 text-white font-semibold'
+                        ? 'bg-gray-900 text-on-ink font-semibold'
                         : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
-                    <AdminIcon name={item.icon} className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-white' : 'text-gray-400'}`} />
+                    <AdminIcon name={item.icon} className={`w-[18px] h-[18px] shrink-0 ${active ? 'text-on-ink' : 'text-gray-400'}`} />
                     <span className="flex-1 leading-snug">{item.label}</span>
                     {count > 0 && (
                       <span

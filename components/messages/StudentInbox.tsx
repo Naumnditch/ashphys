@@ -197,7 +197,7 @@ export function StudentInbox({ firstName, initialEmailNotifications }: { firstNa
             <button
               type="submit"
               disabled={sending || !text.trim()}
-              className="inline-flex h-11 items-center gap-2 rounded-lg bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-40"
+              className="inline-flex h-11 items-center gap-2 rounded-lg bg-gray-900 px-4 text-sm font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-40"
             >
               <MailIcon name="send" />
               <span className="hidden sm:inline">{sending ? 'Sending…' : 'Send'}</span>

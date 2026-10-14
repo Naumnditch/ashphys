@@ -50,7 +50,7 @@ export default function JoinClassPage() {
           </p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-lg font-semibold text-sm"
+            className="bg-gray-900 hover:bg-black text-on-ink px-6 py-2.5 rounded-lg font-semibold text-sm"
           >
             Go to Dashboard
           </button>
@@ -88,7 +88,7 @@ export default function JoinClassPage() {
           <button
             type="submit"
             disabled={loading || code.trim().length < 4}
-            className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-semibold text-[15px] transition-colors disabled:opacity-40"
+            className="w-full bg-gray-900 hover:bg-black text-on-ink py-3 rounded-lg font-semibold text-[15px] transition-colors disabled:opacity-40"
           >
             {loading ? 'Joining…' : 'Join Class'}
           </button>

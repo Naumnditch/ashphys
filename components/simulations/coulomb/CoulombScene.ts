@@ -70,7 +70,7 @@ export class CoulombScene {
   private lines: FatLine[] = [];
   private heads: THREE.InstancedMesh;
   private arrows = { a: new Arrow3D(PLUM), b: new Arrow3D(TEAL), net: new Arrow3D(BRASS) };
-  private arrowLabels = { a: makeLabel('', '#7a4a8f', 12), b: makeLabel('', '#2e7d6b', 12), net: makeLabel('', '#8f6428', 13) };
+  private arrowLabels = { a: makeLabel('', 'rgb(var(--h-7a4a8f))', 12), b: makeLabel('', 'rgb(var(--h-2e7d6b))', 12), net: makeLabel('', 'rgb(var(--h-8f6428))', 13) };
   private para = [dashedLine([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)], INK, 0.45), dashedLine([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)], INK, 0.45)];
   /** World units per newton; kept steady until arrows get too long or too short. */
   private arrowScale = 0;
@@ -96,9 +96,9 @@ export class CoulombScene {
       const s = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 24), new THREE.MeshStandardMaterial({ color: RED, metalness: 0.15, roughness: 0.35 }));
       s.castShadow = true;
       this.spheres.push(s);
-      const sign = makeLabel('+', '#ffffff', 17);
+      const sign = makeLabel('+', 'rgb(var(--h-ffffff))', 17);
       Object.assign(sign.element.style, { background: 'transparent', fontStyle: 'normal', fontFamily: 'ui-sans-serif, system-ui', padding: '0' });
-      const name = makeLabel('', '#1b2a41', 12);
+      const name = makeLabel('', 'rgb(var(--h-1b2a41))', 12);
       this.signs.push(sign);
       this.names.push(name);
       scene.add(s, sign, name);
@@ -345,7 +345,7 @@ export class CoulombScene {
     const thick = Math.min(0.022, spanW * 0.012);
     // In a pair both arrows are the same force (Newton's third law), so the same colour.
     A.b.material.color.set(p.mode === 'pair' ? PLUM : TEAL);
-    L.b.element.style.color = p.mode === 'pair' ? '#7a4a8f' : '#2e7d6b';
+    L.b.element.style.color = p.mode === 'pair' ? 'rgb(var(--h-7a4a8f))' : 'rgb(var(--h-2e7d6b))';
     for (const key of ['a', 'b', 'net'] as const) {
       const v = vectors.find((x) => x.key === key);
       A[key].visible = L[key].visible = !!v;

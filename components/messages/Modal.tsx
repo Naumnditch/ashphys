@@ -38,7 +38,7 @@ export function Modal({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-gray-900/40 sm:p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-scrim/40 sm:p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"

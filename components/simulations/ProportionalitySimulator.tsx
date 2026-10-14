@@ -26,11 +26,11 @@ import { useState } from 'react';
  * doubling the driver scales the responder by exactly 2^k.
  */
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
 
 interface VarDef {
   sym: string;
@@ -303,10 +303,10 @@ export function ProportionalitySimulator() {
 
   return (
     <div className="proportionality-lab flex flex-col gap-5">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{eq.name}</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">solving for {responder}</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">{eq.name}</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">solving for {responder}</span>
         </div>
         <div className="flex gap-1.5 px-4 pt-3">
           {([['drag', 'Drag the sliders'], ['factors', 'Enter factors']] as const).map(([m, label]) => (
@@ -314,7 +314,7 @@ export function ProportionalitySimulator() {
               key={m}
               onClick={() => { setMode(m); setLastDriver(null); }}
               className={`text-[12.5px] font-semibold px-3.5 py-1.5 rounded-full border ${
-                mode === m ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                mode === m ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {label}
@@ -340,7 +340,7 @@ export function ProportionalitySimulator() {
                       fontFamily: 'Georgia, serif',
                       fontSize: sizeFor(sym),
                       color,
-                      background: isResp ? 'rgba(46,125,107,0.10)' : isDriver ? 'rgba(179,74,60,0.10)' : 'transparent',
+                      background: isResp ? 'rgb(var(--h-2e7d6b) / 0.10)' : isDriver ? 'rgb(var(--h-b34a3c) / 0.10)' : 'transparent',
                     }}
                   >
                     {sym}
@@ -391,21 +391,21 @@ export function ProportionalitySimulator() {
             <span
               className="inline-block text-[13.5px] font-bold px-4 py-1.5 rounded-full"
               style={{
-                background: relationship.isDirect ? '#e6f2ee' : '#fbeae7',
-                color: relationship.isDirect ? '#1b5c4d' : '#8f3626',
+                background: relationship.isDirect ? 'rgb(var(--h-e6f2ee))' : 'rgb(var(--h-fbeae7))',
+                color: relationship.isDirect ? 'rgb(var(--h-1b5c4d))' : 'rgb(var(--h-8f3626))',
               }}
             >
               {relationship.text} — {relationship.isDirect ? 'directly proportional' : 'inversely proportional'}
             </span>
             {heldVars.length > 0 && (
-              <div className="text-[11.5px] font-mono text-[#a8a196] mt-1.5">
+              <div className="text-[11.5px] font-mono text-h-a8a196 mt-1.5">
                 with {heldVars.map((v) => v.sym).join(' and ')} held constant
               </div>
             )}
           </div>
         )}
         {!relationship && (
-          <div className="text-center pb-2 text-[12px] text-[#4a5a72]">
+          <div className="text-center pb-2 text-[12px] text-h-4a5a72">
             Drag any slider below — {responder} will answer, and the relationship gets named.
           </div>
         )}
@@ -418,15 +418,15 @@ export function ProportionalitySimulator() {
               const f = factorOf(v.sym);
               const shownVal = mode === 'drag' ? values[v.sym] : v.base * netFactorOf(v.sym);
               return (
-                <div key={v.sym} className={`px-3 py-2.5 rounded border ${isResponder ? 'border-[#2e7d6b] bg-[#f2f9f7]' : 'border-[#eee6d3]'}`}>
+                <div key={v.sym} className={`px-3 py-2.5 rounded border ${isResponder ? 'border-h-2e7d6b bg-h-f2f9f7' : 'border-h-eee6d3'}`}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2">
                       <span className="italic font-bold text-[17px]" style={{ fontFamily: 'Georgia, serif', color: isResponder ? TEAL : INK }}>
                         {v.sym}
                       </span>
-                      <span className="text-[11.5px] text-[#4a5a72]">{v.name}</span>
+                      <span className="text-[11.5px] text-h-4a5a72">{v.name}</span>
                       {mode === 'factors' && (f.num !== 1 || f.den !== 1) && (
-                        <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: isResponder ? '#e6f2ee' : '#f6efdc', color: isResponder ? '#1b5c4d' : '#8f6428' }}>
+                        <span className="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ background: isResponder ? 'rgb(var(--h-e6f2ee))' : 'rgb(var(--h-f6efdc))', color: isResponder ? 'rgb(var(--h-1b5c4d))' : 'rgb(var(--h-8f6428))' }}>
                           {f.den === 1 ? `× ${formatVal(f.num)}` : `${formatVal(f.num)} / ${formatVal(f.den)}`}
                         </span>
                       )}
@@ -437,7 +437,7 @@ export function ProportionalitySimulator() {
                   </div>
 
                   {isResponder ? (
-                    <div className="text-[11px] font-mono uppercase tracking-wide text-[#2e7d6b]">
+                    <div className="text-[11px] font-mono uppercase tracking-wide text-h-2e7d6b">
                       responds automatically — this is what you are solving for
                     </div>
                   ) : mode === 'drag' ? (
@@ -463,13 +463,13 @@ export function ProportionalitySimulator() {
                       />
                       <button
                         onClick={() => applyFactor(v.sym, false)}
-                        className="text-[13px] font-bold px-3 py-1 rounded border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]"
+                        className="text-[13px] font-bold px-3 py-1 rounded border border-h-d8cfb6 text-h-1b2a41 hover:bg-h-faf7f0"
                       >
                         × multiply
                       </button>
                       <button
                         onClick={() => applyFactor(v.sym, true)}
-                        className="text-[13px] font-bold px-3 py-1 rounded border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]"
+                        className="text-[13px] font-bold px-3 py-1 rounded border border-h-d8cfb6 text-h-1b2a41 hover:bg-h-faf7f0"
                       >
                         ÷ divide
                       </button>
@@ -479,7 +479,7 @@ export function ProportionalitySimulator() {
               );
             })}
             {mode === 'factors' && (
-              <p className="text-[11.5px] text-[#4a5a72] leading-snug">
+              <p className="text-[11.5px] text-h-4a5a72 leading-snug">
                 Allocations stack up — each one keeps affecting the balance until you hit Reset, which returns every
                 factor to 1.
               </p>
@@ -487,7 +487,7 @@ export function ProportionalitySimulator() {
           </div>
 
           <div>
-            <div className="font-mono text-[10.5px] tracking-wide uppercase text-[#4a5a72] mb-2">
+            <div className="font-mono text-[10.5px] tracking-wide uppercase text-h-4a5a72 mb-2">
               {mode === 'factors'
                 ? `net effect on ${responder}`
                 : relationship
@@ -495,44 +495,44 @@ export function ProportionalitySimulator() {
                 : 'graph appears once you drag'}
             </div>
             {mode === 'factors' ? (
-              <div className="border border-[#eee6d3] rounded bg-[#faf7f0] p-4 text-center">
+              <div className="border border-h-eee6d3 rounded bg-h-faf7f0 p-4 text-center">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <span className="italic font-bold text-[22px]" style={{ fontFamily: 'Georgia, serif', color: TEAL }}>
                     {responder}
                   </span>
-                  <span className="text-[18px] text-[#4a5a72]">×</span>
-                  <span className="inline-flex flex-col items-center leading-none font-mono font-bold text-[#1b2a41]">
+                  <span className="text-[18px] text-h-4a5a72">×</span>
+                  <span className="inline-flex flex-col items-center leading-none font-mono font-bold text-h-1b2a41">
                     <span className="text-[17px]">{formatVal(respFactor.num)}</span>
                     {respFactor.den !== 1 && (
                       <>
-                        <span className="block w-full h-[2px] my-1 rounded bg-[#1b2a41]" />
+                        <span className="block w-full h-[2px] my-1 rounded bg-h-1b2a41" />
                         <span className="text-[17px]">{formatVal(respFactor.den)}</span>
                       </>
                     )}
                   </span>
                 </div>
-                <div className="text-[12.5px] font-mono text-[#4a5a72]">
+                <div className="text-[12.5px] font-mono text-h-4a5a72">
                   net × {formatVal(respFactor.num / respFactor.den)}
                 </div>
-                <div className="text-[12px] text-[#4a5a72] mt-2">
-                  {formatVal(varOf(responder).base)} → <strong className="text-[#1b2a41]">{formatVal(varOf(responder).base * (respFactor.num / respFactor.den))}</strong> {varOf(responder).unit}
+                <div className="text-[12px] text-h-4a5a72 mt-2">
+                  {formatVal(varOf(responder).base)} → <strong className="text-h-1b2a41">{formatVal(varOf(responder).base * (respFactor.num / respFactor.den))}</strong> {varOf(responder).unit}
                 </div>
               </div>
             ) : (
-              <div className="border border-[#eee6d3] rounded bg-[#faf7f0] p-2">
+              <div className="border border-h-eee6d3 rounded bg-h-faf7f0 p-2">
                 {graph ? (
                   <svg viewBox={`0 0 ${graph.W} ${graph.H}`} className="w-full" style={{ display: 'block' }}>
-                    <line x1={0} y1={graph.H} x2={graph.W} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
-                    <line x1={0} y1={0} x2={0} y2={graph.H} stroke="#c9c0aa" strokeWidth={1} />
+                    <line x1={0} y1={graph.H} x2={graph.W} y2={graph.H} stroke="rgb(var(--h-c9c0aa))" strokeWidth={1} />
+                    <line x1={0} y1={0} x2={0} y2={graph.H} stroke="rgb(var(--h-c9c0aa))" strokeWidth={1} />
                     <path d={graph.path} fill="none" stroke={graph.isDirect ? TEAL : RED} strokeWidth={2.2} />
                     <circle cx={graph.cx} cy={graph.cy} r={5} fill={graph.isDirect ? TEAL : RED} />
                   </svg>
                 ) : (
-                  <div className="text-[11.5px] text-[#a8a196] text-center py-10">—</div>
+                  <div className="text-[11.5px] text-h-a8a196 text-center py-10">—</div>
                 )}
               </div>
             )}
-            <p className="text-[11px] text-[#4a5a72] leading-snug mt-2">
+            <p className="text-[11px] text-h-4a5a72 leading-snug mt-2">
               {mode === 'factors'
                 ? 'Each allocation carries into this fraction by the proportionality rule — multiplying a directly proportional variable multiplies the top, an inversely proportional one multiplies the bottom.'
                 : relationship
@@ -544,29 +544,29 @@ export function ProportionalitySimulator() {
           </div>
         </div>
 
-        <div className="px-4 pb-5 pt-4 mt-2 border-t border-[#eee6d3] flex flex-wrap items-center gap-2">
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1">solve for:</span>
+        <div className="px-4 pb-5 pt-4 mt-2 border-t border-h-eee6d3 flex flex-wrap items-center gap-2">
+          <span className="text-[11px] font-mono text-h-a8a196 mr-1">solve for:</span>
           {eq.vars.map((v) => (
             <button
               key={v.sym}
               onClick={() => chooseResponder(v.sym)}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                v.sym === responder ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                v.sym === responder ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {v.sym}
             </button>
           ))}
-          <button onClick={reset} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] hover:bg-[#faf7f0] ml-2">
+          <button onClick={reset} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-4a5a72 hover:bg-h-faf7f0 ml-2">
             ↺ Reset
           </button>
-          <span className="text-[11px] font-mono text-[#a8a196] mr-1 ml-auto">equation:</span>
+          <span className="text-[11px] font-mono text-h-a8a196 mr-1 ml-auto">equation:</span>
           {EQUATIONS.map((e, i) => (
             <button
               key={e.id}
               onClick={() => switchEquation(i)}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                i === eqIdx ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                i === eqIdx ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
               }`}
             >
               {e.display}
@@ -577,11 +577,11 @@ export function ProportionalitySimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">The Trap</span>
-          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">The Trap</span>
+          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">"F is proportional to m" is an incomplete sentence.</strong> Proportional
+              <strong className="text-h-1b2a41">"F is proportional to m" is an incomplete sentence.</strong> Proportional
               while <em>what</em> is held constant?
             </p>
             <p>
@@ -592,38 +592,38 @@ export function ProportionalitySimulator() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Run the F = ma experiment above both ways and watch the
+              <strong className="text-h-1b2a41">1.</strong> Run the F = ma experiment above both ways and watch the
               graph flip from a straight line to a falling curve.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> On ρ = m/V, solve for ρ and drag V. Density rises as
+              <strong className="text-h-1b2a41">2.</strong> On ρ = m/V, solve for ρ and drag V. Density rises as
               volume falls — squeeze the same mass smaller and it gets denser.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> On p = ρgh, solve for p and drag h. Double the depth,
+              <strong className="text-h-1b2a41">3.</strong> On p = ρgh, solve for p and drag h. Double the depth,
               double the pressure. Then solve for h instead and drag ρ — a denser liquid needs less depth for the same
               pressure.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[19px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               y = k x
             </div>
-            <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[12.5px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               k is the constant of proportionality
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             Reading The Shape
           </h2>
-          <div className="space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+          <div className="space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
               <strong style={{ color: TEAL }}>Direct (y = kx)</strong> — straight line through the origin. Double one,
               double the other. The gradient is k.

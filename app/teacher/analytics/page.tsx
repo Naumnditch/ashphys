@@ -81,7 +81,7 @@ export default async function TeacherAnalyticsPage() {
           </Link>
           <a
             href="/api/teacher/analytics/export?view=roster"
-            className="text-sm font-semibold bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg"
+            className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg"
           >
             Export CSV
           </a>

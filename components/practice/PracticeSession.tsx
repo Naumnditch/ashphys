@@ -268,7 +268,7 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
         <div className="flex items-center justify-center gap-3">
           <Link
             href={`/curriculum/${topic.chapterId}${curriculumId ? `?c=${curriculumId}` : ''}`}
-            className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded-lg font-semibold text-sm"
+            className="bg-gray-900 hover:bg-black text-on-ink px-5 py-2.5 rounded-lg font-semibold text-sm"
           >
             Back to Chapter
           </Link>
@@ -340,8 +340,10 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
           <MomentumDiagram diagramKey={current.imageUrl} />
         )}
         {current.imageUrl && !current.imageUrl.startsWith('diagram:') && (
+          // Uploaded figures are raster images drawn on white: keep a white mat behind them
+          // in dark mode instead of inverting them.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={current.imageUrl} alt="" className="w-full max-w-md mx-auto mb-5 rounded border border-gray-200" />
+          <img src={current.imageUrl} alt="" className="w-full max-w-md mx-auto mb-5 rounded border border-gray-200 p-1" style={{ backgroundColor: '#ffffff' }} />
         )}
         <p className="text-[17px] text-gray-900 leading-relaxed mb-6">{current.questionText}</p>
 
@@ -489,7 +491,7 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
           <button
             onClick={handleCheck}
             disabled={!selected.trim() || checking}
-            className="flex-1 bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-semibold text-[15px] disabled:opacity-40"
+            className="flex-1 bg-gray-900 hover:bg-black text-on-ink py-3 rounded-lg font-semibold text-[15px] disabled:opacity-40"
           >
             {checking ? 'Checking…' : 'Check Answer'}
           </button>
@@ -497,7 +499,7 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
       ) : (
         <button
           onClick={handleNext}
-          className="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-semibold text-[15px]"
+          className="w-full bg-gray-900 hover:bg-black text-on-ink py-3 rounded-lg font-semibold text-[15px]"
         >
           Next Question →
         </button>

@@ -65,7 +65,7 @@ export function CurriculumTierManager({ initialSimulations, initialTopics }: { i
             key={t}
             onClick={() => setTab(t)}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${
-              tab === t ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+              tab === t ? 'bg-gray-900 text-on-ink border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
             }`}
           >
             {t === 'simulations' ? `Simulations (${simulations.length})` : `Lessons (${topics.length})`}

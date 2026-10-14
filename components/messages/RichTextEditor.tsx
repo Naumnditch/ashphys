@@ -146,7 +146,7 @@ export function RichTextEditor({
             aria-pressed={Boolean(active[t.cmd])}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => run(t.cmd, t.arg)}
-            className={`${btn} ${active[t.cmd] ? 'bg-gray-900 text-white hover:bg-gray-800 hover:text-white' : ''}`}
+            className={`${btn} ${active[t.cmd] ? 'bg-gray-900 text-on-ink hover:bg-gray-800 hover:text-on-ink' : ''}`}
           >
             <MailIcon name={t.icon} />
           </button>
@@ -219,7 +219,7 @@ export function RichTextEditor({
             aria-label="Link address"
             className="flex-1 min-w-0 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-gray-900 focus:outline-none"
           />
-          <button type="button" onClick={insertLink} className="rounded-md bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white hover:bg-gray-800">
+          <button type="button" onClick={insertLink} className="rounded-md bg-gray-900 px-2.5 py-1 text-xs font-semibold text-on-ink hover:bg-gray-800">
             Add link
           </button>
         </div>

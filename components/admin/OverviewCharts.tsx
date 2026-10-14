@@ -15,11 +15,11 @@ import {
 import type { DailyPoint } from '@/lib/admin/overview';
 
 // Validated categorical slots 1 and 2 (dataviz reference palette, light surface).
-const SERIES_1 = '#2a78d6';
-const SERIES_2 = '#eb6834';
-const GRID = '#e1e0d9';
-const MUTED = '#898781';
-const SURFACE = '#ffffff';
+const SERIES_1 = 'rgb(var(--h-2a78d6))';
+const SERIES_2 = 'rgb(var(--h-eb6834))';
+const GRID = 'rgb(var(--h-e1e0d9))';
+const MUTED = 'rgb(var(--h-898781))';
+const SURFACE = 'rgb(var(--h-ffffff))';
 
 const axisTick = { fontSize: 11, fill: MUTED };
 
@@ -52,9 +52,9 @@ export function DailyActiveUsersChart({ data }: { data: DailyPoint[] }) {
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} barCategoryGap={2}>
         <CartesianGrid vertical={false} stroke={GRID} />
-        <XAxis dataKey="day" ticks={dayTicks(data)} tickFormatter={shortDate} tick={axisTick} tickLine={false} axisLine={{ stroke: '#c3c2b7' }} />
+        <XAxis dataKey="day" ticks={dayTicks(data)} tickFormatter={shortDate} tick={axisTick} tickLine={false} axisLine={{ stroke: 'rgb(var(--h-c3c2b7))' }} />
         <YAxis allowDecimals={false} tick={axisTick} tickLine={false} axisLine={false} />
-        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(11,11,11,0.04)' }} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgb(var(--h-0b0b0b) / 0.04)' }} />
         <Bar dataKey="activeUsers" name="Active users" fill={SERIES_1} radius={[4, 4, 0, 0]} maxBarSize={24} />
       </BarChart>
     </ResponsiveContainer>
@@ -66,10 +66,10 @@ export function PracticeResultsChart({ data }: { data: DailyPoint[] }) {
     <ResponsiveContainer width="100%" height={240}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} barCategoryGap={2}>
         <CartesianGrid vertical={false} stroke={GRID} />
-        <XAxis dataKey="day" ticks={dayTicks(data)} tickFormatter={shortDate} tick={axisTick} tickLine={false} axisLine={{ stroke: '#c3c2b7' }} />
+        <XAxis dataKey="day" ticks={dayTicks(data)} tickFormatter={shortDate} tick={axisTick} tickLine={false} axisLine={{ stroke: 'rgb(var(--h-c3c2b7))' }} />
         <YAxis allowDecimals={false} tick={axisTick} tickLine={false} axisLine={false} />
-        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(11,11,11,0.04)' }} />
-        <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }} formatter={(value) => <span style={{ color: '#52514e' }}>{value}</span>} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgb(var(--h-0b0b0b) / 0.04)' }} />
+        <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }} formatter={(value) => <span style={{ color: 'rgb(var(--h-52514e))' }}>{value}</span>} />
         {/* The surface-coloured stroke is the 2px gap between stacked segments. */}
         <Bar dataKey="correct" name="Correct" stackId="a" fill={SERIES_1} stroke={SURFACE} strokeWidth={2} maxBarSize={24} />
         <Bar dataKey="incorrect" name="Incorrect" stackId="a" fill={SERIES_2} stroke={SURFACE} strokeWidth={2} radius={[4, 4, 0, 0]} maxBarSize={24} />
@@ -83,10 +83,10 @@ export function ActivityMixChart({ data }: { data: { label: string; count: numbe
     <ResponsiveContainer width="100%" height={data.length * 34 + 8}>
       <BarChart data={data} layout="vertical" margin={{ top: 0, right: 40, left: 0, bottom: 0 }}>
         <XAxis type="number" hide allowDecimals={false} />
-        <YAxis type="category" dataKey="label" width={150} tick={{ fontSize: 12, fill: '#52514e' }} tickLine={false} axisLine={false} />
-        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(11,11,11,0.04)' }} />
+        <YAxis type="category" dataKey="label" width={150} tick={{ fontSize: 12, fill: 'rgb(var(--h-52514e))' }} tickLine={false} axisLine={false} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgb(var(--h-0b0b0b) / 0.04)' }} />
         <Bar dataKey="count" name="Events" fill={SERIES_1} radius={[0, 4, 4, 0]} barSize={16} minPointSize={2}>
-          <LabelList dataKey="count" position="right" style={{ fontSize: 12, fill: '#0b0b0b', fontWeight: 600 }} />
+          <LabelList dataKey="count" position="right" style={{ fontSize: 12, fill: 'rgb(var(--h-0b0b0b))', fontWeight: 600 }} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>

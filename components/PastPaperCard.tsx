@@ -60,15 +60,15 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
   };
 
   return (
-    <div className="bg-white border border-[#e4ddcc] rounded-xl p-5 flex flex-col">
-      <h3 className="text-[17px] font-bold text-[#1b2a41] leading-tight mb-1">
+    <div className="bg-white border border-h-e4ddcc rounded-xl p-5 flex flex-col">
+      <h3 className="text-[17px] font-bold text-h-1b2a41 leading-tight mb-1">
         Paper {paper.paper_number}: {paper.paper_name}
       </h3>
-      <p className="text-[14px] text-[#4a5a72] mb-2">
+      <p className="text-[14px] text-h-4a5a72 mb-2">
         {paper.session} {paper.year}
       </p>
 
-      <div className="flex items-center gap-3 mb-4 text-[12.5px] text-[#4a5a72]">
+      <div className="flex items-center gap-3 mb-4 text-[12.5px] text-h-4a5a72">
         {paper.tier && (
           <span className="inline-flex items-center gap-1">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -86,8 +86,8 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
       </div>
 
       {/* score tracker */}
-      <div className={`flex items-center justify-between gap-2 border border-dashed rounded-lg px-3 py-2.5 mb-3 ${score ? 'border-[#2e7d6b] bg-[#f2f9f7]' : 'border-[#d8cfb6]'}`}>
-        <span className="text-[13.5px] text-[#4a5a72]">Your score</span>
+      <div className={`flex items-center justify-between gap-2 border border-dashed rounded-lg px-3 py-2.5 mb-3 ${score ? 'border-h-2e7d6b bg-h-f2f9f7' : 'border-h-d8cfb6'}`}>
+        <span className="text-[13.5px] text-h-4a5a72">Your score</span>
         <div className="flex items-center gap-1.5">
           <input
             type="number"
@@ -98,14 +98,14 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
             placeholder="—"
             onChange={(e) => setScore(e.target.value)}
             onBlur={(e) => save(e.target.value)}
-            className="w-14 text-center text-[14px] font-mono border border-[#d8cfb6] rounded-md px-1.5 py-1 disabled:bg-transparent disabled:border-transparent"
+            className="w-14 text-center text-[14px] font-mono border border-h-d8cfb6 rounded-md px-1.5 py-1 disabled:bg-transparent disabled:border-transparent"
             title={signedIn ? 'Enter your mark' : 'Sign in to record your score'}
           />
-          <span className="text-[14px] text-[#4a5a72] font-mono">/ {paper.max_marks ?? '—'}</span>
+          <span className="text-[14px] text-h-4a5a72 font-mono">/ {paper.max_marks ?? '—'}</span>
         </div>
       </div>
-      {err && <p className="text-[11.5px] text-[#b34a3c] -mt-2 mb-2">{err}</p>}
-      {saving && <p className="text-[11.5px] text-[#a8a196] -mt-2 mb-2">saving…</p>}
+      {err && <p className="text-[11.5px] text-h-b34a3c -mt-2 mb-2">{err}</p>}
+      {saving && <p className="text-[11.5px] text-h-a8a196 -mt-2 mb-2">saving…</p>}
 
       {/* actions */}
       <div className="mt-auto space-y-2">
@@ -115,12 +115,12 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent({ eventType: 'download', entityType: 'past_paper', entityId: paper.id, metadata: { file: 'question_paper' } })}
-            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-[#eef2fb] text-[#2f52c9] hover:bg-[#e3eaf9]"
+            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-h-eef2fb text-h-2f52c9 hover:bg-h-e3eaf9"
           >
             <DownloadIcon /> Question Paper
           </a>
         ) : (
-          <span className="flex items-center justify-center gap-2 text-[13.5px] px-3 py-2.5 rounded-lg bg-[#f7f4ec] text-[#a8a196]">
+          <span className="flex items-center justify-center gap-2 text-[13.5px] px-3 py-2.5 rounded-lg bg-h-f7f4ec text-h-a8a196">
             <DownloadIcon /> Question Paper
           </span>
         )}
@@ -131,12 +131,12 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent({ eventType: 'download', entityType: 'past_paper', entityId: paper.id, metadata: { file: 'mark_scheme' } })}
-            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-[#f2f1ef] text-[#1b2a41] hover:bg-[#e9e7e3]"
+            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-h-f2f1ef text-h-1b2a41 hover:bg-h-e9e7e3"
           >
             <DownloadIcon /> Mark Scheme
           </a>
         ) : (
-          <span className="flex items-center justify-center gap-2 text-[13.5px] px-3 py-2.5 rounded-lg bg-[#f7f4ec] text-[#a8a196]">
+          <span className="flex items-center justify-center gap-2 text-[13.5px] px-3 py-2.5 rounded-lg bg-h-f7f4ec text-h-a8a196">
             <DownloadIcon /> Mark Scheme
           </span>
         )}
@@ -146,12 +146,12 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
             href={paper.explanation_video_url!}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-[#1b2a41] text-white hover:bg-[#243a5e]"
+            className="flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-h-1b2a41 text-on-ink hover:bg-h-243a5e"
           >
             <PlayIcon /> Video Solution
           </a>
         ) : (
-          <span className="flex items-center justify-center gap-2 text-[12.5px] px-3 py-2.5 rounded-lg bg-[#f6efdc] text-[#8f6428] border border-[#e6d9b8]">
+          <span className="flex items-center justify-center gap-2 text-[12.5px] px-3 py-2.5 rounded-lg bg-h-f6efdc text-h-8f6428 border border-h-e6d9b8">
             <PlayIcon /> Video Solution — coming soon
           </span>
         )}

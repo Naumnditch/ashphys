@@ -153,7 +153,7 @@ export default async function HomePage() {
           >
             <Link
               href="/auth/signup"
-              className="bg-gray-900 hover:bg-black text-white px-7 py-3.5 rounded-lg font-semibold text-[15px] transition-transform hover:scale-[1.03] w-full sm:w-auto"
+              className="bg-gray-900 hover:bg-black text-on-ink px-7 py-3.5 rounded-lg font-semibold text-[15px] transition-transform hover:scale-[1.03] w-full sm:w-auto"
             >
               Start Learning Free
             </Link>
@@ -178,7 +178,7 @@ export default async function HomePage() {
       </section>
 
       {/* ---------- Curriculum coverage ---------- */}
-      <section className="bg-gray-900 py-12">
+      <section className="theme-light bg-gray-900 py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Reveal className="text-center mb-8">
             <h2 className="text-xl font-bold text-white mb-1">Wherever You&rsquo;re Studying, We&rsquo;ve Got It</h2>
@@ -320,7 +320,7 @@ export default async function HomePage() {
                     <div
                       className={`rounded-xl p-6 h-full flex flex-col ${
                         isPro
-                          ? 'bg-gray-900 text-white border-2 border-gray-900 shadow-lg'
+                          ? 'theme-light bg-gray-900 text-white border-2 border-gray-900 shadow-lg'
                           : 'bg-white border border-gray-200'
                       }`}
                     >
@@ -353,7 +353,7 @@ export default async function HomePage() {
                         className={`text-center text-sm font-semibold py-2.5 rounded-lg transition-colors ${
                           isPro
                             ? 'bg-white text-gray-900 hover:bg-gray-100'
-                            : 'bg-gray-900 text-white hover:bg-black'
+                            : 'bg-gray-900 text-on-ink hover:bg-black'
                         }`}
                       >
                         {monthly === 0 ? 'Get Started' : 'Choose ' + plan.name}
@@ -380,7 +380,7 @@ export default async function HomePage() {
           <p className="text-gray-500 mb-8">Join free. Upgrade only if you want to.</p>
           <Link
             href="/auth/signup"
-            className="inline-block bg-gray-900 hover:bg-black text-white px-8 py-3.5 rounded-lg font-semibold transition-transform hover:scale-[1.03]"
+            className="inline-block bg-gray-900 hover:bg-black text-on-ink px-8 py-3.5 rounded-lg font-semibold transition-transform hover:scale-[1.03]"
           >
             Start Learning Free
           </Link>

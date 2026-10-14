@@ -54,7 +54,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
       aria-pressed={on}
       onClick={onClick}
       className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-        on ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+        on ? 'border-gray-900 bg-gray-900 text-on-ink' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
       }`}
     >
       {children}
@@ -225,7 +225,7 @@ export function BulkSendModal({
             <SaveAsTemplate subject={subject} body={body} onSaved={(t) => onTemplatesChange([...templates, t])} />
             <div className="ml-auto flex items-center gap-2">
               <span className={`text-sm text-gray-500 ${previewing ? 'opacity-60' : ''}`}>{countLine}</span>
-              <button type="button" onClick={review} className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800">
+              <button type="button" onClick={review} className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-on-ink hover:bg-gray-800">
                 Review
               </button>
             </div>
@@ -239,7 +239,7 @@ export function BulkSendModal({
               type="button"
               onClick={send}
               disabled={sending}
-              className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-50"
             >
               <MailIcon name="send" />
               {sending ? 'Sending…' : `Send to ${preview?.count ?? 0} ${preview?.count === 1 ? 'person' : 'people'}`}

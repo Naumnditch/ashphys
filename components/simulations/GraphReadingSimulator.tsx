@@ -19,11 +19,11 @@ import { useRef, useState } from 'react';
  * the breakpoint, not the interval ends).
  */
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
 
 interface Pt { x: number; y: number; }
 
@@ -206,10 +206,10 @@ export function GraphReadingSimulator() {
 
   return (
     <div className="graph-reading-lab flex flex-col gap-5">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">{sc.name} graph</span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">drag either handle</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">{sc.name} graph</span>
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">drag either handle</span>
         </div>
 
         <div className="px-4 pt-3 grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-5">
@@ -218,7 +218,7 @@ export function GraphReadingSimulator() {
               ref={svgRef}
               viewBox={`0 0 ${W} ${H}`}
               className="w-full touch-none cursor-ew-resize select-none"
-              style={{ background: '#faf7f0', borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}
+              style={{ background: 'rgb(var(--h-faf7f0))', borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}
               onPointerDown={onDown}
               onPointerMove={onMove}
               onPointerUp={onUp}
@@ -227,16 +227,16 @@ export function GraphReadingSimulator() {
               {/* grid */}
               {Array.from({ length: xTicks + 1 }).map((_, i) => {
                 const x = xMin + ((xMax - xMin) * i) / xTicks;
-                return <line key={`gx${i}`} x1={px(x)} y1={PAD.t} x2={px(x)} y2={H - PAD.b} stroke="rgba(27,42,65,0.07)" strokeWidth={1} />;
+                return <line key={`gx${i}`} x1={px(x)} y1={PAD.t} x2={px(x)} y2={H - PAD.b} stroke="rgb(var(--h-1b2a41) / 0.07)" strokeWidth={1} />;
               })}
               {Array.from({ length: yTicks + 1 }).map((_, i) => {
                 const y = (yMax * i) / yTicks;
-                return <line key={`gy${i}`} x1={PAD.l} y1={py(y)} x2={W - PAD.r} y2={py(y)} stroke="rgba(27,42,65,0.07)" strokeWidth={1} />;
+                return <line key={`gy${i}`} x1={PAD.l} y1={py(y)} x2={W - PAD.r} y2={py(y)} stroke="rgb(var(--h-1b2a41) / 0.07)" strokeWidth={1} />;
               })}
 
               {/* shaded area */}
-              {showArea && sc.areaMeans && <path d={areaPath} fill="rgba(184,130,61,0.22)" stroke="none" />}
-              {showArea && !sc.areaMeans && <path d={areaPath} fill="rgba(179,74,60,0.10)" stroke="none" />}
+              {showArea && sc.areaMeans && <path d={areaPath} fill="rgb(var(--h-b8823d) / 0.22)" stroke="none" />}
+              {showArea && !sc.areaMeans && <path d={areaPath} fill="rgb(var(--h-b34a3c) / 0.10)" stroke="none" />}
 
               {/* axes */}
               <line x1={PAD.l} y1={H - PAD.b} x2={W - PAD.r} y2={H - PAD.b} stroke={INK} strokeWidth={1.8} />
@@ -279,7 +279,7 @@ export function GraphReadingSimulator() {
               {([['a', xa, ya], ['b', xb, yb]] as const).map(([k, x, y]) => (
                 <g key={k}>
                   <line x1={px(x)} y1={PAD.t} x2={px(x)} y2={H - PAD.b} stroke={RED} strokeWidth={1} strokeDasharray="3 3" opacity={0.5} />
-                  <circle cx={px(x)} cy={py(y)} r={7} fill="#fff" stroke={RED} strokeWidth={2.6} />
+                  <circle cx={px(x)} cy={py(y)} r={7} fill="rgb(var(--h-ffffff))" stroke={RED} strokeWidth={2.6} />
                 </g>
               ))}
             </svg>
@@ -288,7 +288,7 @@ export function GraphReadingSimulator() {
               <button
                 onClick={() => setShowArea((s) => !s)}
                 className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                  showArea ? 'bg-[#b8823d] text-white border-[#b8823d]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                  showArea ? 'bg-h-b8823d text-on-ink border-h-b8823d' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
                 }`}
               >
                 {showArea ? '✓ Area shaded' : 'Shade the area'}
@@ -298,7 +298,7 @@ export function GraphReadingSimulator() {
                   key={s.id}
                   onClick={() => switchScenario(i)}
                   className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
-                    i === sIdx ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+                    i === sIdx ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
                   }`}
                 >
                   {s.name}
@@ -309,43 +309,43 @@ export function GraphReadingSimulator() {
 
           {/* readouts */}
           <div className="space-y-3">
-            <div className="border border-[#2e7d6b] bg-[#f2f9f7] rounded p-3">
-              <div className="font-mono text-[10.5px] tracking-wide uppercase text-[#2e7d6b] mb-2">Gradient</div>
-              <div className="space-y-1 text-[12.5px] text-[#4a5a72]">
-                <div className="flex justify-between"><span>rise (change in {sc.yLabel})</span><span className="font-mono text-[#1b2a41]">{fmt(rise)} {sc.yUnit}</span></div>
-                <div className="flex justify-between"><span>run (change in {sc.xLabel})</span><span className="font-mono text-[#1b2a41]">{fmt(run)} {sc.xUnit}</span></div>
+            <div className="border border-h-2e7d6b bg-h-f2f9f7 rounded p-3">
+              <div className="font-mono text-[10.5px] tracking-wide uppercase text-h-2e7d6b mb-2">Gradient</div>
+              <div className="space-y-1 text-[12.5px] text-h-4a5a72">
+                <div className="flex justify-between"><span>rise (change in {sc.yLabel})</span><span className="font-mono text-h-1b2a41">{fmt(rise)} {sc.yUnit}</span></div>
+                <div className="flex justify-between"><span>run (change in {sc.xLabel})</span><span className="font-mono text-h-1b2a41">{fmt(run)} {sc.xUnit}</span></div>
               </div>
-              <div className="border-t border-[#cfe4dd] mt-2 pt-2 flex justify-between items-baseline">
-                <span className="text-[12.5px] font-semibold text-[#1b5c4d]">rise / run</span>
-                <span className="font-mono text-[16px] font-bold text-[#1b5c4d]">{fmt(grad)} {sc.gradientMeans.unit}</span>
+              <div className="border-t border-h-cfe4dd mt-2 pt-2 flex justify-between items-baseline">
+                <span className="text-[12.5px] font-semibold text-h-1b5c4d">rise / run</span>
+                <span className="font-mono text-[16px] font-bold text-h-1b5c4d">{fmt(grad)} {sc.gradientMeans.unit}</span>
               </div>
-              <div className="text-[12px] text-[#1b5c4d] mt-1.5">
+              <div className="text-[12px] text-h-1b5c4d mt-1.5">
                 On this graph the gradient is the <strong>{sc.gradientMeans.name}</strong>.
               </div>
               {corner && (
-                <div className="text-[11.5px] text-[#8f3626] bg-[#fbeae7] rounded px-2 py-1.5 mt-2 leading-snug">
+                <div className="text-[11.5px] text-h-8f3626 bg-h-fbeae7 rounded px-2 py-1.5 mt-2 leading-snug">
                   Your triangle spans a corner in the line, so this is the <strong>average</strong> gradient across that
                   interval — not the gradient at any single point.
                 </div>
               )}
             </div>
 
-            <div className={`border rounded p-3 ${sc.areaMeans ? 'border-[#b8823d] bg-[#fbf5e8]' : 'border-[#e4ddcc] bg-[#faf7f0]'}`}>
-              <div className="font-mono text-[10.5px] tracking-wide uppercase mb-2" style={{ color: sc.areaMeans ? '#8f6428' : MUTE }}>
+            <div className={`border rounded p-3 ${sc.areaMeans ? 'border-h-b8823d bg-h-fbf5e8' : 'border-h-e4ddcc bg-h-faf7f0'}`}>
+              <div className="font-mono text-[10.5px] tracking-wide uppercase mb-2" style={{ color: sc.areaMeans ? 'rgb(var(--h-8f6428))' : MUTE }}>
                 Area under the graph
               </div>
               {sc.areaMeans ? (
                 <>
                   <div className="flex justify-between items-baseline">
-                    <span className="text-[12.5px] font-semibold text-[#8f6428]">between the handles</span>
-                    <span className="font-mono text-[16px] font-bold text-[#8f6428]">{fmt(area, 3)} {sc.areaMeans.unit}</span>
+                    <span className="text-[12.5px] font-semibold text-h-8f6428">between the handles</span>
+                    <span className="font-mono text-[16px] font-bold text-h-8f6428">{fmt(area, 3)} {sc.areaMeans.unit}</span>
                   </div>
-                  <div className="text-[12px] text-[#8f6428] mt-1.5">
+                  <div className="text-[12px] text-h-8f6428 mt-1.5">
                     Here the area is the <strong>{sc.areaMeans.name}</strong>.
                   </div>
                 </>
               ) : (
-                <div className="text-[12px] text-[#4a5a72] leading-snug">
+                <div className="text-[12px] text-h-4a5a72 leading-snug">
                   The area under a <strong>{sc.name.toLowerCase()}</strong> graph has <strong>no standard physical
                   meaning</strong>. You can calculate a number ({fmt(area, 2)}), but it does not correspond to a real
                   quantity — which is exactly why you should always ask what the area represents before computing it.
@@ -356,18 +356,18 @@ export function GraphReadingSimulator() {
         </div>
 
         <div className="px-4 pb-5 pt-4">
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug">{sc.note}</p>
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug">{sc.note}</p>
         </div>
       </div>
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">The Two Questions</span>
-          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">The Two Questions</span>
+          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-h-4a5a72 leading-snug">
             <p>
-              Faced with any graph, ask two things: <strong className="text-[#1b2a41]">what does the gradient
-              represent?</strong> and <strong className="text-[#1b2a41]">what does the area represent?</strong>
+              Faced with any graph, ask two things: <strong className="text-h-1b2a41">what does the gradient
+              represent?</strong> and <strong className="text-h-1b2a41">what does the area represent?</strong>
             </p>
             <p>
               The answer comes from the units. Divide the y-unit by the x-unit and you get the gradient's meaning;
@@ -376,42 +376,42 @@ export function GraphReadingSimulator() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> On the speed–time graph, put both handles inside the
+              <strong className="text-h-1b2a41">1.</strong> On the speed–time graph, put both handles inside the
               first slope and read the acceleration. Then drag one past the corner — the warning appears, because a
               single triangle can no longer describe two different slopes.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Shade the whole speed–time graph. The total area is the
+              <strong className="text-h-1b2a41">2.</strong> Shade the whole speed–time graph. The total area is the
               total distance travelled — including the deceleration, which still covers ground.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Switch to distance–time and shade the area. A number
+              <strong className="text-h-1b2a41">3.</strong> Switch to distance–time and shade the area. A number
               appears, but it means nothing. Getting an answer is not the same as getting a physical quantity.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[19px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               gradient = rise / run
             </div>
-            <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[12.5px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               area = the quantity y × x makes
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             Meanings To Know
           </h2>
-          <div className="space-y-2 text-[12px] text-[#4a5a72] leading-snug">
-            <p><strong className="text-[#1b2a41]">Distance–time</strong> — gradient is speed</p>
-            <p><strong className="text-[#1b2a41]">Speed–time</strong> — gradient is acceleration, area is distance</p>
-            <p><strong className="text-[#1b2a41]">Force–extension</strong> — gradient is k, area is energy stored</p>
-            <p><strong className="text-[#1b2a41]">Voltage–current</strong> — gradient is resistance</p>
+          <div className="space-y-2 text-[12px] text-h-4a5a72 leading-snug">
+            <p><strong className="text-h-1b2a41">Distance–time</strong> — gradient is speed</p>
+            <p><strong className="text-h-1b2a41">Speed–time</strong> — gradient is acceleration, area is distance</p>
+            <p><strong className="text-h-1b2a41">Force–extension</strong> — gradient is k, area is energy stored</p>
+            <p><strong className="text-h-1b2a41">Voltage–current</strong> — gradient is resistance</p>
           </div>
         </div>
       </div>

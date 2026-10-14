@@ -2,10 +2,10 @@
  * throughout the simulations (ink/mute/brass/red), scoped under one class
  * so nothing here can leak onto the rest of the page. */
 .eq-stage {
-  --eq-ink: #1b2a41;
-  --eq-mute: #4a5a72;
-  --eq-brass: #b8823d;
-  --eq-red: #b34a3c;
+  --eq-ink: rgb(var(--h-1b2a41));
+  --eq-mute: rgb(var(--h-4a5a72));
+  --eq-brass: rgb(var(--h-b8823d));
+  --eq-red: rgb(var(--h-b34a3c));
   position: relative;
 }
 
@@ -36,7 +36,7 @@
 }
 .eq-token[data-kind='variable'][data-target='true'] {
   color: var(--eq-red);
-  background: rgba(179, 74, 60, 0.12);
+  background: rgb(var(--h-b34a3c) / 0.12);
 }
 .eq-token[data-kind='number'] {
   font-family: Georgia, serif;
@@ -104,7 +104,7 @@
   height: 15px;
   border-radius: 50%;
   background: var(--eq-mute);
-  color: #fff;
+  color: rgb(var(--h-faf7f0));
   font-size: 10px;
   font-weight: 700;
   font-style: normal;

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 const MAX_TIME = 10; // seconds, length of one recording
 
 type Mode = 'stationary' | 'constant' | 'accelerating' | 'decelerating';
@@ -66,11 +68,11 @@ function drawCar(ctx: CanvasRenderingContext2D, x: number, trackY: number) {
   const bodyLeft = x - carW / 2;
 
   // body
-  ctx.fillStyle = '#2e7d6b';
+  ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
   ctx.beginPath();
   ctx.roundRect(bodyLeft, bodyTop, carW, carH, 3);
   ctx.fill();
-  ctx.strokeStyle = '#1c4a3f';
+  ctx.strokeStyle = 'rgb(var(--h-1c4a3f))';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -78,27 +80,27 @@ function drawCar(ctx: CanvasRenderingContext2D, x: number, trackY: number) {
   const cabinLeft = x - cabinW / 2 + 2;
   const cabinBottom = bodyTop + 2;
   const cabinTop = cabinBottom - cabinH;
-  ctx.fillStyle = '#2e7d6b';
+  ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
   ctx.beginPath();
   ctx.roundRect(cabinLeft, cabinTop, cabinW, cabinH, 3);
   ctx.fill();
   ctx.stroke();
 
   // window
-  ctx.fillStyle = '#eaf3f0';
+  ctx.fillStyle = 'rgb(var(--h-eaf3f0))';
   ctx.beginPath();
   ctx.roundRect(cabinLeft + 2.5, cabinTop + 2, cabinW - 5, cabinH - 5, 1.5);
   ctx.fill();
 
   // wheels
-  ctx.fillStyle = '#1b2a41';
+  ctx.fillStyle = 'rgb(var(--h-1b2a41))';
   ctx.beginPath();
   ctx.arc(bodyLeft + 8, trackY - wheelR, wheelR, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
   ctx.arc(bodyLeft + carW - 8, trackY - wheelR, wheelR, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#8a94a3';
+  ctx.fillStyle = 'rgb(var(--h-8a94a3))';
   ctx.beginPath();
   ctx.arc(bodyLeft + 8, trackY - wheelR, 1.6, 0, Math.PI * 2);
   ctx.fill();
@@ -153,7 +155,7 @@ export function DistanceTimeGraphSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -169,7 +171,7 @@ export function DistanceTimeGraphSimulator() {
     const trackY = 44;
     const trackPadding = 24;
     const trackW = w - trackPadding * 2;
-    ctx.strokeStyle = '#d8cfb6';
+    ctx.strokeStyle = 'rgb(var(--h-d8cfb6))';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(trackPadding, trackY);
@@ -190,7 +192,7 @@ export function DistanceTimeGraphSimulator() {
     const xForT = (t: number) => graphLeft + (t / MAX_TIME) * graphW;
     const yForS = (dVal: number) => graphBottom - (dVal / s.maxDistance) * graphH;
 
-    ctx.strokeStyle = '#b8b0a0';
+    ctx.strokeStyle = 'rgb(var(--h-b8b0a0))';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(graphLeft, graphTop);
@@ -199,8 +201,8 @@ export function DistanceTimeGraphSimulator() {
     ctx.stroke();
 
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#8a94a3';
-    ctx.strokeStyle = '#eee6d3';
+    ctx.fillStyle = 'rgb(var(--h-8a94a3))';
+    ctx.strokeStyle = 'rgb(var(--h-eee6d3))';
     for (let tt = 0; tt <= MAX_TIME; tt += 1) {
       const x = xForT(tt);
       ctx.beginPath();
@@ -221,7 +223,7 @@ export function DistanceTimeGraphSimulator() {
       ctx.fillText(dd.toFixed(0), graphLeft - 6, y + 3);
     }
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.fillText('time (s)', graphRight - 44, graphBottom + 26);
     ctx.save();
@@ -232,7 +234,7 @@ export function DistanceTimeGraphSimulator() {
 
     const trace = traceRef.current;
     if (trace.length > 1) {
-      ctx.strokeStyle = '#2e7d6b';
+      ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
       ctx.lineWidth = 2.4;
       ctx.beginPath();
       trace.forEach((p, i) => {
@@ -247,7 +249,7 @@ export function DistanceTimeGraphSimulator() {
     if (s.elapsed > 0 || trace.length > 0) {
       const cx = xForT(s.elapsed);
       const cy = yForS(dist);
-      ctx.fillStyle = '#b8823d';
+      ctx.fillStyle = 'rgb(var(--h-b8823d))';
       ctx.beginPath();
       ctx.arc(cx, cy, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -259,7 +261,7 @@ export function DistanceTimeGraphSimulator() {
         const x0 = xForT(tBack);
         const y0 = yForS(sBack);
 
-        ctx.strokeStyle = '#b34a3c';
+        ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
         ctx.setLineDash([4, 3]);
         ctx.lineWidth = 1.4;
         ctx.beginPath();
@@ -273,7 +275,7 @@ export function DistanceTimeGraphSimulator() {
         ctx.setLineDash([]);
 
         ctx.font = '600 10px "Courier New", monospace';
-        ctx.fillStyle = '#b34a3c';
+        ctx.fillStyle = 'rgb(var(--h-b34a3c))';
         ctx.textAlign = 'center';
         ctx.fillText('Δt', (x0 + cx) / 2, y0 + 13);
         ctx.textAlign = 'left';
@@ -281,13 +283,13 @@ export function DistanceTimeGraphSimulator() {
 
         const boxX = graphLeft + 6;
         const boxY = graphTop + 4;
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.strokeStyle = '#e4ddcc';
+        ctx.fillStyle = 'rgb(var(--h-ffffff) / 0.9)';
+        ctx.strokeStyle = 'rgb(var(--h-e4ddcc))';
         ctx.beginPath();
         ctx.roundRect(boxX, boxY, 148, 34, 4);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = '#1b2a41';
+        ctx.fillStyle = 'rgb(var(--h-1b2a41))';
         ctx.font = '600 11px "Courier New", monospace';
         ctx.textAlign = 'left';
         ctx.fillText(`gradient = Δs/Δt`, boxX + 7, boxY + 14);
@@ -383,16 +385,18 @@ export function DistanceTimeGraphSimulator() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
+      const ctx = themedContext(canvas);
       ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       draw();
     };
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     draw();
 
     return () => window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -405,12 +409,12 @@ export function DistanceTimeGraphSimulator() {
   return (
     <div className="dt-graph-lab">
       {/* Apparatus: full width */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Live Track & Graph
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {MODE_LABELS[mode]}
           </span>
         </div>
@@ -418,13 +422,13 @@ export function DistanceTimeGraphSimulator() {
 
         {finished && (
           <div className="px-4 pt-1">
-            <p className="text-[11.5px] text-[#1b2a41] font-semibold">
+            <p className="text-[11.5px] text-h-1b2a41 font-semibold">
               ✓ Recording finished ({MAX_TIME}s). Press Release Again to re-run.
             </p>
           </div>
         )}
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="flex flex-wrap gap-1.5 mb-4">
             {(Object.keys(MODE_LABELS) as Mode[]).map((m) => (
               <button
@@ -432,8 +436,8 @@ export function DistanceTimeGraphSimulator() {
                 onClick={() => handleModeChange(m)}
                 className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
                   mode === m
-                    ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                    : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                    : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
                 {MODE_LABELS[m]}
@@ -444,7 +448,7 @@ export function DistanceTimeGraphSimulator() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 mb-4">
             {mode === 'constant' && (
               <div className="flex items-center gap-3 flex-1">
-                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Speed</label>
+                <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Speed</label>
                 <input
                   type="range"
                   min={1}
@@ -459,7 +463,7 @@ export function DistanceTimeGraphSimulator() {
             )}
             {mode === 'accelerating' && (
               <div className="flex items-center gap-3 flex-1">
-                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Acceleration</label>
+                <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Acceleration</label>
                 <input
                   type="range"
                   min={0.3}
@@ -474,7 +478,7 @@ export function DistanceTimeGraphSimulator() {
             )}
             {mode === 'decelerating' && (
               <div className="flex items-center gap-3 flex-1">
-                <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Start speed</label>
+                <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Start speed</label>
                 <input
                   type="range"
                   min={3}
@@ -492,8 +496,8 @@ export function DistanceTimeGraphSimulator() {
               onClick={handleToggleTechnical}
               className={`text-[12.5px] font-semibold px-3.5 py-2 rounded border whitespace-nowrap ${
                 showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {showTechnical ? '✓ Gradient Details Shown' : '⚙ Show Gradient Details'}
@@ -503,13 +507,13 @@ export function DistanceTimeGraphSimulator() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={handlePlayPause}
-              className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
+              className="bg-h-b8823d hover:bg-h-8f6428 text-on-ink text-[13.5px] font-semibold px-3.5 py-2 rounded"
             >
               {finished ? '↻ Release Again' : isRunning ? '⏸ Pause' : '▶ Start'}
             </button>
             <button
               onClick={resetSim}
-              className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+              className="bg-transparent border border-h-d8cfb6 hover:bg-h-f5f0e2 text-h-1b2a41 text-[13.5px] font-semibold px-3.5 py-2 rounded"
             >
               ⟲ Reset
             </button>
@@ -518,26 +522,26 @@ export function DistanceTimeGraphSimulator() {
       </div>
 
       {/* Readouts: full width row */}
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Readouts
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Elapsed time</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Elapsed time</div>
             <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Distance covered</div>
-            <div className="font-mono text-xl font-bold text-[#2e7d6b]">{distanceDisplay} m</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Distance covered</div>
+            <div className="font-mono text-xl font-bold text-h-2e7d6b">{distanceDisplay} m</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Current speed (gradient)</div>
-            <div className="font-mono text-xl font-bold text-[#b8823d]">{speedDisplay} m/s</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Current speed (gradient)</div>
+            <div className="font-mono text-xl font-bold text-h-b8823d">{speedDisplay} m/s</div>
           </div>
         </div>
 
-        <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-[12.5px] text-[#4a5a72] leading-relaxed">
+        <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-4 py-3 text-[12.5px] text-h-4a5a72 leading-relaxed">
           {mode === 'stationary' && 'A flat line: distance never changes, so the object is at rest.'}
           {mode === 'constant' && 'A straight line with steady slope: equal distances covered in equal times.'}
           {mode === 'accelerating' && 'A curve that gets steeper: the gradient — and so the speed — keeps increasing.'}
@@ -546,32 +550,32 @@ export function DistanceTimeGraphSimulator() {
       </div>
 
       {/* Formula box: full width */}
-      <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-5 text-center mb-5">
-        <div className="italic text-[26px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-5 text-center mb-5">
+        <div className="italic text-[26px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
           v = Δs / Δt
         </div>
-        <div className="text-[12px] text-[#4a5a72] mt-2">
+        <div className="text-[12px] text-h-4a5a72 mt-2">
           speed = gradient of the distance-time graph
         </div>
       </div>
 
       {/* Variables: full width row */}
-      <div className="bg-white border border-[#e4ddcc] rounded p-4">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           What Each Variable Means
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {variables.map((v) => (
             <div key={v.symbol} className="flex gap-3 items-start">
               <div
-                className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center font-mono text-[16px] font-bold text-h-8f6428"
                 style={{ fontFamily: 'Georgia, serif' }}
               >
                 {v.symbol}
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                <div className="text-[13px] font-semibold text-h-1b2a41">{v.name}</div>
+                <div className="text-[12.5px] text-h-4a5a72 leading-snug">{v.def}</div>
               </div>
             </div>
           ))}

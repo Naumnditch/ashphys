@@ -232,14 +232,14 @@ function MeterCard({
       </div>
       <p className="text-3xl font-semibold text-gray-900 mt-2">{value}</p>
       <div
-        className="mt-3 h-2.5 rounded-full bg-[#cde2fb] overflow-hidden"
+        className="mt-3 h-2.5 rounded-full bg-h-cde2fb overflow-hidden"
         role="meter"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percent}
         aria-label={title}
       >
-        <div className="h-full rounded-full bg-[#2a78d6]" style={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }} />
+        <div className="h-full rounded-full bg-h-2a78d6" style={{ width: `${Math.min(Math.max(percent, 0), 100)}%` }} />
       </div>
       <p className="text-xs text-gray-500 mt-2">{detail}</p>
     </section>

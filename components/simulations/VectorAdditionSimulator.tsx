@@ -38,24 +38,24 @@ import {
  */
 
 // ---------- shared visual language ----------
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const RED = '#b34a3c';
-const TEAL = '#2e7d6b';
-const PAPER = '#faf7f0';
-const GRID_LINE = 'rgba(27,42,65,0.08)';
-const AXIS_LINE = 'rgba(27,42,65,0.4)';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const RED = 'rgb(var(--h-b34a3c))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const PAPER = 'rgb(var(--h-faf7f0))';
+const GRID_LINE = 'rgb(var(--h-1b2a41) / 0.08)';
+const AXIS_LINE = 'rgb(var(--h-1b2a41) / 0.4)';
 
-const VECTOR_COLORS = ['#b8823d', '#2e7d6b', '#3d6b9e', '#a8478f', '#6b8e3d', '#c9702c'];
-const RESULTANT_COLOR = '#1b2a41';
+const VECTOR_COLORS = ['rgb(var(--h-b8823d))', 'rgb(var(--h-2e7d6b))', 'rgb(var(--h-3d6b9e))', 'rgb(var(--h-a8478f))', 'rgb(var(--h-6b8e3d))', 'rgb(var(--h-c9702c))'];
+const RESULTANT_COLOR = 'rgb(var(--h-1b2a41))';
 const LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'];
 
-const cardCls = 'bg-white border border-[#e4ddcc] rounded overflow-hidden';
-const labelCls = 'font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]';
+const cardCls = 'bg-white border border-h-e4ddcc rounded overflow-hidden';
+const labelCls = 'font-mono text-[11px] tracking-wide uppercase text-h-4a5a72';
 const pillBtn = (active: boolean) =>
   `text-[12.5px] font-semibold px-4 py-1.5 rounded-full border transition-colors ${
-    active ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-white text-[#4a5a72] border-[#d8cfb6] hover:bg-[#faf7f0]'
+    active ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-white text-h-4a5a72 border-h-d8cfb6 hover:bg-h-faf7f0'
   }`;
 
 // ---------- world <-> screen transform ----------
@@ -132,7 +132,7 @@ function Arrow({
   );
 }
 
-function DragHandle({ p, onDown, r = 9, fill = '#fff', stroke = INK }: { p: Vec2; onDown: (e: React.PointerEvent) => void; r?: number; fill?: string; stroke?: string }) {
+function DragHandle({ p, onDown, r = 9, fill = 'rgb(var(--h-ffffff))', stroke = INK }: { p: Vec2; onDown: (e: React.PointerEvent) => void; r?: number; fill?: string; stroke?: string }) {
   return (
     <circle
       cx={p.x}
@@ -284,8 +284,8 @@ function GridAndAxes({ viewW, viewH, origin, pxPerUnit, showGrid }: { viewW: num
 // ---------- readout chip ----------
 function StatChip({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="flex flex-col items-center px-3 py-1.5 rounded bg-[#faf7f0] border border-[#eee6d3] min-w-[64px]">
-      <span className="text-[9.5px] font-mono uppercase tracking-wide text-[#a8a196]">{label}</span>
+    <div className="flex flex-col items-center px-3 py-1.5 rounded bg-h-faf7f0 border border-h-eee6d3 min-w-[64px]">
+      <span className="text-[9.5px] font-mono uppercase tracking-wide text-h-a8a196">{label}</span>
       <span className="text-[13.5px] font-mono font-bold" style={{ color: color ?? INK }}>
         {value}
       </span>
@@ -486,29 +486,29 @@ function Mode1D() {
 
         <div className="px-4 pb-4 flex flex-wrap items-center gap-3">
           <div className="flex gap-2">
-            <button onClick={addVec} disabled={vecs.length >= 4} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-[#d8cfb6] text-[#4a5a72] bg-white hover:bg-[#faf7f0] disabled:opacity-35">
+            <button onClick={addVec} disabled={vecs.length >= 4} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-h-d8cfb6 text-h-4a5a72 bg-white hover:bg-h-faf7f0 disabled:opacity-35">
               + vector
             </button>
-            <button onClick={removeVec} disabled={vecs.length <= 2} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-[#d8cfb6] text-[#4a5a72] bg-white hover:bg-[#faf7f0] disabled:opacity-35">
+            <button onClick={removeVec} disabled={vecs.length <= 2} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-h-d8cfb6 text-h-4a5a72 bg-white hover:bg-h-faf7f0 disabled:opacity-35">
               − vector
             </button>
           </div>
           <div className="flex flex-wrap gap-2 ml-auto">
             {vecs.map((v, i) => (
-              <span key={i} className="text-[12px] font-mono px-2 py-1 rounded" style={{ background: `${v.color}1a`, color: v.color }}>
+              <span key={i} className="text-[12px] font-mono px-2 py-1 rounded" style={{ background: v.color.replace(/\)$/, ' / 0.1)'), color: v.color }}>
                 {v.label} = {fmtMag(v.value)} {unit}
               </span>
             ))}
-            <span className="text-[12px] font-mono px-2 py-1 rounded bg-[#eef2ef]" style={{ color: RESULTANT_COLOR }}>
+            <span className="text-[12px] font-mono px-2 py-1 rounded bg-h-eef2ef" style={{ color: RESULTANT_COLOR }}>
               R = {fmtMag(total)} {unit} ({total >= 0 ? 'positive' : 'negative'} direction)
             </span>
           </div>
         </div>
       </div>
 
-      <p className="text-[12px] text-[#4a5a72] leading-snug px-1">
+      <p className="text-[12px] text-h-4a5a72 leading-snug px-1">
         Drag any arrowhead to change its {CONTEXTS_1D[context].name.toLowerCase()}. Notice: when two vectors point in{' '}
-        <strong className="text-[#1b2a41]">opposite directions</strong>, the tip-to-tail chain doubles back on itself —
+        <strong className="text-h-1b2a41">opposite directions</strong>, the tip-to-tail chain doubles back on itself —
         that's why opposite vectors <em>subtract</em>, not add, in size.
       </p>
     </div>
@@ -640,7 +640,7 @@ function Mode2DSandbox() {
         </div>
 
         <div className="px-4 pt-2 flex flex-wrap items-center gap-1.5">
-          <span className="text-[10.5px] font-mono text-[#a8a196] mr-1">components:</span>
+          <span className="text-[10.5px] font-mono text-h-a8a196 mr-1">components:</span>
           {(['none', 'each', 'projected'] as ComponentStyle[]).map((s) => (
             <button key={s} onClick={() => setCompStyle(s)} className={pillBtn(compStyle === s)}>
               {s === 'none' ? 'None' : s === 'each' ? 'On each vector' : 'Projected on axes'}
@@ -653,7 +653,7 @@ function Mode2DSandbox() {
             ref={svgRef}
             viewBox={`0 0 ${W} ${H}`}
             className="w-full touch-none select-none"
-            style={{ minWidth: 480, background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}
+            style={{ minWidth: 480, background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}
             onPointerMove={onMove}
             onPointerUp={onUp}
             onPointerCancel={onUp}
@@ -724,11 +724,11 @@ function Mode2DSandbox() {
           </svg>
         </div>
 
-        <div className="px-4 pb-4 flex flex-wrap items-center gap-2 border-t border-[#eee6d3] pt-3">
-          <button onClick={addVector} disabled={vecs.length >= 6} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#1b2a41] text-white bg-[#1b2a41] hover:bg-[#2a3d5c] disabled:opacity-35">
+        <div className="px-4 pb-4 flex flex-wrap items-center gap-2 border-t border-h-eee6d3 pt-3">
+          <button onClick={addVector} disabled={vecs.length >= 6} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-1b2a41 text-on-ink bg-h-1b2a41 hover:bg-h-2a3d5c disabled:opacity-35">
             + Add vector
           </button>
-          <span className="text-[11px] text-[#a8a196] italic">drag a tail off the canvas edge to delete it</span>
+          <span className="text-[11px] text-h-a8a196 italic">drag a tail off the canvas edge to delete it</span>
           <div className="ml-auto flex flex-wrap gap-2">
             <StatChip label="Rx" value={fmtMag(resultantVec.x)} color={RESULTANT_COLOR} />
             <StatChip label="Ry" value={fmtMag(resultantVec.y)} color={RESULTANT_COLOR} />
@@ -744,7 +744,7 @@ function Mode2DSandbox() {
           {vecs.map((v) => {
             const polar = toPolar({ x: v.vx, y: v.vy });
             return (
-              <div key={v.id} className="flex flex-wrap items-center gap-3 p-2 rounded border border-[#eee6d3]">
+              <div key={v.id} className="flex flex-wrap items-center gap-3 p-2 rounded border border-h-eee6d3">
                 <span className="italic font-bold text-[15px] w-5 text-center" style={{ color: v.color, fontFamily: 'Georgia, serif' }}>
                   {v.label}
                 </span>
@@ -752,13 +752,13 @@ function Mode2DSandbox() {
                 <NumField label="θ°" value={polar.theta} onChange={(val) => setPolar(v.id, polar.r, val)} />
                 <NumField label="vx" value={v.vx} onChange={(val) => updateVec(v.id, { vx: val })} />
                 <NumField label="vy" value={v.vy} onChange={(val) => updateVec(v.id, { vy: val })} />
-                <button onClick={() => removeVector(v.id)} className="ml-auto text-[11px] font-semibold px-2.5 py-1 rounded-full border border-[#d8cfb6] text-[#b34a3c] hover:bg-[#faf2ef]">
+                <button onClick={() => removeVector(v.id)} className="ml-auto text-[11px] font-semibold px-2.5 py-1 rounded-full border border-h-d8cfb6 text-h-b34a3c hover:bg-h-faf2ef">
                   ✕ delete
                 </button>
               </div>
             );
           })}
-          {vecs.length === 0 && <p className="text-[12px] text-[#a8a196] italic">No vectors — click "+ Add vector" to start.</p>}
+          {vecs.length === 0 && <p className="text-[12px] text-h-a8a196 italic">No vectors — click "+ Add vector" to start.</p>}
         </div>
       </div>
     </div>
@@ -777,7 +777,7 @@ function ToggleChip({ active, onClick, label }: { active: boolean; onClick: () =
 function NumField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <div className="flex items-center gap-1">
-      <span className="text-[11px] font-mono text-[#4a5a72]">{label}=</span>
+      <span className="text-[11px] font-mono text-h-4a5a72">{label}=</span>
       <input
         type="number"
         value={round2(value)}
@@ -882,7 +882,7 @@ function Mode3Methods() {
         </div>
 
         <div className="px-4 pt-2 flex flex-wrap items-center gap-2">
-          <span className="text-[10.5px] font-mono text-[#a8a196]">vectors:</span>
+          <span className="text-[10.5px] font-mono text-h-a8a196">vectors:</span>
           <button onClick={() => setN(2)} disabled={method === 'parallelogram'} className={pillBtn(n === 2) + ' disabled:opacity-35'}>
             2
           </button>
@@ -894,11 +894,11 @@ function Mode3Methods() {
               {reversed ? `order: ${orderedVecs.map((v) => v.label).join('+')} (reversed)` : `order: ${orderedVecs.map((v) => v.label).join('+')}`}
             </button>
           )}
-          {method === 'tiptotail' && <span className="text-[11px] text-[#a8a196] italic">— toggle to see the order doesn't change R</span>}
+          {method === 'tiptotail' && <span className="text-[11px] text-h-a8a196 italic">— toggle to see the order doesn't change R</span>}
         </div>
 
         <div className="px-2 sm:px-4 py-3 overflow-x-auto">
-          <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 420, background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}>
+          <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 420, background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}>
             <GridAndAxes viewW={W} viewH={H} origin={origin} pxPerUnit={pxPerUnit} showGrid={true} />
 
             {method === 'tiptotail' && (
@@ -976,23 +976,23 @@ function Mode3Methods() {
         </div>
 
         <div className="px-4 pb-4 text-center">
-          <span className={`text-[12.5px] font-semibold px-3 py-1.5 rounded-full ${isDone ? 'bg-[#e6f2ee] text-[#1b5c4d]' : 'bg-[#f6efdc] text-[#8f6428]'}`}>{caption}</span>
+          <span className={`text-[12.5px] font-semibold px-3 py-1.5 rounded-full ${isDone ? 'bg-h-e6f2ee text-h-1b5c4d' : 'bg-h-f6efdc text-h-8f6428'}`}>{caption}</span>
         </div>
 
-        <div className="px-4 pb-5 flex flex-col items-center gap-2.5 border-t border-[#eee6d3] pt-4">
+        <div className="px-4 pb-5 flex flex-col items-center gap-2.5 border-t border-h-eee6d3 pt-4">
           <div className="flex items-center gap-3">
-            <button onClick={goBack} disabled={stepIndex <= -1} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] bg-white hover:bg-[#faf7f0] disabled:opacity-35">
+            <button onClick={goBack} disabled={stepIndex <= -1} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-4a5a72 bg-white hover:bg-h-faf7f0 disabled:opacity-35">
               ◀ Back
             </button>
-            <span className="text-[11.5px] font-mono text-[#a8a196] min-w-[90px] text-center">{stepIndex === -1 ? 'Ready' : `Step ${stepIndex + 1} of ${stepCount}`}</span>
-            <button onClick={goNext} disabled={isDone} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#1b2a41] text-white bg-[#1b2a41] hover:bg-[#2a3d5c] disabled:opacity-35">
+            <span className="text-[11.5px] font-mono text-h-a8a196 min-w-[90px] text-center">{stepIndex === -1 ? 'Ready' : `Step ${stepIndex + 1} of ${stepCount}`}</span>
+            <button onClick={goNext} disabled={isDone} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-1b2a41 text-on-ink bg-h-1b2a41 hover:bg-h-2a3d5c disabled:opacity-35">
               Next ▶
             </button>
           </div>
           {isDone && method === 'components' && (
-            <div className="text-[12.5px] font-mono text-[#4a5a72] bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2 max-w-md text-center leading-relaxed">
-              |R| = √(Rx² + Ry²) = √({fmtMag(R.x)}² + {fmtMag(R.y)}²) = <strong className="text-[#1b2a41]">{fmtMag(Rpolar.r)}</strong>
-              <br />θ = tan⁻¹(Ry / Rx) = tan⁻¹({fmtMag(R.y)} / {fmtMag(R.x)}) = <strong className="text-[#1b2a41]">{fmtAngle(Rpolar.theta)}°</strong>
+            <div className="text-[12.5px] font-mono text-h-4a5a72 bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2 max-w-md text-center leading-relaxed">
+              |R| = √(Rx² + Ry²) = √({fmtMag(R.x)}² + {fmtMag(R.y)}²) = <strong className="text-h-1b2a41">{fmtMag(Rpolar.r)}</strong>
+              <br />θ = tan⁻¹(Ry / Rx) = tan⁻¹({fmtMag(R.y)} / {fmtMag(R.x)}) = <strong className="text-h-1b2a41">{fmtAngle(Rpolar.theta)}°</strong>
             </div>
           )}
           <div className="flex flex-wrap gap-2 justify-center">
@@ -1008,7 +1008,7 @@ function Mode3Methods() {
         <span className={labelCls}>Edit the vectors used in this method</span>
         <div className="mt-3 flex flex-wrap gap-3">
           {vecs.slice(0, n).map((v, i) => (
-            <div key={i} className="flex items-center gap-2 p-2 rounded border border-[#eee6d3]">
+            <div key={i} className="flex items-center gap-2 p-2 rounded border border-h-eee6d3">
               <span className="italic font-bold text-[14px] w-4 text-center" style={{ color: v.color, fontFamily: 'Georgia, serif' }}>
                 {v.label}
               </span>
@@ -1064,7 +1064,7 @@ function Mode4Equations() {
         </div>
 
         <div className="px-2 sm:px-4 py-3 overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 400, background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 400, background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}>
             <GridAndAxes viewW={W} viewH={H} origin={origin} pxPerUnit={pxPerUnit} showGrid={true} />
             <Arrow tail={toScreen({ x: 0, y: 0 })} tip={toScreen(av)} color={a.color} width={2.5} dashed opacity={0.5} />
             <Arrow tail={toScreen({ x: 0, y: 0 })} tip={toScreen(bv)} color={b.color} width={2.5} dashed opacity={0.5} />
@@ -1077,7 +1077,7 @@ function Mode4Equations() {
           </svg>
         </div>
 
-        <div className="px-4 pb-4 flex flex-col gap-3 border-t border-[#eee6d3] pt-4">
+        <div className="px-4 pb-4 flex flex-col gap-3 border-t border-h-eee6d3 pt-4">
           <div className="flex flex-wrap items-center gap-3">
             <NumField label="|a|" value={a.r} onChange={(v) => setA({ ...a, r: Math.max(0.1, v) })} />
             <NumField label="θa°" value={a.theta} onChange={(v) => setA({ ...a, theta: v })} />
@@ -1100,7 +1100,7 @@ function Mode4Equations() {
           <span className={labelCls}>Subtraction as addition — a − b = a + (−b)</span>
         </div>
         <div className="px-2 sm:px-4 py-3 overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H * 0.75}`} className="w-full select-none" style={{ minWidth: 400, background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}>
+          <svg viewBox={`0 0 ${W} ${H * 0.75}`} className="w-full select-none" style={{ minWidth: 400, background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}>
             <GridAndAxes viewW={W} viewH={H * 0.75} origin={{ x: origin.x, y: (H * 0.75) / 2 }} pxPerUnit={pxPerUnit} showGrid={true} />
             {(() => {
               const org = { x: origin.x, y: (H * 0.75) / 2 };
@@ -1118,22 +1118,22 @@ function Mode4Equations() {
           </svg>
         </div>
         <div className="px-4 pb-4 text-center">
-          <span className={`text-[12.5px] font-semibold px-3 py-1.5 rounded-full ${subDone ? 'bg-[#e6f2ee] text-[#1b5c4d]' : 'bg-[#f6efdc] text-[#8f6428]'}`}>
+          <span className={`text-[12.5px] font-semibold px-3 py-1.5 rounded-full ${subDone ? 'bg-h-e6f2ee text-h-1b5c4d' : 'bg-h-f6efdc text-h-8f6428'}`}>
             {subStep === -1 && 'a and b, both drawn from the origin.'}
             {subStep === 0 && 'a and b, both drawn from the origin.'}
             {subStep === 1 && '−b is b reversed: same length, opposite direction.'}
             {subStep === 2 && `Add a + (−b) tip-to-tail: the result is a − b = (${fmtMag(diff.x)}, ${fmtMag(diff.y)}).`}
           </span>
         </div>
-        <div className="px-4 pb-5 flex items-center justify-center gap-3 border-t border-[#eee6d3] pt-4">
-          <button onClick={() => setSubStep((s) => Math.max(-1, s - 1))} disabled={subStep <= -1} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#4a5a72] bg-white hover:bg-[#faf7f0] disabled:opacity-35">
+        <div className="px-4 pb-5 flex items-center justify-center gap-3 border-t border-h-eee6d3 pt-4">
+          <button onClick={() => setSubStep((s) => Math.max(-1, s - 1))} disabled={subStep <= -1} className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-4a5a72 bg-white hover:bg-h-faf7f0 disabled:opacity-35">
             ◀ Back
           </button>
-          <span className="text-[11.5px] font-mono text-[#a8a196] min-w-[90px] text-center">{subStep === -1 ? 'Ready' : `Step ${subStep + 1} of ${subStepCount}`}</span>
+          <span className="text-[11.5px] font-mono text-h-a8a196 min-w-[90px] text-center">{subStep === -1 ? 'Ready' : `Step ${subStep + 1} of ${subStepCount}`}</span>
           <button
             onClick={() => setSubStep((s) => Math.min(subStepCount - 1, s + 1))}
             disabled={subDone}
-            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#1b2a41] text-white bg-[#1b2a41] hover:bg-[#2a3d5c] disabled:opacity-35"
+            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-1b2a41 text-on-ink bg-h-1b2a41 hover:bg-h-2a3d5c disabled:opacity-35"
           >
             Next ▶
           </button>
@@ -1159,7 +1159,7 @@ function SliderRow({ label, value, onChange, color }: { label: string; value: nu
         className="flex-1"
         style={{ accentColor: color }}
       />
-      <span className="text-[12px] font-mono w-10 text-right text-[#1b2a41]">{value.toFixed(1)}</span>
+      <span className="text-[12px] font-mono w-10 text-right text-h-1b2a41">{value.toFixed(1)}</span>
     </div>
   );
 }
@@ -1294,7 +1294,7 @@ function Mode5ScaleDrawing() {
           </div>
         </div>
         <div className="px-4 pt-2">
-          <p className="text-[12px] text-[#4a5a72]">
+          <p className="text-[12px] text-h-4a5a72">
             A and B are drawn tip-to-tail to scale (<strong>1 cm : {(1 / scenario.scaleCmPerUnit).toFixed(scenario.scaleCmPerUnit < 1 ? 0 : 1)} {scenario.unit}</strong>
             {scenario.scaleCmPerUnit !== 1 && scenario.scaleCmPerUnit < 1 ? '' : ''}
             ). Use the ruler to measure the straight-line distance from the start dot to the end dot, and the protractor to measure its angle from the dashed reference line — then convert the ruler length back to {scenario.unit} using the scale, and enter both below.
@@ -1308,7 +1308,7 @@ function Mode5ScaleDrawing() {
             width={W}
             height={H}
             className="touch-none select-none"
-            style={{ background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}
+            style={{ background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}
             onPointerMove={onMove}
             onPointerUp={onUp}
             onPointerCancel={onUp}
@@ -1339,11 +1339,11 @@ function Mode5ScaleDrawing() {
           </svg>
         </div>
 
-        <div className="px-4 pb-4 flex flex-wrap items-center gap-3 border-t border-[#eee6d3] pt-3">
-          <button onClick={resetTools} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-[#d8cfb6] text-[#4a5a72] bg-white hover:bg-[#faf7f0]">
+        <div className="px-4 pb-4 flex flex-wrap items-center gap-3 border-t border-h-eee6d3 pt-3">
+          <button onClick={resetTools} className="text-[11.5px] font-semibold px-3 py-1 rounded-full border border-h-d8cfb6 text-h-4a5a72 bg-white hover:bg-h-faf7f0">
             ↺ reset tools
           </button>
-          <span className="text-[11px] text-[#a8a196] italic">drag the ruler/protractor body to move, the small ring to rotate</span>
+          <span className="text-[11px] text-h-a8a196 italic">drag the ruler/protractor body to move, the small ring to rotate</span>
         </div>
       </div>
 
@@ -1351,19 +1351,19 @@ function Mode5ScaleDrawing() {
         <span className={labelCls}>Your answer for the resultant R</span>
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono text-[#4a5a72]">|R| ({scenario.unit})</span>
+            <span className="text-[11px] font-mono text-h-4a5a72">|R| ({scenario.unit})</span>
             <input type="number" value={magAnswer} onChange={(e) => setMagAnswer(e.target.value)} className="w-28 border border-gray-300 rounded px-2 py-1 text-[13px] font-mono" />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono text-[#4a5a72]">θ (° from +x)</span>
+            <span className="text-[11px] font-mono text-h-4a5a72">θ (° from +x)</span>
             <input type="number" value={angleAnswer} onChange={(e) => setAngleAnswer(e.target.value)} className="w-28 border border-gray-300 rounded px-2 py-1 text-[13px] font-mono" />
           </label>
-          <button onClick={checkAnswer} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-[#1b2a41] text-white bg-[#1b2a41] hover:bg-[#2a3d5c]">
+          <button onClick={checkAnswer} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-h-1b2a41 text-on-ink bg-h-1b2a41 hover:bg-h-2a3d5c">
             Check answer
           </button>
         </div>
         {checked && (
-          <div className={`mt-3 p-3 rounded border text-[12.5px] leading-relaxed ${checked.magOk && checked.angleOk ? 'bg-[#e6f2ee] border-[#bfe0d5] text-[#1b5c4d]' : 'bg-[#f6efdc] border-[#e6d9b8] text-[#8f6428]'}`}>
+          <div className={`mt-3 p-3 rounded border text-[12.5px] leading-relaxed ${checked.magOk && checked.angleOk ? 'bg-h-e6f2ee border-h-bfe0d5 text-h-1b5c4d' : 'bg-h-f6efdc border-h-e6d9b8 text-h-8f6428'}`}>
             <div>
               Magnitude: {checked.magOk ? '✓ within 2%' : '✗ off — check your ruler reading and scale conversion'} (you said {magAnswer} {scenario.unit})
             </div>
@@ -1394,7 +1394,7 @@ function RulerTool({ state, onMoveDown, onRotateDown }: { state: ToolState; onMo
   const ticks = Array.from({ length: lengthCm + 1 }, (_, i) => i);
   return (
     <g style={{ cursor: 'grab' }}>
-      <polygon points={body} fill="rgba(184,130,61,0.16)" stroke={BRASS} strokeWidth={1.5} onPointerDown={onMoveDown} style={{ touchAction: 'none' }} />
+      <polygon points={body} fill="rgb(var(--h-b8823d) / 0.16)" stroke={BRASS} strokeWidth={1.5} onPointerDown={onMoveDown} style={{ touchAction: 'none' }} />
       {ticks.map((i) => {
         const big = i % 5 === 0;
         const p0 = corner(i, -1);
@@ -1411,7 +1411,7 @@ function RulerTool({ state, onMoveDown, onRotateDown }: { state: ToolState; onMo
             </text>
           );
         })}
-      <circle cx={end.x} cy={end.y} r={8} fill="#fff" stroke={BRASS} strokeWidth={2} onPointerDown={onRotateDown} style={{ cursor: 'grab', touchAction: 'none' }} />
+      <circle cx={end.x} cy={end.y} r={8} fill="rgb(var(--h-ffffff))" stroke={BRASS} strokeWidth={2} onPointerDown={onRotateDown} style={{ cursor: 'grab', touchAction: 'none' }} />
     </g>
   );
 }
@@ -1428,8 +1428,8 @@ function ProtractorTool({ state, onMoveDown, onRotateDown }: { state: ToolState;
     <g>
       <path
         d={`M ${toXY(0, radius).x} ${toXY(0, radius).y} A ${radius} ${radius} 0 1 0 ${toXY(180, radius).x} ${toXY(180, radius).y} L ${state.pos.x} ${state.pos.y} Z`}
-        fill="rgba(61,107,158,0.14)"
-        stroke={'#3d6b9e'}
+        fill="rgb(var(--h-3d6b9e) / 0.14)"
+        stroke={'rgb(var(--h-3d6b9e))'}
         strokeWidth={1.5}
         onPointerDown={onMoveDown}
         style={{ cursor: 'grab', touchAction: 'none' }}
@@ -1448,9 +1448,9 @@ function ProtractorTool({ state, onMoveDown, onRotateDown }: { state: ToolState;
           </text>
         );
       })}
-      <line x1={state.pos.x} y1={state.pos.y} x2={baselineEnd.x} y2={baselineEnd.y} stroke={'#3d6b9e'} strokeWidth={2} pointerEvents="none" />
-      <circle cx={state.pos.x} cy={state.pos.y} r={5} fill={'#3d6b9e'} pointerEvents="none" />
-      <circle cx={rimStart.x} cy={rimStart.y} r={8} fill="#fff" stroke={'#3d6b9e'} strokeWidth={2} onPointerDown={onRotateDown} style={{ cursor: 'grab', touchAction: 'none' }} />
+      <line x1={state.pos.x} y1={state.pos.y} x2={baselineEnd.x} y2={baselineEnd.y} stroke={'rgb(var(--h-3d6b9e))'} strokeWidth={2} pointerEvents="none" />
+      <circle cx={state.pos.x} cy={state.pos.y} r={5} fill={'rgb(var(--h-3d6b9e))'} pointerEvents="none" />
+      <circle cx={rimStart.x} cy={rimStart.y} r={8} fill="rgb(var(--h-ffffff))" stroke={'rgb(var(--h-3d6b9e))'} strokeWidth={2} onPointerDown={onRotateDown} style={{ cursor: 'grab', touchAction: 'none' }} />
     </g>
   );
 }
@@ -1670,11 +1670,11 @@ function Mode6Challenges() {
         </div>
 
         <div className="px-4 pt-3">
-          <p className="text-[13px] text-[#1b2a41] leading-relaxed">{challenge.prompt}</p>
+          <p className="text-[13px] text-h-1b2a41 leading-relaxed">{challenge.prompt}</p>
         </div>
 
         <div className="px-2 sm:px-4 py-3 overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 360, background: PAPER, borderRadius: 6, border: '1px solid #e4ddcc', display: 'block' }}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full select-none" style={{ minWidth: 360, background: PAPER, borderRadius: 6, border: '1px solid rgb(var(--h-e4ddcc))', display: 'block' }}>
             <GridAndAxes viewW={W} viewH={H} origin={origin} pxPerUnit={pxPerUnit} showGrid={true} />
             {challenge.given.map((g, i) => {
               const v = scaleVec(fromPolar(g.mag, g.theta), drawScale);
@@ -1690,25 +1690,25 @@ function Mode6Challenges() {
           </svg>
         </div>
 
-        <div className="px-4 pb-4 flex flex-wrap items-end gap-3 border-t border-[#eee6d3] pt-3">
+        <div className="px-4 pb-4 flex flex-wrap items-end gap-3 border-t border-h-eee6d3 pt-3">
           <label className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono text-[#4a5a72]">|{challenge.targetLabel}| ({challenge.unit})</span>
+            <span className="text-[11px] font-mono text-h-4a5a72">|{challenge.targetLabel}| ({challenge.unit})</span>
             <input type="number" value={magAnswer} onChange={(e) => setMagAnswer(e.target.value)} className="w-32 border border-gray-300 rounded px-2 py-1 text-[13px] font-mono" />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-[11px] font-mono text-[#4a5a72]">θ (° from +x)</span>
+            <span className="text-[11px] font-mono text-h-4a5a72">θ (° from +x)</span>
             <input type="number" value={angleAnswer} onChange={(e) => setAngleAnswer(e.target.value)} className="w-28 border border-gray-300 rounded px-2 py-1 text-[13px] font-mono" />
           </label>
-          <button onClick={checkAnswer} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-[#1b2a41] text-white bg-[#1b2a41] hover:bg-[#2a3d5c]">
+          <button onClick={checkAnswer} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-h-1b2a41 text-on-ink bg-h-1b2a41 hover:bg-h-2a3d5c">
             Check
           </button>
-          <button onClick={nextChallenge} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-[#b8823d] text-[#8f6428] bg-[#faf7f0] hover:bg-[#f0e5cc]">
+          <button onClick={nextChallenge} className="text-[12.5px] font-semibold px-4 py-2 rounded-full border border-h-b8823d text-h-8f6428 bg-h-faf7f0 hover:bg-h-f0e5cc">
             Next challenge →
           </button>
         </div>
 
         {checked && (
-          <div className={`mx-4 mb-4 p-3 rounded border text-[12.5px] leading-relaxed whitespace-pre-line ${checked.magOk && checked.angleOk ? 'bg-[#e6f2ee] border-[#bfe0d5] text-[#1b5c4d]' : 'bg-[#f6efdc] border-[#e6d9b8] text-[#8f6428]'}`}>
+          <div className={`mx-4 mb-4 p-3 rounded border text-[12.5px] leading-relaxed whitespace-pre-line ${checked.magOk && checked.angleOk ? 'bg-h-e6f2ee border-h-bfe0d5 text-h-1b5c4d' : 'bg-h-f6efdc border-h-e6d9b8 text-h-8f6428'}`}>
             <div className="font-semibold mb-1">
               {checked.magOk && checked.angleOk ? '✓ Correct!' : `${checked.magOk ? 'Magnitude ✓' : 'Magnitude ✗'}, ${checked.angleOk ? 'angle ✓' : 'angle ✗'} — here is the worked solution:`}
             </div>
@@ -1776,9 +1776,9 @@ function HowToUse({ tab }: { tab: Tab }) {
   return (
     <div className={cardCls + ' p-4'}>
       <span className={labelCls}>How to use — {TABS.find((t) => t.id === tab)?.label}</span>
-      <p className="text-[12px] text-[#4a5a72] mt-2 leading-relaxed">{info.how}</p>
+      <p className="text-[12px] text-h-4a5a72 mt-2 leading-relaxed">{info.how}</p>
       <span className={labelCls + ' block mt-3'}>Learning objectives</span>
-      <ul className="mt-1.5 list-disc list-inside text-[12px] text-[#4a5a72] space-y-1">
+      <ul className="mt-1.5 list-disc list-inside text-[12px] text-h-4a5a72 space-y-1">
         {info.goals.map((g, i) => (
           <li key={i}>{g}</li>
         ))}

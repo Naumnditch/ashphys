@@ -65,7 +65,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/messages"
-            className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded font-medium mt-4 text-center"
+            className="bg-gray-900 hover:bg-black text-on-ink px-5 py-2.5 rounded font-medium mt-4 text-center"
           >
             Open Messages
           </Link>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/join-class"
-            className="bg-gray-900 hover:bg-black text-white px-5 py-2.5 rounded font-medium mt-4 text-center"
+            className="bg-gray-900 hover:bg-black text-on-ink px-5 py-2.5 rounded font-medium mt-4 text-center"
           >
             Enter Join Code
           </Link>

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { isDarkCanvas, themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Double-Slit Lab — the same physics engine as the ripple tank,
  * dedicated to Young's experiment and the fringe equation.
@@ -201,7 +203,7 @@ export function DoubleSlitSimulator() {
   const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     if (!offscreenRef.current) {
@@ -210,11 +212,17 @@ export function DoubleSlitSimulator() {
       offscreenRef.current.height = GH;
     }
     const off = offscreenRef.current;
-    const offCtx = off.getContext('2d');
+    const offCtx = themedContext(off);
     if (!offCtx) return;
     if (!imageRef.current) imageRef.current = offCtx.createImageData(GW, GH);
     const img = imageRef.current;
     const data = img.data;
+
+    // Water colour ramp (light: mid-tone teal paper; dark: deep teal) - the field is
+    // painted pixel by pixel, so it picks its palette here rather than via CSS.
+    const dark = isDarkCanvas(canvas);
+    const [crestR, crestG, crestB] = dark ? [176, 220, 206] : [250, 250, 247];
+    const [troughR, troughG, troughB] = dark ? [7, 16, 24] : [27, 62, 88];
 
     const f = fieldRef.current;
     for (let i = 0; i < GW * GH; i++) {
@@ -231,19 +239,19 @@ export function DoubleSlitSimulator() {
       const raw = f.u[i] * 1.15;
       const mag = Math.min(1, Math.abs(raw));
       const v = Math.sign(raw) * Math.pow(mag, 0.65);
-      const baseR = 205;
-      const baseG = 224;
-      const baseB = 218;
+      const baseR = (dark ? 36 : 205);
+      const baseG = (dark ? 62 : 224);
+      const baseB = (dark ? 58 : 218);
       if (v >= 0) {
         const k = v;
-        data[p] = baseR + (250 - baseR) * k;
-        data[p + 1] = baseG + (250 - baseG) * k;
-        data[p + 2] = baseB + (247 - baseB) * k;
+        data[p] = baseR + (crestR - baseR) * k;
+        data[p + 1] = baseG + (crestG - baseG) * k;
+        data[p + 2] = baseB + (crestB - baseB) * k;
       } else {
         const k = -v;
-        data[p] = baseR + (27 - baseR) * k;
-        data[p + 1] = baseG + (62 - baseG) * k;
-        data[p + 2] = baseB + (88 - baseB) * k;
+        data[p] = baseR + (troughR - baseR) * k;
+        data[p + 1] = baseG + (troughG - baseG) * k;
+        data[p + 2] = baseB + (troughB - baseB) * k;
       }
       data[p + 3] = 255;
     }
@@ -259,10 +267,10 @@ export function DoubleSlitSimulator() {
     ctx.drawImage(off, 0, 0, w, h);
 
     // 10 cm grid
-    ctx.strokeStyle = 'rgba(27, 42, 65, 0.16)';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.16)';
     ctx.lineWidth = 1;
     ctx.font = '500 9px ui-monospace, SFMono-Regular, Menlo, monospace';
-    ctx.fillStyle = 'rgba(27, 42, 65, 0.45)';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41) / 0.45)';
     for (let cm = 10; cm < GW * CM_PER_CELL; cm += 10) {
       const x = (cm / (GW * CM_PER_CELL)) * w;
       ctx.beginPath();
@@ -284,7 +292,7 @@ export function DoubleSlitSimulator() {
     const sxPx = px(sx + 0.5);
 
     // ---- screen line (the detector) ----
-    ctx.strokeStyle = '#2e7d6b';
+    ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
     ctx.lineWidth = 2;
     ctx.setLineDash([7, 5]);
     ctx.beginPath();
@@ -292,7 +300,7 @@ export function DoubleSlitSimulator() {
     ctx.lineTo(sxPx, py(GH - 2));
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#2e7d6b';
+    ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
     ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('screen', sxPx, py(2) + 12);
@@ -311,9 +319,9 @@ export function DoubleSlitSimulator() {
       }
       ctx.lineTo(sxPx, py(GH - SIDE_SPONGE));
       ctx.closePath();
-      ctx.fillStyle = 'rgba(184, 130, 61, 0.4)';
+      ctx.fillStyle = 'rgb(var(--h-b8823d) / 0.4)';
       ctx.fill();
-      ctx.strokeStyle = '#b8823d';
+      ctx.strokeStyle = 'rgb(var(--h-b8823d))';
       ctx.lineWidth = 1.6;
       ctx.stroke();
 
@@ -322,7 +330,7 @@ export function DoubleSlitSimulator() {
         const b0 = py(peaks[0] + 0.5);
         const b1 = py(peaks[1] + 0.5);
         const bx = sxPx + profW + 8;
-        ctx.strokeStyle = '#1b2a41';
+        ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
         ctx.lineWidth = 1.4;
         ctx.beginPath();
         ctx.moveTo(bx - 5, b0);
@@ -332,13 +340,13 @@ export function DoubleSlitSimulator() {
         ctx.moveTo(bx - 1, b0);
         ctx.lineTo(bx - 1, b1);
         ctx.stroke();
-        ctx.fillStyle = '#1b2a41';
+        ctx.fillStyle = 'rgb(var(--h-1b2a41))';
         ctx.font = 'italic 700 12px Georgia, serif';
         ctx.textAlign = 'left';
         ctx.fillText('x', bx + 6, (b0 + b1) / 2 + 4);
       }
       // mark detected maxima on the profile
-      ctx.fillStyle = '#b34a3c';
+      ctx.fillStyle = 'rgb(var(--h-b34a3c))';
       peaks.forEach((yy) => {
         ctx.beginPath();
         ctx.arc(sxPx + (env[yy] / envMax) * profW, py(yy + 0.5), 3, 0, Math.PI * 2);
@@ -349,7 +357,7 @@ export function DoubleSlitSimulator() {
     // ---- a bracket at the slits ----
     const halfSep = (s.aCm / CM_PER_CELL) / 2;
     const bxPx = px(BARRIER_X);
-    ctx.strokeStyle = '#8f6428';
+    ctx.strokeStyle = 'rgb(var(--h-8f6428))';
     ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.moveTo(bxPx - 14, py(GH / 2 - halfSep));
@@ -359,14 +367,14 @@ export function DoubleSlitSimulator() {
     ctx.moveTo(bxPx - 18, py(GH / 2 - halfSep));
     ctx.lineTo(bxPx - 18, py(GH / 2 + halfSep));
     ctx.stroke();
-    ctx.fillStyle = '#8f6428';
+    ctx.fillStyle = 'rgb(var(--h-8f6428))';
     ctx.font = 'italic 700 12px Georgia, serif';
     ctx.textAlign = 'right';
     ctx.fillText(`a = ${s.aCm} cm`, bxPx - 26, py(GH / 2) + 4);
 
     // ---- D bracket along the bottom ----
     const dyPx = h - 16;
-    ctx.strokeStyle = '#4a5a72';
+    ctx.strokeStyle = 'rgb(var(--h-4a5a72))';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(bxPx, dyPx - 5);
@@ -376,7 +384,7 @@ export function DoubleSlitSimulator() {
     ctx.moveTo(bxPx, dyPx);
     ctx.lineTo(sxPx, dyPx);
     ctx.stroke();
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = 'italic 700 11.5px Georgia, serif';
     ctx.textAlign = 'center';
     ctx.fillText(`D = ${s.dCm} cm`, (bxPx + sxPx) / 2, dyPx - 8);
@@ -384,7 +392,7 @@ export function DoubleSlitSimulator() {
     if (s.showTechnical) {
       ctx.textAlign = 'left';
       ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       const m = measureFringeSpacing(env);
       const lam = V_DEEP / s.freq;
       const pred = (lam * s.dCm) / s.aCm;
@@ -473,9 +481,11 @@ export function DoubleSlitSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -491,45 +501,45 @@ export function DoubleSlitSimulator() {
   return (
     <div className="double-slit-lab flex flex-col gap-5">
       {/* ---- Tank: full width ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Double-Slit Ripple Tank · {Math.round(GW * CM_PER_CELL)} × {Math.round(GH * CM_PER_CELL)} cm
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {paused ? 'paused' : strobe ? 'strobe' : 'live'}
           </span>
         </div>
         <div className="px-4 pt-2">
-          <canvas ref={canvasRef} className="block w-full rounded border border-[#e4ddcc]" style={{ aspectRatio: '176 / 104' }} />
+          <canvas ref={canvasRef} className="block w-full rounded border border-h-e4ddcc" style={{ aspectRatio: '176 / 104' }} />
         </div>
         <div className="px-4 pb-2 pt-2">
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug">
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug">
             Same tank, same physics as the ripple tank — dedicated to one experiment.{' '}
-            <span className="text-[#b8823d] font-semibold">Brass</span> = the double-slit barrier (the a slider moves the
-            slits). <span className="text-[#2e7d6b] font-semibold">Dashed green line</span> = the detector screen (the D
-            slider moves it). The <span className="text-[#b8823d] font-semibold">brass profile</span> on its right is the
-            integrated wave intensity — its <span className="text-[#b34a3c] font-semibold">red dots</span> are the bright
+            <span className="text-h-b8823d font-semibold">Brass</span> = the double-slit barrier (the a slider moves the
+            slits). <span className="text-h-2e7d6b font-semibold">Dashed green line</span> = the detector screen (the D
+            slider moves it). The <span className="text-h-b8823d font-semibold">brass profile</span> on its right is the
+            integrated wave intensity — its <span className="text-h-b34a3c font-semibold">red dots</span> are the bright
             fringes the sim itself detects.
           </p>
         </div>
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-8 gap-y-3 mb-3">
             <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Dipper f</label>
+              <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Dipper f</label>
               <input type="range" min={4} max={12} step={0.5} value={freq}
                 onChange={(e) => handleFreq(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{freq.toFixed(1)} Hz</span>
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Slit sep. a</label>
+              <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Slit sep. a</label>
               <input type="range" min={6} max={20} step={1} value={aCm}
                 onChange={(e) => handleA(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{aCm} cm</span>
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Distance D</label>
+              <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Distance D</label>
               <input type="range" min={15} max={45} step={1} value={dCm}
                 onChange={(e) => handleD(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{dCm} cm</span>
@@ -538,22 +548,22 @@ export function DoubleSlitSimulator() {
 
           <div className="flex flex-wrap gap-2 mb-3">
             <button onClick={handlePause}
-              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+              className="flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
               {paused ? '▶ Resume' : '⏸ Pause'}
             </button>
             <button onClick={handleStrobe}
               className={`flex-1 min-w-28 text-[12.5px] font-semibold px-3 py-2 rounded border ${
-                strobe ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                strobe ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}>
               {strobe ? '✓ Stroboscope' : '◉ Stroboscope'}
             </button>
             <div className="flex items-center gap-2 flex-1 min-w-40">
-              <span className="text-[13px] text-[#4a5a72]">Speed</span>
+              <span className="text-[13px] text-h-4a5a72">Speed</span>
               {[0.25, 0.5, 1].map((sp) => (
                 <button key={sp}
                   onClick={() => { setSpeed(sp); simRef.current.speed = sp; }}
                   className={`flex-1 text-[12.5px] font-semibold px-2 py-1.5 rounded border ${
-                    speed === sp ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    speed === sp ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                   }`}>
                   {sp === 0.25 ? '¼×' : sp === 0.5 ? '½×' : '1×'}
                 </button>
@@ -568,7 +578,7 @@ export function DoubleSlitSimulator() {
               simRef.current.showTechnical = next;
             }}
             className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
-              showTechnical ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+              showTechnical ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
             }`}>
             {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
           </button>
@@ -577,89 +587,89 @@ export function DoubleSlitSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Live Readings</span>
           <div className="mt-3 space-y-2">
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Wavelength λ = v/f</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{lambdaCm.toFixed(1)} cm</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Wavelength λ = v/f</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{lambdaCm.toFixed(1)} cm</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Predicted x = λD/a</span>
-              <span className="font-mono text-[13px] font-bold text-[#1b2a41]">{predictedX.toFixed(1)} cm</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Predicted x = λD/a</span>
+              <span className="font-mono text-[13px] font-bold text-h-1b2a41">{predictedX.toFixed(1)} cm</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Exact wave theory</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Exact wave theory</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">
                 {exactX !== null ? `${exactX.toFixed(1)} cm` : '—'}
               </span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Measured x (detector)</span>
-              <span className="font-mono text-[13px] font-bold text-[#2e7d6b]">
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Measured x (detector)</span>
+              <span className="font-mono text-[13px] font-bold text-h-2e7d6b">
                 {measured !== null ? `${measured.toFixed(1)} cm` : 'integrating…'}
               </span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Measured vs theory</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Measured vs theory</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">
                 {measured !== null && exactX !== null ? `${((measured / exactX) * 100).toFixed(0)}%` : '—'}
               </span>
             </div>
           </div>
-          <p className="text-[11.5px] text-[#4a5a72] mt-2.5 leading-snug">
+          <p className="text-[11.5px] text-h-4a5a72 mt-2.5 leading-snug">
             Three numbers, one story: the formula x = λD/a is a far-field approximation; the exact row solves the true
             path-difference geometry (no approximation); and the measured row is read off the actual wave field. Measured
             should track the exact theory closely — the gap to the formula is its small print, made visible.
           </p>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Watch the slits move as you slide a — then halve a and see
+              <strong className="text-h-1b2a41">1.</strong> Watch the slits move as you slide a — then halve a and see
               the fringes spread to double the spacing. Inversely related.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Slide the screen out with D and watch the same fringes fan
+              <strong className="text-h-1b2a41">2.</strong> Slide the screen out with D and watch the same fringes fan
               out wider: x grows in proportion to D.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Raise f: shorter λ, tighter fringes. Rearranged, λ = xa/D —
+              <strong className="text-h-1b2a41">3.</strong> Raise f: shorter λ, tighter fringes. Rearranged, λ = xa/D —
               this experiment is a way to MEASURE a wavelength.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">4.</strong> x = λD/a assumes D is much bigger than a. Set a = 20 cm and
+              <strong className="text-h-1b2a41">4.</strong> x = λD/a assumes D is much bigger than a. Set a = 20 cm and
               D = 15 cm: the formula drifts far from the exact and measured rows, which stay together. Restore D ≫ a and
               all three converge. Formulas have small print; this tank is small enough to show you where it is.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[22px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               x = λD / a
             </div>
-            <div className="italic text-[14px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[14px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               bright fringes where the path difference = nλ
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             What Each Variable Means
           </h2>
           <div className="space-y-2.5">
             {variables.map((v) => (
               <div key={v.symbol} className="flex gap-3 items-start">
                 <div
-                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                  className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[16px] font-bold italic text-h-8f6428"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   {v.symbol}
                 </div>
-                <p className="text-[12px] text-[#4a5a72] leading-snug">
-                  <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                <p className="text-[12px] text-h-4a5a72 leading-snug">
+                  <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                 </p>
               </div>
             ))}

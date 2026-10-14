@@ -73,7 +73,7 @@ function Editor({ req, onSaved }: { req: Req; onSaved: (r: Req) => void }) {
         <input value={adminNote} onChange={(e) => setAdminNote(e.target.value)} className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs" />
       </div>
       <div className="sm:col-span-3 flex items-center gap-3">
-        <button onClick={save} disabled={saving} className="bg-gray-900 hover:bg-black text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg disabled:opacity-50">
+        <button onClick={save} disabled={saving} className="bg-gray-900 hover:bg-black text-on-ink text-xs font-semibold px-3.5 py-1.5 rounded-lg disabled:opacity-50">
           {saving ? 'Saving…' : 'Save'}
         </button>
         {error && <span className="text-xs text-red-600">{error}</span>}
@@ -108,7 +108,7 @@ export function VideoRequestManager() {
             key={f}
             onClick={() => setFilter(f)}
             className={`text-xs font-semibold px-3 py-1.5 rounded-full border ${
-              filter === f ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+              filter === f ? 'bg-gray-900 text-on-ink border-gray-900' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
             }`}
           >
             {f === 'all' ? 'All' : f.replace('_', ' ')}

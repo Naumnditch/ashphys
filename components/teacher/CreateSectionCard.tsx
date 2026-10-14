@@ -78,7 +78,7 @@ export function CreateSectionCard() {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-gray-900 hover:bg-black text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+          className="flex-1 bg-gray-900 hover:bg-black text-on-ink text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
         >
           {loading ? 'Creating…' : 'Create'}
         </button>

@@ -170,7 +170,7 @@ export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; to
         <button
           onClick={submit}
           disabled={submitting}
-          className="bg-gray-900 hover:bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
+          className="bg-gray-900 hover:bg-black text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
         >
           {uploading ? 'Uploading screenshot…' : submitting ? 'Submitting…' : 'Submit request'}
         </button>

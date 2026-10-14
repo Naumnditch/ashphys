@@ -14,11 +14,11 @@ import { CIRCULAR_GRAVITY_DIAGRAMS } from './CircularGravityDiagrams';
 import { KINEMATICS_DIAGRAMS } from './KinematicsDiagrams';
 import { COULOMB_CHALLENGE_DIAGRAMS } from './CoulombChallengeDiagrams';
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
 
 interface TrolleyProps {
   x: number;
@@ -29,7 +29,7 @@ interface TrolleyProps {
   fill?: string;
 }
 
-function Trolley({ x, y, width, mass, arrow, fill = '#ffffff' }: TrolleyProps) {
+function Trolley({ x, y, width, mass, arrow, fill = 'rgb(var(--h-ffffff))' }: TrolleyProps) {
   const h = 34;
   const cx = x + width / 2;
   return (
@@ -97,7 +97,7 @@ function Frame({
   note?: string;
 }) {
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-md mx-auto" style={{ background: '#faf7f0', borderRadius: 8, border: '1px solid #e4ddcc' }}>
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-md mx-auto" style={{ background: 'rgb(var(--h-faf7f0))', borderRadius: 8, border: '1px solid rgb(var(--h-e4ddcc))' }}>
       <defs>
         <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
           <path d="M0,0 L6,3 L0,6 Z" fill={BRASS} />
@@ -107,7 +107,7 @@ function Frame({
       <line x1={20} y1={height - 34} x2={width / 2 - 12} y2={height - 34} stroke={MUTE} strokeWidth={1.5} />
       <line x1={width / 2 + 12} y1={height - 34} x2={width - 20} y2={height - 34} stroke={MUTE} strokeWidth={1.5} />
       {/* divider */}
-      <line x1={width / 2} y1={16} x2={width / 2} y2={height - 16} stroke="#d8cfb6" strokeWidth={1.2} strokeDasharray="4 4" />
+      <line x1={width / 2} y1={16} x2={width / 2} y2={height - 16} stroke="rgb(var(--h-d8cfb6))" strokeWidth={1.2} strokeDasharray="4 4" />
       <text x={width / 4} y={26} textAnchor="middle" fontSize={11} fontWeight={700} fill={MUTE} fontFamily="ui-monospace, monospace" letterSpacing={1}>
         BEFORE
       </text>
@@ -128,7 +128,7 @@ const SERIF = 'Georgia, serif';
 
 function Figure({ width, height, children }: { width: number; height: number; children: React.ReactNode }) {
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-md mx-auto" style={{ background: '#faf7f0', borderRadius: 8, border: '1px solid #e4ddcc' }}>
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full max-w-md mx-auto" style={{ background: 'rgb(var(--h-faf7f0))', borderRadius: 8, border: '1px solid rgb(var(--h-e4ddcc))' }}>
       <defs>
         <marker id="dim-end" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
           <path d="M0,0 L6,3 L0,6 Z" fill={MUTE} />
@@ -148,7 +148,7 @@ function Figure({ width, height, children }: { width: number; height: number; ch
 function Charge({ x, y, sign, r = 16 }: { x: number; y: number; sign: '+' | '−'; r?: number }) {
   return (
     <g>
-      <circle cx={x} cy={y} r={r} fill={sign === '+' ? '#f3d9d4' : '#d6e6f2'} stroke={INK} strokeWidth={1.6} />
+      <circle cx={x} cy={y} r={r} fill={sign === '+' ? 'rgb(var(--h-f3d9d4))' : 'rgb(var(--h-d6e6f2))'} stroke={INK} strokeWidth={1.6} />
       <text x={x} y={y + 6} textAnchor="middle" fontSize={17} fontWeight={700} fill={INK} fontFamily={SERIF}>
         {sign}
       </text>
@@ -187,8 +187,8 @@ const COULOMB_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={230} y={126} size={10.5} color={MUTE}>
         frictionless horizontal surface
       </Label>
-      <circle cx={140} cy={86} r={18} fill="#f3d9d4" stroke={INK} strokeWidth={1.6} />
-      <circle cx={320} cy={86} r={18} fill="#f3d9d4" stroke={INK} strokeWidth={1.6} />
+      <circle cx={140} cy={86} r={18} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.6} />
+      <circle cx={320} cy={86} r={18} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.6} />
       <Label x={140} y={92} size={15} bold>
         +
       </Label>
@@ -239,9 +239,9 @@ const COULOMB_DIAGRAMS: Record<string, React.ReactNode> = {
       </Label>
       {/* thread and suspended ball: 120 long at 30° → (−60, +104) */}
       <line x1={230} y1={22} x2={170} y2={126} stroke={INK} strokeWidth={1.4} />
-      <circle cx={170} cy={126} r={9} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={170} cy={126} r={9} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       {/* second ball on an insulating rod */}
-      <circle cx={260} cy={126} r={9} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={260} cy={126} r={9} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       <line x1={269} y1={126} x2={400} y2={126} stroke={BRASS} strokeWidth={4} strokeLinecap="round" />
       <Label x={352} y={116} size={10.5} color={MUTE}>
         insulating rod
@@ -378,7 +378,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={264} y={93} bold>
         r
       </Label>
-      <circle cx={302} cy={100} r={10} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={302} cy={100} r={10} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       <line x1={302} y1={88} x2={302} y2={40} stroke={TEAL} strokeWidth={2.2} markerEnd="url(#vec-end)" />
       <Label x={316} y={52} color={TEAL} bold>
         v
@@ -393,7 +393,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={218} y={145} bold>
         r
       </Label>
-      <circle cx={230} cy={178} r={11} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={230} cy={178} r={11} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       <line x1={243} y1={178} x2={300} y2={178} stroke={TEAL} strokeWidth={2.2} markerEnd="url(#vec-end)" />
       <Label x={296} y={170} color={TEAL} bold>
         v
@@ -411,7 +411,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={218} y={86} bold>
         r
       </Label>
-      <circle cx={230} cy={42} r={11} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={230} cy={42} r={11} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       <line x1={217} y1={42} x2={160} y2={42} stroke={TEAL} strokeWidth={2.2} markerEnd="url(#vec-end)" />
       <Label x={166} y={34} color={TEAL} bold>
         v
@@ -441,7 +441,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={243} y={70} size={12} color={MUTE} bold>
         θ
       </Label>
-      <circle cx={310} cy={150} r={10} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={310} cy={150} r={10} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
     </Figure>
   ),
   'gravity-two-bodies': (
@@ -449,8 +449,8 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Dimension x1={110} x2={360} y={30} label="r" />
       <line x1={110} y1={44} x2={110} y2={60} stroke={MUTE} strokeWidth={1} strokeDasharray="2 3" />
       <line x1={360} y1={44} x2={360} y2={78} stroke={MUTE} strokeWidth={1} strokeDasharray="2 3" />
-      <circle cx={110} cy={96} r={34} fill="#e5e7eb" stroke={INK} strokeWidth={1.6} />
-      <circle cx={360} cy={96} r={16} fill="#e5e7eb" stroke={INK} strokeWidth={1.6} />
+      <circle cx={110} cy={96} r={34} fill="rgb(var(--h-e5e7eb))" stroke={INK} strokeWidth={1.6} />
+      <circle cx={360} cy={96} r={16} fill="rgb(var(--h-e5e7eb))" stroke={INK} strokeWidth={1.6} />
       <Label x={110} y={102} size={15} bold>
         M
       </Label>
@@ -462,7 +462,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
   'gravity-orbit': (
     <Figure width={460} height={230}>
       <circle cx={230} cy={115} r={92} fill="none" stroke={BRASS} strokeWidth={1.4} strokeDasharray="6 5" />
-      <circle cx={230} cy={115} r={44} fill="#dbe7f0" stroke={INK} strokeWidth={1.6} />
+      <circle cx={230} cy={115} r={44} fill="rgb(var(--h-dbe7f0))" stroke={INK} strokeWidth={1.6} />
       <Label x={222} y={146} size={12} bold>
         M
       </Label>
@@ -470,7 +470,7 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Label x={276} y={98} bold>
         r
       </Label>
-      <circle cx={300} cy={55} r={8} fill="#f3d9d4" stroke={INK} strokeWidth={1.5} />
+      <circle cx={300} cy={55} r={8} fill="rgb(var(--h-f3d9d4))" stroke={INK} strokeWidth={1.5} />
       <Label x={356} y={40} size={10.5} color={MUTE}>
         orbiting body, m
       </Label>
@@ -484,8 +484,8 @@ const WORKSHEET_DIAGRAMS: Record<string, React.ReactNode> = {
       <Dimension x1={120} x2={340} y={30} label="r" />
       <line x1={120} y1={44} x2={120} y2={62} stroke={MUTE} strokeWidth={1} strokeDasharray="2 3" />
       <line x1={340} y1={44} x2={340} y2={62} stroke={MUTE} strokeWidth={1} strokeDasharray="2 3" />
-      <circle cx={120} cy={82} r={18} fill="#f4f1ea" stroke={INK} strokeWidth={1.6} />
-      <circle cx={340} cy={82} r={18} fill="#f4f1ea" stroke={INK} strokeWidth={1.6} />
+      <circle cx={120} cy={82} r={18} fill="rgb(var(--h-f4f1ea))" stroke={INK} strokeWidth={1.6} />
+      <circle cx={340} cy={82} r={18} fill="rgb(var(--h-f4f1ea))" stroke={INK} strokeWidth={1.6} />
       <Label x={120} y={87} bold>
         q₁
       </Label>
@@ -649,7 +649,7 @@ const DIAGRAMS: Record<string, React.ReactNode> = {
   'momentum-recoil-1': (
     <Frame width={460} height={170}>
       <Trolley x={70} y={64} width={110} mass="gun, 4 kg" arrow={{ label: '', dir: 0, color: TEAL }} />
-      <Trolley x={260} y={70} width={40} mass="" arrow={{ label: '300 m/s', dir: 1, color: TEAL }} fill="#f6efdc" />
+      <Trolley x={260} y={70} width={40} mass="" arrow={{ label: '300 m/s', dir: 1, color: TEAL }} fill="rgb(var(--h-f6efdc))" />
       <Trolley x={330} y={64} width={110} mass="gun, 4 kg" arrow={{ label: '?', dir: -1, color: BRASS, unknown: true }} />
     </Frame>
   ),

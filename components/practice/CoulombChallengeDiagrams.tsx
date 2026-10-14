@@ -17,15 +17,15 @@
 import type { ReactNode } from 'react';
 import { COULOMB_CHALLENGE_DIAGRAM_DATA } from './coulombChallengeDiagramData';
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const PAPER = '#faf7f0';
-const BORDER = '#e4ddcc';
-const POS = '#f3d9d4';
-const NEG = '#d6e6f2';
-const NEUTRAL = '#f4f1ea';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const PAPER = 'rgb(var(--h-faf7f0))';
+const BORDER = 'rgb(var(--h-e4ddcc))';
+const POS = 'rgb(var(--h-f3d9d4))';
+const NEG = 'rgb(var(--h-d6e6f2))';
+const NEUTRAL = 'rgb(var(--h-f4f1ea))';
 const SERIF = 'Georgia, serif';
 
 type Sign = '+' | '−' | '?' | '';
@@ -348,8 +348,8 @@ export function FieldPendulum({
     <Figure width={460} height={214}>
       {plates && (
         <g>
-          <rect x={60} y={20} width={8} height={170} fill="#ffffff" stroke={INK} strokeWidth={1.4} />
-          <rect x={372} y={20} width={8} height={170} fill="#ffffff" stroke={INK} strokeWidth={1.4} />
+          <rect x={60} y={20} width={8} height={170} fill="rgb(var(--h-ffffff))" stroke={INK} strokeWidth={1.4} />
+          <rect x={372} y={20} width={8} height={170} fill="rgb(var(--h-ffffff))" stroke={INK} strokeWidth={1.4} />
           {[40, 80, 120, 160].map((y) => (
             <g key={y}>
               <Label x={50} y={y + 4} bold>
@@ -394,7 +394,7 @@ export function ReadingsTable({ title, columns, rows }: { title: string; columns
       <Label x={width / 2} y={22} size={11.5} color={MUTE} bold>
         {title}
       </Label>
-      <rect x={x0} y={y0} width={colW * columns.length} height={rowH} fill="#efe7d4" stroke={INK} strokeWidth={1} />
+      <rect x={x0} y={y0} width={colW * columns.length} height={rowH} fill="rgb(var(--h-efe7d4))" stroke={INK} strokeWidth={1} />
       {columns.map((c, i) => (
         <Label key={c} x={x0 + colW * i + colW / 2} y={y0 + 16} size={12} bold>
           {c}
@@ -402,7 +402,7 @@ export function ReadingsTable({ title, columns, rows }: { title: string; columns
       ))}
       {rows.map((row, j) => (
         <g key={j}>
-          <rect x={x0} y={y0 + rowH * (j + 1)} width={colW * columns.length} height={rowH} fill="#ffffff" stroke={INK} strokeWidth={0.8} />
+          <rect x={x0} y={y0 + rowH * (j + 1)} width={colW * columns.length} height={rowH} fill="rgb(var(--h-ffffff))" stroke={INK} strokeWidth={0.8} />
           {row.map((cell, i) => (
             <Label key={i} x={x0 + colW * i + colW / 2} y={y0 + rowH * (j + 1) + 16} size={12}>
               {cell}
@@ -553,8 +553,8 @@ export function CornerCharges({
 export function OilDropPlates({ fieldLabel, dropLabel }: { fieldLabel: string; dropLabel: string }) {
   return (
     <Figure width={460} height={200}>
-      <rect x={70} y={28} width={320} height={9} fill="#ffffff" stroke={INK} strokeWidth={1.4} />
-      <rect x={70} y={160} width={320} height={9} fill="#ffffff" stroke={INK} strokeWidth={1.4} />
+      <rect x={70} y={28} width={320} height={9} fill="rgb(var(--h-ffffff))" stroke={INK} strokeWidth={1.4} />
+      <rect x={70} y={160} width={320} height={9} fill="rgb(var(--h-ffffff))" stroke={INK} strokeWidth={1.4} />
       {[100, 150, 230, 290, 360].map((x) => (
         <g key={x}>
           <Label x={x} y={22} bold>
@@ -642,7 +642,7 @@ export function ForceGraph({
     <Figure width={460} height={240}>
       {yTicks.map((v) => (
         <g key={`y${v}`}>
-          <line x1={ox} y1={r1(Y(v))} x2={ox + W} y2={r1(Y(v))} stroke="#d8cfb6" strokeWidth={0.6} />
+          <line x1={ox} y1={r1(Y(v))} x2={ox + W} y2={r1(Y(v))} stroke="rgb(var(--h-d8cfb6))" strokeWidth={0.6} />
           <Label x={ox - 6} y={Y(v) + 4} size={10} color={MUTE} anchor="end">
             {tickText(v)}
           </Label>
@@ -650,7 +650,7 @@ export function ForceGraph({
       ))}
       {xTicks.map((v) => (
         <g key={`x${v}`}>
-          <line x1={r1(X(v))} y1={oy - H} x2={r1(X(v))} y2={oy} stroke="#d8cfb6" strokeWidth={0.6} />
+          <line x1={r1(X(v))} y1={oy - H} x2={r1(X(v))} y2={oy} stroke="rgb(var(--h-d8cfb6))" strokeWidth={0.6} />
           <Label x={X(v)} y={oy + 15} size={10} color={MUTE}>
             {tickText(v)}
           </Label>

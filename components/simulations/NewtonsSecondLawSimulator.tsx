@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 const MAX_TIME = 8; // seconds per run
 
 function drawBlock(ctx: CanvasRenderingContext2D, x: number, trackY: number, forceN: number) {
@@ -10,18 +12,18 @@ function drawBlock(ctx: CanvasRenderingContext2D, x: number, trackY: number, for
 
   // block
   const grad = ctx.createLinearGradient(x - size / 2, top, x + size / 2, trackY);
-  grad.addColorStop(0, '#e0b871');
-  grad.addColorStop(1, '#8f6428');
+  grad.addColorStop(0, 'rgb(var(--h-e0b871))');
+  grad.addColorStop(1, 'rgb(var(--h-8f6428))');
   ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.roundRect(x - size / 2, top, size, size, 4);
   ctx.fill();
-  ctx.strokeStyle = '#6b4a1c';
+  ctx.strokeStyle = 'rgb(var(--h-6b4a1c))';
   ctx.lineWidth = 1.4;
   ctx.stroke();
 
   // mass label
-  ctx.fillStyle = '#4a3620';
+  ctx.fillStyle = 'rgb(var(--h-4a3620))';
   ctx.font = '700 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('m', x, top + size / 2 + 4);
@@ -34,8 +36,8 @@ function drawBlock(ctx: CanvasRenderingContext2D, x: number, trackY: number, for
     const ax0 = x + size / 2 + 6;
     const ax1 = ax0 + arrowLen;
 
-    ctx.strokeStyle = '#b34a3c';
-    ctx.fillStyle = '#b34a3c';
+    ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
+    ctx.fillStyle = 'rgb(var(--h-b34a3c))';
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(ax0, ay);
@@ -94,7 +96,7 @@ export function NewtonsSecondLawSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -110,7 +112,7 @@ export function NewtonsSecondLawSimulator() {
     const trackY = 66;
     const trackPadding = 24;
     const trackW = w - trackPadding * 2;
-    ctx.strokeStyle = '#d8cfb6';
+    ctx.strokeStyle = 'rgb(var(--h-d8cfb6))';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(trackPadding, trackY);
@@ -119,7 +121,7 @@ export function NewtonsSecondLawSimulator() {
 
     // hatching underneath, indicating a surface
     for (let i = 0; i < trackW; i += 12) {
-      ctx.strokeStyle = '#e6ded0';
+      ctx.strokeStyle = 'rgb(var(--h-e6ded0))';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(trackPadding + i, trackY + 3);
@@ -145,7 +147,7 @@ export function NewtonsSecondLawSimulator() {
     const xForT = (t: number) => graphLeft + (t / MAX_TIME) * graphW;
     const yForV = (vel: number) => graphBottom - (vel / MAX_V) * graphH;
 
-    ctx.strokeStyle = '#b8b0a0';
+    ctx.strokeStyle = 'rgb(var(--h-b8b0a0))';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(graphLeft, graphTop);
@@ -154,8 +156,8 @@ export function NewtonsSecondLawSimulator() {
     ctx.stroke();
 
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#8a94a3';
-    ctx.strokeStyle = '#eee6d3';
+    ctx.fillStyle = 'rgb(var(--h-8a94a3))';
+    ctx.strokeStyle = 'rgb(var(--h-eee6d3))';
     for (let tt = 0; tt <= MAX_TIME; tt += 1) {
       const x = xForT(tt);
       ctx.beginPath();
@@ -176,7 +178,7 @@ export function NewtonsSecondLawSimulator() {
       ctx.fillText(vv.toFixed(0), graphLeft - 6, y + 3);
     }
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.fillText('time (s)', graphRight - 44, graphBottom + 26);
     ctx.save();
@@ -187,7 +189,7 @@ export function NewtonsSecondLawSimulator() {
 
     const trace = traceRef.current;
     if (trace.length > 1) {
-      ctx.strokeStyle = '#2e7d6b';
+      ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
       ctx.lineWidth = 2.4;
       ctx.beginPath();
       trace.forEach((p, i) => {
@@ -202,7 +204,7 @@ export function NewtonsSecondLawSimulator() {
     if (s.elapsed > 0 || trace.length > 0) {
       const cx = xForT(s.elapsed);
       const cy = yForV(v);
-      ctx.fillStyle = '#b8823d';
+      ctx.fillStyle = 'rgb(var(--h-b8823d))';
       ctx.beginPath();
       ctx.arc(cx, cy, 4, 0, Math.PI * 2);
       ctx.fill();
@@ -278,16 +280,18 @@ export function NewtonsSecondLawSimulator() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
+      const ctx = themedContext(canvas);
       ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       draw();
     };
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     draw();
 
     return () => window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -301,12 +305,12 @@ export function NewtonsSecondLawSimulator() {
 
   return (
     <div className="newton-lab">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Live Block & Graph
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             a = {accelDisplay} m/s²
           </span>
         </div>
@@ -314,15 +318,15 @@ export function NewtonsSecondLawSimulator() {
 
         {finished && (
           <div className="px-4 pt-1">
-            <p className="text-[11.5px] text-[#1b2a41] font-semibold">
+            <p className="text-[11.5px] text-h-1b2a41 font-semibold">
               ✓ Run finished ({MAX_TIME}s). Press Run Again to repeat.
             </p>
           </div>
         )}
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="flex items-center gap-3 mb-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Force</label>
+            <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Force</label>
             <input
               type="range"
               min={1}
@@ -336,7 +340,7 @@ export function NewtonsSecondLawSimulator() {
             <span className="font-mono text-[13px] w-16 text-right">{forceN.toFixed(1)} N</span>
           </div>
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Mass</label>
+            <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Mass</label>
             <input
               type="range"
               min={0.5}
@@ -353,13 +357,13 @@ export function NewtonsSecondLawSimulator() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleStartPause}
-              className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
+              className="bg-h-b8823d hover:bg-h-8f6428 text-on-ink text-[13.5px] font-semibold px-3.5 py-2 rounded"
             >
               {finished ? '↻ Run Again' : isRunning ? '⏸ Pause' : '▶ Start'}
             </button>
             <button
               onClick={resetSim}
-              className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+              className="bg-transparent border border-h-d8cfb6 hover:bg-h-f5f0e2 text-h-1b2a41 text-[13.5px] font-semibold px-3.5 py-2 rounded"
             >
               ⟲ Reset
             </button>
@@ -367,59 +371,59 @@ export function NewtonsSecondLawSimulator() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Readouts
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Force F</div>
-            <div className="font-mono text-lg font-bold text-[#b34a3c]">{forceN.toFixed(1)} N</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Force F</div>
+            <div className="font-mono text-lg font-bold text-h-b34a3c">{forceN.toFixed(1)} N</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Mass m</div>
-            <div className="font-mono text-lg font-bold text-[#8f6428]">{massKg.toFixed(1)} kg</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Mass m</div>
+            <div className="font-mono text-lg font-bold text-h-8f6428">{massKg.toFixed(1)} kg</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Acceleration a</div>
-            <div className="font-mono text-lg font-bold text-[#2e7d6b]">{accelDisplay} m/s²</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Acceleration a</div>
+            <div className="font-mono text-lg font-bold text-h-2e7d6b">{accelDisplay} m/s²</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Velocity now</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Velocity now</div>
             <div className="font-mono text-lg font-bold">{velocityDisplay} m/s</div>
           </div>
         </div>
-        <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-[12.5px] text-[#4a5a72] leading-relaxed">
+        <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-4 py-3 text-[12.5px] text-h-4a5a72 leading-relaxed">
           Force and mass stay constant during a run, so acceleration is constant too — that&rsquo;s why the
           velocity-time graph is a straight line. Its gradient <i>is</i> the acceleration.
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-5 text-center mb-5">
-        <div className="italic text-[26px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-5 text-center mb-5">
+        <div className="italic text-[26px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
           F = m a
         </div>
-        <div className="text-[12px] text-[#4a5a72] mt-2">
+        <div className="text-[12px] text-h-4a5a72 mt-2">
           the same resultant force accelerates a bigger mass more slowly
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           What Each Variable Means
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {variables.map((v) => (
             <div key={v.symbol} className="flex gap-3 items-start">
               <div
-                className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center font-mono text-[16px] font-bold text-h-8f6428"
                 style={{ fontFamily: 'Georgia, serif' }}
               >
                 {v.symbol}
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                <div className="text-[13px] font-semibold text-h-1b2a41">{v.name}</div>
+                <div className="text-[12.5px] text-h-4a5a72 leading-snug">{v.def}</div>
               </div>
             </div>
           ))}

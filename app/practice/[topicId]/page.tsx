@@ -53,14 +53,14 @@ export default async function PracticePage({
             {syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId))} · Practice
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{lessonTitle(topic.topic_name, curriculumId)}</h1>
-          <p className="text-xs font-semibold text-[#5a67d8] mt-1">{CURRICULA[curriculumId].displayName} question bank</p>
+          <p className="text-xs font-semibold text-h-5a67d8 mt-1">{CURRICULA[curriculumId].displayName} question bank</p>
         </div>
         {allowed && (
           <div className="flex flex-wrap gap-2">
             <a
               href={`/api/practice/${topic.id}/worksheet?${bank}`}
               download
-              className="text-sm font-semibold bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg whitespace-nowrap"
+              className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg whitespace-nowrap"
             >
               Download PDF
             </a>

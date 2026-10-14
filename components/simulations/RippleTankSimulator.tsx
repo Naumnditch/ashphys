@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { isDarkCanvas, themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Ripple Tank — the 2D wave equation, solved live.
  *
@@ -247,7 +249,7 @@ export function RippleTankSimulator() {
   const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     if (!offscreenRef.current) {
@@ -256,11 +258,17 @@ export function RippleTankSimulator() {
       offscreenRef.current.height = GH;
     }
     const off = offscreenRef.current;
-    const offCtx = off.getContext('2d');
+    const offCtx = themedContext(off);
     if (!offCtx) return;
     if (!imageRef.current) imageRef.current = offCtx.createImageData(GW, GH);
     const img = imageRef.current;
     const data = img.data;
+
+    // Water colour ramp (light: mid-tone teal paper; dark: deep teal) - the field is
+    // painted pixel by pixel, so it picks its palette here rather than via CSS.
+    const dark = isDarkCanvas(canvas);
+    const [crestR, crestG, crestB] = dark ? [176, 220, 206] : [250, 250, 247];
+    const [troughR, troughG, troughB] = dark ? [7, 16, 24] : [27, 62, 88];
 
     const f = fieldRef.current;
     for (let i = 0; i < GW * GH; i++) {
@@ -282,19 +290,19 @@ export function RippleTankSimulator() {
       const mag = Math.min(1, Math.abs(raw));
       const v = Math.sign(raw) * Math.pow(mag, 0.65);
       const sh = f.shallow[i] ? 1 : 0;
-      const baseR = 205 - sh * 22;
-      const baseG = 224 - sh * 8;
-      const baseB = 218 - sh * 14;
+      const baseR = (dark ? 36 : 205) - sh * (dark ? -8 : 22);
+      const baseG = (dark ? 62 : 224) - sh * (dark ? -8 : 8);
+      const baseB = (dark ? 58 : 218) - sh * (dark ? -8 : 14);
       if (v >= 0) {
         const k = v;
-        data[p] = baseR + (250 - baseR) * k;
-        data[p + 1] = baseG + (250 - baseG) * k;
-        data[p + 2] = baseB + (247 - baseB) * k;
+        data[p] = baseR + (crestR - baseR) * k;
+        data[p + 1] = baseG + (crestG - baseG) * k;
+        data[p + 2] = baseB + (crestB - baseB) * k;
       } else {
         const k = -v;
-        data[p] = baseR + (27 - baseR) * k;
-        data[p + 1] = baseG + (62 - baseG) * k;
-        data[p + 2] = baseB + (88 - baseB) * k;
+        data[p] = baseR + (troughR - baseR) * k;
+        data[p + 1] = baseG + (troughG - baseG) * k;
+        data[p + 2] = baseB + (troughB - baseB) * k;
       }
       data[p + 3] = 255;
     }
@@ -308,10 +316,10 @@ export function RippleTankSimulator() {
     ctx.drawImage(off, 0, 0, w, h);
 
     // 10 cm reference grid (every 20 cells)
-    ctx.strokeStyle = 'rgba(27, 42, 65, 0.16)';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.16)';
     ctx.lineWidth = 1;
     ctx.font = '500 9px ui-monospace, SFMono-Regular, Menlo, monospace';
-    ctx.fillStyle = 'rgba(27, 42, 65, 0.45)';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41) / 0.45)';
     for (let cm = 10; cm < GW * CM_PER_CELL; cm += 10) {
       const x = (cm / (GW * CM_PER_CELL)) * w;
       ctx.beginPath();
@@ -331,7 +339,7 @@ export function RippleTankSimulator() {
     const s = simRef.current;
     if (s.showTechnical) {
       ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       const lines = [
         `wave equation u_tt = c²·∇²u on ${GW}×${GH} cells, ${STEPS_PER_SEC} steps/s`,
         `deep: v = ${V_DEEP.toFixed(0)} cm/s   λ = ${(V_DEEP / s.freq).toFixed(1)} cm`,
@@ -413,9 +421,11 @@ export function RippleTankSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -435,30 +445,30 @@ export function RippleTankSimulator() {
     <div className="ripple-tank-lab">
       <div className="flex flex-col gap-5">
         {/* ---- Tank ---- */}
-        <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+        <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
           <div className="flex justify-between items-baseline px-4 pt-3">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
               Ripple Tank · {Math.round(GW * CM_PER_CELL)} × {Math.round(GH * CM_PER_CELL)} cm
             </span>
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
               {paused ? 'paused' : strobe ? 'strobe' : 'live'}
             </span>
           </div>
           <div className="px-4 pt-2">
-            <canvas ref={canvasRef} className="block w-full rounded border border-[#e4ddcc]" style={{ aspectRatio: '176 / 104' }} />
+            <canvas ref={canvasRef} className="block w-full rounded border border-h-e4ddcc" style={{ aspectRatio: '176 / 104' }} />
           </div>
           <div className="px-4 pb-2 pt-2">
-            <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-              <span className="text-[#1b2a41] font-semibold">Bright bands</span> = crests,{' '}
-              <span className="text-[#1b2a41] font-semibold">dark bands</span> = troughs — like the light table under
+            <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+              <span className="text-h-1b2a41 font-semibold">Bright bands</span> = crests,{' '}
+              <span className="text-h-1b2a41 font-semibold">dark bands</span> = troughs — like the light table under
               a real tank. The dark bar on the left is the wave generator: it launches waves one way, left to right,
               and swallows anything that comes back. Every wall has an absorbing beach, so what you see is each
-              phenomenon by itself — no echoes. <span className="text-[#b8823d] font-semibold">Brass</span> = barriers.
+              phenomenon by itself — no echoes. <span className="text-h-b8823d font-semibold">Brass</span> = barriers.
               Gridlines are 10 cm apart, for measuring λ.
             </p>
           </div>
 
-          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
             <div className="flex flex-wrap gap-1.5 mb-3">
               {SCENES.map((sc) => (
                 <button
@@ -466,8 +476,8 @@ export function RippleTankSimulator() {
                   onClick={() => handleScene(sc.key)}
                   className={`text-[12px] font-medium px-2.5 py-1.5 rounded border ${
                     scene === sc.key
-                      ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                      : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                      ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                      : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                   }`}
                 >
                   {sc.name}
@@ -476,7 +486,7 @@ export function RippleTankSimulator() {
             </div>
 
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Dipper f</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Dipper f</label>
               <input
                 type="range"
                 min={3}
@@ -492,7 +502,7 @@ export function RippleTankSimulator() {
             <div className="flex gap-2 mb-3">
               <button
                 onClick={handlePause}
-                className="flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]"
+                className="flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2"
               >
                 {paused ? '▶ Resume' : '⏸ Pause'}
               </button>
@@ -500,8 +510,8 @@ export function RippleTankSimulator() {
                 onClick={handleStrobe}
                 className={`flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                   strobe
-                    ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]'
-                    : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b'
+                    : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
                 {strobe ? '✓ Stroboscope' : '◉ Stroboscope'}
@@ -509,7 +519,7 @@ export function RippleTankSimulator() {
             </div>
 
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Speed</span>
+              <span className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Speed</span>
               {[0.25, 0.5, 1].map((sp) => (
                 <button
                   key={sp}
@@ -519,8 +529,8 @@ export function RippleTankSimulator() {
                   }}
                   className={`flex-1 text-[12.5px] font-semibold px-3 py-1.5 rounded border ${
                     speed === sp
-                      ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                      : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                      ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                      : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                   }`}
                 >
                   {sp === 0.25 ? '¼×' : sp === 0.5 ? '½×' : '1×'}
@@ -536,8 +546,8 @@ export function RippleTankSimulator() {
               }}
               className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
                 showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
@@ -547,69 +557,69 @@ export function RippleTankSimulator() {
 
         {/* ---- Notebook: a row of cards under the full-width tank ---- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
             <div className="flex justify-between items-baseline">
-              <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
-              <span className="font-mono text-[11px] text-[#8f6428]">{active.lesson}</span>
+              <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Live Readings</span>
+              <span className="font-mono text-[11px] text-h-8f6428">{active.lesson}</span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Frequency f</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{freq.toFixed(1)} Hz</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Frequency f</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{freq.toFixed(1)} Hz</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">Period T</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{(1 / freq).toFixed(2)} s</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">Period T</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{(1 / freq).toFixed(2)} s</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">v (deep water)</span>
-                <span className="font-mono text-[13px] text-[#1b2a41]">{V_DEEP.toFixed(0)} cm/s</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">v (deep water)</span>
+                <span className="font-mono text-[13px] text-h-1b2a41">{V_DEEP.toFixed(0)} cm/s</span>
               </div>
-              <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                <span className="text-[12.5px] text-[#4a5a72]">λ (deep water)</span>
-                <span className="font-mono text-[13px] text-[#2e7d6b]">{lambdaDeep.toFixed(1)} cm</span>
+              <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                <span className="text-[12.5px] text-h-4a5a72">λ (deep water)</span>
+                <span className="font-mono text-[13px] text-h-2e7d6b">{lambdaDeep.toFixed(1)} cm</span>
               </div>
               {scene === 'refraction' && (
                 <>
-                  <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                    <span className="text-[12.5px] text-[#4a5a72]">v (shelf)</span>
-                    <span className="font-mono text-[13px] text-[#1b2a41]">{V_SHALLOW.toFixed(0)} cm/s</span>
+                  <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                    <span className="text-[12.5px] text-h-4a5a72">v (shelf)</span>
+                    <span className="font-mono text-[13px] text-h-1b2a41">{V_SHALLOW.toFixed(0)} cm/s</span>
                   </div>
-                  <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-                    <span className="text-[12.5px] text-[#4a5a72]">λ (shelf)</span>
-                    <span className="font-mono text-[13px] text-[#2e7d6b]">{lambdaShallow.toFixed(1)} cm</span>
+                  <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+                    <span className="text-[12.5px] text-h-4a5a72">λ (shelf)</span>
+                    <span className="font-mono text-[13px] text-h-2e7d6b">{lambdaShallow.toFixed(1)} cm</span>
                   </div>
                 </>
               )}
             </div>
           </div>
 
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">What To Look For</span>
-            <p className="text-[12.5px] text-[#1b2a41] font-semibold mt-1.5">{active.blurb}</p>
-            <p className="text-[12px] text-[#4a5a72] mt-1.5 leading-snug">{active.watch}</p>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">What To Look For</span>
+            <p className="text-[12.5px] text-h-1b2a41 font-semibold mt-1.5">{active.blurb}</p>
+            <p className="text-[12px] text-h-4a5a72 mt-1.5 leading-snug">{active.watch}</p>
           </div>
 
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-              <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+              <div className="italic text-[22px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
                 v = f λ
               </div>
             </div>
-            <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+            <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
               What Each Variable Means
             </h2>
             <div className="space-y-2.5">
               {variables.map((v) => (
                 <div key={v.symbol} className="flex gap-3 items-start">
                   <div
-                    className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                    className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[16px] font-bold italic text-h-8f6428"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
                     {v.symbol}
                   </div>
-                  <p className="text-[12px] text-[#4a5a72] leading-snug">
-                    <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                  <p className="text-[12px] text-h-4a5a72 leading-snug">
+                    <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                   </p>
                 </div>
               ))}

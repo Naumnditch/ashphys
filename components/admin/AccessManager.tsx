@@ -158,7 +158,7 @@ export function AccessManager({ plans, initialSubs }: { plans: Plan[]; initialSu
         <button
           onClick={grant}
           disabled={busy || !email.trim()}
-          className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
+          className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
         >
           {busy ? 'Saving…' : 'Grant access'}
         </button>
@@ -221,7 +221,7 @@ export function AccessManager({ plans, initialSubs }: { plans: Plan[]; initialSu
                 <button
                   onClick={() => setTier(s)}
                   disabled={busyRow}
-                  className="bg-[#2e7d6b] hover:bg-[#256355] text-white text-xs font-semibold px-3 py-1.5 rounded-lg disabled:opacity-50"
+                  className="bg-h-2e7d6b hover:bg-h-256355 text-on-ink text-xs font-semibold px-3 py-1.5 rounded-lg disabled:opacity-50"
                 >
                   {busyRow ? '…' : 'Set tier'}
                 </button>

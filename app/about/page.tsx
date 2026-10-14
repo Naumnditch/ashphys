@@ -40,7 +40,7 @@ export default function AboutPage() {
         <div className="flex items-center justify-center gap-3 mt-8">
           <Link
             href="/curriculum"
-            className="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-lg font-semibold text-sm"
+            className="bg-gray-900 hover:bg-black text-on-ink px-6 py-3 rounded-lg font-semibold text-sm"
           >
             Browse the Curriculum
           </Link>

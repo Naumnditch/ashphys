@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 interface Pt {
   x: number; // cm
   y: number; // N
@@ -99,6 +101,8 @@ function lerpColor(stops: [number, string][], t: number): string {
   return stops[stops.length - 1][1];
 }
 
+// Stress colour ramp. Plain hex on purpose: lerpColor() parses these, and the ramp
+// is data (cool grey -> red), not chrome, so it reads on both themes unchanged.
 const HEAT_STOPS: [number, string][] = [
   [0, '#8b93a0'],
   [0.4, '#d4b23c'],
@@ -130,7 +134,7 @@ function drawZigzagSpring(
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
 
-  ctx.strokeStyle = '#3d4653';
+  ctx.strokeStyle = 'rgb(var(--h-3d4653))';
   ctx.lineWidth = 7 - straighten * 3;
   ctx.beginPath();
   points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
@@ -138,9 +142,9 @@ function drawZigzagSpring(
 
   const heatColor = lerpColor(HEAT_STOPS, stressFraction);
   const grad = ctx.createLinearGradient(centerX - 15, topY, centerX + 15, topY);
-  grad.addColorStop(0, '#f2f0ea');
+  grad.addColorStop(0, 'rgb(var(--h-f2f0ea))');
   grad.addColorStop(0.5, heatColor);
-  grad.addColorStop(1, '#6b4a1c');
+  grad.addColorStop(1, 'rgb(var(--h-6b4a1c))');
   ctx.strokeStyle = grad;
   ctx.lineWidth = 5 - straighten * 2.2;
   ctx.beginPath();
@@ -236,7 +240,7 @@ export function SpringSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -261,10 +265,10 @@ export function SpringSimulator() {
     const pxPerCm = (maxSpringLenPx - restLenPx) / FIXED_MAX_EXTENSION_CM;
     const springLenPx = restLenPx + xCm * pxPerCm;
 
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillRect(ceilingX - 30, ceilingY - 8, 60, 8);
     for (let i = -22; i <= 22; i += 8) {
-      ctx.strokeStyle = '#4a5a72';
+      ctx.strokeStyle = 'rgb(var(--h-4a5a72))';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(ceilingX + i, ceilingY);
@@ -278,11 +282,11 @@ export function SpringSimulator() {
     const restY = ceilingY + restLenPx;
     const currentY = ceilingY + springLenPx;
     const bracketX0 = ceilingX + 22;
-    drawDimensionBracket(ctx, bracketX0, ceilingY, restY, 'L₀', '#4a5a72');
+    drawDimensionBracket(ctx, bracketX0, ceilingY, restY, 'L₀', 'rgb(var(--h-4a5a72))');
     if (xCm > 0.3) {
-      drawDimensionBracket(ctx, bracketX0 + 20, restY, currentY, 'Δx', '#b34a3c');
+      drawDimensionBracket(ctx, bracketX0 + 20, restY, currentY, 'Δx', 'rgb(var(--h-b34a3c))');
     }
-    drawDimensionBracket(ctx, bracketX0 + 40, ceilingY, currentY, 'L', '#2e7d6b');
+    drawDimensionBracket(ctx, bracketX0 + 40, ceilingY, currentY, 'L', 'rgb(var(--h-2e7d6b))');
 
     const weightY = ceilingY + springLenPx + 10;
     const weightSize = 22;
@@ -290,7 +294,7 @@ export function SpringSimulator() {
     ctx.beginPath();
     ctx.roundRect(ceilingX - weightSize / 2, weightY, weightSize, weightSize * 0.75, 3);
     ctx.fill();
-    ctx.strokeStyle = '#3d4653';
+    ctx.strokeStyle = 'rgb(var(--h-3d4653))';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -305,7 +309,7 @@ export function SpringSimulator() {
     const xForExt = (ext: number) => graphLeft + (ext / FIXED_MAX_EXTENSION_CM) * graphW;
     const yForForce = (f: number) => graphBottom - (f / FIXED_MAX_FORCE) * graphH;
 
-    ctx.strokeStyle = '#b8b0a0';
+    ctx.strokeStyle = 'rgb(var(--h-b8b0a0))';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(graphLeft, graphTop);
@@ -315,7 +319,7 @@ export function SpringSimulator() {
 
     ctx.textAlign = 'right';
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillText('Force (N)', graphLeft - 2, graphTop - 6);
     ctx.textAlign = 'left';
     ctx.fillText('Extension (cm)', graphRight - 78, graphBottom + 28);
@@ -334,9 +338,9 @@ export function SpringSimulator() {
       });
       ctx.stroke();
     };
-    drawSegment(0, P1.x, '#c7d6e6');
-    drawSegment(P1.x, P2.x, '#e8c3ba');
-    drawSegment(P2.x, FIXED_MAX_EXTENSION_CM, '#d3d6da');
+    drawSegment(0, P1.x, 'rgb(var(--h-c7d6e6))');
+    drawSegment(P1.x, P2.x, 'rgb(var(--h-e8c3ba))');
+    drawSegment(P2.x, FIXED_MAX_EXTENSION_CM, 'rgb(var(--h-d3d6da))');
 
     const labelPoint = (p: Pt, text: string, color: string, dy: number) => {
       const px = xForExt(p.x);
@@ -348,13 +352,13 @@ export function SpringSimulator() {
       ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
       ctx.fillText(text, px + 5, py + dy);
     };
-    labelPoint(P1, 'limit of proportionality', '#7a4a8f', 14);
-    labelPoint(P2, 'elastic limit', '#2e7d6b', -8);
+    labelPoint(P1, 'limit of proportionality', 'rgb(var(--h-7a4a8f))', 14);
+    labelPoint(P2, 'elastic limit', 'rgb(var(--h-2e7d6b))', -8);
 
     // persistent hysteresis reference line, once the spring has yielded
     if (permSet > 0) {
       const fAtMax = forceAtExtension(curveRef.current, a.maxExtensionEver);
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.setLineDash([3, 3]);
       ctx.lineWidth = 1.6;
       ctx.beginPath();
@@ -362,12 +366,12 @@ export function SpringSimulator() {
       ctx.lineTo(xForExt(a.maxExtensionEver), yForForce(fAtMax));
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = '#4a5a72';
+      ctx.fillStyle = 'rgb(var(--h-4a5a72))';
       ctx.font = '600 9.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
       ctx.fillText('unloads along here now', xForExt(permSet) + 4, yForForce(0) - 6);
 
       // little downward tick marking the permanent set on the x-axis
-      ctx.strokeStyle = '#b34a3c';
+      ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(xForExt(permSet), graphBottom);
@@ -383,7 +387,7 @@ export function SpringSimulator() {
       tracePts.push({ x, y: x <= permSet ? 0 : forceWithHysteresis(x) });
     }
     if (tracePts.length > 1) {
-      ctx.strokeStyle = '#2e7d6b';
+      ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
       ctx.lineWidth = 2.6;
       ctx.beginPath();
       tracePts.forEach((p, i) => {
@@ -402,7 +406,7 @@ export function SpringSimulator() {
       ctx.beginPath();
       ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.strokeStyle = '#3d4653';
+      ctx.strokeStyle = 'rgb(var(--h-3d4653))';
       ctx.lineWidth = 1;
       ctx.stroke();
     }
@@ -415,7 +419,7 @@ export function SpringSimulator() {
       const x1 = xForExt(sampleX);
       const y1 = yForForce(sampleF);
 
-      ctx.strokeStyle = '#7a4a8f';
+      ctx.strokeStyle = 'rgb(var(--h-7a4a8f))';
       ctx.setLineDash([4, 3]);
       ctx.lineWidth = 1.4;
       ctx.beginPath();
@@ -428,7 +432,7 @@ export function SpringSimulator() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#7a4a8f';
+      ctx.fillStyle = 'rgb(var(--h-7a4a8f))';
       ctx.font = '600 10px "Courier New", monospace';
       ctx.textAlign = 'center';
       ctx.fillText('Δx', (x0 + x1) / 2, y1 + 13);
@@ -437,13 +441,13 @@ export function SpringSimulator() {
 
       const boxX = graphLeft + 8;
       const boxY = graphBottom - 44;
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.strokeStyle = '#e4ddcc';
+      ctx.fillStyle = 'rgb(var(--h-ffffff) / 0.9)';
+      ctx.strokeStyle = 'rgb(var(--h-e4ddcc))';
       ctx.beginPath();
       ctx.roundRect(boxX, boxY, 150, 36, 4);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       ctx.font = '600 11px "Courier New", monospace';
       ctx.fillText(`k = ΔF/Δx`, boxX + 7, boxY + 15);
       ctx.fillText(`= ${a.k.toFixed(0)} N/m`, boxX + 7, boxY + 28);
@@ -523,16 +527,18 @@ export function SpringSimulator() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
+      const ctx = themedContext(canvas);
       ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       draw();
     };
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     draw();
 
     return () => window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -544,20 +550,20 @@ export function SpringSimulator() {
 
   return (
     <div className="spring-lab">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Live Spring & Graph
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {regionLabel}
           </span>
         </div>
         <canvas ref={canvasRef} className="block w-full" style={{ height: 400 }} />
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="flex items-center gap-3 mb-3">
-            <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Load</label>
+            <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Load</label>
             <input
               type="range"
               min={0}
@@ -570,7 +576,7 @@ export function SpringSimulator() {
             <span className="font-mono text-[13px] w-16 text-right">{targetExtension.toFixed(1)} cm</span>
           </div>
           <div className="flex items-center gap-3 mb-4">
-            <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Spring stiffness</label>
+            <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Spring stiffness</label>
             <input
               type="range"
               min={20}
@@ -587,8 +593,8 @@ export function SpringSimulator() {
             onClick={handleToggleTechnical}
             className={`w-full mb-3 text-[12.5px] font-semibold px-3 py-2 rounded border ${
               showTechnical
-                ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
             }`}
           >
             {showTechnical ? '✓ Gradient Details Shown' : '⚙ Show Gradient Details'}
@@ -596,13 +602,13 @@ export function SpringSimulator() {
 
           <button
             onClick={handleRemoveLoad}
-            className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+            className="bg-transparent border border-h-d8cfb6 hover:bg-h-f5f0e2 text-h-1b2a41 text-[13.5px] font-semibold px-3.5 py-2 rounded"
           >
             ⟲ Remove Load
           </button>
 
           {permanentSetDisplay > 0 && (
-            <p className="text-[12px] text-[#b34a3c] font-medium mt-3">
+            <p className="text-[12px] text-h-b34a3c font-medium mt-3">
               This spring has been permanently stretched by {permanentSetDisplay.toFixed(1)} cm. Removing
               the load won&rsquo;t bring it back below that.
             </p>
@@ -610,72 +616,72 @@ export function SpringSimulator() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Readouts
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Force applied</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Force applied</div>
             <div className="font-mono text-lg font-bold">{forceDisplay} N</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Initial length L₀</div>
-            <div className="font-mono text-lg font-bold text-[#4a5a72]">{NATURAL_LENGTH_CM.toFixed(1)} cm</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Initial length L₀</div>
+            <div className="font-mono text-lg font-bold text-h-4a5a72">{NATURAL_LENGTH_CM.toFixed(1)} cm</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Extension Δx</div>
-            <div className="font-mono text-lg font-bold text-[#b34a3c]">{extensionDisplay} cm</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Extension Δx</div>
+            <div className="font-mono text-lg font-bold text-h-b34a3c">{extensionDisplay} cm</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">New length L</div>
-            <div className="font-mono text-lg font-bold text-[#2e7d6b]">
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">New length L</div>
+            <div className="font-mono text-lg font-bold text-h-2e7d6b">
               {(NATURAL_LENGTH_CM + parseFloat(extensionDisplay)).toFixed(1)} cm
             </div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Spring constant k</div>
-            <div className="font-mono text-lg font-bold text-[#b8823d]">{k} N/m</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Spring constant k</div>
+            <div className="font-mono text-lg font-bold text-h-b8823d">{k} N/m</div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Reading the Curve
         </h2>
-        <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
-          <p><b style={{ color: '#3a6ea8' }}>Hooke&rsquo;s law region:</b> straight line through the origin. F = kx.</p>
-          <p><b style={{ color: '#7a4a8f' }}>Limit of proportionality:</b> the line stops being straight here.</p>
-          <p><b style={{ color: '#2e7d6b' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded. The dashed line shows its new, permanent path.</p>
+        <div className="space-y-1.5 text-[12.5px] text-h-4a5a72">
+          <p><b style={{ color: 'rgb(var(--h-3a6ea8))' }}>Hooke&rsquo;s law region:</b> straight line through the origin. F = kx.</p>
+          <p><b style={{ color: 'rgb(var(--h-7a4a8f))' }}>Limit of proportionality:</b> the line stops being straight here.</p>
+          <p><b style={{ color: 'rgb(var(--h-2e7d6b))' }}>Elastic limit:</b> beyond this, the spring won&rsquo;t return to its original length once unloaded. The dashed line shows its new, permanent path.</p>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-5 text-center mb-5">
-        <div className="italic text-[26px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-5 text-center mb-5">
+        <div className="italic text-[26px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
           F = k x
         </div>
-        <div className="text-[12px] text-[#4a5a72] mt-2">
+        <div className="text-[12px] text-h-4a5a72 mt-2">
           true only in the Hooke&rsquo;s law region, up to the limit of proportionality
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           What Each Variable Means
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {variables.map((v) => (
             <div key={v.symbol} className="flex gap-3 items-start">
               <div
-                className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center font-mono text-[16px] font-bold text-h-8f6428"
                 style={{ fontFamily: 'Georgia, serif' }}
               >
                 {v.symbol}
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                <div className="text-[13px] font-semibold text-h-1b2a41">{v.name}</div>
+                <div className="text-[12.5px] text-h-4a5a72 leading-snug">{v.def}</div>
               </div>
             </div>
           ))}

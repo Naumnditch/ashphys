@@ -37,7 +37,7 @@ export default async function GasLawsSimulationPage() {
       className="min-h-screen"
       style={{
         background:
-          'linear-gradient(#d8e3ec 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, #d8e3ec 1px, transparent 1px) 0 0/24px 24px, #faf7f0',
+          'linear-gradient(rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, rgb(var(--h-faf7f0))',
       }}
     >
       <SimulationStartTracker />
@@ -45,7 +45,7 @@ export default async function GasLawsSimulationPage() {
         {ctx?.chapter_id && (
           <Link
             href={`/curriculum/${ctx.chapter_id}${ctx.topic_id ? `#topic-${ctx.topic_id}` : ''}`}
-            className="text-sm text-[#2e7d6b] hover:underline mb-6 inline-block font-medium"
+            className="text-sm text-h-2e7d6b hover:underline mb-6 inline-block font-medium"
             style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif' }}
           >
             ← Back to {ctx.chapter_title}
@@ -53,18 +53,18 @@ export default async function GasLawsSimulationPage() {
         )}
 
         <div className="mb-6">
-          <div className="font-mono text-xs tracking-wide uppercase text-[#8f6428] mb-1.5">
+          <div className="font-mono text-xs tracking-wide uppercase text-h-8f6428 mb-1.5">
             {ctx ? `Chapter ${ctx.chapter_number} · The Kinetic Particle Model of Matter — Lessons 9.3 & 9.5` : 'Simulation'}
           </div>
           <h1
-            className="text-2xl sm:text-3xl font-semibold text-[#1b2a41]"
+            className="text-2xl sm:text-3xl font-semibold text-h-1b2a41"
             style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.01em' }}
           >
             {ctx?.title || 'Gas in a Box: Kinetic Theory & Boyle&#39;s Law'}
           </h1>
           {ctx?.description && (
             <p
-              className="text-[#4a5a72] text-sm mt-2 max-w-2xl leading-relaxed"
+              className="text-h-4a5a72 text-sm mt-2 max-w-2xl leading-relaxed"
               style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif' }}
             >
               {ctx.description}

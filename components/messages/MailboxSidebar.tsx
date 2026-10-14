@@ -64,7 +64,7 @@ export function MailboxSidebar(p: Props) {
                 aria-selected={active}
                 onClick={() => p.onTab(t.id)}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-medium transition-colors ${
-                  active ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'
+                  active ? 'bg-gray-900 text-on-ink' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 {t.label}

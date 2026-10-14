@@ -4,6 +4,7 @@ import { CurriculumDropdown } from './CurriculumDropdown';
 import { NavDropdown } from './NavDropdown';
 import { SearchBar } from './SearchBar';
 import { getCurrentUser } from '@/lib/auth/session';
+import { ThemeToggle } from './ThemeToggle';
 import { MessagesNavLink } from './messages/MessagesNavLink';
 
 function dashboardHref(user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>) {
@@ -26,11 +27,11 @@ export async function Navbar() {
               width={730}
               height={185}
               priority
-              className="w-[210px] sm:w-[270px] h-auto"
+              className="w-[210px] sm:w-[270px] h-auto logo-mono"
             />
           </Link>
         </div>
-        <nav className="flex items-center gap-2 sm:gap-5">
+        <nav className="flex items-center gap-2 sm:gap-4">
           <div className="hidden lg:block"><CurriculumDropdown /></div>
 
           <div className="hidden lg:block">
@@ -76,6 +77,7 @@ export async function Navbar() {
           </div>
 
           <SearchBar />
+          <ThemeToggle />
           {user ? (
             <>
               <MessagesNavLink href={user.role === 'admin' ? '/admin/messages' : '/dashboard/messages'} />

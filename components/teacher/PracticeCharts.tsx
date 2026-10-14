@@ -13,11 +13,11 @@ import {
   Legend,
 } from 'recharts';
 
-const NAVY = '#1b2a41';
-const OCHRE = '#b8823d';
-const GRID = '#eee6d3';
-const AXIS_TEXT = '#4a5a72';
-const BORDER = '#e4ddcc';
+const NAVY = 'rgb(var(--h-1b2a41))';
+const OCHRE = 'rgb(var(--h-b8823d))';
+const GRID = 'rgb(var(--h-eee6d3))';
+const AXIS_TEXT = 'rgb(var(--h-4a5a72))';
+const BORDER = 'rgb(var(--h-e4ddcc))';
 
 const tooltipStyle = { fontSize: 12, borderRadius: 8, border: `1px solid ${BORDER}` };
 const labelStyle = { color: NAVY, fontWeight: 600 };

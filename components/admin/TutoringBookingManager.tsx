@@ -65,7 +65,7 @@ function Editor({ booking, onSaved }: { booking: Booking; onSaved: (b: Booking) 
         <input value={adminNote} onChange={(e) => setAdminNote(e.target.value)} className="w-full border border-gray-300 rounded-lg px-2.5 py-1.5 text-xs" />
       </div>
       <div className="sm:col-span-3">
-        <button onClick={save} disabled={saving} className="bg-gray-900 hover:bg-black text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg disabled:opacity-50">
+        <button onClick={save} disabled={saving} className="bg-gray-900 hover:bg-black text-on-ink text-xs font-semibold px-3.5 py-1.5 rounded-lg disabled:opacity-50">
           {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
@@ -124,7 +124,7 @@ export function TutoringBookingManager() {
             <label className="block text-xs font-medium text-gray-500 mb-1">Student email</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="student@example.com" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
           </div>
-          <button onClick={record} disabled={busy || !email.trim()} className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50">
+          <button onClick={record} disabled={busy || !email.trim()} className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50">
             {busy ? 'Saving…' : 'Record 1-on-1 tutoring booking'}
           </button>
         </div>

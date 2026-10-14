@@ -79,7 +79,7 @@ export function CurriculumSelector({ selectedCurriculum, source, basePath = '/cu
   }
 
   return (
-    <div className="rounded-xl p-5 sm:p-6 mb-8 text-white shadow-sm bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]">
+    <div className="theme-light rounded-xl p-5 sm:p-6 mb-8 text-white shadow-sm bg-[linear-gradient(135deg,#667eea_0%,#764ba2_100%)]">
       <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
         <h2 id="curriculum-selector-label" className="font-semibold text-lg">
           Choose your curriculum
@@ -104,12 +104,12 @@ export function CurriculumSelector({ selectedCurriculum, source, basePath = '/cu
               onClick={() => select(curriculum.id)}
               className={`text-left rounded-lg border-2 px-4 py-3 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                 active
-                  ? 'bg-white text-[#5a67d8] border-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]'
+                  ? 'bg-white text-h-5a67d8 border-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]'
                   : 'bg-white/10 border-white/30 hover:bg-white/20 hover:border-white'
               }`}
             >
               <span className="block font-semibold">{curriculum.shortName}</span>
-              <span className={`block text-xs mt-0.5 ${active ? 'text-[#5a67d8]/80' : 'text-white/75'}`}>
+              <span className={`block text-xs mt-0.5 ${active ? 'text-h-5a67d8/80' : 'text-white/75'}`}>
                 {curriculum.syllabusCode === 'IB' ? 'SL & HL · 2025' : `Cambridge ${curriculum.syllabusCode}`}
               </span>
             </button>

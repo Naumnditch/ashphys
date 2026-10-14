@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Balance Beam — the moments practical as a real torque engine.
  *
@@ -148,14 +150,14 @@ export function BalanceBeamSimulator() {
 
   const drawDisc = (ctx: CanvasRenderingContext2D, x: number, y: number, mass: number, ghost = false) => {
     const r = 11 + mass * 40;
-    ctx.fillStyle = ghost ? 'rgba(184, 130, 61, 0.45)' : '#b8823d';
-    ctx.strokeStyle = ghost ? 'rgba(122, 84, 34, 0.45)' : '#7a5422';
+    ctx.fillStyle = ghost ? 'rgb(var(--h-b8823d) / 0.45)' : 'rgb(var(--h-b8823d))';
+    ctx.strokeStyle = ghost ? 'rgb(var(--h-7a5422) / 0.45)' : 'rgb(var(--h-7a5422))';
     ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = '#faf7f0';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
     ctx.font = `700 ${mass >= 0.1 ? 11 : 9.5}px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText(`${Math.round(mass * 1000)}g`, x, y + 3.5);
@@ -164,21 +166,21 @@ export function BalanceBeamSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     const s = simRef.current;
     const g = geom();
     ctx.clearRect(0, 0, g.w, g.h);
 
     // ---- weights tray ----
-    ctx.fillStyle = 'rgba(27, 42, 65, 0.05)';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41) / 0.05)';
     ctx.fillRect(0, 0, g.w, 56);
-    ctx.strokeStyle = '#e4ddcc';
+    ctx.strokeStyle = 'rgb(var(--h-e4ddcc))';
     ctx.beginPath();
     ctx.moveTo(0, 56);
     ctx.lineTo(g.w, 56);
     ctx.stroke();
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 10.5px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('WEIGHTS TRAY — drag onto the beam', 12, 15);
@@ -187,7 +189,7 @@ export function BalanceBeamSimulator() {
     });
 
     // ---- bench & pivot stand ----
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(0, g.benchY);
@@ -195,14 +197,14 @@ export function BalanceBeamSimulator() {
     ctx.stroke();
 
     const px = g.beamXpx(s.pivot);
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.beginPath();
     ctx.moveTo(px, g.pivotTopY + 3);
     ctx.lineTo(px - 20, g.benchY);
     ctx.lineTo(px + 20, g.benchY);
     ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = '#faf7f0';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
     ctx.font = '700 9px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('⟷', px, g.benchY - 8);
@@ -216,8 +218,8 @@ export function BalanceBeamSimulator() {
     ctx.translate(0, PIVOT_DROP * g.scale);
     const halfL = -s.pivot * g.scale;
     const halfR = (BEAM_LEN - s.pivot) * g.scale;
-    ctx.fillStyle = '#efe7d2';
-    ctx.strokeStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-efe7d2))';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.roundRect(halfL, -9, halfR - halfL, 18, 2);
@@ -227,14 +229,14 @@ export function BalanceBeamSimulator() {
     for (let cm = 0; cm <= 100; cm += 5) {
       const x = (cm / 100 - s.pivot) * g.scale;
       const tall = cm % 10 === 0;
-      ctx.strokeStyle = 'rgba(27, 42, 65, 0.55)';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.55)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(x, -9);
       ctx.lineTo(x, tall ? -1 : -5);
       ctx.stroke();
       if (tall) {
-        ctx.fillStyle = '#4a5a72';
+        ctx.fillStyle = 'rgb(var(--h-4a5a72))';
         ctx.font = '500 8px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(String(cm), x, 7);
@@ -243,13 +245,13 @@ export function BalanceBeamSimulator() {
     // centre of gravity marker for the beam's own weight
     if (s.beamMass > 0) {
       const xc = (0.5 - s.pivot) * g.scale;
-      ctx.strokeStyle = '#b34a3c';
+      ctx.strokeStyle = 'rgb(var(--h-b34a3c))';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(xc, 9);
       ctx.lineTo(xc, 26);
       ctx.stroke();
-      ctx.fillStyle = '#b34a3c';
+      ctx.fillStyle = 'rgb(var(--h-b34a3c))';
       ctx.beginPath();
       ctx.moveTo(xc, 32);
       ctx.lineTo(xc - 5, 24);
@@ -272,7 +274,7 @@ export function BalanceBeamSimulator() {
     });
     groups.forEach((arr) => {
       const p = beamPoint(arr[0].pos);
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.lineWidth = 1.3;
       ctx.beginPath();
       ctx.moveTo(p.x, p.y + 9);
@@ -289,19 +291,19 @@ export function BalanceBeamSimulator() {
     // ---- mystery bag ----
     if (s.mystery) {
       const p = beamPoint(s.mystery.pos);
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.lineWidth = 1.3;
       ctx.beginPath();
       ctx.moveTo(p.x, p.y + 9);
       ctx.lineTo(p.x, p.y + 24);
       ctx.stroke();
-      ctx.fillStyle = '#7a52b3';
-      ctx.strokeStyle = '#553a80';
+      ctx.fillStyle = 'rgb(var(--h-7a52b3))';
+      ctx.strokeStyle = 'rgb(var(--h-553a80))';
       ctx.beginPath();
       ctx.roundRect(p.x - 16, p.y + 24, 32, 30, 5);
       ctx.fill();
       ctx.stroke();
-      ctx.fillStyle = '#faf7f0';
+      ctx.fillStyle = 'rgb(var(--h-faf7f0))';
       ctx.font = '700 13px Georgia, serif';
       ctx.textAlign = 'center';
       ctx.fillText(s.mystery.revealed ? `${Math.round(s.mystery.mass * 1000)}g` : '?', p.x, p.y + 43);
@@ -312,13 +314,13 @@ export function BalanceBeamSimulator() {
     ctx.textAlign = 'right';
     const atStop = Math.abs(s.theta) >= MAX_TILT - 1e-4;
     if (balancedNow()) {
-      ctx.fillStyle = '#2e7d6b';
+      ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
       ctx.fillText('✓ BALANCED', g.w - 12, 76);
     } else if (atStop) {
-      ctx.fillStyle = '#b34a3c';
+      ctx.fillStyle = 'rgb(var(--h-b34a3c))';
       ctx.fillText('▼ TIPPED — resting on the stop', g.w - 12, 76);
     }
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.fillText(`tilt ${((s.theta * 180) / Math.PI).toFixed(1)}°`, g.w - 12, 92);
 
@@ -327,7 +329,7 @@ export function BalanceBeamSimulator() {
       const tau = netTorque(s.theta);
       ctx.textAlign = 'left';
       ctx.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
-      ctx.fillStyle = '#4a5a72';
+      ctx.fillStyle = 'rgb(var(--h-4a5a72))';
       ctx.fillText(`net moment ${tau >= 0 ? '+' : ''}${tau.toFixed(3)} N·m ${Math.abs(tau) < 0.0005 ? '' : tau > 0 ? '(clockwise)' : '(anticlockwise)'}`, 12, 76);
       ctx.fillText(`I = ${inertia().toFixed(4)} kg·m²`, 12, 92);
       const support = (s.beamMass + s.placed.reduce((a, wt) => a + wt.mass, 0) + (s.mystery ? s.mystery.mass : 0)) * G;
@@ -340,7 +342,7 @@ export function BalanceBeamSimulator() {
       const posOnBeam = dragBeamPos(s.drag.x, s.drag.y);
       if (posOnBeam !== null) {
         const p = beamPoint(posOnBeam);
-        ctx.strokeStyle = 'rgba(46, 125, 107, 0.8)';
+        ctx.strokeStyle = 'rgb(var(--h-2e7d6b) / 0.8)';
         ctx.lineWidth = 2;
         ctx.setLineDash([4, 3]);
         ctx.beginPath();
@@ -500,9 +502,11 @@ export function BalanceBeamSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -559,10 +563,10 @@ export function BalanceBeamSimulator() {
     <div className="balance-beam-lab">
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-5">
         {/* ---- Apparatus ---- */}
-        <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+        <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
           <div className="flex justify-between items-baseline px-4 pt-3">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Metre Rule on a Pivot</span>
-            <span className={`font-mono text-[11px] tracking-wide uppercase ${balanced ? 'text-[#2e7d6b] font-bold' : 'text-[#4a5a72]'}`}>
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Metre Rule on a Pivot</span>
+            <span className={`font-mono text-[11px] tracking-wide uppercase ${balanced ? 'text-h-2e7d6b font-bold' : 'text-h-4a5a72'}`}>
               {balanced ? 'in equilibrium' : 'not balanced'}
             </span>
           </div>
@@ -576,17 +580,17 @@ export function BalanceBeamSimulator() {
             onPointerCancel={handlePointerUp}
           />
           <div className="px-4 pb-2 -mt-1">
-            <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-              <span className="text-[#b8823d] font-semibold">Drag weights</span> from the tray onto the beam — stack
-              them, or drag them off to remove. <span className="text-[#4a5a72] font-semibold">Drag the grey stand</span>{' '}
-              to move the pivot. <span className="text-[#b34a3c] font-semibold">Red arrow</span> = the beam's own weight
+            <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+              <span className="text-h-b8823d font-semibold">Drag weights</span> from the tray onto the beam — stack
+              them, or drag them off to remove. <span className="text-h-4a5a72 font-semibold">Drag the grey stand</span>{' '}
+              to move the pivot. <span className="text-h-b34a3c font-semibold">Red arrow</span> = the beam's own weight
               at its centre of gravity.
             </p>
           </div>
 
-          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Beam mass</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Beam mass</label>
               <input
                 type="range"
                 min={0}
@@ -599,7 +603,7 @@ export function BalanceBeamSimulator() {
               <span className="font-mono text-[13px] w-14 text-right">{Math.round(beamMass * 1000)} g</span>
             </div>
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Pivot at</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Pivot at</label>
               <input
                 type="range"
                 min={0.05}
@@ -621,15 +625,15 @@ export function BalanceBeamSimulator() {
                 onClick={handleMysteryToggle}
                 className={`flex-1 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                   mystery
-                    ? 'bg-[#7a52b3] text-white border-[#7a52b3]'
-                    : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    ? 'bg-h-7a52b3 text-on-ink border-h-7a52b3'
+                    : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
                 {mystery ? '✓ Mystery mass on' : '🎒 Add a mystery mass'}
               </button>
               <button
                 onClick={handleClear}
-                className="text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]"
+                className="text-[12.5px] font-semibold px-3 py-2 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2"
               >
                 Clear weights
               </button>
@@ -643,8 +647,8 @@ export function BalanceBeamSimulator() {
               }}
               className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
                 showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
@@ -654,10 +658,10 @@ export function BalanceBeamSimulator() {
 
         {/* ---- Notebook ---- */}
         <div className="flex flex-col gap-5">
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Moments Ledger</span>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Moments Ledger</span>
             {ledger.length === 0 ? (
-              <p className="text-[12px] text-[#4a5a72] mt-2 leading-snug">
+              <p className="text-[12px] text-h-4a5a72 mt-2 leading-snug">
                 Nothing on the beam yet. Hang a weight and its moment (force × distance) appears here, sorted into
                 clockwise and anticlockwise columns.
               </p>
@@ -665,7 +669,7 @@ export function BalanceBeamSimulator() {
               <div className="mt-2">
                 <table className="w-full text-[12px]">
                   <thead>
-                    <tr className="text-left text-[#4a5a72] border-b border-[#eee6d3]">
+                    <tr className="text-left text-h-4a5a72 border-b border-h-eee6d3">
                       <th className="py-1 font-semibold">Load</th>
                       <th className="py-1 font-semibold text-right">F (N)</th>
                       <th className="py-1 font-semibold text-right">d (m)</th>
@@ -675,28 +679,28 @@ export function BalanceBeamSimulator() {
                   </thead>
                   <tbody>
                     {ledger.map((r, idx) => (
-                      <tr key={idx} className="border-b border-[#f5f0e2]">
-                        <td className="py-1 text-[#1b2a41]">{r.label}</td>
+                      <tr key={idx} className="border-b border-h-f5f0e2">
+                        <td className="py-1 text-h-1b2a41">{r.label}</td>
                         <td className="py-1 text-right font-mono">{r.force}</td>
                         <td className="py-1 text-right font-mono">{r.dist}</td>
-                        <td className="py-1 text-right font-mono text-[#2e7d6b]">
+                        <td className="py-1 text-right font-mono text-h-2e7d6b">
                           {r.side === 'acw' ? (r.moment === null ? '?' : r.moment.toFixed(3)) : ''}
                         </td>
-                        <td className="py-1 text-right font-mono text-[#b34a3c]">
+                        <td className="py-1 text-right font-mono text-h-b34a3c">
                           {r.side === 'cw' ? (r.moment === null ? '?' : r.moment.toFixed(3)) : ''}
                         </td>
                       </tr>
                     ))}
                     <tr>
-                      <td className="py-1.5 font-semibold text-[#1b2a41]" colSpan={3}>
+                      <td className="py-1.5 font-semibold text-h-1b2a41" colSpan={3}>
                         Totals
                       </td>
-                      <td className="py-1.5 text-right font-mono font-bold text-[#2e7d6b]">{acwTotal.toFixed(3)}</td>
-                      <td className="py-1.5 text-right font-mono font-bold text-[#b34a3c]">{cwTotal.toFixed(3)}</td>
+                      <td className="py-1.5 text-right font-mono font-bold text-h-2e7d6b">{acwTotal.toFixed(3)}</td>
+                      <td className="py-1.5 text-right font-mono font-bold text-h-b34a3c">{cwTotal.toFixed(3)}</td>
                     </tr>
                   </tbody>
                 </table>
-                <p className="text-[11.5px] text-[#4a5a72] mt-2 leading-snug">
+                <p className="text-[11.5px] text-h-4a5a72 mt-2 leading-snug">
                   {hasUnknown
                     ? 'Balanced with an unknown on board? Then its moment must make the two totals equal — that is your equation.'
                     : balanced
@@ -708,9 +712,9 @@ export function BalanceBeamSimulator() {
           </div>
 
           {mystery && (
-            <div className="bg-white border border-[#e4ddcc] rounded p-4">
-              <span className="font-mono text-[11px] tracking-wide uppercase text-[#7a52b3]">Mystery Challenge</span>
-              <p className="text-[12px] text-[#4a5a72] mt-1.5 leading-snug">
+            <div className="bg-white border border-h-e4ddcc rounded p-4">
+              <span className="font-mono text-[11px] tracking-wide uppercase text-h-7a52b3">Mystery Challenge</span>
+              <p className="text-[12px] text-h-4a5a72 mt-1.5 leading-snug">
                 A hidden mass is clamped at <strong>{Math.round(mystery.pos * 100)} cm</strong>. Balance the beam with
                 known weights, then use the principle of moments to work out what it must be — and check yourself.
               </p>
@@ -719,8 +723,8 @@ export function BalanceBeamSimulator() {
                 disabled={mystery.revealed}
                 className={`w-full mt-2.5 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                   mystery.revealed
-                    ? 'bg-[#f5f0e2] text-[#8a94a3] border-[#e4ddcc] cursor-not-allowed'
-                    : 'bg-[#7a52b3] text-white border-[#7a52b3] hover:bg-[#684596]'
+                    ? 'bg-h-f5f0e2 text-h-8a94a3 border-h-e4ddcc cursor-not-allowed'
+                    : 'bg-h-7a52b3 text-on-ink border-h-7a52b3 hover:bg-h-684596'
                 }`}
               >
                 {mystery.revealed ? `It was ${Math.round(mystery.mass * 1000)} g` : 'Reveal the mass'}
@@ -728,30 +732,30 @@ export function BalanceBeamSimulator() {
             </div>
           )}
 
-          <div className="bg-white border border-[#e4ddcc] rounded p-4">
-            <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-              <div className="italic text-[21px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-white border border-h-e4ddcc rounded p-4">
+            <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+              <div className="italic text-[21px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
                 M = F × d
               </div>
-              <div className="italic text-[15px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="italic text-[15px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
                 Σ clockwise moments = Σ anticlockwise moments
               </div>
-              <div className="text-[10.5px] text-[#4a5a72] mt-1 not-italic font-sans">(for an object in equilibrium)</div>
+              <div className="text-[10.5px] text-h-4a5a72 mt-1 not-italic font-sans">(for an object in equilibrium)</div>
             </div>
-            <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+            <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
               What Each Variable Means
             </h2>
             <div className="space-y-2.5">
               {variables.map((v) => (
                 <div key={v.symbol} className="flex gap-3 items-start">
                   <div
-                    className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                    className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[16px] font-bold italic text-h-8f6428"
                     style={{ fontFamily: 'Georgia, serif' }}
                   >
                     {v.symbol}
                   </div>
-                  <p className="text-[12px] text-[#4a5a72] leading-snug">
-                    <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                  <p className="text-[12px] text-h-4a5a72 leading-snug">
+                    <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                   </p>
                 </div>
               ))}

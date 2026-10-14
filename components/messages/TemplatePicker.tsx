@@ -146,7 +146,7 @@ export function SaveAsTemplate({
         aria-label="Template name"
         className="w-44 rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-gray-900 focus:outline-none"
       />
-      <button type="button" disabled={saving || !name.trim()} onClick={save} className="rounded-md bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white disabled:opacity-40">
+      <button type="button" disabled={saving || !name.trim()} onClick={save} className="rounded-md bg-gray-900 px-2.5 py-1 text-xs font-semibold text-on-ink disabled:opacity-40">
         {saving ? 'Saving…' : 'Save'}
       </button>
       <button type="button" onClick={() => setOpen(false)} className="text-xs text-gray-500 hover:text-gray-800">

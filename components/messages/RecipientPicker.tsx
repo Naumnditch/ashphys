@@ -75,7 +75,7 @@ export function RecipientPicker({ value, onChange, max = 100 }: { value: Recipie
       >
         {value.map((r) => (
           <span key={r.id} className="inline-flex items-center gap-1 rounded-full bg-gray-100 py-0.5 pl-1 pr-1.5 text-sm text-gray-800" title={r.email}>
-            <span className="grid h-5 w-5 place-items-center rounded-full bg-gray-900 text-[9px] font-semibold text-white">
+            <span className="grid h-5 w-5 place-items-center rounded-full bg-gray-900 text-[9px] font-semibold text-on-ink">
               {initials(r.name.split(' ')[0] ?? '', r.name.split(' ')[1] ?? '', r.email)}
             </span>
             {r.name}

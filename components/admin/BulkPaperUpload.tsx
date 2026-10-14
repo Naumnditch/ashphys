@@ -131,7 +131,7 @@ export function BulkPaperUpload() {
           {files.length > 0 ? `${files.length} file${files.length === 1 ? '' : 's'} ready` : 'no files chosen'}
         </span>
         {files.length > 0 && !busy && (
-          <button onClick={upload} className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2 rounded-lg">
+          <button onClick={upload} className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2 rounded-lg">
             Upload and file them
           </button>
         )}

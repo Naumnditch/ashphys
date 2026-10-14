@@ -72,7 +72,7 @@ export default async function StudentAnalyticsPage({ params }: { params: { stude
         </div>
         <a
           href={`/api/teacher/analytics/export?view=student&studentId=${summary.student_id}`}
-          className="text-sm font-semibold bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg self-start"
+          className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg self-start"
         >
           Export wrong answers
         </a>

@@ -126,7 +126,7 @@ export function AnnouncementsFeed({ announcements, initialCount = 6, step = 4, s
                     {a.status && (
                       <span
                         className={`text-[10.5px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${
-                          a.status === 'new' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'
+                          a.status === 'new' ? 'bg-gray-900 text-on-ink' : 'bg-gray-100 text-gray-700'
                         }`}
                       >
                         {a.status === 'new' ? 'New' : 'Updated'}
@@ -172,7 +172,7 @@ function FilterChip({ active, onClick, label, count, type }: { active: boolean; 
       onClick={onClick}
       aria-pressed={active}
       className={`shrink-0 inline-flex items-center gap-1.5 text-[13px] font-semibold rounded-full px-3 py-1.5 border transition-colors ${
-        active ? 'bg-gray-900 border-gray-900 text-white' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
+        active ? 'bg-gray-900 border-gray-900 text-on-ink' : 'bg-white border-gray-200 text-gray-700 hover:border-gray-400'
       }`}
     >
       {type && <span className={`w-2 h-2 rounded-full ${STYLE[type].dot.split(' ')[0]}`} aria-hidden="true" />}

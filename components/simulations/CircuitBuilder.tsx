@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
 // ============================================================
 // Grid & data model
 // ============================================================
@@ -459,7 +460,7 @@ export function CircuitBuilder() {
   const drawOverlay = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     ctx.clearRect(0, 0, SVG_W, SVG_H);
 
@@ -503,7 +504,7 @@ export function CircuitBuilder() {
         const t = ((phaseRef.current / 40 + i / dotCount) % 1 + 1) % 1;
         const x = p0.x + (p1.x - p0.x) * t;
         const y = p0.y + (p1.y - p0.y) * t;
-        ctx.fillStyle = '#2e7d6b';
+        ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
         ctx.beginPath();
         ctx.arc(x, y, 2.8, 0, Math.PI * 2);
         ctx.fill();
@@ -525,14 +526,14 @@ export function CircuitBuilder() {
   return (
     <div
       ref={wrapperRef}
-      className={isFullscreen ? 'circuit-builder bg-[#faf7f0] p-6 overflow-auto h-full' : 'circuit-builder'}
+      className={isFullscreen ? 'circuit-builder bg-h-faf7f0 p-6 overflow-auto h-full' : 'circuit-builder'}
     >
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Build Your Circuit
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {solveResult.ok ? `I = ${Math.abs(solveResult.totalCurrent).toFixed(2)} A` : 'Not solved'}
           </span>
         </div>
@@ -545,8 +546,8 @@ export function CircuitBuilder() {
               title={t.hint}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full border ${
                 tool === t.id
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {t.label}
@@ -554,13 +555,13 @@ export function CircuitBuilder() {
           ))}
           <button
             onClick={() => setComponents(new Map())}
-            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#b34a3c] hover:bg-[#f5f0e2]"
+            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-b34a3c hover:bg-h-f5f0e2"
           >
             ⟲ Clear All
           </button>
           <button
             onClick={toggleFullscreen}
-            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#f5f0e2] ml-auto"
+            className="text-[12px] font-semibold px-3 py-1.5 rounded-full border border-h-d8cfb6 text-h-1b2a41 hover:bg-h-f5f0e2 ml-auto"
           >
             {isFullscreen ? '⤡ Exit Fullscreen' : '⤢ Fullscreen'}
           </button>
@@ -620,7 +621,7 @@ export function CircuitBuilder() {
                         y1={pa.y}
                         x2={pb.x}
                         y2={pb.y}
-                        stroke="#e6ded0"
+                        stroke="rgb(var(--h-e6ded0))"
                         strokeWidth={1}
                         strokeDasharray="2,4"
                         pointerEvents="none"
@@ -641,7 +642,7 @@ export function CircuitBuilder() {
               {Array.from({ length: GRID_COLS }).map((_, col) =>
                 Array.from({ length: GRID_ROWS }).map((_, row) => {
                   const p = nodePos({ col, row });
-                  return <circle key={`${col}-${row}`} cx={p.x} cy={p.y} r={2.5} fill="#d8cfb6" />;
+                  return <circle key={`${col}-${row}`} cx={p.x} cy={p.y} r={2.5} fill="rgb(var(--h-d8cfb6))" />;
                 })
               )}
             </svg>
@@ -656,43 +657,43 @@ export function CircuitBuilder() {
 
         {!solveResult.ok && (
           <div className="px-4 pb-4">
-            <p className="text-[12.5px] text-[#b34a3c] font-medium">{solveResult.message}</p>
+            <p className="text-[12.5px] text-h-b34a3c font-medium">{solveResult.message}</p>
           </div>
         )}
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Readouts
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Total current</div>
-            <div className="font-mono text-xl font-bold text-[#2e7d6b]">
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Total current</div>
+            <div className="font-mono text-xl font-bold text-h-2e7d6b">
               {solveResult.ok ? Math.abs(solveResult.totalCurrent).toFixed(2) : '—'} A
             </div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Equivalent resistance</div>
-            <div className="font-mono text-xl font-bold text-[#b8823d]">
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Equivalent resistance</div>
+            <div className="font-mono text-xl font-bold text-h-b8823d">
               {solveResult.ok && solveResult.equivalentResistance !== null
                 ? solveResult.equivalentResistance.toFixed(1)
                 : '—'}{' '}
               Ω
             </div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Components placed</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Components placed</div>
             <div className="font-mono text-xl font-bold">{components.size}</div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           How To Use It
         </h2>
-        <div className="space-y-1.5 text-[12.5px] text-[#4a5a72]">
+        <div className="space-y-1.5 text-[12.5px] text-h-4a5a72">
           <p>Pick a tool above, then click any grid line to place it there.</p>
           <p>Click a placed <b>resistor</b> or <b>battery</b> to cycle its value, or double-click it to type an exact one.</p>
           <p>Click a <b>switch</b> to open or close it &mdash; click and drag it to flip which way it swings.</p>
@@ -702,22 +703,22 @@ export function CircuitBuilder() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Series & Parallel Formulas
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-center">
-            <div className="italic text-[16px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-4 py-3 text-center">
+            <div className="italic text-[16px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               R = R₁ + R₂ + ...
             </div>
-            <div className="text-[11px] text-[#4a5a72] mt-1">resistors in series</div>
+            <div className="text-[11px] text-h-4a5a72 mt-1">resistors in series</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-center">
-            <div className="italic text-[16px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-4 py-3 text-center">
+            <div className="italic text-[16px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               1/R = 1/R₁ + 1/R₂ + ...
             </div>
-            <div className="text-[11px] text-[#4a5a72] mt-1">resistors in parallel</div>
+            <div className="text-[11px] text-h-4a5a72 mt-1">resistors in parallel</div>
           </div>
         </div>
       </div>
@@ -750,13 +751,13 @@ function ComponentSymbol({
 
   return (
     <g className="pointer-events-none">
-      <path d={path} stroke="#3d4653" strokeWidth={2.2} fill="none" strokeLinecap="round" />
+      <path d={path} stroke="rgb(var(--h-3d4653))" strokeWidth={2.2} fill="none" strokeLinecap="round" />
 
       {comp.type === 'battery' && (
         <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
-          <line x1={-6} y1={-11} x2={-6} y2={11} stroke="#1b2a41" strokeWidth={2.5} />
-          <line x1={4} y1={-6} x2={4} y2={6} stroke="#1b2a41" strokeWidth={4.5} />
-          <text x={-6} y={-16} fontSize={9} fontWeight={700} fill="#4a5a72" textAnchor="middle">
+          <line x1={-6} y1={-11} x2={-6} y2={11} stroke="rgb(var(--h-1b2a41))" strokeWidth={2.5} />
+          <line x1={4} y1={-6} x2={4} y2={6} stroke="rgb(var(--h-1b2a41))" strokeWidth={4.5} />
+          <text x={-6} y={-16} fontSize={9} fontWeight={700} fill="rgb(var(--h-4a5a72))" textAnchor="middle">
             +
           </text>
         </g>
@@ -764,12 +765,12 @@ function ComponentSymbol({
 
       {comp.type === 'switch' && (
         <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
-          <circle cx={-9} cy={0} r={2.5} fill="#3d4653" />
-          <circle cx={9} cy={0} r={2.5} fill="#3d4653" />
+          <circle cx={-9} cy={0} r={2.5} fill="rgb(var(--h-3d4653))" />
+          <circle cx={9} cy={0} r={2.5} fill="rgb(var(--h-3d4653))" />
           {comp.closed ? (
-            <line x1={-9} y1={0} x2={9} y2={0} stroke="#2e7d6b" strokeWidth={2.5} />
+            <line x1={-9} y1={0} x2={9} y2={0} stroke="rgb(var(--h-2e7d6b))" strokeWidth={2.5} />
           ) : (
-            <line x1={-9} y1={0} x2={7} y2={10 * leverDir} stroke="#b34a3c" strokeWidth={2.5} />
+            <line x1={-9} y1={0} x2={7} y2={10 * leverDir} stroke="rgb(var(--h-b34a3c))" strokeWidth={2.5} />
           )}
         </g>
       )}
@@ -778,24 +779,24 @@ function ComponentSymbol({
         <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
           <polygon
             points="-8,-8 -8,8 8,0"
-            fill={lit ? '#e0d24a' : '#faf7f0'}
-            stroke="#3d4653"
+            fill={lit ? 'rgb(var(--h-e0d24a))' : 'rgb(var(--h-faf7f0))'}
+            stroke="rgb(var(--h-3d4653))"
             strokeWidth={1.6}
           />
-          <line x1={8} y1={-8} x2={8} y2={8} stroke="#3d4653" strokeWidth={2} />
-          {lit && <circle cx={0} cy={0} r={13} fill="rgba(224,210,74,0.35)" />}
+          <line x1={8} y1={-8} x2={8} y2={8} stroke="rgb(var(--h-3d4653))" strokeWidth={2} />
+          {lit && <circle cx={0} cy={0} r={13} fill="rgb(var(--h-e0d24a) / 0.35)" />}
         </g>
       )}
 
       {comp.type === 'ammeter' && (
         <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
-          <circle cx={0} cy={0} r={13} fill="#faf7f0" stroke="#4a5a72" strokeWidth={2} />
+          <circle cx={0} cy={0} r={13} fill="rgb(var(--h-faf7f0))" stroke="rgb(var(--h-4a5a72))" strokeWidth={2} />
           <text
             x={0}
             y={4}
             fontSize={12}
             fontWeight={700}
-            fill="#4a5a72"
+            fill="rgb(var(--h-4a5a72))"
             textAnchor="middle"
             transform={`rotate(${-angle})`}
           >
@@ -806,13 +807,13 @@ function ComponentSymbol({
 
       {comp.type === 'voltmeter' && (
         <g transform={`translate(${midX} ${midY}) rotate(${angle})`}>
-          <circle cx={0} cy={0} r={13} fill="#faf7f0" stroke="#7a4a8f" strokeWidth={2} />
+          <circle cx={0} cy={0} r={13} fill="rgb(var(--h-faf7f0))" stroke="rgb(var(--h-7a4a8f))" strokeWidth={2} />
           <text
             x={0}
             y={4}
             fontSize={12}
             fontWeight={700}
-            fill="#7a4a8f"
+            fill="rgb(var(--h-7a4a8f))"
             textAnchor="middle"
             transform={`rotate(${-angle})`}
           >
@@ -827,7 +828,7 @@ function ComponentSymbol({
           y={midY - 14}
           fontSize={10}
           fontWeight={700}
-          fill="#8f6428"
+          fill="rgb(var(--h-8f6428))"
           textAnchor="middle"
           fontFamily="Courier New, monospace"
         >
@@ -843,7 +844,7 @@ function ComponentSymbol({
             y={midY + 26}
             fontSize={9.5}
             fontWeight={700}
-            fill="#2e7d6b"
+            fill="rgb(var(--h-2e7d6b))"
             textAnchor="middle"
             fontFamily="Courier New, monospace"
           >
@@ -857,7 +858,7 @@ function ComponentSymbol({
           y={midY + 26}
           fontSize={9.5}
           fontWeight={700}
-          fill="#7a4a8f"
+          fill="rgb(var(--h-7a4a8f))"
           textAnchor="middle"
           fontFamily="Courier New, monospace"
         >

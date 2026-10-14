@@ -81,7 +81,7 @@ export function GlossaryOverlay({
         ref={popupRef}
         role="dialog"
         aria-label={`${entry.name} glossary`}
-        className="fixed bg-white border border-[#e4ddcc] rounded-xl shadow-lg p-4 animate-[eqGlossPop_150ms_ease-out]"
+        className="fixed bg-white border border-h-e4ddcc rounded-xl shadow-lg p-4 animate-[eqGlossPop_150ms_ease-out]"
         style={{
           left: pos?.left ?? -9999,
           top: pos?.top ?? -9999,
@@ -91,26 +91,26 @@ export function GlossaryOverlay({
       >
         {pos && (
           <div
-            className="absolute w-3 h-3 bg-white border-[#e4ddcc] rotate-45"
+            className="absolute w-3 h-3 bg-white border-h-e4ddcc rotate-45"
             style={{
               left: pos.arrowSide === 'left' ? 20 : POPUP_WIDTH - 32,
               ...(pos.flipUp
-                ? { bottom: -7, borderRight: '1px solid #e4ddcc', borderBottom: '1px solid #e4ddcc' }
-                : { top: -7, borderLeft: '1px solid #e4ddcc', borderTop: '1px solid #e4ddcc' }),
+                ? { bottom: -7, borderRight: '1px solid rgb(var(--h-e4ddcc))', borderBottom: '1px solid rgb(var(--h-e4ddcc))' }
+                : { top: -7, borderLeft: '1px solid rgb(var(--h-e4ddcc))', borderTop: '1px solid rgb(var(--h-e4ddcc))' }),
             }}
           />
         )}
         <div className="flex items-baseline gap-2 mb-1">
-          <span className="italic text-[19px] font-bold text-[#1b2a41]" style={{ fontFamily: 'Georgia, serif' }}>
+          <span className="italic text-[19px] font-bold text-h-1b2a41" style={{ fontFamily: 'Georgia, serif' }}>
             {entry.symbol}
           </span>
-          <span className="text-[13px] font-semibold text-[#1b2a41]">{entry.name}</span>
+          <span className="text-[13px] font-semibold text-h-1b2a41">{entry.name}</span>
         </div>
-        <div className="text-[11.5px] font-mono text-[#8f6428] mb-2">
-          {entry.unit} <span className="text-[#a8a196]">— {entry.unitName}</span>
+        <div className="text-[11.5px] font-mono text-h-8f6428 mb-2">
+          {entry.unit} <span className="text-h-a8a196">— {entry.unitName}</span>
         </div>
-        <p className="text-[12px] text-[#4a5a72] leading-snug mb-2.5">{entry.description}</p>
-        <p className={`text-[11px] leading-snug ${isTarget ? 'text-[#b34a3c] font-semibold' : 'text-[#a8a196] italic'}`}>
+        <p className="text-[12px] text-h-4a5a72 leading-snug mb-2.5">{entry.description}</p>
+        <p className={`text-[11px] leading-snug ${isTarget ? 'text-h-b34a3c font-semibold' : 'text-h-a8a196 italic'}`}>
           {isTarget
             ? "This is the variable you're currently solving for — it stays highlighted red throughout the derivation."
             : 'Whatever operation moves this quantity gets applied to both sides of the equation at once — the Golden Rule this simulator shows in action.'}

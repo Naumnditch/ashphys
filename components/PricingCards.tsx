@@ -34,14 +34,14 @@ export function PricingCards({ plans, usdRate, signedIn }: { plans: PricingPlan[
   return (
     <div className="mb-10">
       <div className="flex justify-center mb-8">
-        <div className="inline-flex bg-white border border-[#e4ddcc] rounded-full p-1 gap-1">
+        <div className="inline-flex bg-white border border-h-e4ddcc rounded-full p-1 gap-1">
           {PERIODS.map((p) => (
             <button
               key={p.id}
               type="button"
               onClick={() => setPeriod(p.id)}
               className={`text-[13px] font-semibold px-4 py-2 rounded-full transition-colors ${
-                period === p.id ? 'bg-[#1b2a41] text-white' : 'text-[#4a5a72] hover:bg-[#faf7f0]'
+                period === p.id ? 'bg-h-1b2a41 text-on-ink' : 'text-h-4a5a72 hover:bg-h-faf7f0'
               }`}
             >
               {p.label}
@@ -90,49 +90,49 @@ function PricingCard({ plan, period, usdRate, signedIn }: { plan: PricingPlan; p
   return (
     <div
       className={`bg-white border rounded-xl p-6 flex flex-col ${
-        isPlus ? 'border-[#b8823d] shadow-sm' : 'border-[#e4ddcc]'
+        isPlus ? 'border-h-b8823d shadow-sm' : 'border-h-e4ddcc'
       }`}
     >
       <div className="flex items-center gap-2 mb-3 min-h-[22px]">
         {badge && (
-          <span className="text-[10px] font-bold uppercase tracking-wide bg-[#f6efdc] text-[#8f6428] px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold uppercase tracking-wide bg-h-f6efdc text-h-8f6428 px-2 py-0.5 rounded-full">
             {badge}
           </span>
         )}
         {savingsPct > 0 && (
-          <span className="text-[10px] font-bold uppercase tracking-wide bg-[#e6f2ee] text-[#1b5c4d] px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold uppercase tracking-wide bg-h-e6f2ee text-h-1b5c4d px-2 py-0.5 rounded-full">
             Save {savingsPct}%
           </span>
         )}
       </div>
 
-      <h2 className="text-[20px] font-bold text-[#1b2a41] mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+      <h2 className="text-[20px] font-bold text-h-1b2a41 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
         {plan.name}
       </h2>
 
       <div className="mb-3">
         {isFree ? (
           <>
-            <span className="text-[30px] font-bold text-[#1b2a41]">Free</span>
-            <div className="text-[12px] text-[#4a5a72] mt-0.5">free forever</div>
+            <span className="text-[30px] font-bold text-h-1b2a41">Free</span>
+            <div className="text-[12px] text-h-4a5a72 mt-0.5">free forever</div>
           </>
         ) : (
           <>
-            <span className="text-[30px] font-bold text-[#1b2a41]">{perMonth}</span>
-            <span className="text-[13px] text-[#4a5a72] ml-1">TRY / month</span>
-            <div className="text-[12px] text-[#a8a196] mt-0.5">approx. ${tryToUsd(perMonth, usdRate)} USD</div>
-            <div className="text-[12px] text-[#4a5a72] mt-1.5 pt-1.5 border-t border-[#eee6d3]">{billedNote}</div>
+            <span className="text-[30px] font-bold text-h-1b2a41">{perMonth}</span>
+            <span className="text-[13px] text-h-4a5a72 ml-1">TRY / month</span>
+            <div className="text-[12px] text-h-a8a196 mt-0.5">approx. ${tryToUsd(perMonth, usdRate)} USD</div>
+            <div className="text-[12px] text-h-4a5a72 mt-1.5 pt-1.5 border-t border-h-eee6d3">{billedNote}</div>
           </>
         )}
       </div>
 
-      {plan.description && <p className="text-[12.5px] text-[#4a5a72] leading-snug mb-4">{plan.description}</p>}
+      {plan.description && <p className="text-[12.5px] text-h-4a5a72 leading-snug mb-4">{plan.description}</p>}
 
       {features.length > 0 && (
         <ul className="space-y-1.5 mb-5 flex-1">
           {features.map((f, i) => (
-            <li key={i} className="text-[12.5px] text-[#4a5a72] flex gap-2">
-              <span className="text-[#2e7d6b] flex-shrink-0">✓</span>
+            <li key={i} className="text-[12.5px] text-h-4a5a72 flex gap-2">
+              <span className="text-h-2e7d6b flex-shrink-0">✓</span>
               <span>{f}</span>
             </li>
           ))}
@@ -143,7 +143,7 @@ function PricingCard({ plan, period, usdRate, signedIn }: { plan: PricingPlan; p
         {isFree ? (
           <Link
             href={signedIn ? '/curriculum' : '/auth/signup'}
-            className="block text-center text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-[#d8cfb6] text-[#1b2a41] hover:bg-[#faf7f0]"
+            className="block text-center text-[13px] font-semibold px-4 py-2.5 rounded-lg border border-h-d8cfb6 text-h-1b2a41 hover:bg-h-faf7f0"
           >
             {signedIn ? 'Browse the curriculum' : 'Create a free account'}
           </Link>
@@ -153,12 +153,12 @@ function PricingCard({ plan, period, usdRate, signedIn }: { plan: PricingPlan; p
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent({ eventType: 'subscribe_click', metadata: { plan: plan.slug, period } })}
-            className="block text-center text-[13px] font-semibold px-4 py-2.5 rounded-lg bg-[#1b2a41] text-white hover:bg-[#243a5e]"
+            className="block text-center text-[13px] font-semibold px-4 py-2.5 rounded-lg bg-h-1b2a41 text-on-ink hover:bg-h-243a5e"
           >
             Subscribe
           </a>
         ) : (
-          <span className="block text-center text-[12.5px] px-4 py-2.5 rounded-lg bg-[#f5f0e2] text-[#8f6428]">
+          <span className="block text-center text-[12.5px] px-4 py-2.5 rounded-lg bg-h-f5f0e2 text-h-8f6428">
             Checkout link coming soon
           </span>
         )}

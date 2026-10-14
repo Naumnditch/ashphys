@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './theme.css';
+import './theme-hex.css';
 import { Inter } from 'next/font/google';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { PageViewTracker } from '@/components/analytics/PageViewTracker';
 import { SoftPaywallModal } from '@/components/paywall/SoftPaywallModal';
 import { HelpCta } from '@/components/HelpCta';
+import { THEME_INIT_SCRIPT } from '@/lib/theme/theme';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 
@@ -24,7 +27,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const showHelpCta = !user || user.role === 'student';
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Sets data-theme from localStorage before first paint (no flash of the wrong theme). */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className={inter.className}>
         <PageViewTracker />
         <Navbar />

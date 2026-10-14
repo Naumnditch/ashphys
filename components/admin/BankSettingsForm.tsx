@@ -126,7 +126,7 @@ export function BankSettingsForm({ initial }: Props) {
       <button
         onClick={save}
         disabled={busy}
-        className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
+        className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
       >
         {busy ? 'Saving…' : 'Save settings'}
       </button>

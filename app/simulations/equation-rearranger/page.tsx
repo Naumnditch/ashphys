@@ -16,7 +16,7 @@ function Frac({ top, bottom }: { top: React.ReactNode; bottom: React.ReactNode }
   return (
     <span className="inline-flex flex-col items-center align-middle mx-1 leading-tight">
       <span className="px-1">{top}</span>
-      <span className="border-t border-[#1b2a41] w-full text-center px-1">{bottom}</span>
+      <span className="border-t border-h-1b2a41 w-full text-center px-1">{bottom}</span>
     </span>
   );
 }
@@ -25,25 +25,25 @@ function Frac({ top, bottom }: { top: React.ReactNode; bottom: React.ReactNode }
 function CrossMultiplyTip() {
   return (
     <aside
-      className="mb-6 max-w-2xl rounded-xl border border-[#e3c98f] bg-[#fff8e6] px-5 py-4"
+      className="mb-6 max-w-2xl rounded-xl border border-h-e3c98f bg-h-fff8e6 px-5 py-4"
       style={{ fontFamily: SANS }}
       aria-label="Cross-multiplication shortcut"
     >
-      <div className="font-mono text-xs tracking-wide uppercase text-[#8f6428] mb-1.5">Shortcut: cross-multiplication</div>
-      <p className="text-[#1b2a41] text-sm leading-relaxed">
+      <div className="font-mono text-xs tracking-wide uppercase text-h-8f6428 mb-1.5">Shortcut: cross-multiplication</div>
+      <p className="text-h-1b2a41 text-sm leading-relaxed">
         When the variable you want is <strong>in the denominator</strong> and the other side is a single term, don&apos;t multiply and then divide. Just{' '}
         <strong>swap the two across the equals sign</strong>.
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-[#1b2a41]" style={{ fontFamily: 'Georgia, serif', fontSize: '1.25rem' }}>
+      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-h-1b2a41" style={{ fontFamily: 'Georgia, serif', fontSize: '1.25rem' }}>
         <span>
           <i>F</i> = <Frac top={<i>GMm</i>} bottom={<span><i>r</i>²</span>} />
         </span>
-        <span aria-hidden="true" className="text-[#8f6428]">⟹</span>
+        <span aria-hidden="true" className="text-h-8f6428">⟹</span>
         <span>
           <i>r</i>² = <Frac top={<i>GMm</i>} bottom={<i>F</i>} />
         </span>
       </div>
-      <p className="text-[#4a5a72] text-sm leading-relaxed mt-3">
+      <p className="text-h-4a5a72 text-sm leading-relaxed mt-3">
         <i>r</i>² and <i>F</i> traded places: one step instead of two. Try it below: click a variable under a fraction bar and watch the swap.
       </p>
     </aside>
@@ -78,7 +78,7 @@ export default async function EquationRearrangerSimulationPage() {
       className="min-h-screen"
       style={{
         background:
-          'linear-gradient(#d8e3ec 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, #d8e3ec 1px, transparent 1px) 0 0/24px 24px, #faf7f0',
+          'linear-gradient(rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, rgb(var(--h-faf7f0))',
       }}
     >
       <SimulationStartTracker />
@@ -86,7 +86,7 @@ export default async function EquationRearrangerSimulationPage() {
         {ctx?.chapter_id && (
           <Link
             href={`/curriculum/${ctx.chapter_id}${ctx.topic_id ? `#topic-${ctx.topic_id}` : ''}`}
-            className="text-sm text-[#2e7d6b] hover:underline mb-6 inline-block font-medium"
+            className="text-sm text-h-2e7d6b hover:underline mb-6 inline-block font-medium"
             style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif' }}
           >
             ← Back to {ctx.chapter_title}
@@ -94,18 +94,18 @@ export default async function EquationRearrangerSimulationPage() {
         )}
 
         <div className="mb-6">
-          <div className="font-mono text-xs tracking-wide uppercase text-[#8f6428] mb-1.5">
+          <div className="font-mono text-xs tracking-wide uppercase text-h-8f6428 mb-1.5">
             {ctx ? `Chapter ${ctx.chapter_number} · Prep Physics — Rearranging Equations` : 'Simulation'}
           </div>
           <h1
-            className="text-2xl sm:text-3xl font-semibold text-[#1b2a41]"
+            className="text-2xl sm:text-3xl font-semibold text-h-1b2a41"
             style={{ fontFamily: 'Georgia, serif', letterSpacing: '-0.01em' }}
           >
             {ctx?.title || 'Equation Rearranger'}
           </h1>
           {ctx?.description && (
             <p
-              className="text-[#4a5a72] text-sm mt-2 max-w-2xl leading-relaxed"
+              className="text-h-4a5a72 text-sm mt-2 max-w-2xl leading-relaxed"
               style={{ fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif' }}
             >
               {ctx.description}

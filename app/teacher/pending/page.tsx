@@ -43,7 +43,7 @@ export default async function TeacherPendingPage() {
           </Link>
           <Link
             href="/contact"
-            className="px-5 py-2.5 rounded-lg bg-gray-900 text-white font-medium text-sm hover:bg-black"
+            className="px-5 py-2.5 rounded-lg bg-gray-900 text-on-ink font-medium text-sm hover:bg-black"
           >
             Contact Us
           </Link>

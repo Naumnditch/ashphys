@@ -80,21 +80,21 @@ export default async function PastPapersPage({
 
   const pill = (active: boolean) =>
     `text-[13px] font-semibold px-3.5 py-1.5 rounded-full border transition-colors ${
-      active ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-white text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+      active ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-white text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
     }`;
 
   const withFiles = papers.filter((p) => p.question_paper_url).length;
 
   return (
-    <div className="min-h-screen bg-[#faf7f0]" style={{ backgroundImage: 'radial-gradient(#e6ddc4 0.6px, transparent 0.6px)', backgroundSize: '18px 18px' }}>
+    <div className="min-h-screen bg-h-faf7f0" style={{ backgroundImage: 'radial-gradient(rgb(var(--h-e6ddc4)) 0.6px, transparent 0.6px)', backgroundSize: '18px 18px' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        <p className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72] mb-2">
+        <p className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72 mb-2">
           {label.heading}
         </p>
-        <h1 className="text-[32px] font-bold text-[#1b2a41] mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+        <h1 className="text-[32px] font-bold text-h-1b2a41 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
           Past Papers
         </h1>
-        <p className="text-[14px] text-[#4a5a72] leading-snug mb-6 max-w-2xl">
+        <p className="text-[14px] text-h-4a5a72 leading-snug mb-6 max-w-2xl">
           Record your mark on each paper to track your progress, and work through the video solutions as they are
           published.{' '}
           {withFiles === 0 && syllabusFilter === '0625' && (
@@ -104,7 +104,7 @@ export default async function PastPapersPage({
                 href="https://www.cambridgeinternational.org/programmes-and-qualifications/cambridge-igcse-physics-0625/past-papers/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#2e7d6b] font-semibold underline"
+                className="text-h-2e7d6b font-semibold underline"
               >
                 Cambridge&rsquo;s own portal
               </a>{' '}
@@ -122,8 +122,8 @@ export default async function PastPapersPage({
                 href={buildHref({ syllabus: code })}
                 className={`text-[13px] font-semibold px-3.5 py-1.5 rounded-full border transition-colors ${
                   syllabusFilter === code
-                    ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]'
-                    : 'bg-white text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b'
+                    : 'bg-white text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}
               >
                 {SYLLABUS_LABELS[code]?.short ?? code}
@@ -133,8 +133,8 @@ export default async function PastPapersPage({
         )}
 
         {!user && (
-          <div className="bg-white border border-[#e4ddcc] rounded-lg px-4 py-3 mb-6 text-[13px] text-[#4a5a72]">
-            <Link href="/auth/login" className="text-[#2e7d6b] font-semibold underline">Sign in</Link> to save your
+          <div className="bg-white border border-h-e4ddcc rounded-lg px-4 py-3 mb-6 text-[13px] text-h-4a5a72">
+            <Link href="/auth/login" className="text-h-2e7d6b font-semibold underline">Sign in</Link> to save your
             score on each paper and build a record of your progress.
           </div>
         )}
@@ -152,7 +152,7 @@ export default async function PastPapersPage({
           <Link
             href={buildHref({ year: null })}
             className={`text-[12px] font-semibold px-3 py-1 rounded-full border ${
-              yearFilter === null ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-white text-[#4a5a72] border-[#e4ddcc] hover:bg-[#f5f0e2]'
+              yearFilter === null ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-white text-h-4a5a72 border-h-e4ddcc hover:bg-h-f5f0e2'
             }`}
           >
             All Years
@@ -162,7 +162,7 @@ export default async function PastPapersPage({
               key={y}
               href={buildHref({ year: y })}
               className={`text-[12px] font-semibold px-3 py-1 rounded-full border ${
-                yearFilter === y ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-white text-[#4a5a72] border-[#e4ddcc] hover:bg-[#f5f0e2]'
+                yearFilter === y ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-white text-h-4a5a72 border-h-e4ddcc hover:bg-h-f5f0e2'
               }`}
             >
               {y}
@@ -171,8 +171,8 @@ export default async function PastPapersPage({
         </div>
 
         {groupKeys.length === 0 && (
-          <div className="bg-white border border-[#e4ddcc] rounded-xl p-8 text-center">
-            <p className="text-[14px] text-[#4a5a72]">No papers match this filter.</p>
+          <div className="bg-white border border-h-e4ddcc rounded-xl p-8 text-center">
+            <p className="text-[14px] text-h-4a5a72">No papers match this filter.</p>
           </div>
         )}
 
@@ -180,7 +180,7 @@ export default async function PastPapersPage({
           const [y, sess] = key.split('|');
           return (
             <div key={key} className="mb-10">
-              <h2 className="text-[16px] font-bold text-[#1b2a41] mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+              <h2 className="text-[16px] font-bold text-h-1b2a41 mb-4" style={{ fontFamily: 'Georgia, serif' }}>
                 {sess} {y}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

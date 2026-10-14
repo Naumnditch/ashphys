@@ -24,19 +24,19 @@ export default async function PaymentResultPage({
   const success = status === 'success';
 
   return (
-    <div className="min-h-screen bg-[#faf7f0] flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white border border-[#e4ddcc] rounded-xl p-8 text-center">
+    <div className="min-h-screen bg-h-faf7f0 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white border border-h-e4ddcc rounded-xl p-8 text-center">
         <div
           className={`w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ${
-            success ? 'bg-[#e6f2ee] text-[#2e7d6b]' : 'bg-[#fbeae7] text-[#b34a3c]'
+            success ? 'bg-h-e6f2ee text-h-2e7d6b' : 'bg-h-fbeae7 text-h-b34a3c'
           }`}
         >
           {success ? '✓' : '✕'}
         </div>
-        <h1 className="text-[20px] font-bold text-[#1b2a41] mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+        <h1 className="text-[20px] font-bold text-h-1b2a41 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
           {success ? 'Payment Successful' : status === 'invalid' ? 'Could Not Verify Payment' : 'Payment Not Completed'}
         </h1>
-        <p className="text-[13.5px] text-[#4a5a72] mb-5 leading-snug">
+        <p className="text-[13.5px] text-h-4a5a72 mb-5 leading-snug">
           {success
             ? order?.is_test
               ? 'The test charge went through and the signature verified correctly — the integration is working end to end.'
@@ -46,14 +46,14 @@ export default async function PaymentResultPage({
             : 'The payment was not completed, or the confirmation could not be verified. No charge should apply — check your Shopier panel to confirm.'}
         </p>
         {order && (
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded-lg p-3 text-left text-[12px] font-mono text-[#4a5a72] mb-5 space-y-1">
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded-lg p-3 text-left text-[12px] font-mono text-h-4a5a72 mb-5 space-y-1">
             <div>Order: {order.platform_order_id}</div>
             <div>Amount: {order.amount} {order.currency}</div>
             <div>Status: {order.status}</div>
             {order.shopier_payment_id && <div>Shopier ID: {order.shopier_payment_id}</div>}
           </div>
         )}
-        <Link href="/" className="inline-block text-[13.5px] font-semibold text-white bg-[#1b2a41] px-5 py-2.5 rounded-lg">
+        <Link href="/" className="inline-block text-[13.5px] font-semibold text-on-ink bg-h-1b2a41 px-5 py-2.5 rounded-lg">
           Back to AshPhys
         </Link>
       </div>

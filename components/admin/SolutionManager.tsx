@@ -269,7 +269,7 @@ export function SolutionManager({ initialSolutions, chapters }: { initialSolutio
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
+            className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50"
           >
             {saving ? 'Saving…' : form.id ? 'Update Solution' : 'Save Solution'}
           </button>

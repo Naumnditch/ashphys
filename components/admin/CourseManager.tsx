@@ -113,7 +113,7 @@ export function CourseManager() {
         </div>
         {msg && <p className={`text-sm mb-3 ${msg.ok ? 'text-green-700' : 'text-red-600'}`}>{msg.text}</p>}
         <div className="flex gap-2">
-          <button onClick={saveCourse} disabled={busy || !cForm.title} className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50">
+          <button onClick={saveCourse} disabled={busy || !cForm.title} className="bg-gray-900 hover:bg-gray-800 text-on-ink text-sm font-semibold px-5 py-2.5 rounded-lg disabled:opacity-50">
             {busy ? 'Saving…' : cForm.id ? 'Update course' : 'Create course'}
           </button>
           {cForm.id && <button onClick={() => setCForm({ ...blankCourse })} className="text-sm text-gray-500 px-3">Cancel</button>}
@@ -189,7 +189,7 @@ export function CourseManager() {
                         <input type="checkbox" checked={mForm.course_id === c.id ? mForm.is_free_preview : false} onChange={(e) => setMForm({ ...mForm, course_id: c.id, is_free_preview: e.target.checked })} />
                         Free preview — visible without buying
                       </label>
-                      <button onClick={saveModule} disabled={busy || mForm.course_id !== c.id || !mForm.title} className="bg-gray-900 text-white text-[13px] font-semibold px-4 py-2 rounded-lg disabled:opacity-40">
+                      <button onClick={saveModule} disabled={busy || mForm.course_id !== c.id || !mForm.title} className="bg-gray-900 text-on-ink text-[13px] font-semibold px-4 py-2 rounded-lg disabled:opacity-40">
                         {mForm.id ? 'Update lesson' : 'Add lesson'}
                       </button>
                     </div>

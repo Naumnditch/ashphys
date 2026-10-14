@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 /**
  * Pressure in Liquids — p = ρgh, felt at every depth.
  *
@@ -37,11 +39,11 @@ const CW = 280;
 const CH = 320;
 
 const LIQUIDS = [
-  { key: 'water', name: 'Water', rho: 1000, color: '#3d7ea6', light: 'rgba(61, 126, 166, 0.35)' },
-  { key: 'seawater', name: 'Seawater', rho: 1025, color: '#2e7d6b', light: 'rgba(46, 125, 107, 0.35)' },
-  { key: 'oil', name: 'Olive oil', rho: 920, color: '#b8823d', light: 'rgba(184, 130, 61, 0.35)' },
-  { key: 'glycerine', name: 'Glycerine', rho: 1260, color: '#a05c7b', light: 'rgba(160, 92, 123, 0.35)' },
-  { key: 'mercury', name: 'Mercury', rho: 13600, color: '#5a6472', light: 'rgba(90, 100, 114, 0.45)' },
+  { key: 'water', name: 'Water', rho: 1000, color: 'rgb(var(--h-3d7ea6))', light: 'rgb(var(--h-3d7ea6) / 0.35)' },
+  { key: 'seawater', name: 'Seawater', rho: 1025, color: 'rgb(var(--h-2e7d6b))', light: 'rgb(var(--h-2e7d6b) / 0.35)' },
+  { key: 'oil', name: 'Olive oil', rho: 920, color: 'rgb(var(--h-b8823d))', light: 'rgb(var(--h-b8823d) / 0.35)' },
+  { key: 'glycerine', name: 'Glycerine', rho: 1260, color: 'rgb(var(--h-a05c7b))', light: 'rgb(var(--h-a05c7b) / 0.35)' },
+  { key: 'mercury', name: 'Mercury', rho: 13600, color: 'rgb(var(--h-5a6472))', light: 'rgb(var(--h-5a6472) / 0.45)' },
 ] as const;
 
 const GRAVITIES = [
@@ -99,7 +101,7 @@ export function PressureInLiquidsSimulator() {
   const render = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
     const rect = canvas.getBoundingClientRect();
     const scale = rect.width / IW;
@@ -128,7 +130,7 @@ export function PressureInLiquidsSimulator() {
     ctx.stroke();
 
     // tank walls (open top)
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(TANK_X0, SURFACE_Y - 18);
@@ -139,11 +141,11 @@ export function PressureInLiquidsSimulator() {
 
     // depth ruler on the left wall
     ctx.font = '500 9.5px ui-monospace, SFMono-Regular, Menlo, monospace';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.textAlign = 'right';
     for (let h = 0; h <= DEPTH_MAX + 0.001; h += 0.5) {
       const y = SURFACE_Y + h * PX_PER_M;
-      ctx.strokeStyle = 'rgba(27, 42, 65, 0.5)';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.5)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(TANK_X0 - 8, y);
@@ -157,7 +159,7 @@ export function PressureInLiquidsSimulator() {
       for (const hd of SPOUT_DEPTHS) {
         const hy = SURFACE_Y + hd * PX_PER_M;
         // the hole
-        ctx.fillStyle = '#faf7f0';
+        ctx.fillStyle = 'rgb(var(--h-faf7f0))';
         ctx.fillRect(TANK_X1 - 2, hy - 3, 8, 6);
         // jet: v = sqrt(2 g h), then projectile motion, drawn as droplets
         const v = Math.sqrt(2 * g.g * hd); // m/s
@@ -172,13 +174,13 @@ export function PressureInLiquidsSimulator() {
           ctx.arc(x, y, 2.1, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.fillStyle = '#4a5a72';
+        ctx.fillStyle = 'rgb(var(--h-4a5a72))';
         ctx.font = '500 9.5px ui-monospace, SFMono-Regular, Menlo, monospace';
         ctx.textAlign = 'left';
         ctx.fillText(`v = ${v.toFixed(1)} m/s`, TANK_X1 + 12, hy - 7);
       }
       // basin line
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(TANK_X1, BASIN_Y);
@@ -190,7 +192,7 @@ export function PressureInLiquidsSimulator() {
     const py = SURFACE_Y + s.depth * PX_PER_M;
     const pxx = (TANK_X0 + TANK_X1) / 2 - 40;
     // depth line from the surface
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.4;
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -198,24 +200,24 @@ export function PressureInLiquidsSimulator() {
     ctx.lineTo(pxx, py);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.font = 'italic 700 12px Georgia, serif';
     ctx.textAlign = 'right';
     ctx.fillText(`h = ${s.depth.toFixed(2)} m`, pxx - 8, (SURFACE_Y + py) / 2 + 4);
     // sensor
-    ctx.fillStyle = '#faf7f0';
-    ctx.strokeStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(pxx, py, 10, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = '#b34a3c';
+    ctx.fillStyle = 'rgb(var(--h-b34a3c))';
     ctx.beginPath();
     ctx.arc(pxx, py, 3.5, 0, Math.PI * 2);
     ctx.fill();
     // pressure arrows from all sides (pressure acts in every direction)
-    ctx.strokeStyle = 'rgba(27, 42, 65, 0.6)';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41) / 0.6)';
     ctx.lineWidth = 1.6;
     for (let a = 0; a < 8; a++) {
       const ang = (a / 8) * Math.PI * 2;
@@ -227,18 +229,18 @@ export function PressureInLiquidsSimulator() {
       ctx.stroke();
     }
     const pHere = (l.rho * g.g * s.depth) / 1000 + (s.absolute ? P_ATM : 0);
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.font = '700 12.5px ui-monospace, SFMono-Regular, Menlo, monospace';
     ctx.textAlign = 'left';
     ctx.fillText(`p = ${pHere.toFixed(1)} kPa`, pxx + 32, py + 4);
     ctx.font = '500 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillText('drag the probe', pxx + 32, py + 18);
 
     // ---- p–h chart ----
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = 'rgb(var(--h-ffffff))';
     ctx.fillRect(CX, CY, CW, CH);
-    ctx.strokeStyle = '#1b2a41';
+    ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(CX, CY, CW, CH);
     const slopeMax = Math.max(
@@ -268,17 +270,17 @@ export function PressureInLiquidsSimulator() {
       ctx.fill();
     }
     // live point
-    ctx.fillStyle = '#b34a3c';
+    ctx.fillStyle = 'rgb(var(--h-b34a3c))';
     ctx.beginPath();
     ctx.arc(hToX(s.depth), pToY(pHere), 5, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#1b2a41';
+    ctx.fillStyle = 'rgb(var(--h-1b2a41))';
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('pressure vs depth  (slope = ρg)', CX + CW / 2, CY - 8);
     ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, monospace';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.textAlign = 'left';
     ctx.fillText('h (m) →', CX + CW - 48, CY + CH + 14);
     ctx.save();
@@ -289,12 +291,12 @@ export function PressureInLiquidsSimulator() {
 
     // ---- technical overlay ----
     if (s.showTechnical) {
-      ctx.fillStyle = 'rgba(250, 247, 240, 0.93)';
+      ctx.fillStyle = 'rgb(var(--h-faf7f0) / 0.93)';
       ctx.fillRect(CX + 8, CY + 8, 264, 90);
-      ctx.strokeStyle = '#1b2a41';
+      ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
       ctx.lineWidth = 1;
       ctx.strokeRect(CX + 8, CY + 8, 264, 90);
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       ctx.font = '600 10px ui-monospace, SFMono-Regular, Menlo, monospace';
       ctx.textAlign = 'left';
       const lines = [
@@ -373,9 +375,11 @@ export function PressureInLiquidsSimulator() {
     };
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -391,19 +395,19 @@ export function PressureInLiquidsSimulator() {
   return (
     <div className="pressure-liquids-lab flex flex-col gap-5">
       {/* ---- Apparatus: full width ---- */}
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Liquid Column Bench · 2.0 m tank
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             {liquid.name} · ρ = {liquid.rho} kg/m³ · g = {grav.g} N/kg
           </span>
         </div>
         <div className="px-4 pt-2">
           <canvas
             ref={canvasRef}
-            className="block w-full rounded border border-[#e4ddcc] touch-none cursor-ns-resize"
+            className="block w-full rounded border border-h-e4ddcc touch-none cursor-ns-resize"
             style={{ aspectRatio: '1000 / 440' }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -412,22 +416,22 @@ export function PressureInLiquidsSimulator() {
           />
         </div>
         <div className="px-4 pb-2 pt-2">
-          <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-            <span className="text-[#b34a3c] font-semibold">Drag the probe</span> and its measurements land as dots on the
+          <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+            <span className="text-h-b34a3c font-semibold">Drag the probe</span> and its measurements land as dots on the
             p–h chart — trace one liquid, switch, and trace again to compare slopes. The wall{' '}
-            <span className="text-[#2e7d6b] font-semibold">spouts</span> obey Torricelli's theorem: deeper holes fire
+            <span className="text-h-2e7d6b font-semibold">spouts</span> obey Torricelli's theorem: deeper holes fire
             faster jets, which is why dam walls grow thicker toward the base.
           </p>
         </div>
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-3 mb-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[13px] text-[#4a5a72] w-16 flex-shrink-0">Liquid</span>
+              <span className="text-[13px] text-h-4a5a72 w-16 flex-shrink-0">Liquid</span>
               {LIQUIDS.map((l) => (
                 <button key={l.key} onClick={() => handleLiquid(l.key)}
                   className={`flex-1 min-w-20 text-[12px] font-semibold px-2 py-1.5 rounded border ${
-                    liquidKey === l.key ? 'text-white' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    liquidKey === l.key ? 'text-white' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                   }`}
                   style={liquidKey === l.key ? { backgroundColor: l.color, borderColor: l.color } : undefined}>
                   {l.name}
@@ -435,18 +439,18 @@ export function PressureInLiquidsSimulator() {
               ))}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[13px] text-[#4a5a72] w-16 flex-shrink-0">Gravity</span>
+              <span className="text-[13px] text-h-4a5a72 w-16 flex-shrink-0">Gravity</span>
               {GRAVITIES.map((g) => (
                 <button key={g.key} onClick={() => handleG(g.key)}
                   className={`flex-1 text-[12px] font-semibold px-2 py-1.5 rounded border ${
-                    gKey === g.key ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                    gKey === g.key ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                   }`}>
                   {g.name} · {g.g}
                 </button>
               ))}
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-[13px] text-[#4a5a72] w-16 flex-shrink-0">Depth h</label>
+              <label className="text-[13px] text-h-4a5a72 w-16 flex-shrink-0">Depth h</label>
               <input type="range" min={0.05} max={DEPTH_MAX} step={0.01} value={depth}
                 onChange={(e) => setProbe(parseFloat(e.target.value))} className="flex-1" />
               <span className="font-mono text-[13px] w-16 text-right">{depth.toFixed(2)} m</span>
@@ -459,7 +463,7 @@ export function PressureInLiquidsSimulator() {
                   simRef.current.absolute = next;
                 }}
                 className={`flex-1 text-[12px] font-semibold px-2 py-1.5 rounded border ${
-                  absolute ? 'bg-[#2e7d6b] text-white border-[#2e7d6b]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  absolute ? 'bg-h-2e7d6b text-on-ink border-h-2e7d6b' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}>
                 {absolute ? '✓ + Atmospheric (101 kPa)' : '+ Atmospheric?'}
               </button>
@@ -470,13 +474,13 @@ export function PressureInLiquidsSimulator() {
                   simRef.current.spoutsOn = next;
                 }}
                 className={`flex-1 text-[12px] font-semibold px-2 py-1.5 rounded border ${
-                  spoutsOn ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  spoutsOn ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
                 }`}>
                 {spoutsOn ? '✓ Wall Spouts' : 'Wall Spouts'}
               </button>
               <button
                 onClick={() => { simRef.current.dots = []; }}
-                className="flex-1 text-[12px] font-semibold px-2 py-1.5 rounded border bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]">
+                className="flex-1 text-[12px] font-semibold px-2 py-1.5 rounded border bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2">
                 ⌫ Clear Dots
               </button>
             </div>
@@ -488,7 +492,7 @@ export function PressureInLiquidsSimulator() {
               simRef.current.showTechnical = next;
             }}
             className={`w-full text-[12.5px] font-semibold px-3 py-2 rounded border ${
-              showTechnical ? 'bg-[#1b2a41] text-white border-[#1b2a41]' : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+              showTechnical ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41' : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
             }`}>
             {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
           </button>
@@ -497,82 +501,82 @@ export function PressureInLiquidsSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Live Readings</span>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Live Readings</span>
           <div className="mt-3 space-y-2">
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Depth h</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{depth.toFixed(2)} m</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Depth h</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{depth.toFixed(2)} m</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Liquid pressure ρgh</span>
-              <span className="font-mono text-[13px] font-bold text-[#1b2a41]">{pGauge.toFixed(1)} kPa</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Liquid pressure ρgh</span>
+              <span className="font-mono text-[13px] font-bold text-h-1b2a41">{pGauge.toFixed(1)} kPa</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Total (with atmosphere)</span>
-              <span className="font-mono text-[13px] text-[#1b2a41]">{(pGauge + P_ATM).toFixed(1)} kPa</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Total (with atmosphere)</span>
+              <span className="font-mono text-[13px] text-h-1b2a41">{(pGauge + P_ATM).toFixed(1)} kPa</span>
             </div>
-            <div className="flex justify-between border-b border-[#eee6d3] pb-1">
-              <span className="text-[12.5px] text-[#4a5a72]">Reading shown at probe</span>
-              <span className="font-mono text-[13px] font-bold text-[#2e7d6b]">{pShown.toFixed(1)} kPa</span>
+            <div className="flex justify-between border-b border-h-eee6d3 pb-1">
+              <span className="text-[12.5px] text-h-4a5a72">Reading shown at probe</span>
+              <span className="font-mono text-[13px] font-bold text-h-2e7d6b">{pShown.toFixed(1)} kPa</span>
             </div>
           </div>
-          <p className="text-[11.5px] text-[#4a5a72] mt-2.5 leading-snug">
+          <p className="text-[11.5px] text-h-4a5a72 mt-2.5 leading-snug">
             In water on Earth, every metre of depth adds about 9.8 kPa — so 10 m of water adds roughly one whole
             atmosphere. That is why divers feel double the surface pressure at just 10 m down.
           </p>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">1.</strong> Drag the probe slowly from surface to bottom: the dots on
+              <strong className="text-h-1b2a41">1.</strong> Drag the probe slowly from surface to bottom: the dots on
               the chart form a straight line through the origin. Pressure grows in exact proportion to depth.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">2.</strong> Trace water, then switch to mercury and trace again without
+              <strong className="text-h-1b2a41">2.</strong> Trace water, then switch to mercury and trace again without
               clearing. Two lines, and the mercury one is 13.6× steeper — the density ratio, drawn by your own hand.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">3.</strong> Same depth, Moon gravity: about 6× less pressure. The
+              <strong className="text-h-1b2a41">3.</strong> Same depth, Moon gravity: about 6× less pressure. The
               formula has three dials, and g is one of them.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">4.</strong> Watch the three spouts: the deepest fires fastest. More
+              <strong className="text-h-1b2a41">4.</strong> Watch the three spouts: the deepest fires fastest. More
               depth, more pressure, more speed — the reason a dam is a wedge, thick at the bottom.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">5.</strong> Open the technical panel and look at the spout speeds when
+              <strong className="text-h-1b2a41">5.</strong> Open the technical panel and look at the spout speeds when
               you switch liquids: they do not change. Pressure pushes harder on denser liquid, but denser liquid is
               harder to push — a beautiful exact cancellation.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-            <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+            <div className="italic text-[22px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               p = ρgh
             </div>
-            <div className="italic text-[14px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+            <div className="italic text-[14px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
               pressure in a liquid, at depth h below the surface
             </div>
           </div>
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3">
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3">
             What Each Variable Means
           </h2>
           <div className="space-y-2.5">
             {variables.map((v) => (
               <div key={v.symbol} className="flex gap-3 items-start">
                 <div
-                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[16px] font-bold italic text-[#8f6428]"
+                  className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[16px] font-bold italic text-h-8f6428"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   {v.symbol}
                 </div>
-                <p className="text-[12px] text-[#4a5a72] leading-snug">
-                  <strong className="text-[#1b2a41]">{v.name}.</strong> {v.def}
+                <p className="text-[12px] text-h-4a5a72 leading-snug">
+                  <strong className="text-h-1b2a41">{v.name}.</strong> {v.def}
                 </p>
               </div>
             ))}

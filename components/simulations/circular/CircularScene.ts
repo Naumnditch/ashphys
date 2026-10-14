@@ -145,17 +145,17 @@ export class CircularScene {
     Ty: new Arrow3D(0xa57fb8),
   };
   private labels: Record<'v' | 'T' | 'W' | 'N' | 'R' | 'Tx' | 'Ty' | 'r' | 'h' | 'theta' | 'slack', CSS2DObject> = {
-    v: makeLabel('v', '#2e7d6b'),
-    T: makeLabel('T', '#7a4a8f'),
-    W: makeLabel('mg', '#2e5a8f'),
-    N: makeLabel('N', '#4a5a72'),
-    R: makeLabel('F', '#8f6428'),
-    Tx: makeLabel('T sin θ', '#7a4a8f', 12),
-    Ty: makeLabel('T cos θ', '#7a4a8f', 12),
-    r: makeLabel('r', '#4a5a72', 12),
-    h: makeLabel('h', '#4a5a72', 12),
-    theta: makeLabel('θ', '#8f6428', 13),
-    slack: makeLabel('string slack: T = 0', '#b34a3c', 12),
+    v: makeLabel('v', 'rgb(var(--h-2e7d6b))'),
+    T: makeLabel('T', 'rgb(var(--h-7a4a8f))'),
+    W: makeLabel('mg', 'rgb(var(--h-2e5a8f))'),
+    N: makeLabel('N', 'rgb(var(--h-4a5a72))'),
+    R: makeLabel('F', 'rgb(var(--h-8f6428))'),
+    Tx: makeLabel('T sin θ', 'rgb(var(--h-7a4a8f))', 12),
+    Ty: makeLabel('T cos θ', 'rgb(var(--h-7a4a8f))', 12),
+    r: makeLabel('r', 'rgb(var(--h-4a5a72))', 12),
+    h: makeLabel('h', 'rgb(var(--h-4a5a72))', 12),
+    theta: makeLabel('θ', 'rgb(var(--h-8f6428))', 13),
+    slack: makeLabel('string slack: T = 0', 'rgb(var(--h-b34a3c))', 12),
   };
 
   /** After the string is cut: the mass as a free body. */

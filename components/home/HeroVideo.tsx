@@ -44,7 +44,7 @@ export function HeroVideo() {
   };
 
   return (
-    <div className="relative aspect-video overflow-hidden rounded-2xl bg-[#060a13] shadow-2xl shadow-blue-950/20 ring-1 ring-black/5">
+    <div className="theme-light relative aspect-video overflow-hidden rounded-2xl bg-h-060a13 shadow-2xl shadow-blue-950/20 ring-1 ring-black/5">
       <video
         ref={video}
         className="h-full w-full object-cover"

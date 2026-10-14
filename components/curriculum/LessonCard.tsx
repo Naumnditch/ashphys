@@ -33,13 +33,13 @@ export function LessonCard({ lesson, selectedCurriculum, tier, showMetadata = tr
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           {showCodeChip && (
-            <span className="font-mono text-xs font-semibold text-[#5a67d8] bg-[#eef0fd] px-2 py-0.5 rounded">
+            <span className="font-mono text-xs font-semibold text-h-5a67d8 bg-h-eef0fd px-2 py-0.5 rounded">
               {lesson.topicCode}
             </span>
           )}
           <Link
             href={lessonHref(lesson.id, selectedCurriculum)}
-            className="font-semibold text-gray-900 hover:text-[#5a67d8] hover:underline"
+            className="font-semibold text-gray-900 hover:text-h-5a67d8 hover:underline"
           >
             {lesson.title}
           </Link>
@@ -60,7 +60,7 @@ export function LessonCard({ lesson, selectedCurriculum, tier, showMetadata = tr
           </p>
         )}
         {showMetadata && lesson.syllabusReference && (
-          <p className="mt-2 text-sm text-gray-600 bg-gray-50 border-l-[3px] border-[#667eea] px-3 py-1.5 rounded-r">
+          <p className="mt-2 text-sm text-gray-600 bg-gray-50 border-l-[3px] border-h-667eea px-3 py-1.5 rounded-r">
             {lesson.syllabusReference}
           </p>
         )}
@@ -93,7 +93,7 @@ export function LessonCard({ lesson, selectedCurriculum, tier, showMetadata = tr
         ))}
         <Link
           href={lessonHref(lesson.id, selectedCurriculum)}
-          className="text-xs font-semibold text-[#5a67d8] border border-[#c7cdf6] hover:bg-[#eef0fd] px-3 py-1.5 rounded-full whitespace-nowrap"
+          className="text-xs font-semibold text-h-5a67d8 border border-h-c7cdf6 hover:bg-h-eef0fd px-3 py-1.5 rounded-full whitespace-nowrap"
         >
           Open lesson →
         </Link>

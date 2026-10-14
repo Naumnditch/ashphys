@@ -15,24 +15,24 @@
 
 import type { ReactNode } from 'react';
 
-const INK = '#1b2a41';
-const MUTE = '#4a5a72';
-const BRASS = '#b8823d';
-const TEAL = '#2e7d6b';
-const RED = '#b34a3c';
+const INK = 'rgb(var(--h-1b2a41))';
+const MUTE = 'rgb(var(--h-4a5a72))';
+const BRASS = 'rgb(var(--h-b8823d))';
+const TEAL = 'rgb(var(--h-2e7d6b))';
+const RED = 'rgb(var(--h-b34a3c))';
 const SERIF = 'Georgia, serif';
 
-const MASS = '#f3d9d4';
-const METAL = '#b9c2cc';
-const WOOD = '#e9dcc3';
-const EARTH = '#dbe7f0';
-const MOON = '#e5e7eb';
-const MARS = '#f0d6c4';
-const SUN = '#f6e3b4';
-const ROCK = '#d8cfc0';
-const BELT = '#cfcac0';
-const GROUND = '#ece5d3';
-const PEOPLE = '#aab4c2';
+const MASS = 'rgb(var(--h-f3d9d4))';
+const METAL = 'rgb(var(--h-b9c2cc))';
+const WOOD = 'rgb(var(--h-e9dcc3))';
+const EARTH = 'rgb(var(--h-dbe7f0))';
+const MOON = 'rgb(var(--h-e5e7eb))';
+const MARS = 'rgb(var(--h-f0d6c4))';
+const SUN = 'rgb(var(--h-f6e3b4))';
+const ROCK = 'rgb(var(--h-d8cfc0))';
+const BELT = 'rgb(var(--h-cfcac0))';
+const GROUND = 'rgb(var(--h-ece5d3))';
+const PEOPLE = 'rgb(var(--h-aab4c2))';
 
 /** Arrowhead marker for each stroke colour an arrow may use. */
 const HEAD: Record<string, string> = {
@@ -65,7 +65,7 @@ function Fig({ w, h, children }: { w: number; h: number; children: ReactNode }) 
     <svg
       viewBox={`0 0 ${w} ${h}`}
       className="w-full max-w-md mx-auto"
-      style={{ background: '#faf7f0', borderRadius: 8, border: '1px solid #e4ddcc' }}
+      style={{ background: 'rgb(var(--h-faf7f0))', borderRadius: 8, border: '1px solid rgb(var(--h-e4ddcc))' }}
     >
       <defs>
         {Object.entries(HEAD).map(([colour, id]) => (
@@ -194,8 +194,8 @@ function Body({ x, y, r, fill, label, labelSize = 12 }: { x: number; y: number; 
 function Satellite({ x, y }: { x: number; y: number }) {
   return (
     <g>
-      <rect x={x - 13} y={y - 3.5} width={8} height={7} fill="#c9d6e3" stroke={INK} strokeWidth={0.8} />
-      <rect x={x + 5} y={y - 3.5} width={8} height={7} fill="#c9d6e3" stroke={INK} strokeWidth={0.8} />
+      <rect x={x - 13} y={y - 3.5} width={8} height={7} fill="rgb(var(--h-c9d6e3))" stroke={INK} strokeWidth={0.8} />
+      <rect x={x + 5} y={y - 3.5} width={8} height={7} fill="rgb(var(--h-c9d6e3))" stroke={INK} strokeWidth={0.8} />
       <rect x={x - 5} y={y - 5} width={10} height={10} fill={METAL} stroke={INK} strokeWidth={1.1} />
     </g>
   );
@@ -211,7 +211,7 @@ function SpaceStation({ x, y }: { x: number; y: number }) {
     <g>
       <line x1={x - 15} y1={y} x2={x + 15} y2={y} stroke={INK} strokeWidth={1.6} />
       {[-12, -6, 6, 12].map((dx) => (
-        <rect key={dx} x={x + dx - 2} y={y - 8} width={4} height={16} fill="#c9d6e3" stroke={INK} strokeWidth={0.7} />
+        <rect key={dx} x={x + dx - 2} y={y - 8} width={4} height={16} fill="rgb(var(--h-c9d6e3))" stroke={INK} strokeWidth={0.7} />
       ))}
       <rect x={x - 4} y={y - 3} width={8} height={6} fill={METAL} stroke={INK} strokeWidth={1} />
     </g>
@@ -233,7 +233,7 @@ function PersonTop({ x, y, tall = false }: { x: number; y: number; tall?: boolea
   return (
     <g>
       <ellipse cx={x} cy={y} rx={tall ? 9 : 12} ry={tall ? 21 : 7} fill={PEOPLE} stroke={INK} strokeWidth={1.2} />
-      <circle cx={x} cy={y} r={tall ? 6.5 : 5} fill="#6b7280" stroke={INK} strokeWidth={1} />
+      <circle cx={x} cy={y} r={tall ? 6.5 : 5} fill="rgb(var(--h-6b7280))" stroke={INK} strokeWidth={1} />
     </g>
   );
 }
@@ -356,7 +356,7 @@ function MerryGoRound() {
       <Note x={16} y={24}>
         view from above
       </Note>
-      <circle cx={cx} cy={cy} r={r} fill="#f4efe3" stroke={INK} strokeWidth={1.6} />
+      <circle cx={cx} cy={cy} r={r} fill="rgb(var(--h-f4efe3))" stroke={INK} strokeWidth={1.6} />
       <Dot x={cx} y={cy} r={3.5} />
       <Line x1={cx} y1={cy} x2={jx} y2={jy} color={MUTE} width={1.1} dash="4 3" />
       <T x={r1((cx + jx) / 2 + 10)} y={r1((cy + jy) / 2 - 7)} size={11.5} color={MUTE} bold anchor="start">
@@ -389,7 +389,7 @@ function BaggageBelt() {
       <Turn cx={cx} cy={cy} r={r - 30} from={245} to={295} />
       <Dot x={cx} y={cy} />
       <Dim x1={cx} y1={cy} x2={dx} y2={dy} label="7.0 m" lx={r1((cx + dx) / 2 + 10)} ly={r1((cy + dy) / 2 + 12)} anchor="start" />
-      <rect x={sx - 6} y={sy - 14} width={12} height={28} rx={2} fill="#c9a36b" stroke={INK} strokeWidth={1.3} />
+      <rect x={sx - 6} y={sy - 14} width={12} height={28} rx={2} fill="rgb(var(--h-c9a36b))" stroke={INK} strokeWidth={1.3} />
       <rect x={sx + 6} y={sy - 4} width={3} height={8} fill={INK} />
       <T x={sx + 24} y={sy + 4} size={12} bold anchor="start">
         suitcase
@@ -456,7 +456,7 @@ function TableAndHole() {
         frictionless table
       </Note>
       <Line x1={230} y1={140} x2={230} y2={186} width={1.3} />
-      <rect x={214} y={186} width={32} height={26} fill="#cfd5dd" stroke={INK} strokeWidth={1.4} />
+      <rect x={214} y={186} width={32} height={26} fill="rgb(var(--h-cfd5dd))" stroke={INK} strokeWidth={1.4} />
       <T x={256} y={203} size={11.5} bold anchor="start">
         hanging mass, M
       </T>
@@ -472,10 +472,10 @@ function FlatBend() {
       <Note x={16} y={24}>
         flat (unbanked) bend, view from above
       </Note>
-      <path d={arcPath(cx, cy, 150, 200, 340)} fill="none" stroke="#cbc6bb" strokeWidth={36} />
-      <path d={arcPath(cx, cy, 150, 200, 340)} fill="none" stroke="#ffffff" strokeWidth={2} strokeDasharray="10 8" />
-      <rect x={214} y={57} width={32} height={18} rx={4} fill="#c8d6e5" stroke={INK} strokeWidth={1.4} />
-      <rect x={236} y={60} width={6} height={12} rx={1} fill="#7f93aa" />
+      <path d={arcPath(cx, cy, 150, 200, 340)} fill="none" stroke="rgb(var(--h-cbc6bb))" strokeWidth={36} />
+      <path d={arcPath(cx, cy, 150, 200, 340)} fill="none" stroke="rgb(var(--h-ffffff))" strokeWidth={2} strokeDasharray="10 8" />
+      <rect x={214} y={57} width={32} height={18} rx={4} fill="rgb(var(--h-c8d6e5))" stroke={INK} strokeWidth={1.4} />
+      <rect x={236} y={60} width={6} height={12} rx={1} fill="rgb(var(--h-7f93aa))" />
       <T x={230} y={44} size={11.5} bold>
         car, 14 m/s
       </T>
@@ -556,8 +556,8 @@ function BankedRoad({ values }: { values: boolean }) {
       <g transform={`rotate(${-angle} 230 148)`}>
         <rect x={206} y={140} width={10} height={8} rx={1.5} fill={INK} />
         <rect x={244} y={140} width={10} height={8} rx={1.5} fill={INK} />
-        <rect x={202} y={114} width={56} height={28} rx={6} fill="#c8d6e5" stroke={INK} strokeWidth={1.4} />
-        <rect x={210} y={119} width={40} height={10} rx={2} fill="#8fa3b8" />
+        <rect x={202} y={114} width={56} height={28} rx={6} fill="rgb(var(--h-c8d6e5))" stroke={INK} strokeWidth={1.4} />
+        <rect x={210} y={119} width={40} height={10} rx={2} fill="rgb(var(--h-8fa3b8))" />
       </g>
       <Arrow x1={200} y1={52} x2={70} y2={52} color={MUTE} width={1.4} />
       <T x={135} y={44} size={11} color={MUTE}>
@@ -592,7 +592,7 @@ function ToyPlane() {
       <T x={243} y={88} size={12} color={MUTE} bold>
         28°
       </T>
-      <ellipse cx={px} cy={py} rx={16} ry={4.5} fill="#d8dee6" stroke={INK} strokeWidth={1.2} />
+      <ellipse cx={px} cy={py} rx={16} ry={4.5} fill="rgb(var(--h-d8dee6))" stroke={INK} strokeWidth={1.2} />
       <ellipse cx={px + 2} cy={py} rx={3.5} ry={11} fill={METAL} stroke={INK} strokeWidth={1} />
       <path d={`M${px - 16},${py - 1} L${px - 20},${py - 8} L${px - 16},${py - 8} L${px - 12},${py - 2} Z`} fill={METAL} stroke={INK} strokeWidth={0.8} />
       <T x={px + 26} y={py + 5} size={11.5} bold anchor="start">
@@ -621,11 +621,11 @@ function ThemeParkCar() {
         20°
       </T>
       <g transform={`rotate(${-angle} 230 137)`}>
-        <circle cx={216} cy={96} r={8} fill="#8e99a8" stroke={INK} strokeWidth={1} />
-        <circle cx={244} cy={96} r={8} fill="#8e99a8" stroke={INK} strokeWidth={1} />
+        <circle cx={216} cy={96} r={8} fill="rgb(var(--h-8e99a8))" stroke={INK} strokeWidth={1} />
+        <circle cx={244} cy={96} r={8} fill="rgb(var(--h-8e99a8))" stroke={INK} strokeWidth={1} />
         <rect x={203} y={129} width={11} height={8} rx={1.5} fill={INK} />
         <rect x={246} y={129} width={11} height={8} rx={1.5} fill={INK} />
-        <rect x={198} y={103} width={64} height={30} rx={6} fill="#cdd8e4" stroke={INK} strokeWidth={1.4} />
+        <rect x={198} y={103} width={64} height={30} rx={6} fill="rgb(var(--h-cdd8e4))" stroke={INK} strokeWidth={1.4} />
       </g>
       <Arrow x1={200} y1={48} x2={60} y2={48} color={MUTE} width={1.4} />
       <T x={130} y={40} size={11} color={MUTE}>
@@ -763,21 +763,21 @@ function ObservationWheel() {
     <Fig w={460} h={275}>
       {spokes.map((a) => {
         const [x, y] = at(cx, cy, R, a);
-        return <line key={`s${a}`} x1={cx} y1={cy} x2={x} y2={y} stroke="#b7bfca" strokeWidth={0.9} />;
+        return <line key={`s${a}`} x1={cx} y1={cy} x2={x} y2={y} stroke="rgb(var(--h-b7bfca))" strokeWidth={0.9} />;
       })}
       <circle cx={cx} cy={cy} r={R} fill="none" stroke={MUTE} strokeWidth={1.6} />
       {spokes
         .filter((a) => a !== main)
         .map((a) => {
           const [x, y] = at(cx, cy, R, a);
-          return <circle key={`c${a}`} cx={x} cy={y} r={6} fill="#eef2f6" stroke={MUTE} strokeWidth={1} />;
+          return <circle key={`c${a}`} cx={x} cy={y} r={6} fill="rgb(var(--h-eef2f6))" stroke={MUTE} strokeWidth={1} />;
         })}
       <circle cx={cx} cy={cy} r={6} fill={MUTE} />
       <T x={r1((cx + kx) / 2 + 10)} y={r1((cy + ky) / 2 + 8)} size={11.5} color={MUTE} bold anchor="start">
         68 m
       </T>
       {/* the capsule stays level; a passenger stands on its floor */}
-      <circle cx={kx} cy={ky} r={20} fill="#eef2f6" stroke={INK} strokeWidth={1.4} />
+      <circle cx={kx} cy={ky} r={20} fill="rgb(var(--h-eef2f6))" stroke={INK} strokeWidth={1.4} />
       <Line x1={kx - 17.9} y1={ky + 9} x2={kx + 17.9} y2={ky + 9} width={1.4} />
       <circle cx={kx} cy={ky - 8.5} r={2.8} fill={INK} />
       <Line x1={kx} y1={ky - 5.5} x2={kx} y2={ky + 2.5} width={1.2} />
@@ -813,7 +813,7 @@ function HammerThrow() {
       <T x={cx - 16} y={cy + 4} size={12} bold anchor="end">
         Jan
       </T>
-      <circle cx={294} cy={cy} r={10} fill="#8d99a6" stroke={INK} strokeWidth={1.4} />
+      <circle cx={294} cy={cy} r={10} fill="rgb(var(--h-8d99a6))" stroke={INK} strokeWidth={1.4} />
       <Arrow x1={294} y1={cy - 12} x2={294} y2={cy - 64} />
       <T x={304} y={cy - 52} size={11.5} color={TEAL} bold anchor="start">
         velocity
@@ -839,7 +839,7 @@ function BallOverhead() {
       </Note>
       <ellipse cx={164} cy={96} rx={136} ry={22} fill="none" stroke={MUTE} strokeWidth={1.2} strokeDasharray="5 4" />
       <Line x1={164} y1={96} x2={292} y2={96} width={1.3} />
-      <circle cx={300} cy={96} r={8} fill="#8d99a6" stroke={INK} strokeWidth={1.4} />
+      <circle cx={300} cy={96} r={8} fill="rgb(var(--h-8d99a6))" stroke={INK} strokeWidth={1.4} />
       <T x={232} y={88} size={11.5} color={MUTE} bold>
         0.75 m
       </T>
@@ -876,7 +876,7 @@ function FieldLines() {
         const [x2, y2] = at(cx, cy, 54, a);
         return <line key={a} x1={x1} y1={y1} x2={x2} y2={y2} stroke={INK} strokeWidth={1.5} markerEnd="url(#cg-ink)" />;
       })}
-      <Body x={cx} y={cy} r={44} fill="#dfe6ee" label="planet" />
+      <Body x={cx} y={cy} r={44} fill="rgb(var(--h-dfe6ee))" label="planet" />
     </Fig>
   );
 }
@@ -897,7 +897,7 @@ function ShuttleOrbit() {
       {/* shuttle and telescope, joined by a cable */}
       <polygon points={`${sx - 9},${sy + 4} ${sx + 7},${sy} ${sx - 9},${sy - 4}`} fill={METAL} stroke={INK} strokeWidth={1} />
       <Line x1={sx + 7} y1={sy} x2={sx + 17} y2={sy - 8} width={1} />
-      <rect x={sx + 15} y={sy - 13} width={12} height={6} rx={1.5} fill="#c9d6e3" stroke={INK} strokeWidth={0.9} />
+      <rect x={sx + 15} y={sy - 13} width={12} height={6} rx={1.5} fill="rgb(var(--h-c9d6e3))" stroke={INK} strokeWidth={0.9} />
       <T x={sx + 20} y={sy - 20} size={11.5} bold anchor="start">
         shuttle + telescope
       </T>
@@ -1038,7 +1038,7 @@ function TwoOrbits() {
 function SunAndEarthOrbits() {
   return (
     <Fig w={460} h={210}>
-      <Line x1={230} y1={14} x2={230} y2={186} color="#d8cfb6" width={1.2} dash="4 4" />
+      <Line x1={230} y1={14} x2={230} y2={186} color="rgb(var(--h-d8cfb6))" width={1.2} dash="4 4" />
       <Dashed cx={115} cy={96} r={80} />
       <Body x={115} y={96} r={36} fill={SUN} label="Sun" />
       <Line x1={151} y1={96} x2={187} y2={96} color={MUTE} width={1.1} />
@@ -1116,7 +1116,7 @@ function SpaceshipPlanet() {
   return (
     <Fig w={460} h={260}>
       <Dashed cx={cx} cy={cy} r={100} color={BRASS} dash="6 5" />
-      <circle cx={cx} cy={cy} r={72} fill="#e8dcc2" stroke={INK} strokeWidth={1.6} />
+      <circle cx={cx} cy={cy} r={72} fill="rgb(var(--h-e8dcc2))" stroke={INK} strokeWidth={1.6} />
       <T x={cx + 8} y={cy - 26} size={12} bold>
         planet
       </T>
@@ -1174,7 +1174,7 @@ function Phobos() {
       <T x={r1((cx + px) / 2 + 10)} y={r1((cy + py) / 2 + 12)} size={12.5} bold>
         r
       </T>
-      <ellipse cx={px} cy={py} rx={8} ry={5.5} fill="#b8a898" stroke={INK} strokeWidth={1.2} />
+      <ellipse cx={px} cy={py} rx={8} ry={5.5} fill="rgb(var(--h-b8a898))" stroke={INK} strokeWidth={1.2} />
       <T x={px + 14} y={py - 8} size={11.5} bold anchor="start">
         Phobos
       </T>
@@ -1199,7 +1199,7 @@ function StarAndPlanet() {
       <T x={cx + 58} y={cy - 7} size={12.5} color={MUTE} bold>
         r
       </T>
-      <circle cx={cx + 96} cy={cy} r={9} fill="#c9d6e3" stroke={INK} strokeWidth={1.4} />
+      <circle cx={cx + 96} cy={cy} r={9} fill="rgb(var(--h-c9d6e3))" stroke={INK} strokeWidth={1.4} />
       <T x={cx + 112} y={cy + 5} size={13} bold anchor="start">
         m
       </T>
@@ -1271,9 +1271,9 @@ function MoonRadius() {
   return (
     <Fig w={460} h={200}>
       <circle cx={230} cy={96} r={64} fill={MOON} stroke={INK} strokeWidth={1.6} />
-      <circle cx={204} cy={70} r={9} fill="#d4d7dc" />
-      <circle cx={252} cy={126} r={7} fill="#d4d7dc" />
-      <circle cx={196} cy={124} r={5} fill="#d4d7dc" />
+      <circle cx={204} cy={70} r={9} fill="rgb(var(--h-d4d7dc))" />
+      <circle cx={252} cy={126} r={7} fill="rgb(var(--h-d4d7dc))" />
+      <circle cx={196} cy={124} r={5} fill="rgb(var(--h-d4d7dc))" />
       <Dim x1={230} y1={96} x2={294} y2={96} label="1.74 × 10⁶ m" lx={302} ly={100} anchor="start" />
       <Dot x={230} y={96} r={2.5} />
       <T x={230} y={186} size={11.5} color={MUTE} bold>
@@ -1420,7 +1420,7 @@ function IssDrop() {
       <T x={cx + 22} y={36} size={11.5} bold anchor="start">
         ISS
       </T>
-      <rect x={cx - 4} y={56} width={8} height={8} fill="#c9a36b" stroke={INK} strokeWidth={1} />
+      <rect x={cx - 4} y={56} width={8} height={8} fill="rgb(var(--h-c9a36b))" stroke={INK} strokeWidth={1} />
       <Arrow x1={cx} y1={68} x2={cx} y2={114} color={MUTE} width={1.4} dash="4 3" />
       <T x={cx - 12} y={64} size={11.5} anchor="end">
         250 kg capsule, released from rest
@@ -1548,14 +1548,14 @@ function ChCarBend({ radius, note }: { radius: string; note: string }) {
       <Note x={16} y={24}>
         flat (unbanked) bend, view from above
       </Note>
-      <circle cx={230} cy={125} r={80} fill="none" stroke="#cbc6bb" strokeWidth={30} />
-      <circle cx={230} cy={125} r={80} fill="none" stroke="#ffffff" strokeWidth={2} strokeDasharray="10 8" />
+      <circle cx={230} cy={125} r={80} fill="none" stroke="rgb(var(--h-cbc6bb))" strokeWidth={30} />
+      <circle cx={230} cy={125} r={80} fill="none" stroke="rgb(var(--h-ffffff))" strokeWidth={2} strokeDasharray="10 8" />
       <Dot x={230} y={125} r={3.5} />
       <Line x1={230} y1={125} x2={310} y2={125} color={MUTE} width={1.2} />
       <T x={268} y={116} size={12} color={MUTE} bold>
         {radius}
       </T>
-      <rect x={298} y={116} width={26} height={18} rx={4} fill="#c8d6e5" stroke={INK} strokeWidth={1.4} />
+      <rect x={298} y={116} width={26} height={18} rx={4} fill="rgb(var(--h-c8d6e5))" stroke={INK} strokeWidth={1.4} />
       <Note x={230} y={226} anchor="middle">
         {note}
       </Note>

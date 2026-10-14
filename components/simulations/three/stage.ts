@@ -6,6 +6,7 @@
  */
 
 import * as THREE from 'three';
+import { darkHex } from '@/lib/theme/darkVariant';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
@@ -53,6 +54,43 @@ export class ThreeStage {
   private elapsed = 0;
   private cameraTween: { from: THREE.Vector3; to: THREE.Vector3; fromT: THREE.Vector3; toT: THREE.Vector3; start: number } | null = null;
   private onResize: Array<(w: number, h: number) => void> = [];
+  private hemi!: THREE.HemisphereLight;
+  private sun!: THREE.DirectionalLight;
+  private dark = false;
+
+  /**
+   * Re-tints the scene for the page theme. WebGL can't read CSS variables, so
+   * materials get the dark counterpart of their light color (lib/theme/darkVariant,
+   * the same transform that writes the CSS variables). Runs every frame, which
+   * also picks up materials the scene creates later; a material whose color the
+   * scene changed itself keeps that new color as its light-mode base.
+   */
+  private applyTheme() {
+    const dark = getComputedStyle(this.container).colorScheme === 'dark';
+    if (dark !== this.dark) {
+      this.dark = dark;
+      this.renderer.setClearColor(dark ? darkHex(PAPER) : PAPER, 1);
+      // Albedos are lighter in dark mode, so give the lights less to multiply.
+      this.hemi.intensity = dark ? 1.1 : 1.6;
+      this.sun.intensity = dark ? 1.2 : 1.8;
+    }
+    this.scene.traverse((o) => {
+      if (o instanceof FatLine) o.setDark(dark);
+      if (o.userData.themeGrid) o.visible = o.userData.themeGrid === (dark ? 'dark' : 'light');
+      const mat = (o as THREE.Mesh).material as THREE.Material | THREE.Material[] | undefined;
+      if (!mat) return;
+      for (const m of Array.isArray(mat) ? mat : [mat]) {
+        const c = (m as THREE.MeshStandardMaterial).color;
+        if (!c || (m as THREE.Material).userData.noTheme || (m as THREE.LineBasicMaterial).vertexColors) continue;
+        const st = (m.userData.theme ??= { base: c.getHex(), applied: c.getHex() }) as { base: number; applied: number };
+        const cur = c.getHex();
+        if (cur !== st.applied) st.base = cur; // the scene recolored it
+        const want = dark ? darkHex(st.base) : st.base;
+        if (cur !== want) c.setHex(want);
+        st.applied = want;
+      }
+    });
+  }
 
   constructor(private container: HTMLElement, opts: StageOptions) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -78,8 +116,10 @@ export class ThreeStage {
     this.controls.maxDistance = opts.maxDistance ?? 25;
     this.controls.addEventListener('start', () => (this.cameraTween = null));
 
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd8cfb6, 1.6));
+    this.hemi = new THREE.HemisphereLight(0xffffff, 0xd8cfb6, 1.6);
+    this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xffffff, 1.8);
+    this.sun = sun;
     sun.position.set(4, 9, 6);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -262,6 +302,7 @@ export class ThreeStage {
         if (t >= 1) this.cameraTween = null;
       }
       for (const cb of this.frames) cb(dt, this.elapsed);
+      this.applyTheme();
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
       this.labels.render(this.scene, this.camera);
@@ -349,6 +390,9 @@ export class Segment extends THREE.Mesh<THREE.CylinderGeometry, THREE.MeshStanda
  */
 export class FatLine extends Line2 {
   readonly capacity: number;
+  private dark = false;
+  private last: { points: ArrayLike<THREE.Vector3>; colors: THREE.Color | ArrayLike<THREE.Color> } | null = null;
+  private static darkCache = new Map<number, THREE.Color>();
 
   constructor(capacity: number, width = 3) {
     const geometry = new LineGeometry();
@@ -365,8 +409,24 @@ export class FatLine extends Line2 {
     this.material.resolution.set(w, h);
   }
 
+  /** Called by ThreeStage when the page theme flips: repaint with the dark counterparts of the light colors. */
+  setDark(dark: boolean) {
+    if (dark === this.dark) return;
+    this.dark = dark;
+    if (this.last) this.setPoints(this.last.points, this.last.colors);
+  }
+
+  private themed(c: THREE.Color) {
+    if (!this.dark) return c;
+    const hex = c.getHex();
+    let d = FatLine.darkCache.get(hex);
+    if (!d) FatLine.darkCache.set(hex, (d = new THREE.Color(darkHex(hex))));
+    return d;
+  }
+
   /** Points and matching colours (one colour for all if a single one is given). */
   setPoints(points: ArrayLike<THREE.Vector3>, colors: THREE.Color | ArrayLike<THREE.Color>) {
+    this.last = { points, colors };
     const n = Math.min(points.length, this.capacity);
     const segments = Math.max(n - 1, 0);
     const pos = this.geometry.getAttribute('instanceStart') as THREE.InterleavedBufferAttribute;
@@ -378,8 +438,8 @@ export class FatLine extends Line2 {
       const a = points[i];
       const b = points[i + 1];
       pa.set([a.x, a.y, a.z, b.x, b.y, b.z], i * 6);
-      const c0 = colorAt(i);
-      const c1 = colorAt(i + 1);
+      const c0 = this.themed(colorAt(i));
+      const c1 = this.themed(colorAt(i + 1));
       ca.set([c0.r, c0.g, c0.b, c1.r, c1.g, c1.b], i * 6);
     }
     pos.data.needsUpdate = true;
@@ -389,7 +449,7 @@ export class FatLine extends Line2 {
 }
 
 /** A label that stays upright and crisp, positioned in 3D. */
-export function makeLabel(html: string, color = '#1b2a41', size = 13): CSS2DObject {
+export function makeLabel(html: string, color = 'rgb(var(--h-1b2a41))', size = 13): CSS2DObject {
   const el = document.createElement('div');
   el.innerHTML = html;
   Object.assign(el.style, {
@@ -400,7 +460,7 @@ export function makeLabel(html: string, color = '#1b2a41', size = 13): CSS2DObje
     fontSize: `${size}px`,
     padding: '1px 5px',
     borderRadius: '4px',
-    background: 'rgba(250, 247, 240, 0.82)',
+    background: 'rgb(var(--h-faf7f0) / 0.82)',
     whiteSpace: 'nowrap',
     userSelect: 'none',
   });
@@ -437,10 +497,16 @@ export function paperFloor(size = 12, y = 0) {
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(size * 2, size * 2), new THREE.ShadowMaterial({ opacity: 0.14 }));
   shadow.rotation.x = -Math.PI / 2;
   shadow.receiveShadow = true;
-  const grid = new THREE.GridHelper(size, size * 4, 0xc9d6e2, 0xdfe7ee);
-  (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.7;
-  group.add(grid, shadow);
+  // Grid colors live in vertex colors, so keep a light and a dark grid and let
+  // ThreeStage.applyTheme() show the right one.
+  const makeGrid = (c1: number, c2: number, which: 'light' | 'dark') => {
+    const grid = new THREE.GridHelper(size, size * 4, c1, c2);
+    (grid.material as THREE.Material).transparent = true;
+    (grid.material as THREE.Material).opacity = 0.7;
+    grid.userData.themeGrid = which;
+    return grid;
+  };
+  group.add(makeGrid(0xc9d6e2, 0xdfe7ee, 'light'), makeGrid(darkHex(0xc9d6e2), darkHex(0xdfe7ee), 'dark'), shadow);
   group.position.y = y;
   return group;
 }

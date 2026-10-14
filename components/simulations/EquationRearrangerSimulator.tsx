@@ -354,27 +354,27 @@ export function EquationRearrangerSimulator() {
 
   return (
     <div className="equation-rearranger flex flex-col gap-5">
-      <div className="rounded-2xl bg-[#101114] text-[#e8e6e1] shadow-[0_24px_60px_-24px_rgba(15,17,20,0.65)] ring-1 ring-black/40 overflow-hidden">
+      <div className="theme-light rounded-2xl bg-h-101114 text-h-e8e6e1 shadow-[0_24px_60px_-24px_rgba(15,17,20,0.65)] ring-1 ring-black/40 overflow-hidden">
         {/* ---- Header: tabs and equation picker ---- */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 pt-4">
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-[11px] tracking-[0.14em] uppercase text-[#8b8f98]">{eq.name}</span>
+            <span className="font-mono text-[11px] tracking-[0.14em] uppercase text-h-8b8f98">{eq.name}</span>
             {eq.tier && (
               <span
-                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${eq.tier === 'Beyond IGCSE' ? 'bg-[#3a2622] text-[#f2a38f]' : 'bg-[#1d3530] text-[#8fdcc5]'}`}
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${eq.tier === 'Beyond IGCSE' ? 'bg-h-3a2622 text-h-f2a38f' : 'bg-h-1d3530 text-h-8fdcc5'}`}
               >
                 {eq.tier}
               </span>
             )}
           </div>
-          <div className="flex bg-[#1a1c21] rounded-full p-0.5 ring-1 ring-white/5" role="tablist" aria-label="Equation set">
+          <div className="flex bg-h-1a1c21 rounded-full p-0.5 ring-1 ring-white/5" role="tablist" aria-label="Equation set">
             {(['basic', 'advanced'] as Tab[]).map((t) => (
               <button
                 key={t}
                 role="tab"
                 aria-selected={tab === t}
                 onClick={() => switchTab(t)}
-                className={`text-[12px] font-semibold px-3.5 py-1 rounded-full transition-colors ${tab === t ? 'bg-[#e8e6e1] text-[#101114]' : 'text-[#a9adb6] hover:text-white'}`}
+                className={`text-[12px] font-semibold px-3.5 py-1 rounded-full transition-colors ${tab === t ? 'bg-h-e8e6e1 text-h-101114' : 'text-h-a9adb6 hover:text-white'}`}
               >
                 {t === 'basic' ? 'Basic' : 'Advanced'}
               </button>
@@ -391,7 +391,7 @@ export function EquationRearrangerSimulator() {
                 onClick={() => switchEquation(i)}
                 title={e.name}
                 className={`shrink-0 h-10 px-3 rounded-lg border transition-colors flex items-center ${
-                  active ? 'bg-[#1f232b] border-[#58C4DD]/70 text-white' : 'bg-[#16181c] border-white/5 text-[#c9ccd2] hover:border-white/20'
+                  active ? 'bg-h-1f232b border-h-58c4dd/70 text-on-ink' : 'bg-h-16181c border-white/5 text-h-c9ccd2 hover:border-white/20'
                 }`}
               >
                 {previews[e.id] ? (
@@ -417,20 +417,20 @@ export function EquationRearrangerSimulator() {
               <div ref={playerRef} className="relative bg-black select-none [&:fullscreen]:flex [&:fullscreen]:flex-col [&:fullscreen]:justify-center" onKeyDown={onPlayerKey}>
                 <div ref={setStageEl} className="relative w-full aspect-video" role="img" aria-label={`${eq.name}: ${renderSideText(settledState(step).left)} = ${renderSideText(settledState(step).right)}`} />
                 {status !== 'ready' && (
-                  <div className="absolute inset-0 flex items-center justify-center text-[13px] text-[#8b8f98]">
+                  <div className="absolute inset-0 flex items-center justify-center text-[13px] text-h-8b8f98">
                     {status === 'loading' ? 'Typesetting…' : 'This lesson needs WebGL, which your browser has turned off.'}
                   </div>
                 )}
                 {hover && hoverVar && !animating && (
                   <div
-                    className="pointer-events-none absolute -translate-x-1/2 -translate-y-full rounded-md bg-[#1b1d22]/95 ring-1 ring-white/10 px-2.5 py-1.5 text-[12px] leading-tight shadow-lg"
+                    className="pointer-events-none absolute -translate-x-1/2 -translate-y-full rounded-md bg-h-1b1d22/95 ring-1 ring-white/10 px-2.5 py-1.5 text-[12px] leading-tight shadow-lg"
                     style={{ left: hover.x, top: hover.y - 10 }}
                   >
                     <span className="font-semibold" style={{ color: varColor(hover.symbol) }}>
                       {hoverVar.name}
                     </span>{' '}
-                    <span className="text-[#8b8f98]">({hoverVar.unit})</span>
-                    <div className="text-[#a9adb6] text-[11px] mt-0.5">{hover.symbol === target && done ? 'already solved for' : 'click to solve for it'}</div>
+                    <span className="text-h-8b8f98">({hoverVar.unit})</span>
+                    <div className="text-h-a9adb6 text-[11px] mt-0.5">{hover.symbol === target && done ? 'already solved for' : 'click to solve for it'}</div>
                   </div>
                 )}
                 {status === 'ready' && target && total > 0 && step === -1 && !animating && !playing && (
@@ -446,7 +446,7 @@ export function EquationRearrangerSimulator() {
                 )}
 
                 {/* Transport */}
-                <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 bg-[#0c0d10] border-t border-white/5">
+                <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 bg-h-0c0d10 border-t border-white/5">
                   <IconButton label="Previous step" onClick={stepPrev} disabled={!target || step < 0}>
                     <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
                   </IconButton>
@@ -468,26 +468,26 @@ export function EquationRearrangerSimulator() {
                         >
                           <span
                             className={`block w-full h-[5px] rounded-full transition-colors ${
-                              i < step || (i === step && !animating) ? 'bg-[#FFFF00]' : i === step ? 'bg-[#FFFF00]/60 animate-pulse' : 'bg-white/15 group-hover:bg-white/30'
+                              i < step || (i === step && !animating) ? 'bg-h-ffff00' : i === step ? 'bg-h-ffff00/60 animate-pulse' : 'bg-white/15 group-hover:bg-white/30'
                             }`}
                           />
                         </button>
                       ))
                     ) : (
-                      <span className="text-[11.5px] text-[#6f737c] truncate">Click a variable in the equation to solve for it</span>
+                      <span className="text-[11.5px] text-h-6f737c truncate">Click a variable in the equation to solve for it</span>
                     )}
                   </div>
-                  <span className="font-mono text-[11px] text-[#8b8f98] tabular-nums whitespace-nowrap hidden sm:inline">
+                  <span className="font-mono text-[11px] text-h-8b8f98 tabular-nums whitespace-nowrap hidden sm:inline">
                     {target && total > 0 ? `${Math.max(step + 1, 0)} / ${total}` : ''}
                   </span>
                   <select
                     value={speed}
                     onChange={(e) => changeSpeed(Number(e.target.value))}
                     aria-label="Playback speed"
-                    className="bg-transparent text-[11.5px] font-mono text-[#c9ccd2] border border-white/10 rounded px-1 py-0.5 focus:outline-none"
+                    className="bg-transparent text-[11.5px] font-mono text-h-c9ccd2 border border-white/10 rounded px-1 py-0.5 focus:outline-none"
                   >
                     {SPEEDS.map((k) => (
-                      <option key={k} value={k} className="bg-[#101114]">
+                      <option key={k} value={k} className="bg-h-101114">
                         {k}×
                       </option>
                     ))}
@@ -501,8 +501,8 @@ export function EquationRearrangerSimulator() {
           </RevealDeck>
 
           {/* Steps panel */}
-          <aside className="border-t lg:border-t-0 lg:border-l border-white/5 bg-[#121317] p-4 flex flex-col gap-3">
-            <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-[#8b8f98]">
+          <aside className="border-t lg:border-t-0 lg:border-l border-white/5 bg-h-121317 p-4 flex flex-col gap-3">
+            <div className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-h-8b8f98">
               {target ? (
                 <>
                   Solving for <span className="normal-case" style={{ color: TARGET_COLOR }}>{target}</span>
@@ -513,7 +513,7 @@ export function EquationRearrangerSimulator() {
             </div>
             {target ? (
               total === 0 ? (
-                <p className="text-[12.5px] text-[#c9ccd2]">{target} is already on its own. Pick another variable.</p>
+                <p className="text-[12.5px] text-h-c9ccd2">{target} is already on its own. Pick another variable.</p>
               ) : (
                 <ol className="space-y-1">
                   {steps.map((label, i) => (
@@ -521,25 +521,25 @@ export function EquationRearrangerSimulator() {
                       <button
                         onClick={() => jumpTo(i)}
                         className={`w-full text-left flex gap-2.5 items-start rounded-md px-2 py-1.5 text-[12.5px] leading-snug transition-colors ${
-                          i === step ? 'bg-white/[0.07] text-white' : i < step ? 'text-[#c9ccd2] hover:bg-white/[0.04]' : 'text-[#7d818a] hover:bg-white/[0.04]'
+                          i === step ? 'bg-white/[0.07] text-white' : i < step ? 'text-h-c9ccd2 hover:bg-white/[0.04]' : 'text-h-7d818a hover:bg-white/[0.04]'
                         }`}
                       >
-                        <span className={`font-mono text-[11px] mt-px ${i <= step ? 'text-[#FFFF00]' : 'text-[#5d6169]'}`}>{String(i + 1).padStart(2, '0')}</span>
+                        <span className={`font-mono text-[11px] mt-px ${i <= step ? 'text-h-ffff00' : 'text-h-5d6169'}`}>{String(i + 1).padStart(2, '0')}</span>
                         <span>{label}</span>
                       </button>
                     </li>
                   ))}
-                  <li className={`px-2 py-1.5 text-[12.5px] ${done ? 'text-[#83C167]' : 'text-[#5d6169]'}`}>{done ? '✓ Solved' : 'Solved'}</li>
+                  <li className={`px-2 py-1.5 text-[12.5px] ${done ? 'text-h-83c167' : 'text-h-5d6169'}`}>{done ? '✓ Solved' : 'Solved'}</li>
                 </ol>
               )
             ) : (
-              <p className="text-[12.5px] leading-relaxed text-[#a9adb6]">
+              <p className="text-[12.5px] leading-relaxed text-h-a9adb6">
                 Click any variable in the equation — or below — and the film works out how to get it on its own, one legal move at a time.
               </p>
             )}
             <div className="mt-auto pt-3 border-t border-white/5 flex flex-wrap gap-1.5">
               {eq.vars.map((v) => (
-                <span key={v.symbol} className="inline-flex items-center rounded-full bg-[#1a1c21] ring-1 ring-white/5 overflow-hidden">
+                <span key={v.symbol} className="inline-flex items-center rounded-full bg-h-1a1c21 ring-1 ring-white/5 overflow-hidden">
                   <button
                     onClick={() => solveFor(v.symbol)}
                     disabled={animating}
@@ -551,11 +551,11 @@ export function EquationRearrangerSimulator() {
                       style={{ color: varColor(v.symbol) }}
                       dangerouslySetInnerHTML={{ __html: symbolSvgs[v.symbol] ?? v.symbol }}
                     />
-                    <span className="text-[#c9ccd2]">{v.name}</span>
+                    <span className="text-h-c9ccd2">{v.name}</span>
                   </button>
                   <button
                     onClick={(e) => openGlossary(v.symbol, e.currentTarget)}
-                    className="px-1.5 py-1 text-[11px] text-[#8b8f98] hover:text-white hover:bg-white/5 border-l border-white/5"
+                    className="px-1.5 py-1 text-[11px] text-h-8b8f98 hover:text-white hover:bg-white/5 border-l border-white/5"
                     aria-label={`What is ${v.name}?`}
                   >
                     ⓘ
@@ -564,7 +564,7 @@ export function EquationRearrangerSimulator() {
               ))}
             </div>
             {target && (
-              <button onClick={reset} className="text-[11.5px] text-[#8b8f98] hover:text-white self-start">
+              <button onClick={reset} className="text-[11.5px] text-h-8b8f98 hover:text-white self-start">
                 ↺ Back to the original equation
               </button>
             )}
@@ -577,82 +577,82 @@ export function EquationRearrangerSimulator() {
 
       {/* ---- Notebook row ---- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">The Golden Rule</span>
-          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">The Golden Rule</span>
+          <div className="mt-2.5 space-y-2.5 text-[12.5px] text-h-4a5a72 leading-snug">
             <p>
-              <strong className="text-[#1b2a41]">Whatever you do to one side, you must do to the other.</strong> Watch the operation appear on
+              <strong className="text-h-1b2a41">Whatever you do to one side, you must do to the other.</strong> Watch the operation appear on
               both sides at once — a real new fraction or a real new term, not a floating label.
             </p>
             <p>
-              The pieces that cancel flash <span className="font-semibold text-[#c0392b]">red</span> and are struck through, with the reason
+              The pieces that cancel flash <span className="font-semibold text-h-c0392b">red</span> and are struck through, with the reason
               written above (m/m = 1). Then everything else slides into the simplified equation.
             </p>
             <p>
-              The variable you are solving for is <span className="font-semibold text-[#b59f00]">yellow</span> throughout; every other variable
+              The variable you are solving for is <span className="font-semibold text-h-b59f00">yellow</span> throughout; every other variable
               keeps its own colour, and constants (G, k, π, ½, ε₀, c) are grey.
             </p>
             <p>
-              <strong className="text-[#1b2a41]">Play</strong> runs the whole derivation like a film; <strong className="text-[#1b2a41]">Next</strong> takes
+              <strong className="text-h-1b2a41">Play</strong> runs the whole derivation like a film; <strong className="text-h-1b2a41">Next</strong> takes
               one step at a time. Space pauses, ← → step, F goes full screen. Click a step to jump straight to it.
             </p>
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">Try This</span>
-          <div className="mt-2 space-y-2.5 text-[12px] text-[#4a5a72] leading-snug">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">Try This</span>
+          <div className="mt-2 space-y-2.5 text-[12px] text-h-4a5a72 leading-snug">
             {tab === 'basic' ? (
               <>
                 <p>
-                  <strong className="text-[#1b2a41]">1.</strong> Click a in F = ma. Both sides are divided by m; the two m&rsquo;s cancel, leaving a on
+                  <strong className="text-h-1b2a41">1.</strong> Click a in F = ma. Both sides are divided by m; the two m&rsquo;s cancel, leaving a on
                   its own.
                 </p>
                 <p>
-                  <strong className="text-[#1b2a41]">2.</strong> Switch to ρ = m/V and click V. V climbs out of the denominator first, then ρ is
+                  <strong className="text-h-1b2a41">2.</strong> Switch to ρ = m/V and click V. V climbs out of the denominator first, then ρ is
                   cleared the same way — two moves, in the right order.
                 </p>
                 <p>
-                  <strong className="text-[#1b2a41]">3.</strong> When a derivation finishes, click a different variable: it carries on from what is on
+                  <strong className="text-h-1b2a41">3.</strong> When a derivation finishes, click a different variable: it carries on from what is on
                   screen.
                 </p>
               </>
             ) : (
               <>
                 <p>
-                  <strong className="text-[#1b2a41]">1.</strong> Click r in F = GMm/r². r² lifts into the numerator, the rest clears away, and it
+                  <strong className="text-h-1b2a41">1.</strong> Click r in F = GMm/r². r² lifts into the numerator, the rest clears away, and it
                   finishes with a real square root of both sides.
                 </p>
                 <p>
-                  <strong className="text-[#1b2a41]">2.</strong> Click L in the pendulum equation T = 2π√(L/g): divide by 2π, square both sides to
+                  <strong className="text-h-1b2a41">2.</strong> Click L in the pendulum equation T = 2π√(L/g): divide by 2π, square both sides to
                   remove the root, then clear g.
                 </p>
                 <p>
-                  <strong className="text-[#1b2a41]">3.</strong> Try V₁/V₂ = N₁/N₂ or p₁V₁ = p₂V₂: cross-multiplying, one legal move at a time.
+                  <strong className="text-h-1b2a41">3.</strong> Try V₁/V₂ = N₁/N₂ or p₁V₁ = p₂V₂: cross-multiplying, one legal move at a time.
                 </p>
               </>
             )}
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
           {target && total >= 0 ? (
             <>
-              <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-3">
-                <div className="italic text-[19px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-3">
+                <div className="italic text-[19px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
                   {target} = {renderSideText(answerSide)}
                 </div>
-                <div className="italic text-[12.5px] text-[#8f6428] mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
+                <div className="italic text-[12.5px] text-h-8f6428 mt-1.5" style={{ fontFamily: 'Georgia, serif' }}>
                   {eq.name}
                 </div>
               </div>
               {done && (
-                <div className="bg-[#faf7f0] border border-[#eee6d3] rounded-lg p-3 mb-1">
-                  <div className="font-mono text-[10.5px] tracking-wide uppercase text-[#4a5a72] mb-2">Verify — plug the answer back in</div>
+                <div className="bg-h-faf7f0 border border-h-eee6d3 rounded-lg p-3 mb-1">
+                  <div className="font-mono text-[10.5px] tracking-wide uppercase text-h-4a5a72 mb-2">Verify — plug the answer back in</div>
                   <div className="flex flex-wrap gap-2.5 mb-2">
                     {otherKeys.map((k) => (
                       <div key={k} className="flex items-center gap-1">
-                        <span className="text-[11.5px] font-mono text-[#4a5a72]">{k}=</span>
+                        <span className="text-[11.5px] font-mono text-h-4a5a72">{k}=</span>
                         <input
                           type="number"
                           value={sampleVals[k]}
@@ -662,11 +662,11 @@ export function EquationRearrangerSimulator() {
                       </div>
                     ))}
                   </div>
-                  <div className="text-[12px] text-[#4a5a72]">
-                    {target} works out to <span className="font-mono font-bold text-[#1b2a41]">{rearrangedVal.toExponential(4)}</span> — original equation:{' '}
+                  <div className="text-[12px] text-h-4a5a72">
+                    {target} works out to <span className="font-mono font-bold text-h-1b2a41">{rearrangedVal.toExponential(4)}</span> — original equation:{' '}
                     <span className="font-mono">{origLeftVal.toExponential(4)}</span> vs <span className="font-mono">{origRightVal.toExponential(4)}</span>
                   </div>
-                  <div className={`mt-1 text-[11.5px] font-semibold ${balances ? 'text-[#2e7d6b]' : 'text-[#b34a3c]'}`}>
+                  <div className={`mt-1 text-[11.5px] font-semibold ${balances ? 'text-h-2e7d6b' : 'text-h-b34a3c'}`}>
                     {balances ? '✓ Balances, for any values you try.' : 'Should balance — try different numbers.'}
                   </div>
                 </div>
@@ -674,24 +674,24 @@ export function EquationRearrangerSimulator() {
             </>
           ) : (
             <div className="text-center py-6">
-              <div className="italic text-[22px] text-[#8f6428] mb-2" style={{ fontFamily: 'Georgia, serif' }}>
+              <div className="italic text-[22px] text-h-8f6428 mb-2" style={{ fontFamily: 'Georgia, serif' }}>
                 {renderSideText(eq.initial.left)} = {renderSideText(eq.initial.right)}
               </div>
-              <p className="text-[12px] text-[#4a5a72]">Click a variable to watch it isolate.</p>
+              <p className="text-[12px] text-h-4a5a72">Click a variable to watch it isolate.</p>
             </div>
           )}
-          <h2 className="font-mono text-[13px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3 mt-3">What Each Variable Means</h2>
+          <h2 className="font-mono text-[13px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3 mt-3">What Each Variable Means</h2>
           <div className="space-y-2">
             {eq.vars.map((v) => (
               <div key={v.symbol} className="flex gap-2.5 items-start">
                 <div
-                  className="flex-shrink-0 w-8 h-8 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center text-[14px] font-bold italic text-[#8f6428]"
+                  className="flex-shrink-0 w-8 h-8 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center text-[14px] font-bold italic text-h-8f6428"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   {v.symbol}
                 </div>
-                <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-                  <strong className="text-[#1b2a41]">{v.name}</strong> ({v.unit})
+                <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+                  <strong className="text-h-1b2a41">{v.name}</strong> ({v.unit})
                 </p>
               </div>
             ))}

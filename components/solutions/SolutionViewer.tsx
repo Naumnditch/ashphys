@@ -66,7 +66,7 @@ export function SolutionViewer({ id, embedded = false }: { id: string; embedded?
     <div>
       {!embedded && (
         <>
-          <Link href="/curriculum" className="text-sm text-[#2e7d6b] hover:underline mb-6 inline-block font-medium">
+          <Link href="/curriculum" className="text-sm text-h-2e7d6b hover:underline mb-6 inline-block font-medium">
             ← Back to curriculum
           </Link>
 
@@ -74,7 +74,7 @@ export function SolutionViewer({ id, embedded = false }: { id: string; embedded?
             <DifficultyBadge difficulty={solution.difficulty} />
             <TierBadge tier={solution.tierRequired} />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-[#1b2a41] mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-h-1b2a41 mb-1" style={{ fontFamily: 'Georgia, serif' }}>
             {solution.problemTitle}
           </h1>
           <p className="text-sm text-gray-400 mb-6">
@@ -94,8 +94,8 @@ export function SolutionViewer({ id, embedded = false }: { id: string; embedded?
           />
           <div className="bg-white border border-gray-200 rounded-xl p-8 text-center max-w-lg mx-auto">
             <div className="text-4xl mb-4">🔒</div>
-            <h2 className="text-xl font-bold text-[#1b2a41] mb-2">{REASON_COPY[access.reason].title}</h2>
-            <p className="text-[#4a5a72] text-sm mb-6">{REASON_COPY[access.reason].body}</p>
+            <h2 className="text-xl font-bold text-h-1b2a41 mb-2">{REASON_COPY[access.reason].title}</h2>
+            <p className="text-h-4a5a72 text-sm mb-6">{REASON_COPY[access.reason].body}</p>
             {access.reason === 'sign_in_required' ? (
               <Link href="/auth/login" className="btn btn-primary">Sign in</Link>
             ) : (

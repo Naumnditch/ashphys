@@ -8,7 +8,7 @@ export default function SolutionPage({ params }: { params: { id: string } }) {
       className="min-h-screen"
       style={{
         background:
-          'linear-gradient(#d8e3ec 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, #d8e3ec 1px, transparent 1px) 0 0/24px 24px, #faf7f0',
+          'linear-gradient(rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, rgb(var(--h-d8e3ec)) 1px, transparent 1px) 0 0/24px 24px, rgb(var(--h-faf7f0))',
       }}
     >
       <div className="max-w-4xl mx-auto px-4 py-8">

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 const G = 9.8;
 const DAMPING = 0.12; // energy loss coefficient (air resistance + pivot friction)
 const TRAIL_SECONDS = 3.5;
@@ -134,7 +136,7 @@ export function PendulumSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -154,7 +156,7 @@ export function PendulumSimulator() {
 
     // faint full-swing guide arc
     const origAmpRad = (amplitude * Math.PI) / 180;
-    ctx.strokeStyle = '#e9e1cd';
+    ctx.strokeStyle = 'rgb(var(--h-e9e1cd))';
     ctx.setLineDash([3, 4]);
     ctx.beginPath();
     ctx.arc(pivotX, pivotY, rodLen, Math.PI / 2 - origAmpRad, Math.PI / 2 + origAmpRad);
@@ -168,7 +170,7 @@ export function PendulumSimulator() {
       if (alpha <= 0.01) continue;
       ctx.beginPath();
       ctx.arc(pivotX, pivotY, rodLen, flash.startAngle, flash.endAngle);
-      ctx.strokeStyle = `rgba(179, 74, 60, ${alpha})`;
+      ctx.strokeStyle = `rgb(var(--h-b34a3c) / ${alpha})`;
       ctx.lineWidth = 4;
       ctx.stroke();
     }
@@ -182,14 +184,14 @@ export function PendulumSimulator() {
       ctx.beginPath();
       ctx.moveTo(trail[i - 1].x, trail[i - 1].y);
       ctx.lineTo(trail[i].x, trail[i].y);
-      ctx.strokeStyle = `rgba(46, 125, 107, ${trailAlpha})`;
+      ctx.strokeStyle = `rgb(var(--h-2e7d6b) / ${trailAlpha})`;
       ctx.lineWidth = 2;
       ctx.stroke();
     }
 
     // --- technical overlay: vertical reference + angle arc ---
     if (s.showTechnical) {
-      ctx.strokeStyle = '#c3ccd6';
+      ctx.strokeStyle = 'rgb(var(--h-c3ccd6))';
       ctx.setLineDash([2, 3]);
       ctx.beginPath();
       ctx.moveTo(pivotX, pivotY);
@@ -200,7 +202,7 @@ export function PendulumSimulator() {
       const arcR = 34;
       const a0 = Math.PI / 2;
       const a1 = Math.PI / 2 - s.angle;
-      ctx.strokeStyle = '#8a94a3';
+      ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
       ctx.lineWidth = 1.4;
       ctx.beginPath();
       ctx.arc(pivotX, pivotY, arcR, Math.min(a0, a1), Math.max(a0, a1));
@@ -211,21 +213,21 @@ export function PendulumSimulator() {
       const lx = pivotX + labelR * Math.cos(mid);
       const ly = pivotY + labelR * Math.sin(mid);
       ctx.font = '600 12px "Courier New", monospace';
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       ctx.textAlign = 'center';
       ctx.fillText(`${Math.abs((s.angle * 180) / Math.PI).toFixed(1)}°`, lx, ly);
       ctx.textAlign = 'left';
     }
 
     // pivot bracket
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.fillRect(pivotX - 30, pivotY - 8, 60, 8);
     ctx.beginPath();
     ctx.arc(pivotX, pivotY, 4, 0, Math.PI * 2);
     ctx.fill();
 
     // string
-    ctx.strokeStyle = '#8a94a3';
+    ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(pivotX, pivotY);
@@ -234,13 +236,13 @@ export function PendulumSimulator() {
 
     // bob
     const grad = ctx.createRadialGradient(bobX - 5, bobY - 5, 2, bobX, bobY, 16);
-    grad.addColorStop(0, '#e0b871');
-    grad.addColorStop(1, '#8f6428');
+    grad.addColorStop(0, 'rgb(var(--h-e0b871))');
+    grad.addColorStop(1, 'rgb(var(--h-8f6428))');
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(bobX, bobY, 15, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = '#6b4a1c';
+    ctx.strokeStyle = 'rgb(var(--h-6b4a1c))';
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -256,13 +258,13 @@ export function PendulumSimulator() {
       const tangentY = -Math.sin(s.angle);
 
       // Weight: straight down
-      drawArrow(ctx, bobX, bobY, bobX, bobY + Math.min(55, weightN * pxPerN), '#2e5a8f', 'W');
+      drawArrow(ctx, bobX, bobY, bobX, bobY + Math.min(55, weightN * pxPerN), 'rgb(var(--h-2e5a8f))', 'W');
 
       // Tension: along string toward pivot
       const dirToPivotX = (pivotX - bobX) / rodLen;
       const dirToPivotY = (pivotY - bobY) / rodLen;
       const tensLen = Math.min(70, tensionN * pxPerN);
-      drawArrow(ctx, bobX, bobY, bobX + dirToPivotX * tensLen, bobY + dirToPivotY * tensLen, '#7a4a8f', 'Tension');
+      drawArrow(ctx, bobX, bobY, bobX + dirToPivotX * tensLen, bobY + dirToPivotY * tensLen, 'rgb(var(--h-7a4a8f))', 'Tension');
 
       // Restoring force: tangential component of weight
       const restLen = Math.min(60, Math.abs(restoringN) * pxPerN);
@@ -273,7 +275,7 @@ export function PendulumSimulator() {
         bobY,
         bobX + tangentX * restLen * restSign,
         bobY + tangentY * restLen * restSign,
-        '#b8467a',
+        'rgb(var(--h-b8467a))',
         'Restoring'
       );
 
@@ -287,7 +289,7 @@ export function PendulumSimulator() {
         bobY,
         bobX + tangentX * vLen * vSign,
         bobY + tangentY * vLen * vSign,
-        '#2e7d6b',
+        'rgb(var(--h-2e7d6b))',
         'v'
       );
 
@@ -296,8 +298,8 @@ export function PendulumSimulator() {
       const boxY = 44;
       const boxW = 168;
       const boxH = 74;
-      ctx.fillStyle = 'rgba(255,255,255,0.88)';
-      ctx.strokeStyle = '#e4ddcc';
+      ctx.fillStyle = 'rgb(var(--h-ffffff) / 0.88)';
+      ctx.strokeStyle = 'rgb(var(--h-e4ddcc))';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.roundRect(boxX, boxY, boxW, boxH, 4);
@@ -305,7 +307,7 @@ export function PendulumSimulator() {
       ctx.stroke();
 
       ctx.font = '600 11px "Courier New", monospace';
-      ctx.fillStyle = '#1b2a41';
+      ctx.fillStyle = 'rgb(var(--h-1b2a41))';
       ctx.textAlign = 'left';
       const lines = [
         `θ = ${Math.abs((s.angle * 180) / Math.PI).toFixed(1)}°`,
@@ -464,19 +466,21 @@ export function PendulumSimulator() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
+      const ctx = themedContext(canvas);
       ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       draw();
     };
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
 
     stateRef.current.angle = (amplitude * Math.PI) / 180;
     stateRef.current.prevRightPeakDeg = amplitude;
     draw();
 
     return () => window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -489,32 +493,32 @@ export function PendulumSimulator() {
   return (
     <div className="pendulum-lab">
       <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-5">
-        <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden">
+        <div className="bg-white border border-h-e4ddcc rounded overflow-hidden">
           <div className="flex justify-between items-baseline px-4 pt-3">
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
               Live Apparatus
             </span>
-            <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+            <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
               θ = {angleDisplay}°
             </span>
           </div>
           <canvas ref={canvasRef} className="block w-full" style={{ height: 340 }} />
 
           <div className="px-4 pb-2 -mt-1">
-            <p className="text-[11.5px] text-[#4a5a72] leading-snug">
-              <span className="text-[#2e7d6b] font-semibold">Teal trail</span> = recent path.{' '}
-              <span className="text-[#b34a3c] font-semibold">Red flash</span> = distance no longer reached.
+            <p className="text-[11.5px] text-h-4a5a72 leading-snug">
+              <span className="text-h-2e7d6b font-semibold">Teal trail</span> = recent path.{' '}
+              <span className="text-h-b34a3c font-semibold">Red flash</span> = distance no longer reached.
               {settled && (
-                <span className="block mt-1 text-[#1b2a41] font-semibold">
+                <span className="block mt-1 text-h-1b2a41 font-semibold">
                   ✓ Settled — the pendulum has come to rest. Elapsed time stopped.
                 </span>
               )}
             </p>
           </div>
 
-          <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+          <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Length (L)</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Length (L)</label>
               <input
                 type="range"
                 min={0.2}
@@ -527,7 +531,7 @@ export function PendulumSimulator() {
               <span className="font-mono text-[13px] w-14 text-right">{length.toFixed(2)} m</span>
             </div>
             <div className="flex items-center gap-3 mb-3">
-              <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Start angle</label>
+              <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Start angle</label>
               <input
                 type="range"
                 min={5}
@@ -544,17 +548,17 @@ export function PendulumSimulator() {
               onClick={handleToggleTechnical}
               className={`w-full mb-3 text-[12.5px] font-semibold px-3 py-2 rounded border ${
                 showTechnical
-                  ? 'bg-[#1b2a41] text-white border-[#1b2a41]'
-                  : 'bg-transparent text-[#1b2a41] border-[#d8cfb6] hover:bg-[#f5f0e2]'
+                  ? 'bg-h-1b2a41 text-on-ink border-h-1b2a41'
+                  : 'bg-transparent text-h-1b2a41 border-h-d8cfb6 hover:bg-h-f5f0e2'
               }`}
             >
               {showTechnical ? '✓ Technical Details Shown' : '⚙ Show Technical Details'}
             </button>
 
             {showTechnical && (
-              <div className="mb-3 bg-[#faf7f0] border border-[#eee6d3] rounded p-3">
+              <div className="mb-3 bg-h-faf7f0 border border-h-eee6d3 rounded p-3">
                 <div className="flex items-center gap-3 mb-2.5">
-                  <label className="text-[13px] text-[#4a5a72] w-28 flex-shrink-0">Bob mass</label>
+                  <label className="text-[13px] text-h-4a5a72 w-28 flex-shrink-0">Bob mass</label>
                   <input
                     type="range"
                     min={0.05}
@@ -566,14 +570,14 @@ export function PendulumSimulator() {
                   />
                   <span className="font-mono text-[13px] w-14 text-right">{mass.toFixed(2)} kg</span>
                 </div>
-                <p className="text-[11px] text-[#4a5a72] leading-snug mb-2.5">
+                <p className="text-[11px] text-h-4a5a72 leading-snug mb-2.5">
                   Notice the period doesn&rsquo;t change with mass — only length and gravity affect it.
                 </p>
                 <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px]">
-                  <LegendDot color="#2e7d6b" label="Velocity" />
-                  <LegendDot color="#2e5a8f" label="Weight" />
-                  <LegendDot color="#7a4a8f" label="Tension" />
-                  <LegendDot color="#b8467a" label="Restoring force" />
+                  <LegendDot color="rgb(var(--h-2e7d6b))" label="Velocity" />
+                  <LegendDot color="rgb(var(--h-2e5a8f))" label="Weight" />
+                  <LegendDot color="rgb(var(--h-7a4a8f))" label="Tension" />
+                  <LegendDot color="rgb(var(--h-b8467a))" label="Restoring force" />
                 </div>
               </div>
             )}
@@ -581,13 +585,13 @@ export function PendulumSimulator() {
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={handlePlayPause}
-                className="bg-[#b8823d] hover:bg-[#8f6428] text-white text-[13.5px] font-semibold px-3.5 py-2 rounded"
+                className="bg-h-b8823d hover:bg-h-8f6428 text-on-ink text-[13.5px] font-semibold px-3.5 py-2 rounded"
               >
                 {settled ? '↻ Release Again' : isRunning ? '⏸ Pause' : '▶ Release'}
               </button>
               <button
                 onClick={resetPendulum}
-                className="bg-transparent border border-[#d8cfb6] hover:bg-[#f5f0e2] text-[#1b2a41] text-[13.5px] font-semibold px-3.5 py-2 rounded"
+                className="bg-transparent border border-h-d8cfb6 hover:bg-h-f5f0e2 text-h-1b2a41 text-[13.5px] font-semibold px-3.5 py-2 rounded"
               >
                 ⟲ Reset
               </button>
@@ -595,65 +599,65 @@ export function PendulumSimulator() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e4ddcc] rounded p-4">
-          <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+        <div className="bg-white border border-h-e4ddcc rounded p-4">
+          <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
             Readouts
           </h2>
           <div className="grid grid-cols-2 gap-2.5 mb-4">
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">
-                Elapsed time {settled && <span className="text-[#b34a3c]">(stopped)</span>}
+            <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+              <div className="text-[11px] text-h-4a5a72 mb-1">
+                Elapsed time {settled && <span className="text-h-b34a3c">(stopped)</span>}
               </div>
               <div className="font-mono text-xl font-bold">{elapsedDisplay} s</div>
             </div>
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Swings completed</div>
+            <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+              <div className="text-[11px] text-h-4a5a72 mb-1">Swings completed</div>
               <div className="font-mono text-xl font-bold">{swingCount}</div>
             </div>
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Theoretical period T</div>
-              <div className="font-mono text-xl font-bold text-[#2e7d6b]">{theory.toFixed(2)} s</div>
+            <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+              <div className="text-[11px] text-h-4a5a72 mb-1">Theoretical period T</div>
+              <div className="font-mono text-xl font-bold text-h-2e7d6b">{theory.toFixed(2)} s</div>
             </div>
-            <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-              <div className="text-[11px] text-[#4a5a72] mb-1">Amplitude now</div>
-              <div className="font-mono text-xl font-bold text-[#b34a3c]">{currentAmplitude}°</div>
+            <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+              <div className="text-[11px] text-h-4a5a72 mb-1">Amplitude now</div>
+              <div className="font-mono text-xl font-bold text-h-b34a3c">{currentAmplitude}°</div>
             </div>
           </div>
 
           {showTechnical && (
             <div className="grid grid-cols-2 gap-2.5 mb-4">
-              <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-                <div className="text-[11px] text-[#4a5a72] mb-1">Theoretical T/2</div>
+              <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+                <div className="text-[11px] text-h-4a5a72 mb-1">Theoretical T/2</div>
                 <div className="font-mono text-lg font-bold">{(theory / 2).toFixed(2)} s</div>
               </div>
-              <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-                <div className="text-[11px] text-[#4a5a72] mb-1">Measured last T/2</div>
+              <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+                <div className="text-[11px] text-h-4a5a72 mb-1">Measured last T/2</div>
                 <div className="font-mono text-lg font-bold">{measuredHalfCycleDisplay} s</div>
               </div>
             </div>
           )}
 
-          <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-3.5 text-center mb-4">
-            <div className="italic text-[22px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+          <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-3.5 text-center mb-4">
+            <div className="italic text-[22px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
               T = 2π √(L / g)
             </div>
           </div>
 
-          <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+          <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
             What Each Variable Means
           </h2>
           <div className="space-y-2.5">
             {variables.map((v) => (
               <div key={v.symbol} className="flex gap-3 items-start">
                 <div
-                  className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                  className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center font-mono text-[16px] font-bold text-h-8f6428"
                   style={{ fontFamily: 'Georgia, serif' }}
                 >
                   {v.symbol}
                 </div>
                 <div>
-                  <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                  <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                  <div className="text-[13px] font-semibold text-h-1b2a41">{v.name}</div>
+                  <div className="text-[12.5px] text-h-4a5a72 leading-snug">{v.def}</div>
                 </div>
               </div>
             ))}
@@ -666,7 +670,7 @@ export function PendulumSimulator() {
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
-    <span className="flex items-center gap-1.5 text-[#4a5a72]">
+    <span className="flex items-center gap-1.5 text-h-4a5a72">
       <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: color }} />
       {label}
     </span>

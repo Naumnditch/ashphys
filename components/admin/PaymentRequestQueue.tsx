@@ -170,7 +170,7 @@ export function PaymentRequestQueue({ plans }: { plans: Plan[] }) {
 
                   <div className="flex gap-2">
                     <button onClick={() => review(r, 'approve')} disabled={busy === r.id}
-                      className="bg-[#2e7d6b] hover:bg-[#256355] text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
+                      className="bg-h-2e7d6b hover:bg-h-256355 text-on-ink text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50">
                       {busy === r.id ? 'Working…' : '✓ Approve & grant access'}
                     </button>
                     <button onClick={() => review(r, 'reject')} disabled={busy === r.id}

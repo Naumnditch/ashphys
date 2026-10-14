@@ -36,7 +36,7 @@ export function UnsubscribeForm({ token, email, initiallySubscribed }: { token: 
             <strong className="text-gray-900">{email}</strong> gets an email whenever the AshPhys team sends you a message.
           </p>
           {changed && <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">You&apos;re subscribed again.</p>}
-          <button type="button" disabled={busy} onClick={() => submit('unsubscribe')} className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50">
+          <button type="button" disabled={busy} onClick={() => submit('unsubscribe')} className="w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-50">
             {busy ? 'Saving…' : 'Unsubscribe from AshPhys emails'}
           </button>
         </>

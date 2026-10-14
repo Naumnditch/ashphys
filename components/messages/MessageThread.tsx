@@ -209,7 +209,7 @@ export function MessageThread({
         <button type="button" onClick={onBack} className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 lg:hidden" aria-label="Back to conversations">
           <MailIcon name="back" className="h-5 w-5" />
         </button>
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gray-900 text-sm font-semibold text-white">{initials(s.firstName, s.lastName, s.email)}</span>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gray-900 text-sm font-semibold text-on-ink">{initials(s.firstName, s.lastName, s.email)}</span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <h2 className="truncate text-base font-semibold text-gray-900">{name}</h2>
@@ -232,7 +232,7 @@ export function MessageThread({
               type="button"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium capitalize ${view === v ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`rounded-md px-2.5 py-1 text-xs font-medium capitalize ${view === v ? 'bg-gray-900 text-on-ink' : 'text-gray-600 hover:bg-gray-100'}`}
             >
               {v}
             </button>
@@ -322,7 +322,7 @@ export function MessageThread({
             type="button"
             onClick={send}
             disabled={sending}
-            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50 max-sm:ml-auto"
+            className="inline-flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-on-ink hover:bg-gray-800 disabled:opacity-50 max-sm:ml-auto"
           >
             <MailIcon name="send" />
             {sending ? 'Sending…' : 'Send'}

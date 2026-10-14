@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { themedContext } from '@/lib/theme/canvas';
+import { THEME_CHANGE_EVENT } from '@/lib/theme/theme';
 interface PathPoint {
   x: number;
   y: number;
@@ -31,7 +33,7 @@ function buildLoopPath(left: number, top: number, right: number, bottom: number)
 }
 
 function drawBattery(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
-  ctx.strokeStyle = '#1b2a41';
+  ctx.strokeStyle = 'rgb(var(--h-1b2a41))';
   ctx.lineWidth = 2.5;
   ctx.beginPath();
   ctx.moveTo(cx - 14, cy);
@@ -50,7 +52,7 @@ function drawBattery(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
   ctx.lineTo(cx + 14, cy);
   ctx.stroke();
   ctx.font = '700 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
-  ctx.fillStyle = '#4a5a72';
+  ctx.fillStyle = 'rgb(var(--h-4a5a72))';
   ctx.textAlign = 'center';
   ctx.fillText('+', cx - 9, cy - 14);
   ctx.fillText('−', cx + 9, cy - 14);
@@ -62,7 +64,7 @@ function drawResistor(ctx: CanvasRenderingContext2D, cx: number, cy: number, hot
   const h = 14;
   const heat = `rgb(${180 + hot * 60}, ${74 + hot * 20}, ${60 - hot * 20})`;
   ctx.strokeStyle = heat;
-  ctx.fillStyle = '#faf7f0';
+  ctx.fillStyle = 'rgb(var(--h-faf7f0))';
   ctx.lineWidth = 2.2;
   ctx.beginPath();
   ctx.moveTo(cx - w / 2 - 12, cy);
@@ -94,7 +96,7 @@ export function OhmsLawSimulator() {
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
+    const ctx = themedContext(canvas);
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
@@ -109,7 +111,7 @@ export function OhmsLawSimulator() {
     const loopBottom = 130;
     pathRef.current = buildLoopPath(loopLeft, loopTop, loopRight, loopBottom);
 
-    ctx.strokeStyle = '#8a94a3';
+    ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
     ctx.lineWidth = 2.2;
     ctx.beginPath();
     ctx.roundRect(loopLeft, loopTop, loopRight - loopLeft, loopBottom - loopTop, 10);
@@ -120,14 +122,14 @@ export function OhmsLawSimulator() {
 
     // ammeter, in series on the right side
     const ammeterY = (loopTop + loopBottom) / 2;
-    ctx.fillStyle = '#faf7f0';
-    ctx.strokeStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
+    ctx.strokeStyle = 'rgb(var(--h-4a5a72))';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(loopRight, ammeterY, 13, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '700 12px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('A', loopRight, ammeterY + 4);
@@ -135,7 +137,7 @@ export function OhmsLawSimulator() {
     // voltmeter, across the resistor
     const vmX = (loopLeft + loopRight) / 2;
     const vmY = loopTop - 26;
-    ctx.strokeStyle = '#8a94a3';
+    ctx.strokeStyle = 'rgb(var(--h-8a94a3))';
     ctx.lineWidth = 1.4;
     ctx.setLineDash([2, 3]);
     ctx.beginPath();
@@ -145,14 +147,14 @@ export function OhmsLawSimulator() {
     ctx.lineTo(vmX + 30, loopTop);
     ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle = '#faf7f0';
-    ctx.strokeStyle = '#7a4a8f';
+    ctx.fillStyle = 'rgb(var(--h-faf7f0))';
+    ctx.strokeStyle = 'rgb(var(--h-7a4a8f))';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(vmX, vmY, 13, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    ctx.fillStyle = '#7a4a8f';
+    ctx.fillStyle = 'rgb(var(--h-7a4a8f))';
     ctx.fillText('V', vmX, vmY + 4);
     ctx.textAlign = 'left';
 
@@ -163,7 +165,7 @@ export function OhmsLawSimulator() {
       for (let i = 0; i < dotCount; i++) {
         const idx = Math.floor((phaseRef.current + (i / dotCount) * path.length) % path.length);
         const p = path[idx];
-        ctx.fillStyle = '#2e7d6b';
+        ctx.fillStyle = 'rgb(var(--h-2e7d6b))';
         ctx.beginPath();
         ctx.arc(p.x, p.y, 2.6, 0, Math.PI * 2);
         ctx.fill();
@@ -184,7 +186,7 @@ export function OhmsLawSimulator() {
     const xForI = (i: number) => graphLeft + (i / MAX_I) * graphW;
     const yForV = (v: number) => graphBottom - (v / MAX_V) * graphH;
 
-    ctx.strokeStyle = '#b8b0a0';
+    ctx.strokeStyle = 'rgb(var(--h-b8b0a0))';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(graphLeft, graphTop);
@@ -193,8 +195,8 @@ export function OhmsLawSimulator() {
     ctx.stroke();
 
     ctx.font = '10px "Courier New", monospace';
-    ctx.fillStyle = '#8a94a3';
-    ctx.strokeStyle = '#eee6d3';
+    ctx.fillStyle = 'rgb(var(--h-8a94a3))';
+    ctx.strokeStyle = 'rgb(var(--h-eee6d3))';
     for (let ii = 0; ii <= MAX_I; ii += 1) {
       const x = xForI(ii);
       ctx.beginPath();
@@ -214,7 +216,7 @@ export function OhmsLawSimulator() {
       ctx.fillText(String(vv), graphLeft - 6, y + 3);
     }
     ctx.textAlign = 'left';
-    ctx.fillStyle = '#4a5a72';
+    ctx.fillStyle = 'rgb(var(--h-4a5a72))';
     ctx.font = '600 10px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
     ctx.fillText('Current (A)', graphRight - 62, graphBottom + 26);
     ctx.save();
@@ -224,7 +226,7 @@ export function OhmsLawSimulator() {
     ctx.restore();
 
     // full characteristic line for the current resistance (through the origin)
-    ctx.strokeStyle = '#c7d6e6';
+    ctx.strokeStyle = 'rgb(var(--h-c7d6e6))';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.moveTo(xForI(0), yForV(0));
@@ -233,14 +235,14 @@ export function OhmsLawSimulator() {
     ctx.stroke();
 
     // live operating point + short trace from origin
-    ctx.strokeStyle = '#2e7d6b';
+    ctx.strokeStyle = 'rgb(var(--h-2e7d6b))';
     ctx.lineWidth = 2.4;
     ctx.beginPath();
     ctx.moveTo(xForI(0), yForV(0));
     ctx.lineTo(xForI(Math.min(current, MAX_I)), yForV(Math.min(voltage, MAX_V)));
     ctx.stroke();
 
-    ctx.fillStyle = '#b8823d';
+    ctx.fillStyle = 'rgb(var(--h-b8823d))';
     ctx.beginPath();
     ctx.arc(xForI(Math.min(current, MAX_I)), yForV(Math.min(voltage, MAX_V)), 4.5, 0, Math.PI * 2);
     ctx.fill();
@@ -260,13 +262,14 @@ export function OhmsLawSimulator() {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width * devicePixelRatio;
       canvas.height = rect.height * devicePixelRatio;
-      const ctx = canvas.getContext('2d');
+      const ctx = themedContext(canvas);
       ctx?.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
       draw();
     };
 
     resize();
     window.addEventListener('resize', resize);
+    window.addEventListener(THEME_CHANGE_EVENT, resize);
 
     runningRef.current = true;
     requestAnimationFrame(animate);
@@ -274,6 +277,7 @@ export function OhmsLawSimulator() {
     return () => {
       runningRef.current = false;
       window.removeEventListener('resize', resize);
+      window.removeEventListener(THEME_CHANGE_EVENT, resize);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -291,20 +295,20 @@ export function OhmsLawSimulator() {
 
   return (
     <div className="ohms-lab">
-      <div className="bg-white border border-[#e4ddcc] rounded overflow-hidden mb-5">
+      <div className="bg-white border border-h-e4ddcc rounded overflow-hidden mb-5">
         <div className="flex justify-between items-baseline px-4 pt-3">
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             Live Circuit & Graph
           </span>
-          <span className="font-mono text-[11px] tracking-wide uppercase text-[#4a5a72]">
+          <span className="font-mono text-[11px] tracking-wide uppercase text-h-4a5a72">
             I = {current.toFixed(2)} A
           </span>
         </div>
         <canvas ref={canvasRef} className="block w-full" style={{ height: 400 }} />
 
-        <div className="px-4 pb-5 pt-3 border-t border-[#eee6d3]">
+        <div className="px-4 pb-5 pt-3 border-t border-h-eee6d3">
           <div className="flex items-center gap-3 mb-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Voltage</label>
+            <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Voltage</label>
             <input
               type="range"
               min={1}
@@ -317,7 +321,7 @@ export function OhmsLawSimulator() {
             <span className="font-mono text-[13px] w-16 text-right">{voltage.toFixed(1)} V</span>
           </div>
           <div className="flex items-center gap-3">
-            <label className="text-[13px] text-[#4a5a72] w-24 flex-shrink-0">Resistance</label>
+            <label className="text-[13px] text-h-4a5a72 w-24 flex-shrink-0">Resistance</label>
             <input
               type="range"
               min={1}
@@ -332,55 +336,55 @@ export function OhmsLawSimulator() {
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4 mb-5">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4 mb-5">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           Readouts
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Voltage V</div>
-            <div className="font-mono text-xl font-bold text-[#7a4a8f]">{voltage.toFixed(1)} V</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Voltage V</div>
+            <div className="font-mono text-xl font-bold text-h-7a4a8f">{voltage.toFixed(1)} V</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Current I</div>
-            <div className="font-mono text-xl font-bold text-[#2e7d6b]">{current.toFixed(2)} A</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Current I</div>
+            <div className="font-mono text-xl font-bold text-h-2e7d6b">{current.toFixed(2)} A</div>
           </div>
-          <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-3 py-2.5">
-            <div className="text-[11px] text-[#4a5a72] mb-1">Resistance R</div>
-            <div className="font-mono text-xl font-bold text-[#b8823d]">{resistance} Ω</div>
+          <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-3 py-2.5">
+            <div className="text-[11px] text-h-4a5a72 mb-1">Resistance R</div>
+            <div className="font-mono text-xl font-bold text-h-b8823d">{resistance} Ω</div>
           </div>
         </div>
-        <div className="bg-[#faf7f0] border border-[#eee6d3] rounded px-4 py-3 text-[12.5px] text-[#4a5a72] leading-relaxed">
+        <div className="bg-h-faf7f0 border border-h-eee6d3 rounded px-4 py-3 text-[12.5px] text-h-4a5a72 leading-relaxed">
           For a fixed resistor, the V-I graph is a straight line through the origin — that&rsquo;s Ohm&rsquo;s
           law. The line&rsquo;s gradient is the resistance: a steeper line means a bigger R.
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-[#fbf5e8] to-[#f6efdc] border border-[#e6d9b8] rounded px-4 py-5 text-center mb-5">
-        <div className="italic text-[26px] text-[#8f6428]" style={{ fontFamily: 'Georgia, serif' }}>
+      <div className="bg-gradient-to-br from-h-fbf5e8 to-h-f6efdc border border-h-e6d9b8 rounded px-4 py-5 text-center mb-5">
+        <div className="italic text-[26px] text-h-8f6428" style={{ fontFamily: 'Georgia, serif' }}>
           V = I R
         </div>
-        <div className="text-[12px] text-[#4a5a72] mt-2">
+        <div className="text-[12px] text-h-4a5a72 mt-2">
           voltage = current × resistance
         </div>
       </div>
 
-      <div className="bg-white border border-[#e4ddcc] rounded p-4">
-        <h2 className="font-mono text-[15px] tracking-wide uppercase text-[#4a5a72] border-b border-[#eee6d3] pb-2 mb-3.5">
+      <div className="bg-white border border-h-e4ddcc rounded p-4">
+        <h2 className="font-mono text-[15px] tracking-wide uppercase text-h-4a5a72 border-b border-h-eee6d3 pb-2 mb-3.5">
           What Each Variable Means
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {variables.map((v) => (
             <div key={v.symbol} className="flex gap-3 items-start">
               <div
-                className="flex-shrink-0 w-9 h-9 rounded bg-[#faf7f0] border border-[#eee6d3] flex items-center justify-center font-mono text-[16px] font-bold text-[#8f6428]"
+                className="flex-shrink-0 w-9 h-9 rounded bg-h-faf7f0 border border-h-eee6d3 flex items-center justify-center font-mono text-[16px] font-bold text-h-8f6428"
                 style={{ fontFamily: 'Georgia, serif' }}
               >
                 {v.symbol}
               </div>
               <div>
-                <div className="text-[13px] font-semibold text-[#1b2a41]">{v.name}</div>
-                <div className="text-[12.5px] text-[#4a5a72] leading-snug">{v.def}</div>
+                <div className="text-[13px] font-semibold text-h-1b2a41">{v.name}</div>
+                <div className="text-[12.5px] text-h-4a5a72 leading-snug">{v.def}</div>
               </div>
             </div>
           ))}
