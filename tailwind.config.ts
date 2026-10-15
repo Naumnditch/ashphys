@@ -28,6 +28,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: '400px',
+      },
       colors: {
         black: v('ink'),
         // `white` stays literal white for text/gradients/overlays; surfaces use
