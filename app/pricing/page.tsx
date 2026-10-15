@@ -39,7 +39,7 @@ export default async function PricingPage() {
             <p className="text-[12.5px] text-h-4a5a72 leading-snug mb-3">
               Included free with Plus and Pro — stuck on a problem, get a personal video walkthrough.
             </p>
-            <Link href="/video-requests" className="text-[12.5px] font-semibold text-h-2e7d6b underline">
+            <Link href="/dashboard?tab=videos" className="text-[12.5px] font-semibold text-h-2e7d6b underline">
               Learn more →
             </Link>
           </div>
@@ -48,7 +48,7 @@ export default async function PricingPage() {
             <p className="text-[12.5px] text-h-4a5a72 leading-snug mb-3">
               Book a private session with a teacher — from ${tryToUsd(999, usdRate)} for Pro members.
             </p>
-            <Link href="/tutoring" className="text-[12.5px] font-semibold text-h-2e7d6b underline">
+            <Link href="/dashboard?tab=tutoring" className="text-[12.5px] font-semibold text-h-2e7d6b underline">
               Book a session →
             </Link>
           </div>

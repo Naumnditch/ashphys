@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-15 (What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-15 (What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,560 @@ Last updated: 2026-10-15 (What's New feed caught up: it had stopped at 24 Sep be
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Video request submission: "Network error" (FIXED 2026-10-14)
+
+**Root cause.** The screenshot upload was not what failed; the request insert
+was. Production is running this branch's code without the 2026-10-14
+migrations (see the admin section below), so `POST /api/video-requests`
+(`createVideoRequest` → `withRlsContext` → `SET LOCAL ROLE ashphys_user`) threw
+`role "ashphys_user" does not exist`. Vercel recorded it 11 times on
+`/api/video-requests`, the last at 22:13 UTC; nothing for `/api/video-requests/upload`.
+The route had no try/catch, so Next answered with an HTML 500. Both forms did
+`await res.json()` on it, which threw, and the form's catch-all printed
+"Network error — please try again". The upload code itself only ever returned
+explicit messages. Storage was healthy: the `video-request-screenshots` bucket
+exists and is private, but had no size or type limit (`file_size_limit` and
+`allowed_mime_types` both null); its last object is from 10 Oct.
+
+What changed:
+- **One submit path for both forms** (`lib/videoRequests/submit.ts`, used by the
+  dashboard's `VideoRequestForm` and the homepage `VideoRequestCta`), in explicit
+  steps: validate (fields, jpg/png/webp) → compress only if over 4 MB (canvas,
+  ≤1600px wide, JPEG 0.8, `lib/videoRequests/screenshot.ts`) → upload → save.
+  Every failure names its step ("Image upload failed: …", "Could not save your
+  request: …", "Image is too large (max 4 MB)") and is logged in full with
+  `console.error('[video request] …')`. Raw storage or server details (keys,
+  paths, SQL) are never shown. A non-JSON response is a readable failure, not a
+  throw. If the upload fails but the request is still valid without the image
+  (the dashboard form, or the homepage form with a question number), the request
+  is saved and the student is told the image was skipped. The forms show errors
+  with `role="alert"`. After success the dashboard form calls `onSubmitted` →
+  `reload()`; the homepage form redirects to `/dashboard?tab=videos&request=sent`.
+- **`POST /api/video-requests/upload`** now takes `{ contentType, size }`, checks
+  type and size, mints the request id and returns `{ ok, requestId, path,
+  signedUrl }`. The path is `{student_id}/{request_id}-{timestamp}.{ext}`, with
+  the folder taken from the session. Bytes still go straight to Storage (Vercel's
+  ~4.5 MB body limit never applies).
+- **`POST /api/video-requests`** returns `{ ok: true, id }` or `{ ok: false, error }`
+  (`success` mirrors `ok` for old callers) and has try/catch around everything.
+  `student_id` comes from the session only (a body `student_id` is ignored). A
+  screenshot path must be one minted for this student (otherwise 400, and it is
+  never deleted), and its request id becomes the row id. If anything fails after
+  the upload (validation, the open-request cap, the insert), the uploaded file is
+  deleted (`lib/storage/deleteObject.ts`, service key, best effort). A double
+  submit returns the same row. `GET` also returns JSON errors.
+- **Student request reads and writes work on either schema.**
+  `lib/videoRequests/student.ts` uses the RLS transaction once migration 03's
+  `video_requests_insert_own` policy exists. Before that it runs the same queries
+  as the owner, always scoped by the session's student id (what production did
+  before 2026-10-14). It only selects `question_number`, `youtube_id` and the
+  opens join when those exist (`lib/db/schemaFeatures.ts` gained
+  `videoRequestRls` and `requestOpens`). The admin PATCH full path now also
+  requires the policies.
+- **Migration `2026-10-14-06-video-request-screenshots-bucket.sql`** (independent
+  of 01–05): ensures the bucket exists, private, `file_size_limit` 4 MB,
+  `allowed_mime_types` jpeg/png/webp. **Not applied to production.**
+
+Tests & checks:
+- `lib/videoRequests/__tests__/submit.test.ts` (15). No screenshot → no upload,
+  saves. Valid screenshot → upload, PUT, save with path and id. Oversized and
+  incompressible → "Image is too large (max 4 MB)" with no request sent.
+  Compression uploads the smaller JPEG. Wrong type. Storage rejection hides raw
+  details. 413 → size message. An optional image is skipped on upload failure; a
+  required one isn't. Non-JSON 500 → "Could not save your request: …" (the
+  original bug). Server reason passed through. Offline. Required fields. Plus the
+  path/size rules.
+- `app/api/video-requests/__tests__/route.test.ts` (7). Saves as the session
+  user even with a body `student_id`; a screenshot path is stored under its
+  minted id; another student's path is refused and not deleted; an insert failure
+  deletes the upload and returns a readable error without "ashphys_user";
+  validation-after-upload cleans up; Free tier and signed-out get JSON; homepage
+  rules.
+- `app/api/video-requests/upload/__tests__/route.test.ts` (5). The path format is
+  in the student's own folder, a client `path` is ignored, oversized and wrong
+  types are rejected, signing failures hide details, and the tier/login gate holds.
+- DB (`npm run test:db`, now 30). `lib/videoRequests/__tests__/studentDb.test.ts`
+  runs the real `createVideoRequest`/`getMyVideoRequests` in both RLS and
+  pre-migration modes: saves without/with a screenshot (path and minted id
+  stored, double submit idempotent), can't take over another student's id, and
+  lists only the student's own rows. RLS refuses an insert for another
+  `student_id` (42501). The dashboard DB test now also checks the bucket migration
+  (it creates a minimal `storage.buckets` when the database isn't Supabase).
+- Full suite 1508 passed, 30 DB tests skipped without `TEST_DATABASE_URL` (30/30
+  pass with it), 1 failed (the same pre-existing live-DNS test). `tsc`, ESLint
+  (16 changed files) and `next build` are clean.
+- Local run as the Plus student, against both the **production-like schema** (no
+  migrations) and the migrated replica, with a local stand-in for the Storage API
+  (there are no Supabase keys in the sandbox; it enforces the same 4 MB /
+  jpg-png-webp limits).
+  - A request without an image and one with a 1170×2532 phone screenshot both
+    saved and appeared under "Your requests" with no reload. The screenshot is at
+    `{student}/{request_id}-{ts}.png` with `request_id` = the row id.
+  - A 14.8 MB phone photo was compressed in Chromium to a 568 KB JPEG and saved.
+  - An incompressible 43 MB image got "Image is too large (max 4 MB)" and nothing
+    was uploaded.
+  - With the open-request cap reached, the uploaded file was deleted and the
+    student saw "Could not save your request: you already have 3 open video
+    requests…".
+  - "Network error" never appeared. One dev-mode run on a freshly started server
+    saw one extra page navigation; it didn't reproduce on rerun and there were no
+    page loads.
+
+Decisions (video request submission, 2026-10-14):
+- **No storage.objects policies.** The brief asks for "authenticated users insert
+  into their own folder", but there is no Supabase Auth here: students never talk
+  to Storage as `authenticated` (`auth.uid()` is null). Own-folder writes are
+  enforced by the server minting a signed upload URL for one exact path in the
+  session's folder, and own-file reads by signed read URLs minted only for the
+  requester's rows. With RLS on and no policies, anon/authenticated can't touch
+  the bucket. Migration 06 adds the size/type limits on the bucket instead.
+- **The student fallback reverses an earlier decision.** "Student RLS paths don't
+  fall back" left production unable to take requests at all. The fallback only
+  applies while migration 03's policies are absent, is exactly the pre-2026-10-14
+  behaviour, and still never takes the student id from the client.
+- **The request id is minted at upload time** so the storage path can carry it
+  (`{student}/{request_id}-{ts}.{ext}`) and the API can prove the file belongs to
+  the request being saved.
+- **The rollback (deleting an orphaned upload) happens on the server.** Students
+  have no delete rights on Storage, and the server holds the service key.
+- **"Save without the image"** only when the request still identifies the question
+  (any dashboard request; homepage requests that have a question number).
+- **Compression only above the limit.** Images ≤ 4 MB upload untouched (PNG
+  screenshots stay sharp).
+- **Old cached pages** that call the upload route with the former `{ path }` body
+  get "Image upload failed: use a JPG, PNG or WebP image" until they reload.
+
+Manual steps:
+1. Apply migrations 01–05 (still the main blocker for everything else on the
+   student side). Request submission no longer depends on them once this commit is
+   deployed.
+2. Apply `2026-10-14-06-video-request-screenshots-bucket.sql` to production
+   (Supabase SQL editor or psql). It is independent and idempotent.
+3. Deploy this commit.
+
+### Admin video requests: stuck on "Loading…" (FIXED 2026-10-14)
+
+**⚠️ Production needs action now.** On 2026-10-14 ~21:50 UTC the branch
+`claude/pensive-turing-v6nkea` (e6e76c7) was promoted to production
+(`dpl_GuziAqfwtXeR7RwbtZsrB8dbdreB`), but migrations
+`database/seeds/2026-10-14-01..05-*.sql` were never applied to the live database
+(checked: 0 RLS policies, no `lesson_videos`, no `video_requests.question_number`,
+no role `ashphys_user`). Besides this page, Vercel runtime errors show the
+student side failing on `role "ashphys_user" does not exist`: dashboard progress
+and request list, `/api/video-requests` (students cannot submit or list requests),
+and lesson-page videos. Fix: apply migrations 01–05 in order (psql loop in the
+sections below), or roll production back to `main` until they are. (A
+`claude/friendly-allen-1mudd4` production deploy two minutes earlier was
+superseded by this one, so its curriculum redesign is not live either.)
+
+**Root cause** (case 2 of the brief: the query throws and the error is
+swallowed, so loading never ends):
+- `GET /api/admin/video-requests` selected `r.question_number` and a
+  `lesson_videos` subquery, both added by migration 01, which production doesn't
+  have. Postgres raised `42703 column r.question_number does not exist` (Vercel
+  runtime errors, 2 occurrences, 21:50–21:51 UTC). The route had no try/catch,
+  so Next answered with a non-JSON 500.
+- `VideoRequestManager`'s loader was `fetch` → `await res.json()` →
+  `setLoading(false)` with no try/catch/finally. `res.json()` threw on the HTML
+  body, the promise rejected unhandled, and `setLoading(false)` never ran, so
+  "Loading…" stayed forever with no error and no list.
+- Ruled out: the admin check (server-side in `app/admin/layout.tsx` and again in
+  the route, never a client flag that stays null); RLS recursion (production has
+  no policies at all; in the migrations the only policy helper,
+  `app_is_admin()`, is SECURITY DEFINER with `search_path = public`, reads only
+  `users`, which has no policies, so nothing calls back); 42501 (the admin read
+  runs as the table owner). There is no `profiles` or `video_solve_requests`
+  table in this project: the tables are `users` and `video_requests`.
+- The admin save (`PATCH`) would also have failed in production, since it runs
+  under the `ashphys_user` role that doesn't exist yet.
+
+What changed:
+- `components/admin/useAdminVideoRequests.ts` (new): `loadAdminVideoRequests()`
+  never throws: network errors, non-JSON bodies and JSON errors become
+  `{kind:'error', message}`, and 401/403 become `{kind:'unauthorized'}`.
+  `useAdminVideoRequests()` uses try/catch/finally with a cancelled flag (unmount
+  or a newer load), and `setLoading(false)` is in `finally`. The fetch
+  implementation is kept in a ref so a changing prop can't restart the load (the
+  first version of this hook looped forever on an inline `fetchImpl`; the tests
+  caught it).
+- `components/admin/VideoRequestManager.tsx`: explicit states. Loading
+  (`role=status`); error (`role=alert`, the server's message, "Try again"); "Not
+  authorized" (`role=alert`, no rows); "No requests yet."; and the list. Each row
+  shows the student's name, email and short ID (`#22222222`, full ID on hover).
+  Saving reloads the list, so the row updates.
+- `app/api/admin/video-requests/route.ts`: works on both schemas via
+  `lib/db/schemaFeatures.ts` (cached 60 s, so applying the migrations takes effect
+  without a redeploy). Explicit columns, `ORDER BY r.created_at DESC` (was "open
+  first"), `studentId` in each row, 401 for no user and 403 for non-admins.
+  Every failure is a JSON `{success:false, error}`, and a failing screenshot link
+  no longer fails the whole list. `PATCH` before the migrations updates
+  status/link/note as the owner (`youtube_id` too once that column exists), and
+  "add to a lesson" returns 409 with an explanation. After the migrations it uses
+  the same RLS transaction as before.
+
+Tests & checks:
+- `components/admin/__tests__/VideoRequestManager.test.tsx` (12, jsdom). The loader
+  maps JSON errors, a non-JSON 500 (the original hang), network failures, and
+  401/403. The hook ends loading on error, a missing user, success and a non-JSON
+  body. The component shows the alert instead of "Loading…", "Not authorized" with
+  no rows, "No requests yet.", and a row with the student name and ID.
+- `app/api/admin/video-requests/__tests__/route.test.ts` (10). Non-admin → 403
+  "Not authorized" with no rows and no query; missing user → 401. The
+  pre-migration SQL doesn't mention `question_number` or `lesson_videos`, isn't
+  `SELECT *`, and orders by `created_at DESC`; the migrated SQL does include the
+  new columns. A query failure returns a JSON error. On PATCH: pre-migration
+  save, `youtube_id` once available, 409 for lesson attach, non-admin, bad link.
+- Full suite: 1481 passed, 20 DB tests skipped without `TEST_DATABASE_URL` (20/20
+  pass with it), 1 failed (the same pre-existing live-DNS messaging test). `tsc`
+  clean, `next build` clean, ESLint clean on the changed files.
+- Local run, twice: against a copy of the **current production schema**
+  (`ashphys_prodlike`, built from the live DDL snapshot) and against the migrated
+  replica. As admin, the list loads with no error; I opened a student's request,
+  set it fulfilled, pasted `https://www.youtube.com/watch?v=dQw4w9WgXcQ&si=…`, added
+  a note and saved. The PATCH returned 200, the row badge changed to fulfilled,
+  and after a reload it was still fulfilled with the link stored as
+  `https://youtu.be/dQw4w9WgXcQ` (plus `youtube_id` on the migrated DB). A student
+  calling the admin API gets 403 "Not authorized" and no rows.
+
+Decisions (admin video requests fix, 2026-10-14):
+- **No RLS change and no migration.** The cause was schema drift plus an
+  unguarded loader, not recursion or a denial. `is_admin()` from the brief was not
+  added: `app_is_admin()` already exists (migration 03) and is
+  non-recursive, and it reads `users.role` because there is no Supabase Auth
+  `app_metadata`.
+- **The admin API degrades instead of requiring the migrations.** The admin is
+  verified server-side, so the pre-migration fallback (owner query, original
+  columns) is safe. Student-facing row-level-security paths deliberately do not
+  fall back, because that would silently skip RLS. They need the migrations.
+- **Order is newest first only** (the old "open first" ordering was dropped, per
+  the brief); the status chips still filter.
+- **Migrations were not run against production by this session.** They
+  create a role and RLS policies on the live database, the documented MCP
+  `execute_sql` hang on any `;` makes the multi-statement files impractical to
+  send that way, and this sandbox has no `DATABASE_URL`. This is the manual step
+  above.
+
+### Student dashboard: two-column tabs (NEW 2026-10-14, not yet deployed)
+
+Replaces the single-column dashboard from the section below. **Needs migration
+`database/seeds/2026-10-14-05-video-request-ids-and-opens.sql`, applied after 01–04**
+(none of 01–05 are in production yet; checked 2026-10-14: 0 policies, no
+`lesson_videos`). Same psql loop as below, now `0{1,2,3,4,5}`.
+
+What changed:
+- **Layout** (`app/dashboard/page.tsx` → `components/dashboard/DashboardTabs.tsx`):
+  the page header (welcome, progress chips, My Devices / Log out) above a
+  two-column card filling the viewport (`h-[calc(100dvh-9.5rem)]`, min 34rem).
+  Left: a 280px vertical tab list. Right: the panel, scrolling on its own. Below
+  `lg` the list becomes one horizontal scrolling tab bar (the selected tab is
+  scrolled into view) and the panel fills the rest. Tab buttons are ≥ 44px; works
+  at 360px (checked).
+- **Tabs, in order**: Messages ✉️, Browse the Curriculum 📖, Join a Class 🏫,
+  Video Solve Requests 🎥, 1-on-1 Tutoring 🧑‍🏫, each with icon, title,
+  description, active state. Badges: unread messages (existing `useUnreadCount`),
+  ready videos (fulfilled, with a video, not opened). Each panel mounts the
+  existing feature component: `StudentInbox`; `LessonCard` (via
+  `CurriculumTab`); `JoinClassForm`; `VideoRequestForm`; the tutoring booking
+  flow (`TutoringPanel` → `TutoringBooking`). Only the active panel is mounted.
+- **Routing/state** (`lib/dashboard/tabs.ts`, pure): `?tab=messages|curriculum|
+  classes|videos|tutoring`. A valid param wins; an invalid one falls back to the
+  default; no param → last tab from localStorage (`ashphys:dashboard-tab`); else
+  `videos` if an unopened ready video exists, otherwise `messages`. Changing tabs
+  uses `history.replaceState` (no history entries; refresh keeps the tab).
+- **Old routes redirect** to the matching tab: `/dashboard/messages` (sent emails
+  link here; the `#m-<id>` fragment survives), `/dashboard/join-class`,
+  `/video-requests` (keeps `?lesson=`), `/tutoring`. In-app links (navbar mail
+  icon, help button, pricing teasers, unsubscribe pages, homepage CTA) now point at
+  `/dashboard?tab=…` directly.
+- **Video Solve Requests tab** (`VideosTab`, `VideoRequestsGrid`): the existing
+  request form (Free tier still gets the same upsell instead), then "Your requests"
+  newest first in a 1/2/3-column grid with All / Ready / In progress / Declined chips
+  (with counts). Cards: chapter + lesson, question (number + text), status badge,
+  date; declined cards show the admin note. Fulfilled cards show
+  `https://i.ytimg.com/vi/{id}/hqdefault.jpg` with a play icon, alt "Video for
+  <lesson>: <question>". Clicking swaps in the player (the form is hidden, not
+  unmounted; panel scrolls to top; focus on "← Back to requests"); the iframe is
+  created only then, `…youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&playsinline=1&autoplay=1`,
+  with the "Open on YouTube" fallback under it and the teacher's note.
+- **`useMyVideoRequests`** (`components/video-requests/useMyVideoRequests.ts`,
+  new — it did not exist before): GET `/api/video-requests`; a 401 inside the
+  loader → `signed-out`; loads on mount, again on window focus / tab visible;
+  `reload()` (called after a successful submit); server-rendered initial data.
+  Lives in the tab shell so the badge and the tab share it.
+- **Opened tracking**: table `video_request_opens (student_id, request_id,
+  youtube_id, opened_at)`, PK (student, request); `POST /api/video-requests/:id/opened`
+  on play. It remembers which video was opened, so if an admin swaps the video
+  the request counts as ready again.
+- **YouTube id on admin save**: new column `video_requests.youtube_id` (CHECK 11
+  chars), written by `PATCH /api/admin/video-requests` from the existing parser;
+  migration 05 backfills it from `youtube_url` (the 3 live rows are youtu.be
+  links). `youtube_url` is kept.
+- **Curriculum tab** (`CurriculumTab`): the student's curriculum (account →
+  cookie → IGCSE, with a switcher that saves the preference like /curriculum does),
+  chapters/units as a list with the student's accuracy; choosing one lists its
+  lessons (existing `LessonCard`) in the panel with "← All chapters". Strengths /
+  "Needs work" (revise + request-a-video links) and the "Start with a lesson" note
+  sit at the top.
+- **Tutoring tab** (`TutoringPanel`, moved from `/tutoring` unchanged plus "Your
+  bookings", `GET /api/tutoring/bookings`, refreshed on focus). "Book & Pay" opens
+  Shopier's payment page in a **new tab** (opened on the click so popup blockers
+  allow it; falls back to the same tab if blocked), so the dashboard stays open and
+  the booking shows up when the student comes back.
+
+Tests & checks (2026-10-14):
+- `lib/dashboard/__tests__/tabs.test.ts` (11): order, valid param, invalid → default
+  (not storage), storage when no param, corrupt storage, ready-video default.
+- `components/dashboard/__tests__/DashboardTabs.test.tsx` (8, jsdom): URL param →
+  active tab + URL/storage, invalid → default, storage, replaceState (no new history
+  entry), tablist/tab/tabpanel ARIA + arrow/Home/End keys, unread badge, ready badge
+  rising after a focus refetch.
+- `components/dashboard/__tests__/VideoRequestsGrid.test.tsx` (5, jsdom): fulfilled →
+  thumbnail with alt and no iframe; click → autoplay nocookie iframe, fallback link
+  only, back; nothing YouTube for unfulfilled; filters + decline note; card fields.
+- DB tests (+3, now 20, `npm run test:db`): another student's requests are invisible
+  even when asked for by id; a student can mark only their own video opened; id
+  CHECK + backfill.
+- New dev deps: `jsdom@25.0.1`, `@testing-library/react@16.1.0`,
+  `@testing-library/dom@10.4.0` (component tests opt in with `// @vitest-environment jsdom`).
+- Full suite: 1459 passed, 20 DB tests skipped without `TEST_DATABASE_URL`, 1 failed
+  = the same pre-existing live-DNS messaging test. `tsc` clean, `next build` clean
+  (font stub, restored), ESLint (`next/core-web-vitals`, ad hoc) clean on all 39
+  changed files.
+- Local walkthrough (Playwright, 37 checks, all pass): default tab = Videos with a
+  ready video; every tab by click, ArrowUp/Home; chapter → lessons → back; refresh,
+  storage and invalid-param fallbacks; the four old routes redirect; submit from
+  the tab appears under In progress; **admin fulfils it while the student's page
+  stays open; on focus the badge goes 1 → 2 and the new thumbnail is under Ready**;
+  click → iframe with autoplay, only the fallback link, teacher note; badge back to
+  1 and still 1 after reload; Book & Pay opens a new tab and the dashboard stays;
+  360px: 44px tabs in one scrolling row, panel inside the width.
+
+Decisions (dashboard tabs, 2026-10-14):
+- **Table/hook names in the brief vs this codebase**: there is no
+  `video_solve_requests` table (it is `video_requests`) and there was no
+  `useMyVideoRequests` hook (created). The brief's "select policy restricts reads to
+  `student_id = auth.uid()`" cannot hold here: there is no Supabase Auth, so
+  `auth.uid()` is always null. The equivalent, confirmed, is migration 03's
+  `video_requests_read`: `USING (student_id = app_current_user_id() OR app_is_admin())`
+  for the `ashphys_user` role, and every student read of requests goes through
+  `withRlsContext`. **No existing RLS policy was changed**; migration 05 only adds
+  policies on the new `video_request_opens` table (own read/insert/update; admin read).
+- **"Opened" in a table, not localStorage**, so the badge is right on every device.
+- **"In progress" chip = open + in_progress** (both still waiting); "Ready" =
+  fulfilled with a video (opened or not; unopened ones carry a "New" tag).
+- **`/curriculum` is NOT redirected**: it is the public, logged-out curriculum page
+  (navbar, search, SEO). Only the dashboard's own "View Curriculum" became a tab.
+- **Where the previous dashboard's progress went**: streak / answered / accuracy /
+  lessons chips in the header; strengths, needs-work and per-chapter accuracy in the
+  Curriculum tab. The per-lesson accuracy table was dropped (per-chapter accuracy is
+  shown when browsing). The SQL functions are unchanged.
+- **Free tier on the Videos tab** sees the same upsell as the old page, plus their
+  own earlier requests (the old page hid them; the previous dashboard showed them).
+- **Tutoring "without leaving the page"**: Shopier's payment page cannot be embedded
+  (it is a full-page form POST to Shopier), so it opens in a new tab and the
+  dashboard stays; `TutoringBooking` gained a `checkoutInNewTab` prop (default off).
+  The known 509 / OSB caveats above still apply to the payment itself.
+- **Moves, not rewrites**: `JoinClassForm` (from the join-class page; `onDone`
+  replaces "Go to Dashboard" when embedded; `autoFocus` dropped so opening the tab
+  doesn't steal focus from the tab list), `TutoringPanel` (from `/tutoring`),
+  `getVideoRequestFormOptions` (from `/video-requests`). `VideoRequestForm` lost its
+  built-in list (now the grid) and gained `onSubmitted`.
+- **Client-safe modules** (found while running it: `LessonCard` pulled `pg` into the
+  browser): tier constants/`tierName` → `lib/subscriptions/tiers.ts` (re-exported
+  from `getUserTier.ts`), request types/`readyVideoCount` →
+  `lib/videoRequests/types.ts`, `formatPercent`/`isNewStudent` → `lib/dashboard/format.ts`.
+- **Help button hidden on `/dashboard`** (both of its links are tabs there).
+- Removed `components/video-requests/VideoRequestList.tsx` (replaced by the grid).
+
+Unfinished / follow-ups (dashboard tabs):
+- Apply migrations 01–05 in order, then deploy (manual).
+- Tiers for existing students are unchanged; Plus/Pro is needed for the request form.
+- The tab height uses a fixed allowance for the navbar and page padding
+  (`100dvh - 9.5rem`); a much taller navbar would need that number adjusted.
+- Thumbnails/videos render black in this sandbox (no YouTube access); real
+  browsers load them.
+- Locally "Book & Pay" reports "Shopier is not configured" (no keys here); the
+  new-tab flow itself was verified.
+- Still pre-existing: navbar can show "Sign In / Sign Up" right after login until a
+  reload; the homepage is ~411px wide at 375px.
+
+### Lesson videos, student dashboard & hero request CTA (NEW 2026-10-14, not yet deployed)
+
+**Migrations are written but NOT applied to the live Supabase project.** Apply them
+(in order) before deploying this code — see "How to apply" below. Without them,
+lesson pages just show no videos and the dashboard shows a "couldn't load" note, but
+submitting a video request (which now runs under row-level security) fails, so the
+migrations are a hard prerequisite for the deploy.
+
+What shipped:
+- **Lesson videos.** Table `lesson_videos` (id, lesson_id → `topics`, youtube_id
+  CHECK `^[A-Za-z0-9_-]{11}$`, title, description, sort_order, is_published,
+  source_request_id → `video_requests`, created_at, updated_at; unique
+  (lesson_id, youtube_id)). `lib/youtube/videoId.ts` → `parseYouTubeId()` /
+  `extractYouTubeId()` accept youtu.be, watch?v=, embed/ (incl. youtube-nocookie),
+  shorts/, live/, /v/, m./music./www., with or without https and `si=`/`t=`/`list=`
+  params; everything else (other hosts, look-alikes, channels, playlists, bare ids,
+  wrong-length ids) is rejected with a readable error. `components/video/YouTubeEmbed.tsx`:
+  `https://www.youtube-nocookie.com/embed/{id}?rel=0&modestbranding=1&playsinline=1`,
+  16:9 (`aspect-video`), `loading="lazy"`, small "Open on YouTube" fallback link.
+  `/lessons/[topicId]` has a **Video lessons** section (published, sort_order);
+  Free tier/visitors see titles + a lock and upgrade link — the ids are never
+  rendered for them. Admin: `/admin/lesson-videos` (sidebar → Content): paste link
+  (validated live, embed preview before saving), lesson picker grouped by chapter,
+  title, description, order, published; list with rename/reorder/publish/remove.
+  API `app/api/admin/lesson-videos/route.ts`.
+- **Fulfilled requests → lessons.** `/admin/video-requests` editor validates the
+  link with the same parser (stored normalised as `https://youtu.be/{id}`), shows a
+  preview, and offers an optional "Also add this video to a lesson" picker (empty by
+  default; a one-click "Use the requested lesson" helper) plus "Publish on the lesson
+  page now" (off by default → draft). Creates or links the `lesson_videos` row
+  (`upsertLessonVideo(..., 'link')`): an existing row for the same lesson+video keeps
+  its title/order and only gains `source_request_id`.
+- **Student dashboard** `/dashboard` (server component now; login required by
+  middleware + page): progress overview (questions attempted, accuracy, lessons
+  visited, study days), current/longest streak, strengths & weaknesses (each weakness
+  links to its weakest lesson and to `/video-requests?lesson=<id>` prefilled), chapter
+  breakdown with per-lesson table (`<details>`), My video requests (newest first,
+  fulfilled ones play inline with the teacher's note), shortcuts. New students get a
+  "Start with a lesson" card instead of zeros. Success banner on `?request=sent`.
+  The stale placeholder tiles ("0 / 25", "Course Coming Soon … August 24, 2026") were removed.
+- **Data/aggregation in SQL**: `get_student_progress(student_id)` and
+  `get_student_streaks(student_id, now, tz)` return plain jsonb; `student_study_days()`
+  is the shared day set. `activity_events` (student_id, type lesson_view|video_view,
+  lesson_id, created_at) is fed by `POST /api/activity` (cookie-derived student,
+  30-min de-dupe per student/type/lesson): lesson page mount, and the first click
+  into an embed (window-blur trick, since iframe clicks are invisible).
+- **Hero CTA** (`components/home/VideoRequestCta.tsx`): "Stuck on a question? Tell
+  us, and we'll record the walkthrough." + subline + button. Opens a dialog
+  (portalled to `<body>`): visitors → log in / sign up; Free → Plus/Pro upgrade
+  prompt; Plus/Pro → form (lesson picker grouped by chapter, loaded from
+  `GET /api/video-requests/lessons` only when opened; question number OR screenshot
+  via the existing signed-upload flow; description ≤ 500 chars) → POST
+  `/api/video-requests` → redirect `/dashboard?request=sent`. On phones the CTA sits
+  directly under the headline (flex `order`), from `sm` up after the main buttons.
+  Verified above the fold at 375×667, 360×740, 390×844.
+- **No YouTube links for students** except the fallback: `GET /api/video-requests`
+  now returns `youtubeId` (fulfilled only), never the URL; `/video-requests` and the
+  dashboard share `components/video-requests/VideoRequestList.tsx` (embeds). Past
+  paper "Video Solution" and course-module videos now play inline when the URL is
+  YouTube (non-YouTube URLs keep their link). Admin pages still show raw links.
+- **Real row-level security** (`lib/db/rls.ts` → `withRlsContext(user, fn)`): see Decisions.
+
+Files: migrations `database/seeds/2026-10-14-0{1..4}-*.sql`; `lib/youtube/`,
+`lib/db/rls.ts`, `lib/videos/`, `lib/videoRequests/student.ts`, `lib/activity/`,
+`lib/dashboard/data.ts`; `components/video/`, `components/home/VideoRequestCta.tsx`,
+`components/admin/LessonVideoManager.tsx`, `components/analytics/ActivityTracker.tsx`,
+`components/video-requests/VideoRequestList.tsx`; `app/admin/lesson-videos/`,
+`app/api/activity/`, `app/api/admin/lesson-videos/`, `app/api/video-requests/lessons/`;
+edited: lesson page, dashboard, homepage, `/video-requests` (+ `?lesson=` prefill and
+a question-number field), admin video requests (API + manager), AdminSidebar,
+PastPaperCard, `courses/[slug]`.
+
+How to apply the migrations (in order; each is idempotent):
+```
+for f in database/seeds/2026-10-14-0{1,2,3,4,5}-*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
+```
+(or paste each file into the Supabase SQL editor / `apply_migration`, in order). Run
+as the same role the app connects as (`postgres`): migration 03 creates the NOLOGIN
+role `ashphys_user` and grants the connecting role `SET` on it. Note the "bare `;`
+hangs the MCP tool" gotcha above — these files contain semicolons, so prefer psql or
+the SQL editor over `execute_sql`. Then deploy.
+
+Tests & verification (2026-10-14):
+- `lib/youtube/__tests__/videoId.test.ts` — 61 tests (all formats, invalid input, URL builders).
+- `lib/dashboard/__tests__/dashboardDb.test.ts` — 17 DB tests, skipped unless
+  `TEST_DATABASE_URL` points at a throwaway Postgres 15+ (`npm run test:db`; loads
+  `database/tests/base-schema.sql` — a trimmed snapshot of the live tables — if the
+  DB is empty, then the migrations): Istanbul-midnight streak boundary (23:30 vs
+  00:30, alive at 23:59 "yesterday", dead at 00:01), current vs longest, the 5-attempt
+  threshold (5 counts, 4 doesn't, <2 qualifying → no labels, never both labels,
+  weakest lesson), and RLS isolation (each student sees only own rows in
+  practice_attempts / question_attempts / activity_events / video_requests; cannot
+  aggregate, insert for, or fulfil others; `users` unreadable; admins see all and
+  write lesson_videos; students/visitors see published videos only and cannot write).
+  Ran green against a local PG16 replica built from the live schema DDL (non-superuser
+  `postgres` owner, like Supabase).
+- Full suite: 1435 passed, 17 DB tests skipped, 1 failed — the pre-existing live-DNS
+  messaging test (`student@gmail.com` MX lookup), which fails in this sandbox without
+  any change. `tsc --noEmit` clean. `next build` clean (font-stub workaround, restored).
+- ESLint: the repo has no ESLint config, and adding `next/core-web-vitals` makes
+  `next build` fail on many pre-existing `react/no-unescaped-entities` errors in the
+  simulations, so no config was committed. All 31 new/changed TS files lint clean
+  (zero warnings) with `next/core-web-vitals` applied ad hoc.
+- Local walkthrough (Next dev + Playwright against the replica, all passed): admin
+  rejects a Vimeo link, previews and attaches a video to 3.7 Circular motion; Plus
+  student sees the nocookie lazy embed and only the fallback link; Free student sees
+  the lock and the video id is absent from the HTML; Free hero CTA → upgrade prompt;
+  Plus hero CTA → form validation → `/dashboard?request=sent`; admin fulfils with a
+  link + note and links it to the lesson as a draft (not shown on the lesson page);
+  dashboard plays it inline with the note. (YouTube itself is unreachable from the
+  sandbox, so the players render black there.)
+
+Decisions (2026-10-14):
+- **"Lesson" = `topics` row**, so `lesson_videos.lesson_id` → `topics(id)` (the
+  `lessons` table is still empty, unused schema).
+- **No new `question_attempts` table.** `practice_attempts` already records every
+  answer (append-only, source of truth since 2026-09-22). A `question_attempts`
+  *view* (`security_invoker`) exposes it in the requested shape (question_id,
+  lesson_id, attempted_at…). Chapter grouping uses the lesson's chapter, falling back
+  to the attempt's.
+- **`activity_events` instead of reusing `analytics_events`**: the latter has
+  anonymous rows, fires lesson_view for every topic *listed* on a chapter page, and is
+  due a 12-month prune.
+- **RLS that actually applies.** The app connects as the owner (bypasses RLS) with its
+  own JWT (no `auth.uid()`), so policies are written for a NOLOGIN role
+  `ashphys_user` and `current_setting('app.user_id')`; `withRlsContext` does
+  `BEGIN; SET LOCAL ROLE ashphys_user; set_config('app.user_id', …, true)` per
+  request. Admin = `users.role` looked up by a SECURITY DEFINER `app_is_admin()`, never
+  a client value. Policies are scoped `TO ashphys_user`, so Supabase's anon /
+  authenticated roles still see nothing. Read-only policies were added on topics,
+  chapters, courses (for joins) and student-own policies on the existing
+  practice_attempts and video_requests (plus admin UPDATE on video_requests). Owner
+  queries elsewhere are unchanged. The RPCs also refuse (42501) to aggregate anyone
+  but the caller unless admin.
+- **Video tier gate = the solve-request gate**: Plus/Pro (`getUserTier() >= TIER_PLUS`)
+  watch; Free and visitors get the lock; admins always see videos. Fulfilled request
+  videos on the dashboard are shown to whoever made the request (they were Plus when
+  they asked).
+- **Strengths/weaknesses**: chapters need ≥ 5 attempts; nothing is labelled until 2
+  chapters qualify; strengths = top min(2, ceil(n/2)), weaknesses = bottom
+  min(2, n − strengths) — exactly top 2 / bottom 2 from n ≥ 4, never both labels on one
+  chapter. Ties: accuracy, then more attempts, then chapter number. A weakness links to
+  its lowest-accuracy lesson.
+- **Streak**: a day counts if it has an attempt, lesson view or video view, in
+  Europe/Istanbul local date; alive if the last such day is today or yesterday.
+  "Lessons visited" = distinct lessons viewed or practised. "Study days" = distinct
+  such days.
+- **Request form**: the homepage form requires a lesson and a question number or a
+  screenshot (`requireQuestion`); the older `/video-requests` form stays optional-field.
+  New nullable column `video_requests.question_number`. Screenshot paths must sit
+  under the student's own folder.
+- **Fulfilment never auto-publishes**: attaching to a lesson is opt-in per save and
+  defaults to a draft.
+- **Migrations live in `database/seeds/` with a date prefix**, like every earlier
+  schema change (there is no separate migrations folder); numbered 01–04 for order.
+- **Not applied to production by this session**: they need to ship together with the
+  code; applying is listed as a manual step.
+- **Hero**: on phones the h1 is `text-3xl` (was 4xl) and the top padding `pt-8` (was
+  16) so the CTA fits above the fold; desktop unchanged apart from the CTA card.
+- **ashphyss (stale mirror) not touched** — per "Live site", Vercel builds `ashphys`.
+
+Unfinished / follow-ups:
+- Apply the four migrations, then deploy (manual).
+- Tiers for existing students are unchanged: video lessons and requests need an active
+  Plus/Pro `subscriptions` row (grant via `/admin/access`). Students without one see
+  the locks.
+- No lesson videos exist yet — attach them at `/admin/lesson-videos`.
+- Streak history starts now: lesson/video views before 2026-10-14 were not logged in
+  `activity_events` (practice attempts do count retroactively). Old `analytics_events`
+  lesson_view rows were deliberately not backfilled (see the coarse-event note above).
+- `video_view` is recorded on the first click into the player, not on actual playback
+  (no YouTube IFrame API).
+- Pre-existing, noticed while testing, not fixed: at 375px the homepage/dashboard
+  document is ~411px wide (navbar "Sign Up" button clipped) — same on the untouched
+  homepage; and after logging in, the navbar can still show "Sign In / Sign Up" until a
+  full reload (login uses `router.push` without `router.refresh()`).
 
 ### Dark mode (NEW 2026-10-14, not yet deployed)
 - Theme = light / dark / system. `data-theme` on `<html>` (set before first paint by the

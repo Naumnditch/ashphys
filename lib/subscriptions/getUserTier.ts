@@ -11,10 +11,11 @@
  */
 
 import { query } from '@/lib/db/client';
+import { TIER_FREE } from '@/lib/subscriptions/tiers';
 
-export const TIER_FREE = 0;
-export const TIER_PLUS = 1;
-export const TIER_PRO = 2;
+// Re-exported so existing imports keep working; the values live in a
+// server-free module that client components can import.
+export { TIER_FREE, TIER_PLUS, TIER_PRO, tierName } from '@/lib/subscriptions/tiers';
 
 /**
  * Returns the tier_level of the user's currently active subscription,
@@ -36,10 +37,4 @@ export async function getUserTier(userId: string | null | undefined): Promise<nu
   );
 
   return result.rows[0]?.tier_level ?? TIER_FREE;
-}
-
-export function tierName(tier: number): string {
-  if (tier >= TIER_PRO) return 'Pro';
-  if (tier >= TIER_PLUS) return 'Plus';
-  return 'Free';
 }

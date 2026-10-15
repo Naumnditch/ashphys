@@ -80,7 +80,7 @@ export async function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
-              <MessagesNavLink href={user.role === 'admin' ? '/admin/messages' : '/dashboard/messages'} />
+              <MessagesNavLink href={user.role === 'admin' ? '/admin/messages' : '/dashboard?tab=messages'} />
               <Link className="btn btn-primary text-sm whitespace-nowrap" href={dashboardHref(user)}>
                 {user.role === 'admin' ? 'Admin' : 'Dashboard'}
               </Link>

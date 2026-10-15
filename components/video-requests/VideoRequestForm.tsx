@@ -1,119 +1,79 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { putFileToSignedUrl } from '@/lib/storage/directUpload';
+import { useState } from 'react';
+import { submitVideoRequest } from '@/lib/videoRequests/submit';
+import { SCREENSHOT_ACCEPT } from '@/lib/videoRequests/screenshot';
 
 interface Chapter { id: string; chapter_number: number; title: string; }
 interface Topic { id: string; chapter_id: string; topic_name: string; }
-interface Req {
-  id: string;
-  description: string;
-  status: 'open' | 'in_progress' | 'fulfilled' | 'declined';
-  youtubeUrl: string | null;
-  adminNote: string | null;
-  createdAt: string;
-  topicName: string | null;
-  chapterNumber: number | null;
-  chapterTitle: string | null;
-  screenshotUrl: string | null;
-}
-
-const STATUS_LABEL: Record<Req['status'], string> = {
-  open: 'Awaiting a teacher',
-  in_progress: 'Being recorded',
-  fulfilled: 'Video ready',
-  declined: 'Declined',
-};
-
-const STATUS_STYLE: Record<Req['status'], string> = {
-  open: 'bg-amber-50 text-amber-700',
-  in_progress: 'bg-blue-50 text-blue-700',
-  fulfilled: 'bg-green-50 text-green-700',
-  declined: 'bg-gray-100 text-gray-500',
-};
-
-export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; topics: Topic[] }) {
-  const [chapterId, setChapterId] = useState('');
-  const [topicId, setTopicId] = useState('');
+export function VideoRequestForm({
+  chapters,
+  topics,
+  initialTopicId,
+  onSubmitted,
+}: {
+  chapters: Chapter[];
+  topics: Topic[];
+  initialTopicId?: string;
+  /** Called after a successful submit (the dashboard reloads "Your requests"). */
+  onSubmitted?: () => void;
+}) {
+  // ?lesson=<id> (from a dashboard weakness) pre-selects that lesson.
+  const initialTopic = topics.find((t) => t.id === initialTopicId);
+  const [chapterId, setChapterId] = useState(initialTopic?.chapter_id ?? '');
+  const [topicId, setTopicId] = useState(initialTopic?.id ?? '');
+  const [questionNumber, setQuestionNumber] = useState('');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const [requests, setRequests] = useState<Req[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const topicsForChapter = topics.filter((t) => t.chapter_id === chapterId);
 
-  const loadRequests = async () => {
-    const res = await fetch('/api/video-requests');
-    const data = await res.json();
-    if (data.success) setRequests(data.requests);
-    setLoading(false);
-  };
-  useEffect(() => { loadRequests(); }, []);
-
   const submit = async () => {
-    if (!description.trim()) {
-      setError('Describe the problem you need help with');
-      return;
-    }
     setSubmitting(true);
     setError(null);
     setMsg(null);
     try {
-      let screenshotPath: string | undefined;
-      if (file) {
-        setUploading(true);
-        const signRes = await fetch('/api/video-requests/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ path: file.name }),
-        });
-        const signData = await signRes.json();
-        if (!signRes.ok || !signData.success) {
-          setError(signData.error || 'Could not start upload');
-          setSubmitting(false);
-          setUploading(false);
-          return;
-        }
-        const put = await putFileToSignedUrl(signData.signedUrl, file);
-        setUploading(false);
-        if (!put.ok) {
-          setError(put.error);
-          setSubmitting(false);
-          return;
-        }
-        screenshotPath = signData.path;
-      }
-
-      const res = await fetch('/api/video-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description, chapterId: chapterId || undefined, topicId: topicId || undefined, screenshotPath }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Could not submit request');
-        setSubmitting(false);
+      const result = await submitVideoRequest(
+        {
+          description,
+          lessonId: topicId || null,
+          chapterId: chapterId || null,
+          questionNumber,
+          file,
+        },
+        { onStep: (step) => setUploading(step === 'uploading' || step === 'compressing') }
+      );
+      if (!result.ok) {
+        setError(result.error);
         return;
       }
-      setMsg('Request submitted — a teacher will record a video for you soon.');
+      setMsg(
+        result.imageSkipped
+          ? `Request saved without the image (${result.imageSkipped}). Describe the question in words if it matters.`
+          : 'Request submitted — a teacher will record a video for you soon.'
+      );
       setDescription('');
+      setQuestionNumber('');
       setFile(null);
       setChapterId('');
       setTopicId('');
-      await loadRequests();
-    } catch {
-      setError('Network error — please try again');
+      onSubmitted?.();
+    } catch (err) {
+      // submitVideoRequest reports every expected failure itself; this is a bug guard.
+      console.error('[video request] unexpected failure', err);
+      setError('Could not save your request: something unexpected went wrong. Please try again.');
     } finally {
+      setUploading(false);
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div>
       <div className="bg-white border border-gray-200 rounded-xl p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           <div>
@@ -141,6 +101,17 @@ export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; to
           </div>
         </div>
         <div className="mb-3">
+          <label htmlFor="vr-question" className="block text-xs font-medium text-gray-500 mb-1">Question number (optional)</label>
+          <input
+            id="vr-question"
+            value={questionNumber}
+            onChange={(e) => setQuestionNumber(e.target.value)}
+            maxLength={40}
+            placeholder="e.g. Q7b"
+            className="w-full sm:w-48 border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="mb-3">
           <label className="block text-xs font-medium text-gray-500 mb-1">What are you stuck on?</label>
           <textarea
             value={description}
@@ -157,7 +128,7 @@ export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; to
               Choose image
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={SCREENSHOT_ACCEPT}
                 className="hidden"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               />
@@ -165,8 +136,8 @@ export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; to
             <span className="text-xs text-gray-400">{file ? file.name : 'no file chosen'}</span>
           </div>
         </div>
-        {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-        {msg && <p className="text-sm text-green-700 mb-3">{msg}</p>}
+        {error && <p role="alert" className="text-sm text-red-600 mb-3">{error}</p>}
+        {msg && <p role="status" className="text-sm text-green-700 mb-3">{msg}</p>}
         <button
           onClick={submit}
           disabled={submitting}
@@ -174,44 +145,6 @@ export function VideoRequestForm({ chapters, topics }: { chapters: Chapter[]; to
         >
           {uploading ? 'Uploading screenshot…' : submitting ? 'Submitting…' : 'Submit request'}
         </button>
-      </div>
-
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Your requests</h2>
-        {loading ? (
-          <p className="text-sm text-gray-400">Loading…</p>
-        ) : requests.length === 0 ? (
-          <p className="text-sm text-gray-400">No requests yet.</p>
-        ) : (
-          <div className="bg-white border border-gray-200 rounded-xl divide-y divide-gray-100">
-            {requests.map((r) => (
-              <div key={r.id} className="px-5 py-4">
-                <div className="flex items-center justify-between gap-3 flex-wrap mb-1.5">
-                  <span className="text-[13px] text-gray-900">
-                    {r.chapterTitle ? `Ch. ${r.chapterNumber} — ${r.chapterTitle}` : 'General'}
-                    {r.topicName ? ` · ${r.topicName}` : ''}
-                  </span>
-                  <span className={`text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${STATUS_STYLE[r.status]}`}>
-                    {STATUS_LABEL[r.status]}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-700 mb-1.5">{r.description}</p>
-                {r.screenshotUrl && (
-                  <a href={r.screenshotUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline">
-                    View screenshot
-                  </a>
-                )}
-                {r.status === 'fulfilled' && r.youtubeUrl && (
-                  <a href={r.youtubeUrl} target="_blank" rel="noopener noreferrer" className="block mt-2 text-sm font-semibold text-red-600 underline">
-                    ▶ Watch your video
-                  </a>
-                )}
-                {r.adminNote && <p className="text-xs text-gray-400 mt-1.5">Note: {r.adminNote}</p>}
-                <p className="text-[11px] text-gray-400 mt-1.5">{new Date(r.createdAt).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

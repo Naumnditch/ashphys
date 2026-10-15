@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/session';
-import { getUserTier, tierName } from '@/lib/subscriptions/getUserTier';
+import { getUserTier, tierName, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 import {
   CURRICULA,
   chapterLabel,
@@ -16,6 +16,9 @@ import {
 import { getLesson, resolveCurriculum } from '@/lib/curricula/queries';
 import { SimulationIcon } from '@/components/icons/SimulationIcon';
 import { ChapterViewTracker } from '@/components/analytics/ChapterViewTracker';
+import { ActivityTracker } from '@/components/analytics/ActivityTracker';
+import { YouTubeEmbed } from '@/components/video/YouTubeEmbed';
+import { getPublishedLessonVideos, type LessonVideo } from '@/lib/videos/lessonVideos';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,10 +62,17 @@ export default async function LessonPage({
   const alsoIn = (lesson.curriculum_ids ?? []).filter((c): c is CurriculumId => c !== curriculumId && c in CURRICULA);
   const locked = user?.role !== 'admin' && tier < lesson.required_tier;
   const practiceHref = (c: CurriculumId) => `/practice/${lesson.id}?c=${c}`;
+  // Same gate as video solve requests: Plus and Pro watch, Free sees a lock.
+  const canWatchVideos = user?.role === 'admin' || tier >= TIER_PLUS;
+  const videos: LessonVideo[] = await getPublishedLessonVideos(user, lesson.id).catch((err) => {
+    console.error('Failed to load lesson videos', err);
+    return [];
+  });
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <ChapterViewTracker topicIds={[lesson.id]} />
+      {user && <ActivityTracker type="lesson_view" lessonId={lesson.id} />}
       <Link href={`/curriculum?c=${curriculumId}`} className="text-sm text-blue-600 hover:underline mb-6 inline-block">
         ← {curriculum.displayName} curriculum
       </Link>
@@ -122,6 +132,48 @@ export default async function LessonPage({
           </p>
         )}
       </header>
+
+      <section className="mb-8" aria-labelledby="video-lessons">
+        <h2 id="video-lessons" className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3 border-b pb-2">
+          Video lessons
+        </h2>
+        {videos.length === 0 ? (
+          <p className="text-sm text-gray-500">There are no video lessons for this lesson yet.</p>
+        ) : canWatchVideos ? (
+          <ol className="space-y-6">
+            {videos.map((v) => (
+              <li key={v.id}>
+                <h3 className="font-semibold text-gray-900 mb-1">{v.title}</h3>
+                {v.description && <p className="text-sm text-gray-600 mb-2">{v.description}</p>}
+                <YouTubeEmbed youtubeId={v.youtubeId} title={v.title} trackView={user ? { lessonId: lesson.id } : undefined} />
+              </li>
+            ))}
+          </ol>
+        ) : (
+          // Locked: titles only. The video ids are never rendered, so they
+          // never reach a Free-tier browser.
+          <div className="border border-amber-200 bg-amber-50 rounded-lg px-4 py-4">
+            <p className="text-sm text-amber-900 font-semibold mb-2">
+              🔒 {videos.length} video lesson{videos.length === 1 ? '' : 's'} for this lesson — Plus &amp; Pro
+            </p>
+            <ul className="text-sm text-amber-900/80 list-disc list-inside mb-3 space-y-0.5">
+              {videos.map((v) => (
+                <li key={v.id}>{v.title}</li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/pricing" className="text-sm font-semibold text-on-ink bg-gray-900 hover:bg-black px-4 py-2 rounded-full">
+                See Plus &amp; Pro plans
+              </Link>
+              {!user && (
+                <Link href="/auth/login" className="text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-white px-4 py-2 rounded-full">
+                  Log in
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </section>
 
       <section className="mb-8">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3 border-b pb-2">

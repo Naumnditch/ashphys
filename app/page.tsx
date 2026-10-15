@@ -8,6 +8,9 @@ import { HeroVideo } from '@/components/home/HeroVideo';
 import { AnnouncementsFeed } from '@/components/announcements/AnnouncementsFeed';
 import { AnnouncementTicker } from '@/components/announcements/AnnouncementTicker';
 import { SAMPLE_ANNOUNCEMENTS } from '@/lib/announcements/sampleAnnouncements';
+import { VideoRequestCta, type RequestViewer } from '@/components/home/VideoRequestCta';
+import { getCurrentUser } from '@/lib/auth/session';
+import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,8 +105,14 @@ const SIM_SHOWCASE = [
   { title: 'Spring Lab', tagline: "Hooke's law, pushed past its limit", href: '/simulations/spring' },
 ];
 
+async function getRequestViewer(): Promise<RequestViewer> {
+  const user = await getCurrentUser();
+  if (!user) return 'guest';
+  return (await getUserTier(user.id)) >= TIER_PLUS ? 'member' : 'free';
+}
+
 export default async function HomePage() {
-  const [stats, plans] = await Promise.all([getStats(), getPlans()]);
+  const [stats, plans, requestViewer] = await Promise.all([getStats(), getPlans(), getRequestViewer()]);
 
   return (
     <div>
@@ -121,26 +130,29 @@ export default async function HomePage() {
         <PhysicsBackground />
         <FloatingFormulas />
 
-        <div className="relative text-center max-w-3xl mx-auto px-4 pt-16 pb-14">
-          <div className="flex justify-center mb-4 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
+        {/* On phones the video-request CTA moves up to sit under the headline
+            (flex order), so it is visible without scrolling; from sm up it
+            follows the main buttons. */}
+        <div className="relative flex flex-col text-center max-w-3xl mx-auto px-4 pt-8 sm:pt-16 pb-14">
+          <div className="order-1 sm:order-none flex justify-center mb-4 animate-fade-in-up" style={{ animationDelay: '0ms' }}>
             <AnnouncementTicker announcements={SAMPLE_ANNOUNCEMENTS} now={Date.now()} />
           </div>
           <div
-            className="inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-600 mb-6 animate-fade-in-up"
+            className="order-1 sm:order-none self-center inline-flex items-center gap-2 bg-gray-100 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-600 mb-4 sm:mb-6 animate-fade-in-up"
             style={{ animationDelay: '0ms' }}
           >
             IGCSE · AS & A Level · IB — all under one roof
           </div>
 
           <h1
-            className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5 animate-fade-in-up"
+            className="order-1 sm:order-none text-3xl sm:text-5xl font-bold tracking-tight text-gray-900 mb-5 animate-fade-in-up"
             style={{ animationDelay: '80ms' }}
           >
             One Website. Every Physics<br className="hidden sm:block" /> Lesson You&rsquo;ll Ever Need.
           </h1>
 
           <p
-            className="text-lg text-gray-600 leading-relaxed max-w-xl mx-auto mb-8 animate-fade-in-up"
+            className="order-3 sm:order-none text-lg text-gray-600 leading-relaxed max-w-xl mx-auto mb-8 animate-fade-in-up"
             style={{ animationDelay: '160ms' }}
           >
             Full curriculum coverage, real interactive simulations, and practice that adapts to
@@ -148,7 +160,7 @@ export default async function HomePage() {
           </p>
 
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in-up"
+            className="order-3 sm:order-none flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-in-up"
             style={{ animationDelay: '240ms' }}
           >
             <Link
@@ -165,11 +177,14 @@ export default async function HomePage() {
             </Link>
           </div>
           <p
-            className="text-xs text-gray-400 mt-4 animate-fade-in-up"
+            className="order-3 sm:order-none text-xs text-gray-400 mt-4 animate-fade-in-up"
             style={{ animationDelay: '300ms' }}
           >
             Free forever for the core curriculum. No credit card needed.
           </p>
+          <div id="request-video" className="order-2 sm:order-none mb-6 sm:mb-0 sm:mt-8 animate-fade-in-up scroll-mt-24" style={{ animationDelay: '120ms' }}>
+            <VideoRequestCta viewer={requestViewer} />
+          </div>
         </div>
 
         <div id="film" className="relative max-w-5xl mx-auto px-4 pb-16 animate-fade-in-up scroll-mt-24" style={{ animationDelay: '360ms' }}>

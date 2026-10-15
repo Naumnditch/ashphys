@@ -11,6 +11,8 @@ const HIDDEN_PREFIXES = [
   '/auth',
   '/video-requests',
   '/tutoring',
+  // The dashboard has both services as tabs.
+  '/dashboard',
   '/book',
   '/success',
   '/unsubscribe',
@@ -60,7 +62,7 @@ export function HelpCta({ hasVideoAccess }: { hasVideoAccess: boolean }) {
           className="absolute bottom-full right-0 mb-2 w-[min(18rem,calc(100vw-2rem))] rounded-xl border border-gray-200 bg-white p-1.5 shadow-lg"
         >
           <Link
-            href="/video-requests"
+            href="/dashboard?tab=videos"
             className="block rounded-lg px-3 py-2.5 hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:outline-none"
           >
             <span className="block text-[12px] text-gray-500">Didn&apos;t understand yet?</span>
@@ -73,7 +75,7 @@ export function HelpCta({ hasVideoAccess }: { hasVideoAccess: boolean }) {
             )}
           </Link>
           <Link
-            href="/tutoring"
+            href="/dashboard?tab=tutoring"
             className="block rounded-lg px-3 py-2.5 hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:outline-none"
           >
             <span className="block text-[12px] text-gray-500">Need a human hand?</span>

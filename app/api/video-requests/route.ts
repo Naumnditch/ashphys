@@ -1,10 +1,17 @@
 /**
  * GET  /api/video-requests — the current student's own requests
  * POST /api/video-requests — submit a new video solve request
+ *      → { ok: true, id } | { ok: false, error } (`success` mirrors `ok`)
  *
  * Server-side tier enforcement (Part 1): this is the actual gate, not the
- * /video-requests page's UI — a Plus/Pro-only feature must reject a free
- * user's request even if they reach this endpoint directly.
+ * form — a Plus/Pro-only feature must reject a free user's request even if
+ * they reach this endpoint directly.
+ *
+ * student_id always comes from the session. A screenshot must be the one
+ * POST /api/video-requests/upload minted for this student; its request id
+ * becomes the row's id. If the row can't be saved, the uploaded file is
+ * deleted so nothing is orphaned. Every failure is JSON with a readable
+ * `error` (internal details are logged, not returned).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,84 +19,115 @@ import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 import { getMaxOpenVideoRequests } from '@/lib/settings';
 import { query } from '@/lib/db/client';
-import { signedFileUrl } from '@/lib/storage/signed';
+import { deleteStorageObject } from '@/lib/storage/deleteObject';
+import { SCREENSHOT_BUCKET, createVideoRequest, getMyVideoRequests } from '@/lib/videoRequests/student';
+import { requestIdFromScreenshotPath } from '@/lib/videoRequests/screenshot';
 
 const OPEN_STATUSES = ['open', 'in_progress'];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_DESCRIPTION = 2000;
+const MAX_QUESTION_NUMBER = 40;
+
+const optionalUuid = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
+const fail = (status: number, error: string) => NextResponse.json({ ok: false, success: false, error }, { status });
 
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ success: false, error: 'Not authorized' }, { status: 401 });
+  if (!user) return fail(401, 'Not authorized');
+  try {
+    const requests = await getMyVideoRequests(user);
+    return NextResponse.json({ ok: true, success: true, requests });
+  } catch (err) {
+    console.error('GET /api/video-requests failed', err);
+    return fail(500, 'Could not load your requests right now. Please try again.');
   }
-
-  const result = await query(
-    `SELECT r.id, r.description, r.screenshot_path, r.status, r.youtube_url, r.admin_note, r.created_at,
-            t.topic_name, c.chapter_number, c.title AS chapter_title
-     FROM video_requests r
-     LEFT JOIN topics t ON t.id = r.topic_id
-     LEFT JOIN chapters c ON c.id = r.chapter_id
-     WHERE r.student_id = $1
-     ORDER BY r.created_at DESC`,
-    [user.id]
-  );
-
-  const requests = await Promise.all(
-    result.rows.map(async (r) => ({
-      id: r.id,
-      description: r.description,
-      status: r.status,
-      youtubeUrl: r.youtube_url,
-      adminNote: r.admin_note,
-      createdAt: r.created_at,
-      topicName: r.topic_name,
-      chapterNumber: r.chapter_number,
-      chapterTitle: r.chapter_title,
-      screenshotUrl: r.screenshot_path ? await signedFileUrl('video-request-screenshots', r.screenshot_path) : null,
-    }))
-  );
-
-  return NextResponse.json({ success: true, requests });
 }
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ success: false, error: 'Not authorized' }, { status: 401 });
-  }
+  if (!user) return fail(401, 'you are signed out. Log in again and retry.');
 
-  const tier = await getUserTier(user.id);
-  if (tier < TIER_PLUS) {
-    return NextResponse.json({ success: false, error: 'Video solve requests are available on Plus and Pro plans.' }, { status: 403 });
-  }
+  let screenshotPath: string | null = null;
+  try {
+    const tier = await getUserTier(user.id);
+    if (tier < TIER_PLUS) return fail(403, 'video solve requests are available on Plus and Pro plans.');
 
-  const { description, topicId, chapterId, screenshotPath } = (await req.json()) as {
-    description?: string;
-    topicId?: string;
-    chapterId?: string;
-    screenshotPath?: string;
-  };
-  if (!description || !description.trim()) {
-    return NextResponse.json({ success: false, error: 'A description of the problem is required' }, { status: 400 });
-  }
+    const body = (await req.json().catch(() => ({}))) as {
+      description?: unknown;
+      topicId?: unknown;
+      lessonId?: unknown;
+      chapterId?: unknown;
+      questionNumber?: unknown;
+      screenshotPath?: unknown;
+      requestId?: unknown;
+      requireQuestion?: unknown;
+    };
+    // Note: any student_id in the body is ignored; the row belongs to the session's user.
 
-  const maxOpen = await getMaxOpenVideoRequests();
-  const openCount = await query(
-    `SELECT COUNT(*)::int AS n FROM video_requests WHERE student_id = $1 AND status = ANY($2::text[])`,
-    [user.id, OPEN_STATUSES]
-  );
-  if (openCount.rows[0].n >= maxOpen) {
-    return NextResponse.json(
-      { success: false, error: `You already have ${maxOpen} open video requests. Wait for one to be answered before submitting another.` },
-      { status: 429 }
+    if (typeof body.screenshotPath === 'string' && body.screenshotPath) screenshotPath = body.screenshotPath;
+    let requestId: string | null = null;
+    if (screenshotPath) {
+      requestId = requestIdFromScreenshotPath(screenshotPath, user.id);
+      if (!requestId) {
+        screenshotPath = null; // never delete a path we didn't mint for this student
+        return fail(400, 'the screenshot upload is invalid. Choose the image again.');
+      }
+      const claimed = optionalUuid(body.requestId);
+      if (claimed && claimed.toLowerCase() !== requestId) {
+        screenshotPath = null;
+        return fail(400, 'the screenshot upload is invalid. Choose the image again.');
+      }
+    }
+
+    const description = typeof body.description === 'string' ? body.description.trim() : '';
+    if (!description) return await rejectAndClean(400, 'describe the problem you need help with.', screenshotPath);
+    if (description.length > MAX_DESCRIPTION) {
+      return await rejectAndClean(400, `keep the description under ${MAX_DESCRIPTION} characters.`, screenshotPath);
+    }
+    const questionNumber = typeof body.questionNumber === 'string' && body.questionNumber.trim() ? body.questionNumber.trim() : null;
+    if (questionNumber && questionNumber.length > MAX_QUESTION_NUMBER) {
+      return await rejectAndClean(400, 'the question number is too long.', screenshotPath);
+    }
+    const topicId = optionalUuid(body.lessonId) ?? optionalUuid(body.topicId);
+    // The homepage form asks for a lesson and for a question number or a screenshot.
+    if (body.requireQuestion === true) {
+      if (!topicId) return await rejectAndClean(400, 'choose the lesson you are stuck on.', screenshotPath);
+      if (!questionNumber && !screenshotPath) return fail(400, 'add the question number or a screenshot of the question.');
+    }
+
+    const maxOpen = await getMaxOpenVideoRequests();
+    const openCount = await query(
+      `SELECT COUNT(*)::int AS n FROM video_requests WHERE student_id = $1 AND status = ANY($2::text[])`,
+      [user.id, OPEN_STATUSES]
     );
+    if (openCount.rows[0].n >= maxOpen) {
+      return await rejectAndClean(
+        429,
+        `you already have ${maxOpen} open video requests. Wait for one to be answered before sending another.`,
+        screenshotPath
+      );
+    }
+
+    const id = await createVideoRequest(user, {
+      id: requestId,
+      description,
+      topicId,
+      chapterId: optionalUuid(body.chapterId),
+      questionNumber,
+      screenshotPath,
+    });
+    return NextResponse.json({ ok: true, success: true, id });
+  } catch (err) {
+    console.error('POST /api/video-requests failed', err);
+    return await rejectAndClean(500, 'the server could not store it right now. Please try again in a minute.', screenshotPath);
   }
+}
 
-  const inserted = await query(
-    `INSERT INTO video_requests (student_id, chapter_id, topic_id, description, screenshot_path)
-     VALUES ($1, $2, $3, $4, $5)
-     RETURNING id`,
-    [user.id, chapterId || null, topicId || null, description.trim(), screenshotPath || null]
-  );
-
-  return NextResponse.json({ success: true, id: inserted.rows[0].id });
+/** Fails the request and removes its already-uploaded screenshot (best effort). */
+async function rejectAndClean(status: number, error: string, screenshotPath: string | null) {
+  if (screenshotPath) {
+    const removed = await deleteStorageObject(SCREENSHOT_BUCKET, screenshotPath);
+    if (!removed) console.error('POST /api/video-requests: could not remove orphaned screenshot');
+  }
+  return fail(status, error);
 }

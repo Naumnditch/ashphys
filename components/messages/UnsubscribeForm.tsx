@@ -44,7 +44,7 @@ export function UnsubscribeForm({ token, email, initiallySubscribed }: { token: 
         <>
           <p className="rounded-lg bg-gray-50 px-3 py-2 text-sm">
             <strong className="text-gray-900">{email}</strong> is unsubscribed. We won&apos;t email you messages any more; they&apos;ll still be waiting in your{' '}
-            <a href="/dashboard/messages" className="text-blue-700 underline">
+            <a href="/dashboard?tab=messages" className="text-blue-700 underline">
               AshPhys inbox
             </a>
             .

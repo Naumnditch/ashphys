@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { trackEvent } from '@/lib/analytics/client';
+import { parseYouTubeId } from '@/lib/youtube/videoId';
+import { YouTubeEmbed } from '@/components/video/YouTubeEmbed';
 
 export interface PaperCardData {
   id: string;
@@ -36,9 +38,13 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
   const [score, setScore] = useState(paper.my_score ?? '');
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [showVideo, setShowVideo] = useState(false);
 
   const code = `${paper.syllabus_code}/${paper.paper_number}${paper.variant}`;
   const hasVideo = paper.explanation_status === 'published' && paper.explanation_video_url;
+  // YouTube explanations play on-site; any other host keeps its plain link.
+  const parsedVideo = hasVideo ? parseYouTubeId(paper.explanation_video_url) : null;
+  const youtubeId = parsedVideo?.ok ? parsedVideo.id : null;
 
   const save = async (value: string) => {
     if (!signedIn) return;
@@ -141,7 +147,19 @@ export function PastPaperCard({ paper, signedIn }: { paper: PaperCardData; signe
           </span>
         )}
 
-        {hasVideo ? (
+        {youtubeId ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowVideo((v) => !v)}
+              aria-expanded={showVideo}
+              className="w-full flex items-center justify-center gap-2 text-[13.5px] font-semibold px-3 py-2.5 rounded-lg bg-h-1b2a41 text-on-ink hover:bg-h-243a5e"
+            >
+              <PlayIcon /> {showVideo ? 'Hide video solution' : 'Video Solution'}
+            </button>
+            {showVideo && <YouTubeEmbed youtubeId={youtubeId} title={`Paper ${paper.paper_number} video solution`} />}
+          </>
+        ) : hasVideo ? (
           <a
             href={paper.explanation_video_url!}
             target="_blank"
