@@ -100,6 +100,7 @@ export default async function LessonPage({
         {found && topicCode !== 'Maths' && found.section.title !== title && (
           <p className="text-gray-600 mt-2">Syllabus section: {found.section.title}</p>
         )}
+        {lesson.description && <p className="mt-4 text-gray-700">{lesson.description}</p>}
         {lesson.syllabus_reference && (
           <p className="mt-4 text-gray-700 bg-gray-50 border-l-[3px] border-h-667eea px-4 py-2 rounded-r">
             {lesson.syllabus_reference}

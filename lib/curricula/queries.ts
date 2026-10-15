@@ -7,10 +7,11 @@ import { cookies } from 'next/headers';
 import { query } from '@/lib/db/client';
 import { CURRICULUM_COOKIE, DEFAULT_CURRICULUM, isCurriculumId, tryParseCurriculum, type CurriculumId } from './index';
 import type { LessonRow } from './lessons';
+import type { LessonProgress } from './courseLayout';
 
 const LESSON_COLUMNS = `
   t.id, t.topic_name, t."order", t.required_tier, t.curriculum_ids,
-  t.topic_code, t.as_topic_code, t.a_level_topic_code, t.ib_topic_code, t.syllabus_reference,
+  t.topic_code, t.as_topic_code, t.a_level_topic_code, t.ib_topic_code, t.syllabus_reference, t.description,
   c.id AS chapter_id, c.chapter_number, c.title AS chapter_title, co.code AS course_code`;
 
 /**
@@ -34,6 +35,31 @@ export async function getLessonsByCurriculum(curriculumId: CurriculumId): Promis
     [curriculumId]
   );
   return result.rows as LessonRow[];
+}
+
+/**
+ * A student's practice record on each of these lessons that they have one
+ * for (`topic_mastery`). Lessons never practised are absent. Mastery is per
+ * lesson, not per curriculum bank.
+ */
+export async function getLessonProgress(
+  studentId: string,
+  topicIds: string[],
+  masteryStreak: number
+): Promise<Record<string, LessonProgress>> {
+  if (topicIds.length === 0) return {};
+  const result = await query(
+    `SELECT topic_id, mastered, best_streak FROM topic_mastery WHERE student_id = $1 AND topic_id = ANY($2::uuid[])`,
+    [studentId, topicIds]
+  );
+  const progress: Record<string, LessonProgress> = {};
+  for (const row of result.rows as { topic_id: string; mastered: boolean; best_streak: number }[]) {
+    progress[row.topic_id] = {
+      mastered: Boolean(row.mastered),
+      fraction: row.mastered ? 1 : Math.min(1, Math.max(0, Number(row.best_streak) || 0) / masteryStreak),
+    };
+  }
+  return progress;
 }
 
 export interface LessonDetail extends LessonRow {
