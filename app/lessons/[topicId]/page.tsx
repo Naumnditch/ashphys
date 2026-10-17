@@ -19,6 +19,7 @@ import { ChapterViewTracker } from '@/components/analytics/ChapterViewTracker';
 import { ActivityTracker } from '@/components/analytics/ActivityTracker';
 import { YouTubeEmbed } from '@/components/video/YouTubeEmbed';
 import { getPublishedLessonVideos, type LessonVideo } from '@/lib/videos/lessonVideos';
+import { cheatSheetFor, cheatSheetHref, syllabusReference } from '@/lib/cheatsheets';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,6 +63,7 @@ export default async function LessonPage({
   const alsoIn = (lesson.curriculum_ids ?? []).filter((c): c is CurriculumId => c !== curriculumId && c in CURRICULA);
   const locked = user?.role !== 'admin' && tier < lesson.required_tier;
   const practiceHref = (c: CurriculumId) => `/practice/${lesson.id}?c=${c}`;
+  const sheet = cheatSheetFor(lesson.id, curriculumId);
   // Same gate as video solve requests: Plus and Pro watch, Free sees a lock.
   const canWatchVideos = user?.role === 'admin' || tier >= TIER_PLUS;
   const videos: LessonVideo[] = await getPublishedLessonVideos(user, lesson.id).catch((err) => {
@@ -133,6 +135,28 @@ export default async function LessonPage({
           </p>
         )}
       </header>
+
+      <section className="mb-8" aria-labelledby="cheat-sheet">
+        <h2 id="cheat-sheet" className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3 border-b pb-2">
+          Revision cheat sheet
+        </h2>
+        {sheet ? (
+          <Link
+            href={cheatSheetHref(sheet)}
+            className="flex flex-wrap items-center justify-between gap-3 border border-gray-200 rounded-lg px-4 py-3 bg-white hover:border-blue-400 hover:shadow-sm"
+          >
+            <span className="min-w-0">
+              <span className="block font-medium text-gray-900">{sheet.title}: printable summary</span>
+              <span className="block text-xs text-gray-500 font-mono">
+                {syllabusReference(sheet)} · definitions, equations, diagrams, worked example, quick recall
+              </span>
+            </span>
+            <span className="text-sm font-semibold text-blue-600 whitespace-nowrap">Open sheet →</span>
+          </Link>
+        ) : (
+          <p className="text-sm text-gray-500">There&rsquo;s no {curriculum.shortName} cheat sheet for this lesson yet.</p>
+        )}
+      </section>
 
       <section className="mb-8" aria-labelledby="video-lessons">
         <h2 id="video-lessons" className="text-sm font-semibold uppercase tracking-wide text-gray-500 mb-3 border-b pb-2">

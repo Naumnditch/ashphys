@@ -47,6 +47,8 @@ interface ChapterCardProps {
   progress?: Record<string, LessonProgress>;
   masteryStreak: number;
   viewerId?: string | null;
+  /** Lesson ids with a cheat sheet in this curriculum. */
+  cheatSheetLessonIds?: string[];
 }
 
 /**
@@ -54,7 +56,15 @@ interface ChapterCardProps {
  * optional chapter mastery, and its lessons in two balanced columns from
  * 900px up (one column below).
  */
-export function ChapterCard({ group, curriculumId, tier, progress, masteryStreak, viewerId }: ChapterCardProps) {
+export function ChapterCard({
+  group,
+  curriculumId,
+  tier,
+  progress,
+  masteryStreak,
+  viewerId,
+  cheatSheetLessonIds,
+}: ChapterCardProps) {
   const [open, setOpen] = useState(true);
   const panelId = useId();
   const headingId = useId();
@@ -94,6 +104,7 @@ export function ChapterCard({ group, curriculumId, tier, progress, masteryStreak
             tier={tier}
             progress={progress?.[lesson.id]}
             masteryStreak={masteryStreak}
+            hasCheatSheet={cheatSheetLessonIds?.includes(lesson.id)}
           />
         ))}
       </ul>

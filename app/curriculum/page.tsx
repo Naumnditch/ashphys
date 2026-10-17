@@ -7,6 +7,8 @@ import { CurriculumSelector } from '@/components/curriculum/CurriculumSelector';
 import { ChapterCard } from '@/components/curriculum/ChapterCard';
 import type { LessonProgress } from '@/lib/curricula/courseLayout';
 import { MASTERY_STREAK } from '@/lib/practice/attempts';
+import { cheatSheetsFor } from '@/lib/cheatsheets';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +55,7 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
   const summary = summarize(groups);
   const progress = await loadProgress(user?.id, groups);
   const effectiveTier = user?.role === 'admin' ? Number.MAX_SAFE_INTEGER : tier;
+  const sheetLessonIds = cheatSheetsFor(curriculumId).map((s) => s.topicId);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -73,6 +76,13 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
           <p className="text-xs text-gray-500 mt-2">
             {summary.lessons} lessons · {summary.withSimulations} with simulations · {summary.questions}{' '}
             {curriculum.shortName} practice questions across {summary.withQuestions} lessons
+          </p>
+        )}
+        {sheetLessonIds.length > 0 && (
+          <p className="text-sm mt-2">
+            <Link href={`/cheat-sheets?c=${curriculumId}`} className="text-blue-600 hover:underline">
+              {sheetLessonIds.length} printable revision cheat sheet{sheetLessonIds.length === 1 ? '' : 's'} →
+            </Link>
           </p>
         )}
       </div>
@@ -102,6 +112,7 @@ export default async function CurriculumPage({ searchParams }: { searchParams: {
             progress={progress && progressFor(group, progress)}
             masteryStreak={MASTERY_STREAK}
             viewerId={user?.id}
+            cheatSheetLessonIds={sheetLessonIds.filter((id) => group.lessons.some((l) => l.id === id))}
           />
         ))}
       </div>

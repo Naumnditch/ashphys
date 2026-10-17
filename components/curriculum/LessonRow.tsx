@@ -3,7 +3,7 @@ import type { CurriculumId } from '@/lib/curricula';
 import type { CurriculumLesson } from '@/lib/curricula/lessons';
 import { lessonKind, lessonNumber, type LessonProgress } from '@/lib/curricula/courseLayout';
 import { tierName } from '@/lib/subscriptions/tiers';
-import { LessonTypeIcon, LockIcon, MasteredCheck, ProgressRing } from './LessonIcons';
+import { CheatSheetIcon, LessonTypeIcon, LockIcon, MasteredCheck, ProgressRing } from './LessonIcons';
 
 /** The lesson page, through one curriculum. The route every curriculum row has always linked to. */
 export function lessonHref(lessonId: string, curriculumId: CurriculumId) {
@@ -17,6 +17,8 @@ interface LessonRowProps {
   tier: number;
   progress?: LessonProgress;
   masteryStreak: number;
+  /** This curriculum has a revision cheat sheet for the lesson (shown as an icon; the row stays one link). */
+  hasCheatSheet?: boolean;
 }
 
 /**
@@ -24,7 +26,7 @@ interface LessonRowProps {
  * meta on the right. The whole row is the link to the lesson page, where the
  * practice bank, the simulations and the syllabus reference live.
  */
-export function LessonRow({ lesson, curriculumId, tier, progress, masteryStreak }: LessonRowProps) {
+export function LessonRow({ lesson, curriculumId, tier, progress, masteryStreak, hasCheatSheet }: LessonRowProps) {
   const kind = lessonKind(lesson);
   const { number, title } = lessonNumber(lesson, curriculumId);
   const locked = tier < lesson.requiredTier;
@@ -52,6 +54,7 @@ export function LessonRow({ lesson, curriculumId, tier, progress, masteryStreak 
             <LockIcon label={`Locked: requires ${tierName(lesson.requiredTier)}`} />
           ) : (
             <>
+              {hasCheatSheet && <CheatSheetIcon />}
               {lesson.questionCount > 0 && (
                 <span>
                   {lesson.questionCount} question{lesson.questionCount === 1 ? '' : 's'}

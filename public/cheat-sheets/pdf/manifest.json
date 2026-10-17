@@ -1,0 +1,19 @@
+{
+  "igcse-circular-motion": {
+    "hash": "4bb91d37630ffe678c7c1405faaa5bb372fcc8acf2879ba8d399352ca71d3a50",
+    "files": {
+      "a4": {
+        "file": "igcse-circular-motion-a4.pdf",
+        "pages": 2,
+        "sheets": 2,
+        "bytes": 242160
+      },
+      "letter": {
+        "file": "igcse-circular-motion-letter.pdf",
+        "pages": 2,
+        "sheets": 2,
+        "bytes": 242657
+      }
+    }
+  }
+}

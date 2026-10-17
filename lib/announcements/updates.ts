@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheet-circular-motion',
+    category: 'lesson',
+    type: 'new',
+    title: 'Printable revision cheat sheets',
+    description: 'The first one is IGCSE Circular motion: definitions, equations, hand-drawn diagrams, a worked example and quick recall, with A4 and Letter PDFs.',
+    date: '2026-10-17',
+    href: '/cheat-sheets/igcse-circular-motion',
+    published: true,
+  },
+  {
     id: 'dark-mode',
     category: 'platform',
     type: 'new',

@@ -57,6 +57,18 @@ export function LessonTypeIcon({ kind, className = 'w-5 h-5' }: { kind: LessonKi
   );
 }
 
+/** Marks a lesson that has a printable revision cheat sheet in this curriculum. */
+export function CheatSheetIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <span role="img" aria-label="Revision cheat sheet available" title="Revision cheat sheet available" className="inline-flex">
+      <svg {...SVG_PROPS} className={className}>
+        <path d="M6 3h9l3 3v15H6z" />
+        <path d="M9 9h6M9 13h6M9 17h3" />
+      </svg>
+    </span>
+  );
+}
+
 export function LockIcon({ label, className = 'w-4 h-4' }: { label: string; className?: string }) {
   return (
     <span role="img" aria-label={label} title={label} className="inline-flex flex-shrink-0">
