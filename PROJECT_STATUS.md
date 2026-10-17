@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-17 (revision cheat sheets: pilot sheet IGCSE 3.7 Circular motion at `/cheat-sheets/igcse-circular-motion`, data-driven template, prebuilt A4/Letter PDFs — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -25,92 +25,79 @@ Last updated: 2026-10-17 (revision cheat sheets: pilot sheet IGCSE 3.7 Circular 
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
 
-### Revision cheat sheets (NEW 2026-10-17, pilot: IGCSE Circular motion)
+### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion)
 
 **What it is.** A printable revision sheet per lesson *per curriculum* (simulations
-are shared; sheets, like question banks, are curriculum-specific). Each sheet has:
-header (title, curriculum, syllabus reference e.g. `0625 Ch.3`, chapter, lesson,
-syllabus sections, one-line goal) → key definitions (each flagged `[syllabus wording]`
-or `[paraphrase]`) → core equations (KaTeX, symbol/meaning/SI unit table) →
-hand-drawn diagrams (Rough.js) with captions → worked example (step by step, units
-checked) → 3–5 "✗ Wrong / ✓ Right" mistakes → 4–6 click-to-reveal recall questions →
-3–5 sentence summary. Content that not every reader is examined on carries a dashed
-violet tag: `supplement` (IGCSE Extended), `a-level-only`, `beyond` (outside the
-syllabus), `hl-only`.
+are shared; sheets, like question banks, are curriculum-specific). Live sheets:
+`/cheat-sheets/igcse-circular-motion` (0625 Ch.3, 4 pages) and
+`/cheat-sheets/a-level-circular-motion` (9702 A Level Ch.16, 6 pages: horizontal
+circles incl. banked track, vertical circles, conical pendulum).
 
-**Routes.** `/cheat-sheets/[slug]` (static, free, no DB), `/cheat-sheets?c=<id>`
-(index with the same `CurriculumSelector` as /curriculum, so the curriculum choice is
-remembered the same way). Linked from the lesson page (new "Revision cheat sheet"
-section; "no … cheat sheet yet" otherwise), the curriculum page ("n printable revision
-cheat sheets →" under the curriculum name) and, per lesson row, a small document icon in
-the row's meta (the row is still ONE link, per the curriculum design).
+**Format (owner's spec, 2026-10-17 revision), six sections in this order:**
+01 The big picture (summarised explanation + key terms, each flagged `[syllabus wording]`
+or `[paraphrase]`) → 02 Deriving the equations (one block per case, figure beside the
+numbered steps, boxed RESULT) → 03 Key equations (each in its own box) + a "Symbols and
+units" list → 04 Sample problems with solutions (steps, answer box; the **unit check is
+NOT a step**: it sits under the answer in small muted type) → 05 Practice problems
+(final answer only: "Final answer" toggle on screen, printed when "Print answers" is on,
+which is the default) → 06 Other useful information (common mistakes ✗/✓, exam tips,
+what the syllabus asks, links). Content that not every reader is examined on carries a
+dashed violet tag (`supplement`, `a-level-only`, `beyond`, `hl-only`); A Level chapters
+16+ get an "A Level only (not AS)" chip in the header automatically.
 
-**Files.**
-- Content: `lib/cheatsheets/sheets/<slug>.ts` (typed data, `lib/cheatsheets/types.ts`).
-  **The file name must equal the slug** (a test and the PDF script rely on it). Register
-  it in `CHEAT_SHEETS` in `lib/cheatsheets/index.ts`. No lesson content lives in components.
-- Diagrams are data too: circles, lines, arrows, dots, labels, right-angle marks and ✗
-  marks with a *role* (`force` / `velocity` / `acceleration` / `ink` / `muted`).
-  `lib/cheatsheets/rough.ts` turns them into SVG paths with Rough.js's **generator** on the
-  server (no DOM; fixed seed per diagram → identical wobble every render; no client JS).
-- Rendering: `components/cheatsheet/` — `CheatSheetView` (server), `Math.tsx` (KaTeX
-  `renderToString` on the server; `$…$` in any text field is typeset inline),
-  `RoughDiagram`, `SheetToolbar` (client), `cheatsheet.css` (all styles, scoped `.cs-*`).
-- `sheetBreakBefore` (data) splits the sheet into "Sheet 1 of 2 / Sheet 2 of 2".
+**Diagrams are precise vector SVG, not hand-drawn.** The owner rejected the Rough.js
+sketch look; roughjs is removed. Diagram shapes are data (circle, ellipse, line, arrow,
+dot, polygon, angle arc, right-angle mark, ✗, hatched surface, labels) with a *role*
+(`force` red / `velocity` teal / `acceleration` brass / `ink` / `muted`), turned into exact
+SVG paths on the server by `lib/cheatsheets/diagram.ts` (filled arrowheads, fixed stroke
+widths). Math labels use the KaTeX fonts: `F_T` = F with upright subscript T, `|cos|` =
+upright text. Geometry helpers for data files: `lib/cheatsheets/draw.ts` (`onCircle`,
+`tangent`, `inward`, `along`, `dir`…; screen y down, angles anticlockwise on screen).
 
-**Design.** Courier Prime (next/font, `--font-typewriter`) for headings, labels, chips and
-margin notes; body text stays in the site's Inter; maths in KaTeX. Warm paper
-(`#faf6ee` + SVG-noise texture), dark warm grey ink (`#2f2a24`). Fixed colour meaning on
-every sheet: **red = force, teal = velocity, brass = acceleration, violet = "not examined
-for everyone" tags.** Every text colour is ≥ 4.5:1 on paper and tint, light and dark
-(checked). Dark mode follows the site's `data-theme` / OS preference. Margin notes sit in
-a right-hand column from 768px and under their item on phones. The only motion is the
-recall answer fade-in, off under `prefers-reduced-motion`. Wrong/Right use ✗/✓ + labels,
-not red/green, so colour keeps its physics meaning.
+**Routes & links.** `/cheat-sheets/[slug]` (static, free, no DB), `/cheat-sheets?c=<id>`
+(index with the same `CurriculumSelector` as /curriculum). Linked from the lesson page
+("Revision cheat sheet" section), the curriculum page ("n printable revision cheat
+sheets →") and a document icon in each covered lesson's row (row is still ONE link). A
+sheet can cover more lessons than its own via `alsoCovers` (the A Level sheet covers all
+seven Chapter 16 lessons, A Level only).
 
-**Print & PDF.** Print CSS hides the site chrome and toolbar, forces the light palette,
-uses 9pt / 1.4 body text, and takes `@page` size + margins from the toolbar (A4 or Letter,
-stored in localStorage `ashphys-cheatsheet-prefs`). Toolbar toggles: paper tint (off =
-ink saver) and print recall answers (a compact "Answers 1. … 2. …" line). **Download PDF**
-links to a prebuilt vector PDF, `public/cheat-sheets/pdf/<slug>-<a4|letter>.pdf` (answers
-included), made by `node scripts/cheatsheet-pdfs.mjs http://localhost:3100` against a
-local `next start`: Chromium's print engine, i.e. exactly what Print → Save as PDF gives.
-The script **exits non-zero if any sheet prints to more pages than it has sheets**, and
-writes `manifest.json` with the sha256 of each data file; the unit test fails if a data
-file changes without the PDFs being rebuilt. (CSS/component changes don't trip that
-test: rebuild the PDFs by hand after layout changes.)
-- Why not jsPDF + html2canvas (the brief's suggestion): tried and rejected. html2canvas
-  misplaces KaTeX fraction bars, draws dashed inline borders through text and paints the
-  hidden `<details>` answers over the questions; its foreignObject mode taints the canvas
-  on Safari. The server-side pdfkit route (worksheets) would need a second layout engine
-  and MathJax instead of KaTeX.
-- Size: ~240 KB per PDF (embedded font subsets), ~0.5 MB per sheet in git. Fine for
-  dozens of sheets; at a few hundred, move the PDFs to a Storage bucket.
+**Files.** Content: `lib/cheatsheets/sheets/<slug>.ts` (typed by `lib/cheatsheets/types.ts`;
+**file name = slug**), registered in `CHEAT_SHEETS` (`lib/cheatsheets/index.ts`). Pages:
+`pages` in the data lists each printed page as sections or item ranges
+(`{ section: 'samples', from: 2 }`); a section continuing from an earlier page is headed
+"(continued)". Rendering: `components/cheatsheet/` (`CheatSheetView`, `Diagram`, `Math`
+(KaTeX on the server), `SheetToolbar`, `cheatsheet.css`). All component font sizes are in
+`em` so the 9pt print size scales everything (a `rem` size would ignore it).
 
-**Pilot sheet: IGCSE 3.7 Circular motion (extension)**, topic
-`db2c98d5-dd86-5faf-9121-5533bdd5d212`, coursebook Chapter 3 Forces and Motion (the brief
-called it "Chapter 2"; Chapter 2 in the DB/coursebook is Describing Motion). Syllabus
-basis: 0625 1.5.1 Supplement (the qualitative (a)–(c) statement, quoted, which ends
-"F = mv²/r is not required") and 6.1.1 Supplement (average orbital speed v = 2πr/T,
-recall and use). So F = mv²/r appears only in a box tagged "Not examined in 0625 · A Level
-Ch.16". Worked example: satellite r = 7.0 × 10⁶ m, v = 7.5 × 10³ m/s → swap T and v in one
-step (T = 2πr/v) → 5864 s → 5.9 × 10³ s (2 s.f.) ≈ 98 min. The unit test recomputes every
-number (and recall Q6, 3.8 m/s), checks the 90° angle between each velocity and force
-arrow, and that the released ball's path is tangential. The quoted syllabus wording comes
-from secondary copies of the 2023–25 syllabus (cambridgeinternational.org was unreachable
-from the sandbox): re-check against the official 2026–28 PDF.
+**Print & PDF.** Print CSS hides site chrome, forces the light palette, 9pt/1.4, `@page`
+from the toolbar (A4 / Letter). **Download PDF** serves prebuilt vector PDFs
+(`public/cheat-sheets/pdf/<slug>-<a4|letter>.pdf`, answers included) made by
+`node scripts/cheatsheet-pdfs.mjs http://localhost:3100` against a local `next start`
+(Chromium print engine = exactly Print → Save as PDF). The script fails if any sheet
+prints to more pages than its `pages` list; the unit test fails if a data file changed
+without rebuilding the PDFs (layout/CSS changes don't trip it: rebuild by hand). Every
+page was measured against US Letter (the shorter paper, 259 mm printable): A Level max
+951/980 px, IGCSE max 969/980 px, so a big content addition to a page will spill: re-plan
+`pages`. jsPDF + html2canvas was tried and rejected (misplaced KaTeX fraction bars,
+borders through text, hidden `<details>` painted; Safari taints foreignObject canvases).
+~300–370 KB per PDF; move to a Storage bucket once there are hundreds.
 
-**Checks done.** 21 unit tests (`lib/cheatsheets/__tests__/cheatsheets.test.ts`: section
-counts, every LaTeX string compiles under KaTeX `throwOnError`, every symbol has an SI
-unit, diagram points inside their viewBox, syllabus sections exist in `syllabi.ts`, AS
-chapters 1–15, registry lookups, PDFs current). Chromium at 380 / 820 / 1280px, light and
-dark: no horizontal page overflow (equations scroll inside their own box). Printed A4 and
-Letter, answers on and off: each exactly 2 pages. `tsc`, `next build`, eslint
-(next/core-web-vitals) clean.
+**Physics checks** (`lib/cheatsheets/__tests__/cheatsheets.test.ts`, 45 tests): every sample
+and practice number recomputed (g = 9.81 at A Level), the vertical-circle 6mg tension
+difference, both conical-pendulum period formulas agree, every LaTeX string compiles,
+every symbol has an SI unit, diagrams stay inside their viewBox, and diagram geometry is
+physically right (v ⟂ F, F/a towards the centre, Δv parallel to the radius, N ⟂ banked
+road with components N cos θ / N sin θ, both forces down at the top of a vertical circle,
+conical tension at θ to the vertical pointing at the pivot). Pages cover every item once.
 
-**Next sheets.** The A Level (16.1, Ch.16) and IB (A.2) appearances of the same lesson
-have no sheet yet. Their syllabi DO require F = mv²/r and a = v²/r = rω², so they need
-their own data files, not a copy.
+**Syllabus notes.** IGCSE: 1.5.1 Supplement (qualitative (a)–(c), "F = mv²/r is not
+required", so F = mv²/r appears only tagged "Not examined in 0625") and 6.1.1 Supplement
+(v = 2πr/T). The brief said "IGCSE Chapter 2"; the lesson is 3.7 in Chapter 3. A Level:
+9702 topic 12 / coursebook 16.1–16.7; banked tracks, vertical circles and conical
+pendulums are not separate syllabus items (exam applications of F = mv²/r), stated on the
+sheet. The quoted syllabus wording came from secondary copies (cambridgeinternational.org
+was unreachable from the sandbox): re-check against the official PDFs. IB (A.2) has no
+sheet yet.
 
 ### Admin student history & activity (NEW 2026-10-16)
 

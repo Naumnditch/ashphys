@@ -10,7 +10,7 @@ interface Prefs {
   tint: boolean;
   answers: boolean;
 }
-const DEFAULTS: Prefs = { paper: 'a4', tint: false, answers: false };
+const DEFAULTS: Prefs = { paper: 'a4', tint: false, answers: true };
 
 function readPrefs(): Prefs {
   try {
@@ -18,7 +18,7 @@ function readPrefs(): Prefs {
     return {
       paper: raw.paper === 'letter' ? 'letter' : 'a4',
       tint: raw.tint === true,
-      answers: raw.answers === true,
+      answers: raw.answers !== false,
     };
   } catch {
     return DEFAULTS;
@@ -35,7 +35,7 @@ function writePrefs(p: Prefs) {
 
 /**
  * Print and PDF controls above a cheat sheet: paper size, paper tint (off =
- * ink saver), whether the quick-recall answers print, Print, and a link to the
+ * ink saver), whether the practice answers print, Print, and a link to the
  * prebuilt PDF for the chosen paper. The choices are data attributes on the
  * sheet root plus one @page rule, so the browser's own Print → Save as PDF
  * matches the downloadable file.
@@ -84,7 +84,7 @@ export function SheetToolbar({ rootId, pdfs }: { rootId: string; pdfs: Partial<R
       </label>
       <label className="cs-check">
         <input type="checkbox" checked={prefs.answers} onChange={(e) => update({ answers: e.target.checked })} />
-        Print recall answers
+        Print answers
       </label>
       <span className="flex gap-2 ml-auto">
         <button type="button" className="cs-btn" onClick={() => window.print()}>
@@ -95,7 +95,7 @@ export function SheetToolbar({ rootId, pdfs }: { rootId: string; pdfs: Partial<R
             className="cs-btn cs-btn--primary"
             href={pdfs[prefs.paper]}
             download
-            title={`${prefs.paper === 'a4' ? 'A4' : 'US Letter'} PDF, quick-recall answers included`}
+            title={`${prefs.paper === 'a4' ? 'A4' : 'US Letter'} PDF, practice answers included`}
           >
             Download PDF
           </a>

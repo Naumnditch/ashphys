@@ -6,6 +6,10 @@
  *
  * Cheat sheets are per curriculum (a shared lesson gets one sheet per
  * curriculum that needs one), unlike simulations, which every curriculum shares.
+ *
+ * Every sheet has the same six sections, in this order:
+ *   explanation → derivations → equations → samples → practice → other
+ * Any text field may contain `$…$`, typeset inline with KaTeX.
  */
 
 import type { CurriculumId } from '@/lib/curricula';
@@ -24,30 +28,92 @@ export interface Tagged {
   tagLabel?: string;
 }
 
-export interface Definition extends Tagged {
+/** A definition. `syllabus` = the syllabus's own wording, quoted; `paraphrase` = ours. */
+export interface KeyTerm extends Tagged {
   term: string;
-  /** Plain text; `$…$` spans are typeset with KaTeX. */
   text: string;
-  /** `syllabus` = the syllabus's own wording, quoted; `paraphrase` = ours. */
   source: 'syllabus' | 'paraphrase';
-  /** Short margin note in the typewriter font, shown beside the item. */
+}
+
+/** 1 · The big picture: a short summarised explanation plus the key terms. */
+export interface Explanation {
+  paragraphs: string[];
+  keyTerms: KeyTerm[];
+  /** Diagram ids shown beside the explanation. */
+  figures?: string[];
+}
+
+export interface DerivationStep {
+  text?: string;
+  /** KaTeX display line. */
+  latex?: string;
+}
+
+/** 2 · How an equation (or a case's equations) follow from physics the student already knows. */
+export interface Derivation extends Tagged {
+  id: string;
+  title: string;
+  /** The situation, in one or two sentences. */
+  setup: string;
+  /** Diagram id shown beside the steps. */
+  figure?: string;
+  steps: DerivationStep[];
+  /** The result, boxed (KaTeX). */
+  result: string;
+}
+
+/** 3 · An important equation, shown in its own box. */
+export interface KeyEquation extends Tagged {
+  name: string;
+  latex: string;
+  /** When it applies, e.g. "top of a vertical circle". */
   note?: string;
 }
 
+/** A symbol in the sheet's "Symbols and units" table. */
 export interface EquationSymbol {
-  /** KaTeX source for the symbol, e.g. `T`. */
   symbol: string;
   meaning: string;
-  /** SI unit as KaTeX source, e.g. `\mathrm{m\,s^{-1}}`; omit for dimensionless. */
+  /** SI unit as KaTeX; omit for a ratio with no unit. */
   unit?: string;
 }
 
-export interface CoreEquation extends Tagged {
-  name: string;
-  /** KaTeX display source. */
-  latex: string;
-  symbols: EquationSymbol[];
-  note?: string;
+export interface SolutionStep {
+  text: string;
+  latex?: string;
+}
+
+/** 4 · A sample problem, solved step by step. */
+export interface SampleProblem extends Tagged {
+  title: string;
+  /** As an exam would set it, command word first. */
+  question: string;
+  figure?: string;
+  steps: SolutionStep[];
+  /** Final answer with unit and justified significant figures (KaTeX). */
+  answer: string;
+  /** Unit check of the final expression (KaTeX), printed small under the answer. */
+  unitCheck?: string;
+}
+
+/** 5 · A practice problem: the final answer only, no working. */
+export interface PracticeProblem extends Tagged {
+  question: string;
+  answer: string;
+}
+
+export interface CommonMistake {
+  wrong: string;
+  right: string;
+}
+
+/** 6 · Everything else worth knowing. */
+export interface OtherInfo {
+  mistakes: CommonMistake[];
+  tips: string[];
+  /** What the syllabus does and does not ask for. */
+  syllabus: string[];
+  links?: { label: string; href: string }[];
 }
 
 /** What a coloured stroke means. The same role has the same colour on every sheet. */
@@ -56,16 +122,33 @@ export type DiagramRole = 'force' | 'velocity' | 'acceleration' | 'ink' | 'muted
 export type Point = [number, number];
 
 export type DiagramShape =
-  | { kind: 'circle'; centre: Point; radius: number; role?: DiagramRole; dashed?: boolean }
-  | { kind: 'line'; from: Point; to: Point; role?: DiagramRole; dashed?: boolean }
+  | { kind: 'circle'; centre: Point; radius: number; role?: DiagramRole; dashed?: boolean; fill?: 'soft' }
+  | { kind: 'ellipse'; centre: Point; rx: number; ry: number; role?: DiagramRole; dashed?: boolean }
+  | { kind: 'line'; from: Point; to: Point; role?: DiagramRole; dashed?: boolean; thin?: boolean }
   | { kind: 'arrow'; from: Point; to: Point; role: DiagramRole; dashed?: boolean }
   /** A filled body, e.g. the object moving round the circle. */
   | { kind: 'dot'; at: Point; radius: number; role?: DiagramRole }
-  | { kind: 'label'; at: Point; text: string; role?: DiagramRole; anchor?: 'start' | 'middle' | 'end'; size?: 'sm' | 'md' }
-  /** The square corner mark showing two lines meet at 90°. `a` and `b` are unit-ish directions from `at`. */
+  | { kind: 'polygon'; points: Point[]; role?: DiagramRole; fill?: 'soft' | 'none' }
+  /** An angle marker: arc from `from` to `to` degrees (anticlockwise as seen on screen, 0 = +x). */
+  | { kind: 'arc'; centre: Point; radius: number; from: number; to: number; role?: DiagramRole }
+  /** The square corner mark showing two lines meet at 90°. `a` and `b` are directions from `at`. */
   | { kind: 'rightAngle'; at: Point; a: Point; b: Point; size: number; role?: DiagramRole }
   /** An ✗ through something that does NOT happen. */
-  | { kind: 'cross'; at: Point; size: number };
+  | { kind: 'cross'; at: Point; size: number }
+  /** A fixed surface: a line with hatching on one side. */
+  | { kind: 'surface'; from: Point; to: Point; side?: 'left' | 'right' }
+  /**
+   * Text. `math` labels are set like the equations (italic letters, `_x` or
+   * `_{xy}` for an upright subscript); `note` labels are small plain text.
+   */
+  | {
+      kind: 'label';
+      at: Point;
+      text: string;
+      role?: DiagramRole;
+      anchor?: 'start' | 'middle' | 'end';
+      style?: 'math' | 'note';
+    };
 
 export interface Diagram {
   id: string;
@@ -77,65 +160,45 @@ export interface Diagram {
   width: number;
   height: number;
   shapes: DiagramShape[];
-  /** Rough.js seed, so the hand-drawn wobble is identical on every render. */
-  seed: number;
 }
 
-export interface WorkedStep {
-  /** What this step does, in words. */
-  text: string;
-  /** Optional KaTeX display line for the step. */
-  latex?: string;
-  /** The unit check for this step, as KaTeX, e.g. `\frac{\mathrm{m}}{\mathrm{m\,s^{-1}}} = \mathrm{s}`. */
-  units?: string;
-  note?: string;
-}
+export type SectionKey = 'explanation' | 'derivations' | 'equations' | 'samples' | 'practice' | 'other';
 
-export interface WorkedExample extends Tagged {
-  title: string;
-  /** The question, as an exam would set it. Command word first where it fits. */
-  question: string;
-  steps: WorkedStep[];
-  /** The final answer, as KaTeX, with unit and justified significant figures. */
-  answer: string;
-}
-
-export interface CommonMistake {
-  wrong: string;
-  right: string;
-}
-
-export interface RecallQuestion {
-  question: string;
-  answer: string;
-}
-
-export type SectionKey = 'definitions' | 'equations' | 'diagrams' | 'worked' | 'mistakes' | 'recall' | 'summary';
+/**
+ * One printed page is a list of blocks: a whole section, or part of a list
+ * section (derivations, samples, practice) by item index, `from` inclusive,
+ * `to` exclusive. A section that continues from the previous page is headed
+ * "(continued)".
+ */
+export type PageBlock = SectionKey | { section: 'derivations' | 'samples' | 'practice'; from: number; to?: number };
 
 export interface CheatSheet {
-  /** URL slug: `/cheat-sheets/<slug>`. */
+  /** URL slug: `/cheat-sheets/<slug>`; also the data file's name. */
   slug: string;
   /** The `topics` row (lesson) this sheet belongs to. */
   topicId: string;
+  /** Other lessons in the same curriculum this sheet also covers (linked from their pages too). */
+  alsoCovers?: string[];
   curriculumId: CurriculumId;
   title: string;
-  /** The lesson's number in this curriculum, e.g. "3.7" or "16.2". */
+  /** The lesson's number in this curriculum, e.g. "3.7" or "16.1". */
   lessonCode: string;
-  /** Coursebook chapter (IGCSE/AS/A Level) or IB theme number. */
+  /** Coursebook chapter (IGCSE/AS/A Level) or IB theme. */
   chapter: { number: number | string; title: string };
-  /** Syllabus section(s) the sheet covers, e.g. "1.5.1" or "A.2". */
+  /** Syllabus or coursebook section(s) the sheet covers, e.g. "1.5.1" or "16.5". */
   syllabusSections: string[];
   /** One line: what the student can do after this sheet. */
   goal: string;
   /** Date the content was last checked against the syllabus (YYYY-MM-DD). */
   reviewed: string;
-  definitions: Definition[];
-  equations: CoreEquation[];
+  explanation: Explanation;
+  derivations: Derivation[];
+  equations: KeyEquation[];
+  symbols: EquationSymbol[];
+  samples: SampleProblem[];
+  practice: PracticeProblem[];
+  other: OtherInfo;
   diagrams: Diagram[];
-  worked: WorkedExample[];
-  mistakes: CommonMistake[];
-  recall: RecallQuestion[];
-  summary: string[];
-  /** Section that starts "Sheet 2" when the content is longer than one A4 page. */
-  sheetBreakBefore?: SectionKey;
+  /** Printed pages. Omit for a single page holding every section. */
+  pages?: PageBlock[][];
 }

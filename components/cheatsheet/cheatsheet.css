@@ -154,7 +154,7 @@
 @media (min-width: 768px) {
   .cs-page {
     padding: 2.25rem 2.5rem 1.5rem;
-    font-size: 0.9rem;
+    font-size: 0.9em;
   }
 }
 
@@ -176,7 +176,7 @@
 }
 .cs-kicker {
   font-family: var(--cs-typewriter);
-  font-size: 0.75rem;
+  font-size: 0.75em;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--cs-muted);
@@ -184,14 +184,14 @@
 .cs-title {
   font-family: var(--cs-typewriter);
   font-weight: 700;
-  font-size: 1.9rem;
+  font-size: 1.9em;
   line-height: 1.15;
   margin: 0.2rem 0 0.5rem;
   color: var(--cs-ink);
 }
 @media (min-width: 768px) {
   .cs-title {
-    font-size: 2.2rem;
+    font-size: 2.2em;
   }
 }
 .cs-chips {
@@ -202,7 +202,7 @@
 }
 .cs-chip {
   font-family: var(--cs-typewriter);
-  font-size: 0.78rem;
+  font-size: 0.78em;
   border: 1px solid var(--cs-rule);
   border-radius: 4px;
   padding: 0.05rem 0.45rem;
@@ -226,167 +226,307 @@
   justify-content: space-between;
   gap: 0.25rem 1rem;
   font-family: var(--cs-typewriter);
-  font-size: 0.78rem;
+  font-size: 0.78em;
   color: var(--cs-muted);
   border-bottom: 1.5px solid var(--cs-ink);
   padding-bottom: 0.4rem;
   margin-bottom: 1rem;
 }
 
-/* ---------- sections ---------- */
+/* ---------- header extras ---------- */
 
-.cs-section {
-  margin-bottom: 1.15rem;
-}
-.cs-section__head {
+.cs-header__bottom {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0 1rem;
-  margin: 0 0 0.5rem;
+  gap: 0.3rem 1.5rem;
+}
+.cs-header__bottom .cs-goal {
+  flex: 1 1 24rem;
+}
+.cs-tag--chip {
+  font-size: 0.75em;
+  padding: 0.05rem 0.45rem;
+  margin-left: 0;
+  vertical-align: baseline;
+}
+
+/* ---------- sections ---------- */
+
+.cs-section {
+  margin-bottom: 1.3rem;
+}
+.cs-section__head {
+  margin: 0 0 0.55rem;
   padding-bottom: 0.15rem;
   border-bottom: 1px dashed var(--cs-rule);
   break-after: avoid;
 }
-.cs-section__head .cs-legend {
-  margin: 0;
-}
 .cs-section h2 {
   font-family: var(--cs-typewriter);
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.1em;
   letter-spacing: 0.02em;
   margin: 0;
   color: var(--cs-ink);
 }
-.cs-section h2 .cs-num {
+.cs-num {
   color: var(--cs-muted);
   margin-right: 0.4rem;
   font-weight: 400;
 }
-
-/* An item with its margin note: one column on phones, note in the margin from 768px. */
-.cs-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.2rem 1.1rem;
-  margin-bottom: 0.55rem;
-  break-inside: avoid;
-}
-@media (min-width: 768px) {
-  .cs-item {
-    grid-template-columns: minmax(0, 1fr) 10.5rem;
-  }
-}
-.cs-note {
-  font-family: var(--cs-typewriter);
-  font-size: 0.78rem;
-  line-height: 1.4;
+.cs-continued {
+  font-weight: 400;
   color: var(--cs-muted);
-  border-left: 2px solid var(--cs-rule);
-  padding-left: 0.5rem;
-  align-self: start;
+  font-size: 0.85em;
 }
-
-.cs-term {
+.cs-h3 {
+  font-family: var(--cs-typewriter);
   font-weight: 700;
+  font-size: 0.95em;
+  margin: 0 0 0.25rem;
+  break-after: avoid;
 }
-.cs-source {
-  font-family: var(--cs-typewriter);
-  font-size: 0.72rem;
-  color: var(--cs-muted);
-  white-space: nowrap;
-}
-.cs-quote {
-  border-left: 3px solid var(--cs-ink);
-  padding-left: 0.6rem;
+.cs-para {
+  margin: 0 0 0.45rem;
 }
 
 .cs-tag {
   display: inline-block;
   font-family: var(--cs-typewriter);
-  font-size: 0.7rem;
+  font-size: 0.7em;
   font-weight: 700;
   line-height: 1.3;
   color: var(--cs-flag);
   border: 1px dashed var(--cs-flag);
   border-radius: 3px;
   padding: 0 0.3rem;
-  margin-left: 0.35rem;
+  margin-left: 0.4rem;
   vertical-align: 0.1em;
   white-space: nowrap;
 }
 .cs-flagged {
-  border: 1px dashed var(--cs-flag);
-  border-radius: 4px;
-  padding: 0.4rem 0.6rem;
+  border: 1px dashed var(--cs-flag) !important;
+}
+.cs-source {
+  font-family: var(--cs-typewriter);
+  font-size: 0.72em;
+  font-weight: 400;
+  color: var(--cs-muted);
+  white-space: nowrap;
 }
 
-/* Equations: side by side from 768px, each with its note underneath. */
-.cs-eqs {
+/* 1 · explanation: text, with figures beside it from 768px. */
+.cs-explain {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0.6rem 1rem;
+  gap: 0.8rem 1.4rem;
 }
 @media (min-width: 768px) {
-  .cs-eqs {
+  .cs-explain {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+}
+.cs-explain__figs {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+/* Two or more figures: under the text, side by side. */
+@media (min-width: 640px) {
+  .cs-explain--row {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .cs-explain--row .cs-explain__figs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.cs-eqs .cs-note {
-  margin-top: 0.3rem;
+.cs-terms {
+  margin: 0.5rem 0 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem 1.2rem;
 }
-.cs-eq-wrap {
+@media (min-width: 768px) {
+  .cs-terms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.cs-terms dt {
+  font-weight: 700;
+}
+.cs-terms dd {
+  margin: 0;
+}
+.cs-quote {
+  border-left: 3px solid var(--cs-ink);
+  padding-left: 0.6rem;
+}
+
+/* 2 · derivations: figure beside the steps from 768px. */
+.cs-deriv {
+  margin-bottom: 0.9rem;
   break-inside: avoid;
 }
-.cs-eq {
-  border: 1px solid var(--cs-rule);
-  background: var(--cs-tint);
-  border-radius: 4px;
-  padding: 0.5rem 0.75rem;
+.cs-deriv__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem 1.2rem;
+  align-items: start;
 }
-.cs-eq__name {
+@media (min-width: 768px) {
+  .cs-deriv__grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+}
+.cs-dsteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: cs-d;
+}
+.cs-dsteps > li {
+  counter-increment: cs-d;
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.15rem;
+}
+.cs-dsteps > li::before {
+  content: counter(cs-d) '.';
+  position: absolute;
+  left: 0;
+  top: 0;
   font-family: var(--cs-typewriter);
   font-weight: 700;
-  font-size: 0.85rem;
+  color: var(--cs-muted);
+}
+.cs-result {
+  position: relative;
+  border: 2px solid var(--cs-ink);
+  border-radius: 4px;
+  padding: 0.15rem 0.75rem 0;
+  margin-top: 0.7rem;
+  background: var(--cs-tint);
+}
+/* Sits on the top border like a legend, so the equation gets the full width. */
+.cs-result__label {
+  position: absolute;
+  top: -0.75em;
+  left: 0.6rem;
+  padding: 0 0.35rem;
+  background: var(--cs-tint);
+  border: 1px solid var(--cs-ink);
+  border-radius: 3px;
+  font-family: var(--cs-typewriter);
+  font-weight: 700;
+  font-size: 0.7em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cs-ink);
+}
+.cs-result .cs-math-block {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 3 · key equations, each in its own box; symbols table under them. */
+.cs-boxes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+@media (min-width: 560px) {
+  .cs-boxes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .cs-boxes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.cs-box {
+  border: 2px solid var(--cs-ink);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem 0.35rem;
+  background: var(--cs-tint);
+  break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+}
+.cs-box__name {
+  font-family: var(--cs-typewriter);
+  font-weight: 700;
+  font-size: 0.8em;
+  line-height: 1.35;
+}
+.cs-box .cs-math-block {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cs-box__note {
+  font-size: 0.75em;
+  color: var(--cs-muted);
+  text-align: center;
 }
 .cs-math-block {
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.15rem 0;
+  padding: 0.1rem 0;
   font-size: 1.05em;
 }
 .cs-math-block .katex-display {
   margin: 0.3rem 0;
 }
 .cs-symbols {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
+  margin-top: 0.7rem;
+  font-size: 0.85em;
 }
-.cs-symbols td {
-  padding: 0.1rem 0.4rem 0.1rem 0;
-  vertical-align: baseline;
+.cs-symbols__title {
+  font-family: var(--cs-typewriter);
+  font-weight: 700;
+  font-size: 0.85em;
+  padding-bottom: 0.2rem;
 }
-.cs-symbols td:first-child {
-  width: 2.2rem;
+.cs-symbols ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: 1.4rem;
 }
-.cs-symbols td:last-child {
+@media (min-width: 768px) {
+  .cs-symbols ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.cs-symbols li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+  gap: 0 0.5rem;
+  align-items: baseline;
+  padding: 0.08rem 0;
+  border-bottom: 1px dotted var(--cs-rule);
+}
+.cs-symbols__unit {
   text-align: right;
   white-space: nowrap;
   color: var(--cs-muted);
 }
 
-/* Diagrams */
+/* Figures */
 .cs-legend {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem 1rem;
   font-family: var(--cs-typewriter);
-  font-size: 0.78rem;
-  color: var(--cs-muted);
-  margin-bottom: 0.4rem;
+  font-size: 0.78em;
+  margin: 0;
 }
 .cs-legend span {
   display: inline-flex;
@@ -399,37 +539,33 @@
   height: 0;
   border-top: 2.5px solid currentColor;
 }
-.cs-figs {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.9rem;
-}
-@media (min-width: 640px) {
-  .cs-figs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 .cs-fig {
   margin: 0;
   break-inside: avoid;
 }
-.cs-fig svg {
+.cs-fig svg,
+.cs-sample__fig svg {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 260px;
+  max-height: 270px;
 }
 .cs-fig__title {
   font-family: var(--cs-typewriter);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8em;
 }
 .cs-fig figcaption {
-  font-size: 0.82rem;
+  font-size: 0.8em;
   line-height: 1.45;
   color: var(--cs-muted);
 }
-
+.cs-fig__ref {
+  font-family: var(--cs-typewriter);
+  font-size: 0.7em;
+  color: var(--cs-muted);
+  text-align: center;
+}
 .cs-role-force {
   color: var(--cs-force);
 }
@@ -445,18 +581,48 @@
 .cs-role-muted {
   color: var(--cs-muted);
 }
-.cs-fig text {
+path.cs-soft {
+  fill: var(--cs-tint);
+  stroke: none;
+}
+.cs-fig-math {
+  font-family: KaTeX_Math, 'Times New Roman', serif;
+  font-style: italic;
+  fill: currentColor;
+}
+.cs-fig-math .cs-fig-upright {
+  font-family: KaTeX_Main, 'Times New Roman', serif;
+  font-style: normal;
+}
+.cs-fig-note {
   font-family: var(--cs-typewriter);
   fill: currentColor;
 }
 
-/* Worked example */
+/* 4 · sample problems */
+.cs-sample {
+  margin-bottom: 0.9rem;
+  break-inside: avoid;
+}
 .cs-question {
   background: var(--cs-tint);
   border-left: 3px solid var(--cs-ink);
-  padding: 0.45rem 0.7rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 0 4px 4px 0;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+.cs-sample__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+}
+@media (min-width: 768px) {
+  .cs-sample__grid {
+    grid-template-columns: minmax(0, 1fr) 9.5rem;
+  }
+}
+.cs-sample__fig svg {
+  max-height: 150px;
 }
 .cs-steps {
   list-style: none;
@@ -467,62 +633,123 @@
 .cs-steps > li {
   counter-increment: cs-step;
 }
-.cs-step {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0 1rem;
-  align-items: center;
-}
-@media (min-width: 768px) {
-  .cs-step {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  }
-}
-.cs-step__math {
-  min-width: 0;
-}
 .cs-step__text::before {
   content: 'Step ' counter(cs-step) '. ';
   font-family: var(--cs-typewriter);
   font-weight: 700;
 }
-.cs-units {
-  font-size: 0.85rem;
-  color: var(--cs-muted);
-}
-.cs-units b {
-  font-family: var(--cs-typewriter);
-}
 .cs-answer {
   border: 1.5px solid var(--cs-ink);
   border-radius: 4px;
   padding: 0.3rem 0.7rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 0.6rem;
+  margin-top: 0.3rem;
 }
 .cs-answer b {
   font-family: var(--cs-typewriter);
 }
+/* The unit check is a side note on the answer, not a step: small, muted, right-aligned. */
+.cs-unitcheck {
+  font-size: 0.72em;
+  line-height: 1.3;
+  color: var(--cs-muted);
+  text-align: right;
+  margin-top: 0.2rem;
+  font-family: var(--cs-typewriter);
+}
+.cs-unitcheck .katex {
+  font-size: 1.05em;
+}
 
-/* Mistakes */
+/* 5 · practice problems */
+.cs-practice {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.45rem 1.2rem;
+}
+@media (min-width: 768px) {
+  .cs-practice {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.cs-practice > li {
+  display: flex;
+  gap: 0.5rem;
+  break-inside: avoid;
+}
+.cs-practice__n {
+  font-family: var(--cs-typewriter);
+  font-weight: 700;
+  color: var(--cs-muted);
+  flex: none;
+  min-width: 1.9rem;
+}
+.cs-practice__ans {
+  margin-top: 0.1rem;
+}
+.cs-practice__ans summary {
+  cursor: pointer;
+  font-family: var(--cs-typewriter);
+  font-size: 0.75em;
+  color: var(--cs-muted);
+  min-height: 24px;
+}
+.cs-practice__ans[open] summary {
+  color: var(--cs-ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cs-practice__ans[open] > :not(summary) {
+    animation: cs-reveal 180ms ease-out;
+  }
+}
+@keyframes cs-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* The printed copy of the answer: hidden on screen, shown in print when "answers" is on. */
+.cs-practice__printed {
+  display: none;
+  font-size: 0.8em;
+  color: var(--cs-muted);
+}
+
+/* 6 · other information */
+.cs-other {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem 1.4rem;
+}
+@media (min-width: 768px) {
+  .cs-other {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cs-other__mistakes {
+    grid-column: 1 / -1;
+  }
+}
 .cs-mistakes {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 0.45rem;
-}
-.cs-mistakes li {
-  border-left: 2px solid var(--cs-rule);
-  padding-left: 0.55rem;
+  gap: 0.4rem;
 }
 @media (min-width: 768px) {
   .cs-mistakes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem 1.1rem;
+    gap: 0.4rem 1.1rem;
   }
+}
+.cs-mistakes li {
+  border-left: 2px solid var(--cs-rule);
+  padding-left: 0.55rem;
+  break-inside: avoid;
 }
 .cs-mistakes p {
   margin: 0;
@@ -534,102 +761,18 @@
 .cs-right b {
   font-family: var(--cs-typewriter);
 }
-.cs-right b {
+.cs-bullets {
+  margin: 0 0 0.4rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+.cs-bullets li + li {
+  margin-top: 0.15rem;
+}
+.cs-bullets a {
   color: var(--cs-ink);
-}
-
-/* Quick recall */
-.cs-recall {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 0.35rem;
-}
-.cs-recall details {
-  border: 1px solid var(--cs-rule);
-  border-radius: 4px;
-  padding: 0.35rem 0.6rem;
-}
-.cs-recall summary {
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  gap: 0.5rem;
-  min-height: 28px;
-}
-.cs-recall summary::-webkit-details-marker {
-  display: none;
-}
-.cs-recall summary::after {
-  content: 'show';
-  margin-left: auto;
-  font-family: var(--cs-typewriter);
-  font-size: 0.75rem;
-  color: var(--cs-muted);
-  align-self: center;
-  white-space: nowrap;
-}
-.cs-recall details[open] summary::after {
-  content: 'hide';
-}
-.cs-recall__n {
-  font-family: var(--cs-typewriter);
-  font-weight: 700;
-}
-.cs-recall__answer {
-  margin: 0.25rem 0 0.1rem;
-  padding-top: 0.25rem;
-  border-top: 1px dashed var(--cs-rule);
-}
-.cs-recall__answer b {
-  font-family: var(--cs-typewriter);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .cs-recall details[open] .cs-recall__answer {
-    animation: cs-reveal 180ms ease-out;
-  }
-}
-@keyframes cs-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(-2px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-/* The print/PDF copy of the answers: hidden on screen, shown when "answers" is on. */
-.cs-recall__printed {
-  display: none;
-  margin-top: 0.3rem;
-  font-size: 0.85em;
-  line-height: 1.4;
-  color: var(--cs-muted);
-}
-.cs-recall__printed b {
-  font-family: var(--cs-typewriter);
-  color: var(--cs-ink);
-}
-.cs-recall__printed > span + span::before {
-  content: ' ·';
-}
-
-/* Summary */
-.cs-summary {
-  border: 2px solid var(--cs-ink);
-  border-radius: 4px;
-  padding: 0.6rem 0.9rem;
-  background: var(--cs-tint);
-}
-.cs-summary ol {
-  list-style: decimal;
-  margin: 0;
-  padding-left: 1.2rem;
-}
-.cs-summary li + li {
-  margin-top: 0.2rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .cs-footer {
@@ -637,7 +780,7 @@
   padding-top: 0.4rem;
   border-top: 1px dashed var(--cs-rule);
   font-family: var(--cs-typewriter);
-  font-size: 0.7rem;
+  font-size: 0.7em;
   color: var(--cs-muted);
   display: flex;
   flex-wrap: wrap;
@@ -661,6 +804,7 @@
     --cs-accel: #87570f;
     --cs-flag: #5a4699;
     --cs-noise: none;
+    --cs-sheen: none;
   }
   /* Only the sheet prints: no navbar, footer, help button or toolbar. */
   body:has(.cs-root) > *:not(main),
@@ -692,113 +836,107 @@
     break-after: auto;
   }
   .cs-root[data-ink='tint'] .cs-page,
-  .cs-root[data-ink='tint'] .cs-eq,
+  .cs-root[data-ink='tint'] .cs-box,
+  .cs-root[data-ink='tint'] .cs-result,
   .cs-root[data-ink='tint'] .cs-question,
-  .cs-root[data-ink='tint'] .cs-summary,
-  .cs-root[data-ink='tint'] .cs-chip {
+  .cs-root[data-ink='tint'] .cs-chip,
+  .cs-fig svg,
+  .cs-sample__fig svg {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
   .cs-root[data-ink='tint'] .cs-page {
     background: var(--cs-paper);
   }
-  .cs-root[data-ink='saver'] .cs-eq,
-  .cs-root[data-ink='saver'] .cs-question,
-  .cs-root[data-ink='saver'] .cs-summary,
-  .cs-root[data-ink='saver'] .cs-chip {
-    background: transparent;
+  .cs-root[data-ink='saver'] .cs-result__label {
+    background: #fff;
   }
-  .cs-fig svg,
-  .cs-fig text {
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+  .cs-root[data-ink='saver'] .cs-box,
+  .cs-root[data-ink='saver'] .cs-result,
+  .cs-root[data-ink='saver'] .cs-question,
+  .cs-root[data-ink='saver'] .cs-chip,
+  .cs-root[data-ink='saver'] path.cs-soft {
+    background: transparent;
+    fill: #fff;
   }
   .cs-title {
-    font-size: 20pt;
+    font-size: 16pt;
+    margin: 0 0 0.25rem;
   }
-  .cs-item {
-    grid-template-columns: minmax(0, 1fr) 31mm;
-    gap: 0.15rem 0.8rem;
-  }
-  .cs-step {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  }
-  .cs-figs {
+  .cs-terms {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .cs-fig svg {
-    max-height: 41mm;
+  .cs-symbols ul {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 1rem;
   }
-  .cs-eqs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .cs-symbols li {
+    grid-template-columns: 1.6rem minmax(0, 1fr) auto;
   }
-  .cs-recall {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.25rem 0.6rem;
+  .cs-box {
+    padding: 0.25rem 0.55rem 0.2rem;
   }
-  .cs-recall li {
-    break-inside: avoid;
+  .cs-deriv,
+  .cs-sample {
+    margin-bottom: 0.55rem;
   }
-  .cs-mistakes {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.3rem 0.9rem;
-  }
-  .cs-diagram-block {
-    break-inside: avoid;
-  }
-  .cs-mistakes li,
-  .cs-steps li {
-    break-inside: avoid;
-  }
-  .cs-math-block {
-    overflow: visible;
-  }
-  .cs-recall details {
-    padding: 0.15rem 0.5rem;
-  }
-  .cs-recall summary::after {
-    content: none;
-  }
-  .cs-root[data-print-answers='on'] .cs-recall__printed {
-    display: block;
-  }
-  .cs-section {
-    margin-bottom: 0.65rem;
-  }
-  .cs-item {
-    margin-bottom: 0.35rem;
+  .cs-question {
+    padding: 0.3rem 0.6rem;
   }
   .cs-header {
     padding-bottom: 0.5rem;
     margin-bottom: 0.7rem;
   }
+  .cs-section {
+    margin-bottom: 0.7rem;
+  }
+  .cs-section__head {
+    margin-bottom: 0.35rem;
+  }
+  /* The paper layout, whatever the print engine's viewport width. */
+  .cs-explain {
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  }
+  .cs-explain--row .cs-explain__figs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cs-deriv__grid {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+  .cs-boxes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cs-sample__grid {
+    grid-template-columns: minmax(0, 1fr) 34mm;
+  }
+  .cs-practice,
+  .cs-mistakes,
+  .cs-other {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .cs-other__mistakes {
+    grid-column: 1 / -1;
+  }
+  .cs-fig svg {
+    max-height: 58mm;
+  }
+  .cs-sample__fig svg {
+    max-height: 34mm;
+  }
+  .cs-math-block {
+    overflow: visible;
+  }
   .cs-math-block .katex-display {
     margin: 0.15rem 0;
   }
-  .cs-symbols {
-    line-height: 1.3;
+  .cs-practice__ans {
+    display: none;
+  }
+  .cs-root[data-print-answers='on'] .cs-practice__printed {
+    display: block;
   }
   .cs-footer {
     margin-top: 0.4rem;
     padding-top: 0.2rem;
-  }
-  .cs-title {
-    margin: 0 0 0.3rem;
-  }
-  .cs-summary {
-    padding: 0.35rem 0.7rem;
-  }
-  .cs-summary li + li {
-    margin-top: 0;
-  }
-  .cs-question {
-    padding: 0.3rem 0.6rem;
-    margin-bottom: 0.35rem;
-  }
-  .cs-section__head {
-    margin-bottom: 0.3rem;
-  }
-  .cs-fig figcaption {
-    line-height: 1.35;
   }
 }

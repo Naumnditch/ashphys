@@ -1,18 +1,35 @@
 {
+  "a-level-circular-motion": {
+    "hash": "5ba07480de310398591b43c45ac975ea0a09f5bc063433cab53fdc26fff637df",
+    "files": {
+      "a4": {
+        "file": "a-level-circular-motion-a4.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 370755
+      },
+      "letter": {
+        "file": "a-level-circular-motion-letter.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 372847
+      }
+    }
+  },
   "igcse-circular-motion": {
-    "hash": "4bb91d37630ffe678c7c1405faaa5bb372fcc8acf2879ba8d399352ca71d3a50",
+    "hash": "4488018b14216188455dd0fa98e70a0978e72b4aa4dea210a856656972dd7db9",
     "files": {
       "a4": {
         "file": "igcse-circular-motion-a4.pdf",
-        "pages": 2,
-        "sheets": 2,
-        "bytes": 242160
+        "pages": 4,
+        "sheets": 4,
+        "bytes": 296819
       },
       "letter": {
         "file": "igcse-circular-motion-letter.pdf",
-        "pages": 2,
-        "sheets": 2,
-        "bytes": 242657
+        "pages": 4,
+        "sheets": 4,
+        "bytes": 297481
       }
     }
   }

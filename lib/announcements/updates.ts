@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheet-a-level-circular-motion',
+    category: 'lesson',
+    type: 'new',
+    title: 'A Level Circular motion cheat sheet',
+    description: 'Horizontal circles and banked tracks, vertical circles and the conical pendulum: derivations, key equations, worked samples and 10 practice problems.',
+    date: '2026-10-17',
+    href: '/cheat-sheets/a-level-circular-motion',
+    published: true,
+  },
+  {
     id: 'cheat-sheet-circular-motion',
     category: 'lesson',
     type: 'new',
