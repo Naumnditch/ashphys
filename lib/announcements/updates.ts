@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheets-as-kinematics',
+    category: 'lesson',
+    type: 'new',
+    title: 'AS Kinematics: a one-page cheat sheet for every lesson',
+    description: 'Eight printable one-page sheets for Chapter 1, from speed to scalars and vectors: key equations, a worked sample and four practice problems each.',
+    date: '2026-10-19',
+    href: '/cheat-sheets?c=as',
+    published: true,
+  },
+  {
     id: 'cheat-sheet-a-level-coulombs-law',
     category: 'lesson',
     type: 'new',

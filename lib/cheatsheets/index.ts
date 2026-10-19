@@ -12,6 +12,14 @@ import { igcseCircularMotion } from './sheets/igcse-circular-motion';
 import { aLevelCircularMotion } from './sheets/a-level-circular-motion';
 import { aLevelGravitationalFields } from './sheets/a-level-gravitational-fields';
 import { aLevelCoulombsLaw } from './sheets/a-level-coulombs-law';
+import { as11Speed } from './sheets/as-1-1-speed';
+import { as12DistanceDisplacement } from './sheets/as-1-2-distance-and-displacement';
+import { as13SpeedVelocity } from './sheets/as-1-3-speed-and-velocity';
+import { as14DisplacementTimeGraphs } from './sheets/as-1-4-displacement-time-graphs';
+import { as15CombiningDisplacements } from './sheets/as-1-5-combining-displacements';
+import { as16CombiningVelocities } from './sheets/as-1-6-combining-velocities';
+import { as17SubtractingVectors } from './sheets/as-1-7-subtracting-vectors';
+import { as18ScalarsVectors } from './sheets/as-1-8-scalars-and-vectors';
 
 export type * from './types';
 
@@ -20,6 +28,15 @@ export const CHEAT_SHEETS: readonly CheatSheet[] = [
   aLevelCircularMotion,
   aLevelGravitationalFields,
   aLevelCoulombsLaw,
+  // AS Chapter 1 Kinematics: one single-page sheet per lesson.
+  as11Speed,
+  as12DistanceDisplacement,
+  as13SpeedVelocity,
+  as14DisplacementTimeGraphs,
+  as15CombiningDisplacements,
+  as16CombiningVelocities,
+  as17SubtractingVectors,
+  as18ScalarsVectors,
 ];
 
 export function getCheatSheet(slug: string): CheatSheet | undefined {
@@ -113,4 +130,13 @@ export function sectionLength(sheet: CheatSheet, section: SectionKey): number {
   if (section === 'samples') return sheet.samples.length;
   if (section === 'practice') return sheet.practice.length;
   return 1;
+}
+
+/** A list section with no items is left out entirely. */
+export function sectionIsEmpty(sheet: CheatSheet, k: SectionKey): boolean {
+  if (k === 'derivations') return sheet.derivations.length === 0;
+  if (k === 'equations') return sheet.equations.length === 0;
+  if (k === 'samples') return sheet.samples.length === 0;
+  if (k === 'practice') return sheet.practice.length === 0;
+  return false;
 }

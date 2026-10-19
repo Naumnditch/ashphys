@@ -50,6 +50,142 @@
       }
     }
   },
+  "as-1-1-speed": {
+    "hash": "6f91dd74ba3241fac4d112df343ed6ecc1ba7bfa32361751f1de8e0490e128f5",
+    "files": {
+      "a4": {
+        "file": "as-1-1-speed-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 142289
+      },
+      "letter": {
+        "file": "as-1-1-speed-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 142290
+      }
+    }
+  },
+  "as-1-2-distance-and-displacement": {
+    "hash": "53ec4cf5f1ea73fbdedef87a2f945d236dc8c65cfa820722b224809efa04b136",
+    "files": {
+      "a4": {
+        "file": "as-1-2-distance-and-displacement-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 144572
+      },
+      "letter": {
+        "file": "as-1-2-distance-and-displacement-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 144804
+      }
+    }
+  },
+  "as-1-3-speed-and-velocity": {
+    "hash": "9b889b200328966a55cba0305c671e2b28ca3fdd3cf2690ec3938e00d1bb47bd",
+    "files": {
+      "a4": {
+        "file": "as-1-3-speed-and-velocity-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 145890
+      },
+      "letter": {
+        "file": "as-1-3-speed-and-velocity-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 145832
+      }
+    }
+  },
+  "as-1-4-displacement-time-graphs": {
+    "hash": "2efc92a0ce53a6226ff9f4dc99c4e1ac74b1ccd2dc6d110bf81f62ed0763991d",
+    "files": {
+      "a4": {
+        "file": "as-1-4-displacement-time-graphs-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 151174
+      },
+      "letter": {
+        "file": "as-1-4-displacement-time-graphs-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 151484
+      }
+    }
+  },
+  "as-1-5-combining-displacements": {
+    "hash": "642bf0eacff80a3f24acfeec4c4298fb6f5d59713ffcc01d97c157ecb57af595",
+    "files": {
+      "a4": {
+        "file": "as-1-5-combining-displacements-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 178432
+      },
+      "letter": {
+        "file": "as-1-5-combining-displacements-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 178894
+      }
+    }
+  },
+  "as-1-6-combining-velocities": {
+    "hash": "014db77df867ef48fb41201e7fa14843bb1d2f7e9fbc4556014cd5109fbcd615",
+    "files": {
+      "a4": {
+        "file": "as-1-6-combining-velocities-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 169160
+      },
+      "letter": {
+        "file": "as-1-6-combining-velocities-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 169764
+      }
+    }
+  },
+  "as-1-7-subtracting-vectors": {
+    "hash": "294ac2d0e1b6eb2588c7e9570e6053db602374790130062e1937bdaecd286f61",
+    "files": {
+      "a4": {
+        "file": "as-1-7-subtracting-vectors-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 184958
+      },
+      "letter": {
+        "file": "as-1-7-subtracting-vectors-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 185369
+      }
+    }
+  },
+  "as-1-8-scalars-and-vectors": {
+    "hash": "86b33b236dd8b4325168878b00494bf004d6bf48c9ce8e223ddecd370113900c",
+    "files": {
+      "a4": {
+        "file": "as-1-8-scalars-and-vectors-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 129066
+      },
+      "letter": {
+        "file": "as-1-8-scalars-and-vectors-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 129417
+      }
+    }
+  },
   "igcse-circular-motion": {
     "hash": "4488018b14216188455dd0fa98e70a0978e72b4aa4dea210a856656972dd7db9",
     "files": {

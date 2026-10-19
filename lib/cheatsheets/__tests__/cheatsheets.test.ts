@@ -110,7 +110,7 @@ describe('cheat sheet registry', () => {
     // The A Level sheet also covers the other Chapter 16 lessons, in A Level only.
     expect(cheatSheetFor('744a91d7-6b75-4fd2-b3c7-17689e965446', 'a-level')).toBe(alevel);
     expect(cheatSheetFor('0245e29c-acd6-5c5f-b1b3-bf9431a0fa6b', 'ib')).toBeUndefined();
-    expect(cheatSheetsFor('as')).toEqual([]);
+    expect(cheatSheetsFor('as')).toHaveLength(8);
     expect(getCheatSheet('nope')).toBeUndefined();
   });
 
@@ -131,15 +131,17 @@ describe('cheat sheet registry', () => {
 
 describe.each(CHEAT_SHEETS.map((s) => [s.slug, s] as const))('sheet %s', (_slug, sheet) => {
   it('has every section of the format', () => {
+    // A one-page lesson sheet (no `pages`) is deliberately short: a derivation is optional.
+    const lesson = !sheet.pages;
     expect(sheet.topicId).toMatch(UUID);
     for (const id of sheet.alsoCovers ?? []) expect(id).toMatch(UUID);
     expect(sheet.explanation.paragraphs.length).toBeGreaterThanOrEqual(2);
     expect(sheet.explanation.keyTerms.length).toBeGreaterThanOrEqual(1);
-    expect(sheet.derivations.length).toBeGreaterThanOrEqual(1);
-    expect(sheet.equations.length).toBeGreaterThanOrEqual(3);
-    expect(sheet.samples.length).toBeGreaterThanOrEqual(2);
-    expect(sheet.practice.length).toBeGreaterThanOrEqual(4);
-    expect(sheet.other.mistakes.length).toBeGreaterThanOrEqual(3);
+    expect(sheet.derivations.length).toBeGreaterThanOrEqual(lesson ? 0 : 1);
+    expect(sheet.equations.length).toBeGreaterThanOrEqual(lesson ? 1 : 3);
+    expect(sheet.samples.length).toBeGreaterThanOrEqual(lesson ? 1 : 2);
+    expect(sheet.practice.length).toBeGreaterThanOrEqual(lesson ? 3 : 4);
+    expect(sheet.other.mistakes.length).toBeGreaterThanOrEqual(lesson ? 1 : 3);
     expect(sheet.other.mistakes.length).toBeLessThanOrEqual(5);
     expect(sheet.other.tips.length).toBeGreaterThanOrEqual(1);
     expect(sheet.other.syllabus.length).toBeGreaterThanOrEqual(1);
@@ -505,6 +507,92 @@ describe('A Level Coulomb’s law: arithmetic', () => {
       '−4.3 × 10⁻¹⁸ J',
     ];
     coul.practice.forEach((p, i) => expect(p.answer, `P${i + 1}`).toContain(shown[i]));
+  });
+});
+
+describe('AS Chapter 1 Kinematics lesson sheets', () => {
+  const as = CHEAT_SHEETS.filter((s) => s.curriculumId === 'as' && s.chapter.number === 1);
+  const deg = (d: number) => (d * Math.PI) / 180;
+  const atanDeg = (y: number, x: number) => (Math.atan2(y, x) * 180) / Math.PI;
+
+  it('covers all eight lessons, 1.1–1.8, one page each', () => {
+    expect(as.map((s) => s.lessonCode).sort()).toEqual(['1.1', '1.2', '1.3', '1.4', '1.5', '1.6', '1.7', '1.8']);
+    for (const s of as) expect(sheetPages(s).length, s.slug).toBe(1);
+  });
+
+  it('1.1 speed numbers', () => {
+    expect((150000 / 9000).toFixed(1)).toBe('16.7');
+    expect(0.05 / 0.02).toBeCloseTo(2.5, 12);
+    expect((100 / 9.58).toFixed(1)).toBe('10.4');
+    expect(72 / 3.6).toBeCloseTo(20, 12);
+    expect(1500 / 12).toBe(125);
+    expect(400 / 50).toBe(8);
+  });
+
+  it('1.2 and 1.7: 3-4-5 triangles and 53°', () => {
+    expect(Math.hypot(3, 4)).toBe(5);
+    expect(atanDeg(4, 3).toFixed(0)).toBe('53');
+    expect(Math.hypot(6, 8)).toBe(10);
+    expect(Math.hypot(20, 20).toFixed(1)).toBe('28.3');
+  });
+
+  it('1.3 average speed and velocity', () => {
+    expect((400 / 30).toFixed(1)).toBe('13.3');
+    expect((200 / 30).toFixed(2)).toBe('6.67');
+    expect(12000 / 600).toBe(20);
+  });
+
+  it('1.4 gradients match the graph in the figure', () => {
+    const sheet = as.find((s) => s.lessonCode === '1.4')!;
+    const curve = sheet.diagrams[0].shapes.find((s) => s.kind === 'curve') as Extract<DiagramShape, { kind: 'curve' }>;
+    // Pixel gradients back to physical units: 15 px per s, 4.5 px per m.
+    const v = (a: Point, b: Point) => -(b[1] - a[1]) / 4.5 / ((b[0] - a[0]) / 15);
+    const [A, B, C, D] = curve.points;
+    expect(v(A, B)).toBeCloseTo(5, 6);
+    expect(v(B, C)).toBeCloseTo(0, 6);
+    expect(v(C, D)).toBeCloseTo(-5, 6);
+    expect(40 / 8).toBe(5);
+    expect(24 / 4).toBe(6);
+  });
+
+  it('1.5 components and resultants', () => {
+    expect((20 * Math.cos(deg(30))).toFixed(1)).toBe('17.3');
+    expect((20 * Math.sin(deg(30))).toFixed(1)).toBe('10.0');
+    expect(Math.hypot(12, 5)).toBe(13);
+    expect(atanDeg(5, 12).toFixed(0)).toBe('23');
+    expect((50 * Math.cos(deg(40))).toFixed(0)).toBe('38');
+    expect((50 * Math.sin(deg(40))).toFixed(0)).toBe('32');
+    expect((8 * Math.sin(deg(60))).toFixed(1)).toBe('6.9');
+  });
+
+  it('1.6 river crossing and wind', () => {
+    expect(Math.hypot(3, 1.5).toFixed(2)).toBe('3.35');
+    expect(atanDeg(1.5, 3).toFixed(0)).toBe('27');
+    expect(60 / 3).toBe(20);
+    expect(1.5 * 20).toBe(30);
+    expect(Math.hypot(200, 50).toFixed(0)).toBe('206');
+    expect(atanDeg(50, 200).toFixed(0)).toBe('14');
+    expect(((Math.asin(1.5 / 3) * 180) / Math.PI).toFixed(0)).toBe('30');
+    expect(Math.sqrt(9 - 2.25).toFixed(1)).toBe('2.6');
+    expect(48 / 1.2).toBeCloseTo(40, 12);
+  });
+
+  it('figures: 1.6 resultant = v_b + v_c, 1.7 Δv = v₂ + (−v₁), 1.5 components close the triangle', () => {
+    const river = as.find((s) => s.lessonCode === '1.6')!.diagrams[0];
+    const [vb, vc, v] = arrows(river).filter((a) => a.role === 'velocity');
+    expect([vb.to[0] + vec(vc)[0], vb.to[1] + vec(vc)[1]]).toEqual(v.to);
+    // 40 px per m s⁻¹: 3.0 across, 1.5 downstream.
+    expect(Math.hypot(...vec(vb)) / 40).toBeCloseTo(3, 6);
+    expect(Math.hypot(...vec(vc)) / 40).toBeCloseTo(1.5, 6);
+    const sub = as.find((s) => s.lessonCode === '1.7')!.diagrams[0];
+    const [v1, v2, v2b, minusV1, dv] = arrows(sub);
+    expect(vec(v2b)).toEqual(vec(v2));
+    expect(vec(minusV1).map((n) => n + 0)).toEqual(vec(v1).map((n) => -n + 0));
+    expect(dv.to).toEqual(minusV1.to);
+    const res = as.find((s) => s.lessonCode === '1.5')!.diagrams.find((d) => d.id === 'resolve')!;
+    const [r, x, y] = arrows(res);
+    expect(y.to).toEqual(r.to);
+    expect(Math.hypot(...vec(x)) / Math.hypot(...vec(r))).toBeCloseTo(Math.cos(deg(30)), 2);
   });
 });
 

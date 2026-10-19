@@ -6,6 +6,7 @@ import {
   SECTION_ORDER,
   SECTION_TITLES,
   isALevelOnly,
+  sectionIsEmpty,
   sheetPages,
   syllabusReference,
   tagLabel,
@@ -46,11 +47,11 @@ function sectionsLabel(codes: string[]) {
   return codes.length > 3 ? `${codes[0]}–${codes[codes.length - 1]}` : codes.join(', ');
 }
 
-function SectionHead({ k, continued }: { k: SectionKey; continued: boolean }) {
+function SectionHead({ k, n, continued }: { k: SectionKey; n: number; continued: boolean }) {
   return (
     <div className="cs-section__head">
       <h2 id={continued ? undefined : `cs-h-${k}`}>
-        <span className="cs-num">{String(SECTION_ORDER.indexOf(k) + 1).padStart(2, '0')}</span>
+        <span className="cs-num">{String(n).padStart(2, '0')}</span>
         {SECTION_TITLES[k]}
         {continued && <span className="cs-continued"> (continued)</span>}
       </h2>
@@ -64,10 +65,15 @@ interface Ctx {
   figNo: (id: string) => number;
   /** Where a figure is first shown in full: "explanation", "derivation:<i>" or "sample:<i>". */
   firstShownIn: (id: string) => string | undefined;
+  /** Section numbers count only the sections this sheet has (a short lesson sheet may have no derivation). */
+  sectionNo: (k: SectionKey) => number;
+  /** A one-page lesson sheet (compact layout). */
+  single: boolean;
   diagram: (id: string) => Diagram;
 }
 
 function renderPart(ctx: Ctx, part: PagePart) {
+  if (sectionIsEmpty(ctx.sheet, part.section)) return null;
   const { sheet } = ctx;
   const range = <T,>(items: T[]) => items.slice(part.from ?? 0, part.to ?? items.length);
   const offset = part.from ?? 0;
@@ -76,9 +82,33 @@ function renderPart(ctx: Ctx, part: PagePart) {
   switch (part.section) {
     case 'explanation': {
       const figs = sheet.explanation.figures ?? [];
+      const terms = (
+        <dl className="cs-terms">
+          {sheet.explanation.keyTerms.map((t) => (
+            <div key={t.term} className={t.source === 'syllabus' ? 'cs-quote' : undefined}>
+              <dt>
+                <MathText text={t.term} />
+                <Tag item={t} />{' '}
+                <span className="cs-source">[{t.source === 'syllabus' ? 'syllabus wording' : 'paraphrase'}]</span>
+              </dt>
+              <dd>
+                {t.source === 'syllabus' ? (
+                  <q>
+                    <MathText text={t.text} />
+                  </q>
+                ) : (
+                  <MathText text={t.text} />
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      );
+      // On a one-page sheet with one figure, the key terms run beside the figure, under the text.
+      const termsBesideFigure = ctx.single && figs.length === 1;
       return (
         <section key={key} className="cs-section" aria-labelledby="cs-h-explanation">
-          <SectionHead k="explanation" continued={part.continued} />
+          <SectionHead k="explanation" n={ctx.sectionNo('explanation')} continued={part.continued} />
           <div className={figs.length === 1 ? 'cs-explain' : figs.length > 1 ? 'cs-explain cs-explain--row' : undefined}>
             <div>
               {sheet.explanation.paragraphs.map((p, i) => (
@@ -86,6 +116,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
                   <MathText text={p} />
                 </p>
               ))}
+              {termsBesideFigure && terms}
             </div>
             {figs.length > 0 && (
               <div className="cs-explain__figs">
@@ -95,26 +126,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
               </div>
             )}
           </div>
-          <dl className="cs-terms">
-            {sheet.explanation.keyTerms.map((t) => (
-              <div key={t.term} className={t.source === 'syllabus' ? 'cs-quote' : undefined}>
-                <dt>
-                  <MathText text={t.term} />
-                  <Tag item={t} />{' '}
-                  <span className="cs-source">[{t.source === 'syllabus' ? 'syllabus wording' : 'paraphrase'}]</span>
-                </dt>
-                <dd>
-                  {t.source === 'syllabus' ? (
-                    <q>
-                      <MathText text={t.text} />
-                    </q>
-                  ) : (
-                    <MathText text={t.text} />
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {!termsBesideFigure && terms}
         </section>
       );
     }
@@ -122,7 +134,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
     case 'derivations':
       return (
         <section key={key} className="cs-section" aria-labelledby={part.continued ? undefined : 'cs-h-derivations'}>
-          <SectionHead k="derivations" continued={part.continued} />
+          <SectionHead k="derivations" n={ctx.sectionNo('derivations')} continued={part.continued} />
           {range(sheet.derivations).map((d, i) => (
             <article key={d.id} className="cs-deriv">
               <h3 className="cs-h3">
@@ -161,7 +173,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
     case 'equations':
       return (
         <section key={key} className="cs-section" aria-labelledby="cs-h-equations">
-          <SectionHead k="equations" continued={part.continued} />
+          <SectionHead k="equations" n={ctx.sectionNo('equations')} continued={part.continued} />
           <div className="cs-boxes">
             {sheet.equations.map((e) => (
               <div key={e.name} className={`cs-box${e.tag && e.tag !== 'supplement' ? ' cs-flagged' : ''}`}>
@@ -196,7 +208,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
     case 'samples':
       return (
         <section key={key} className="cs-section" aria-labelledby={part.continued ? undefined : 'cs-h-samples'}>
-          <SectionHead k="samples" continued={part.continued} />
+          <SectionHead k="samples" n={ctx.sectionNo('samples')} continued={part.continued} />
           {range(sheet.samples).map((s, i) => (
             <article key={s.title} className="cs-sample">
               <p className="cs-question m-0">
@@ -237,14 +249,16 @@ function renderPart(ctx: Ctx, part: PagePart) {
                     </div>
                   ))}
               </div>
-              <div className="cs-answer">
-                <b>Answer:</b> <MathText text={s.answer} />
-              </div>
-              {s.unitCheck && (
-                <div className="cs-unitcheck">
-                  Unit check: <MathText text={`$${s.unitCheck}\\ \\checkmark$`} />
+              <div className="cs-answer-row">
+                <div className="cs-answer">
+                  <b>Answer:</b> <MathText text={s.answer} />
                 </div>
-              )}
+                {s.unitCheck && (
+                  <div className="cs-unitcheck">
+                    Unit check: <MathText text={`$${s.unitCheck}\\ \\checkmark$`} />
+                  </div>
+                )}
+              </div>
             </article>
           ))}
         </section>
@@ -254,7 +268,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
       const items = range(sheet.practice);
       return (
         <section key={key} className="cs-section" aria-labelledby={part.continued ? undefined : 'cs-h-practice'}>
-          <SectionHead k="practice" continued={part.continued} />
+          <SectionHead k="practice" n={ctx.sectionNo('practice')} continued={part.continued} />
           <ol className="cs-practice">
             {items.map((p, i) => (
               <li key={i}>
@@ -281,7 +295,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
       const o = sheet.other;
       return (
         <section key={key} className="cs-section" aria-labelledby="cs-h-other">
-          <SectionHead k="other" continued={part.continued} />
+          <SectionHead k="other" n={ctx.sectionNo('other')} continued={part.continued} />
           <div className="cs-other">
             <div className="cs-other__mistakes">
               <h3 className="cs-h3">Common mistakes</h3>
@@ -307,7 +321,7 @@ function renderPart(ctx: Ctx, part: PagePart) {
                   </li>
                 ))}
               </ul>
-              {o.links && o.links.length > 0 && (
+              {!ctx.single && o.links && o.links.length > 0 && (
                 <>
                   <h3 className="cs-h3">Explore</h3>
                   <ul className="cs-bullets">
@@ -331,6 +345,18 @@ function renderPart(ctx: Ctx, part: PagePart) {
               </ul>
             </div>
           </div>
+          {/* One-page sheets: links on one line under the grid, so they don't lengthen a column. */}
+          {ctx.single && o.links && o.links.length > 0 && (
+            <p className="cs-explore-line">
+              <b>Explore:</b>{' '}
+              {o.links.map((l, i) => (
+                <span key={l.href}>
+                  {i > 0 && ' · '}
+                  <a href={l.href}>{l.label}</a>
+                </span>
+              ))}
+            </p>
+          )}
         </section>
       );
     }
@@ -364,6 +390,8 @@ export function CheatSheetView({ sheet, url }: { sheet: CheatSheet; url: string 
     sheet,
     figNo: (id) => order.indexOf(id) + 1,
     firstShownIn: (id) => firstShown.get(id),
+    single: pages.length === 1,
+    sectionNo: (k) => SECTION_ORDER.filter((x) => !sectionIsEmpty(sheet, x)).indexOf(k) + 1,
     diagram: (id) => {
       const d = sheet.diagrams.find((x) => x.id === id);
       if (!d) throw new Error(`Cheat sheet ${sheet.slug}: no diagram "${id}"`);
@@ -372,7 +400,14 @@ export function CheatSheetView({ sheet, url }: { sheet: CheatSheet; url: string 
   };
 
   return (
-    <div id="cs-root" className={`cs-root ${typewriter.variable}`} data-ink="saver" data-print-answers="on" data-paper="a4">
+    <div
+      id="cs-root"
+      // A one-page lesson sheet uses the compact layout (steps beside their equations).
+      className={`cs-root ${typewriter.variable}${pages.length === 1 ? ' cs-root--single' : ''}`}
+      data-ink="saver"
+      data-print-answers="on"
+      data-paper="a4"
+    >
       <SheetToolbar rootId="cs-root" pdfs={pdfHrefs(sheet.slug)} />
       {pages.map((parts, p) => (
         <article key={p} className="cs-page" aria-label={`Sheet ${p + 1} of ${pages.length}`}>
