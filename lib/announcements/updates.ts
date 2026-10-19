@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheet-a-level-coulombs-law',
+    category: 'lesson',
+    type: 'new',
+    title: 'A Level Coulomb’s law cheat sheet',
+    description: 'Electric field and potential of point charges, combining charges, the neutral point and the gravity comparison, with worked samples and 10 practice problems.',
+    date: '2026-10-19',
+    href: '/cheat-sheets/a-level-coulombs-law',
+    published: true,
+  },
+  {
     id: 'cheat-sheet-a-level-gravitational-fields',
     category: 'lesson',
     type: 'new',

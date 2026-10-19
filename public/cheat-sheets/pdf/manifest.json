@@ -16,6 +16,23 @@
       }
     }
   },
+  "a-level-coulombs-law": {
+    "hash": "91b819d8a1c9b93acfe8cbd391cbee6aa08611503ef35c31d3dfdae6783568d7",
+    "files": {
+      "a4": {
+        "file": "a-level-coulombs-law-a4.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 316090
+      },
+      "letter": {
+        "file": "a-level-coulombs-law-letter.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 317480
+      }
+    }
+  },
   "a-level-gravitational-fields": {
     "hash": "5d3714ebfa22331ad75cc76dcdcf58ee30af073ad542364157f3f11f35ea82ad",
     "files": {

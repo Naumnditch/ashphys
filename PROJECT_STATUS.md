@@ -27,6 +27,19 @@ Last updated: 2026-10-17 (revision cheat sheets: new six-section format, precise
 
 ### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion; 2026-10-19: A Level Gravitational fields)
 
+**2026-10-19 — A Level Chapter 22 Coulomb's law** at `/cheat-sheets/a-level-coulombs-law`
+(6 pages). Covers all five Chapter 22 lessons (22.1 its own; 22.2–22.5 via `alsoCovers`,
+incl. the shared IGCSE 17.4 Coulomb lesson in its A Level role). Derivations: E = Q/4πε₀r²;
+V = Q/4πε₀r, Ep = Qq/4πε₀r, ΔEp = qΔV, E = −ΔV/Δr; combining two charges (vector E,
+scalar V, neutral point); electric vs gravitational fields (F_E/F_G ≈ 2.3 × 10³⁹ for p–e).
+Samples: force between spheres, neutral point of +2.0/+8.0 μC (x = d/3, V ≠ 0 there),
+α-particle closest approach (the r ↔ E_k swap), two hanging charged spheres (F = mg tan θ,
+then Coulomb). 10 practice problems. Constants 1/4πε₀ = 8.99 × 10⁹, e = 1.60 × 10⁻¹⁹ C. Links
+the Coulomb's Law Lab simulation and the 98-question bank. Charges and potential curves
+are drawn in neutral ink (red/teal stay reserved for force/velocity). Template change: a
+sample whose figure is not shown earlier on the sheet now shows it full size (with its
+Fig. number and caption) instead of a thumbnail. Max printed height on US Letter 952/980.
+
 **2026-10-19 — A Level Chapter 17 Gravitational fields** at
 `/cheat-sheets/a-level-gravitational-fields` (6 pages), same format as Chapter 16. Covers
 all seven Chapter 17 lessons (17.1 field lines is its own; `alsoCovers` 17.2–17.7, including

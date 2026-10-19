@@ -22,6 +22,7 @@ import { PDF_MANIFEST, pdfHrefs } from '../pdfFiles';
 import { igcseCircularMotion as igcse } from '../sheets/igcse-circular-motion';
 import { aLevelCircularMotion as alevel } from '../sheets/a-level-circular-motion';
 import { aLevelGravitationalFields as grav } from '../sheets/a-level-gravitational-fields';
+import { aLevelCoulombsLaw as coul } from '../sheets/a-level-coulombs-law';
 import type { CheatSheet, Diagram, DiagramShape, Point } from '../types';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -417,6 +418,96 @@ describe('A Level gravitational fields: arithmetic', () => {
   });
 });
 
+describe('A Level Coulomb’s law: arithmetic', () => {
+  const k = 8.99e9;
+  const e = 1.6e-19;
+
+  it('1/(4πε₀) = 8.99e9 with ε₀ = 8.85e-12', () => {
+    expect((1 / (4 * Math.PI * 8.85e-12)).toPrecision(3)).toBe('8.99e+9');
+  });
+
+  it('sample 1: +4.0 nC and −6.0 nC at 5.0 cm', () => {
+    expect(((k * 4e-9 * 6e-9) / 0.05 ** 2).toExponential(2)).toBe('8.63e-5');
+    expect(coul.samples[0].answer).toMatch(/8\.6.*attractive/);
+  });
+
+  it('sample 2: neutral point of +2.0 μC and +8.0 μC, 30 cm apart', () => {
+    const x = 0.3 / (1 + Math.sqrt(8 / 2));
+    expect(x).toBeCloseTo(0.1, 12);
+    // The fields really cancel there.
+    expect((k * 2e-6) / x ** 2).toBeCloseTo((k * 8e-6) / (0.3 - x) ** 2, 3);
+    const V = k * (2e-6 / x + 8e-6 / (0.3 - x));
+    expect(V.toPrecision(3)).toBe('5.39e+5');
+    expect(coul.samples[1].answer).toContain('5.4\\times10^{5}');
+  });
+
+  it('sample 3: α-particle closest approach, 7.7 MeV onto gold', () => {
+    const Ek = 7.7e6 * e;
+    expect(Ek.toPrecision(3)).toBe('1.23e-12');
+    const r = (k * 2 * e * 79 * e) / Ek;
+    expect(r.toPrecision(3)).toBe('2.95e-14');
+    const swap = coul.samples[2].steps[2];
+    expect(swap.text).toMatch(/swap/i);
+    expect(swap.latex).toContain(String.raw`r = \frac{Qq}{4\pi\varepsilon_{0}E_\mathrm{k}}`);
+  });
+
+  it('sample 4: hanging spheres, 0.20 g, 0.50 m threads at 15°', () => {
+    const th = (15 * Math.PI) / 180;
+    const F = 0.2e-3 * 9.81 * Math.tan(th);
+    const d = 2 * 0.5 * Math.sin(th);
+    const Q = d * Math.sqrt(F / k);
+    expect(F.toExponential(2)).toBe('5.26e-4');
+    expect(d.toFixed(3)).toBe('0.259');
+    expect(Q.toPrecision(3)).toBe('6.26e-8');
+    // Coulomb’s law with that charge gives back the electric force.
+    expect((k * Q * Q) / d ** 2).toBeCloseTo(F, 12);
+  });
+
+  it('proton–electron force ratio ≈ 2.3e39', () => {
+    expect(((k * e * e) / (6.67e-11 * 1.67e-27 * 9.11e-31)).toPrecision(2)).toBe('2.3e+39');
+  });
+
+  it('practice answers', () => {
+    const computed = [
+      ((k * e * e) / 1e-30).toPrecision(2),
+      ((k * 5e-6) / 0.2 ** 2).toPrecision(2),
+      (e * 3e4).toPrecision(2),
+      ((k * -3e-9) / 0.1).toPrecision(2),
+      (2e-6 * 200).toExponential(1),
+      '¼ ½',
+      ((0.15 * 3e5) / k).toExponential(1),
+      (60 / 0.002).toPrecision(2),
+      ((k * e * e) / (6.67e-11 * 1.67e-27 ** 2)).toPrecision(2),
+      ((-k * e * e) / 5.3e-11).toPrecision(2),
+    ];
+    expect(computed).toEqual([
+      '2.3e+2',
+      '1.1e+6',
+      '4.8e-15',
+      '-2.7e+2',
+      '4.0e-4',
+      '¼ ½',
+      '5.0e-6',
+      '3.0e+4',
+      '1.2e+36',
+      '-4.3e-18',
+    ]);
+    const shown = [
+      '2.3 × 10² N',
+      '1.1 × 10⁶ N C⁻¹',
+      '4.8 × 10⁻¹⁵ N',
+      '−2.7 × 10² V',
+      '4.0 × 10⁻⁴ J',
+      '¼',
+      '5.0 × 10⁻⁶ C',
+      '3.0 × 10⁴',
+      '1.2 × 10³⁶',
+      '−4.3 × 10⁻¹⁸ J',
+    ];
+    coul.practice.forEach((p, i) => expect(p.answer, `P${i + 1}`).toContain(shown[i]));
+  });
+});
+
 describe('diagram physics', () => {
   it.each([
     [igcse, 'velocity-and-force'],
@@ -534,6 +625,58 @@ describe('diagram physics', () => {
     const F = arrows(d).find((a) => a.role === 'force')!;
     expect(Math.abs(cosBetween(vec(v), vec(F)))).toBeLessThan(0.01);
     expect(cosBetween(vec(F), [orbit.centre[0] - F.from[0], orbit.centre[1] - F.from[1]])).toBeGreaterThan(0.999);
+  });
+
+  it('Coulomb: field lines point away from + and towards −', () => {
+    const d = fig(coul, 'radial-fields');
+    const [pos, neg] = d.shapes
+      .filter((s): s is Extract<DiagramShape, { kind: 'circle' }> => s.kind === 'circle' && !s.fill)
+      .map((c) => c.centre);
+    for (const a of arrows(d)) {
+      const nearPos = Math.hypot(a.from[0] - pos[0], a.from[1] - pos[1]) < Math.hypot(a.from[0] - neg[0], a.from[1] - neg[1]);
+      const centre = nearPos ? pos : neg;
+      const away: Point = [a.from[0] - centre[0], a.from[1] - centre[1]];
+      // Outward from +: arrow along "away"; inward to −: arrow against "away".
+      expect(cosBetween(vec(a), away)).toBeCloseTo(nearPos ? 1 : -1, 3);
+    }
+  });
+
+  it('Coulomb: at the dipole midpoint both fields point from + to −', () => {
+    const d = fig(coul, 'dipole');
+    expect(arrows(d).every((a) => a.to[0] > a.from[0] && a.to[1] === a.from[1])).toBe(true);
+  });
+
+  it('Coulomb: the neutral point is d/3 from the smaller charge, with equal and opposite fields', () => {
+    const d = fig(coul, 'neutral-point');
+    const [c1, c2] = d.shapes.filter((s): s is Extract<DiagramShape, { kind: 'circle' }> => s.kind === 'circle' && !s.fill);
+    const N = (d.shapes.find((s) => s.kind === 'dot') as Extract<DiagramShape, { kind: 'dot' }>).at;
+    expect((N[0] - c1.centre[0]) / (c2.centre[0] - c1.centre[0])).toBeCloseTo(1 / 3, 2);
+    expect(c2.radius).toBeGreaterThan(c1.radius);
+    const [e1, e2] = arrows(d);
+    expect(vec(e1)[0]).toBeCloseTo(-vec(e2)[0], 6);
+    // E₁ (from the left charge) points away from it, to the right.
+    expect(vec(e1)[0]).toBeGreaterThan(0);
+  });
+
+  it('Coulomb: the hanging sphere balances, F/mg = tan θ and the tension points at the pivot', () => {
+    const d = fig(coul, 'suspended');
+    const pivot = (d.shapes.find((s) => s.kind === 'arc') as Extract<DiagramShape, { kind: 'arc' }>).centre;
+    const [T, W, F] = arrows(d);
+    const toPivot: Point = [pivot[0] - T.from[0], pivot[1] - T.from[1]];
+    expect(cosBetween(vec(T), toPivot)).toBeGreaterThan(0.999);
+    expect(vec(W)[0]).toBe(0);
+    expect(vec(F)[1]).toBe(0);
+    expect(cosBetween(toPivot, [0, -1])).toBeCloseTo(Math.cos((15 * Math.PI) / 180), 3);
+    // The drawn forces close: T + W + F ≈ 0 (F is drawn 10 px longer so its head is visible).
+    expect(vec(T)[1] + vec(W)[1]).toBeCloseTo(0, -1);
+    expect(vec(T)[0] + vec(F)[0] - 10).toBeCloseTo(0, -1);
+  });
+
+  it('Coulomb: V ∝ 1/r curves, positive for +Q and negative for −Q', () => {
+    const d = fig(coul, 'potential-graph');
+    const [pos, neg] = d.shapes.filter((s): s is Extract<DiagramShape, { kind: 'curve' }> => s.kind === 'curve');
+    for (const [x, y] of pos.points) expect(125 - y).toBeCloseTo(90 / ((x - 60) / 25), 0);
+    for (const [x, y] of neg.points) expect(y - 125).toBeCloseTo(90 / ((x - 60) / 25), 0);
   });
 
   it('A Level: the conical pendulum tension points at the pivot, at θ to the vertical', () => {

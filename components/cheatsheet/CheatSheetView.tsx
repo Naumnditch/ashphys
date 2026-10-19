@@ -62,6 +62,8 @@ interface Ctx {
   sheet: CheatSheet;
   /** Figure numbers, in order of first appearance. */
   figNo: (id: string) => number;
+  /** Where a figure is first shown in full: "explanation", "derivation:<i>" or "sample:<i>". */
+  firstShownIn: (id: string) => string | undefined;
   diagram: (id: string) => Diagram;
 }
 
@@ -205,7 +207,15 @@ function renderPart(ctx: Ctx, part: PagePart) {
                 <br />
                 <MathText text={s.question} />
               </p>
-              <div className={s.figure ? 'cs-sample__grid' : undefined}>
+              <div
+                className={
+                  !s.figure
+                    ? undefined
+                    : ctx.firstShownIn(s.figure) === `sample:${offset + i}`
+                      ? 'cs-sample__grid cs-sample__grid--figure'
+                      : 'cs-sample__grid'
+                }
+              >
                 <ol className="cs-steps">
                   {s.steps.map((step, j) => (
                     <li key={j}>
@@ -216,12 +226,16 @@ function renderPart(ctx: Ctx, part: PagePart) {
                     </li>
                   ))}
                 </ol>
-                {s.figure && (
-                  <div className="cs-sample__fig" aria-hidden="true">
-                    <SheetDiagram diagram={ctx.diagram(s.figure)} />
-                    <div className="cs-fig__ref">see Fig. {ctx.figNo(s.figure)}</div>
-                  </div>
-                )}
+                {s.figure &&
+                  // A figure not shown earlier on the sheet appears here in full; otherwise a thumbnail refers back to it.
+                  (ctx.firstShownIn(s.figure) === `sample:${offset + i}` ? (
+                    <Figure diagram={ctx.diagram(s.figure)} n={ctx.figNo(s.figure)} />
+                  ) : (
+                    <div className="cs-sample__fig" aria-hidden="true">
+                      <SheetDiagram diagram={ctx.diagram(s.figure)} />
+                      <div className="cs-fig__ref">see Fig. {ctx.figNo(s.figure)}</div>
+                    </div>
+                  ))}
               </div>
               <div className="cs-answer">
                 <b>Answer:</b> <MathText text={s.answer} />
@@ -331,17 +345,25 @@ export function CheatSheetView({ sheet, url }: { sheet: CheatSheet; url: string 
 
   // Figures are numbered in the order they first appear on the sheet.
   const order: string[] = [];
-  const note = (id?: string) => id && !order.includes(id) && order.push(id);
+  const firstShown = new Map<string, string>();
+  const note = (id: string | undefined, where: string) => {
+    if (!id || order.includes(id)) return;
+    order.push(id);
+    firstShown.set(id, where);
+  };
   for (const page of pages) {
     for (const part of page) {
-      if (part.section === 'explanation') (sheet.explanation.figures ?? []).forEach(note);
-      if (part.section === 'derivations') sheet.derivations.slice(part.from ?? 0, part.to).forEach((d) => note(d.figure));
-      if (part.section === 'samples') sheet.samples.slice(part.from ?? 0, part.to).forEach((s) => note(s.figure));
+      const from = part.from ?? 0;
+      if (part.section === 'explanation') (sheet.explanation.figures ?? []).forEach((id) => note(id, 'explanation'));
+      if (part.section === 'derivations')
+        sheet.derivations.slice(from, part.to).forEach((d, i) => note(d.figure, `derivation:${from + i}`));
+      if (part.section === 'samples') sheet.samples.slice(from, part.to).forEach((s, i) => note(s.figure, `sample:${from + i}`));
     }
   }
   const ctx: Ctx = {
     sheet,
     figNo: (id) => order.indexOf(id) + 1,
+    firstShownIn: (id) => firstShown.get(id),
     diagram: (id) => {
       const d = sheet.diagrams.find((x) => x.id === id);
       if (!d) throw new Error(`Cheat sheet ${sheet.slug}: no diagram "${id}"`);

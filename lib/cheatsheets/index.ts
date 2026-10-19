@@ -11,10 +11,16 @@ import type { CheatSheet, ContentTag, PageBlock, SectionKey } from './types';
 import { igcseCircularMotion } from './sheets/igcse-circular-motion';
 import { aLevelCircularMotion } from './sheets/a-level-circular-motion';
 import { aLevelGravitationalFields } from './sheets/a-level-gravitational-fields';
+import { aLevelCoulombsLaw } from './sheets/a-level-coulombs-law';
 
 export type * from './types';
 
-export const CHEAT_SHEETS: readonly CheatSheet[] = [igcseCircularMotion, aLevelCircularMotion, aLevelGravitationalFields];
+export const CHEAT_SHEETS: readonly CheatSheet[] = [
+  igcseCircularMotion,
+  aLevelCircularMotion,
+  aLevelGravitationalFields,
+  aLevelCoulombsLaw,
+];
 
 export function getCheatSheet(slug: string): CheatSheet | undefined {
   return CHEAT_SHEETS.find((s) => s.slug === slug);
