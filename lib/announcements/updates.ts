@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheets-as-accelerated-motion',
+    category: 'lesson',
+    type: 'new',
+    title: 'AS Accelerated motion: 14 one-page cheat sheets',
+    description: 'A printable page for every Chapter 2 lesson: acceleration, v–t graphs, suvat and their derivation, free fall, measuring g and projectiles.',
+    date: '2026-10-19',
+    href: '/cheat-sheets?c=as',
+    published: true,
+  },
+  {
     id: 'cheat-sheets-as-kinematics',
     category: 'lesson',
     type: 'new',

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import katex from 'katex';
+import { keepUnitsTogether } from '@/components/cheatsheet/Math';
 import { findSection } from '@/lib/curricula';
 import {
   CHEAT_SHEETS,
@@ -110,7 +111,7 @@ describe('cheat sheet registry', () => {
     // The A Level sheet also covers the other Chapter 16 lessons, in A Level only.
     expect(cheatSheetFor('744a91d7-6b75-4fd2-b3c7-17689e965446', 'a-level')).toBe(alevel);
     expect(cheatSheetFor('0245e29c-acd6-5c5f-b1b3-bf9431a0fa6b', 'ib')).toBeUndefined();
-    expect(cheatSheetsFor('as')).toHaveLength(8);
+    expect(cheatSheetsFor('as')).toHaveLength(22);
     expect(getCheatSheet('nope')).toBeUndefined();
   });
 
@@ -138,7 +139,8 @@ describe.each(CHEAT_SHEETS.map((s) => [s.slug, s] as const))('sheet %s', (_slug,
     expect(sheet.explanation.paragraphs.length).toBeGreaterThanOrEqual(2);
     expect(sheet.explanation.keyTerms.length).toBeGreaterThanOrEqual(1);
     expect(sheet.derivations.length).toBeGreaterThanOrEqual(lesson ? 0 : 1);
-    expect(sheet.equations.length).toBeGreaterThanOrEqual(lesson ? 1 : 3);
+    // A lesson sheet whose derivation boxes the result needs no separate key-equations box.
+    expect(sheet.equations.length).toBeGreaterThanOrEqual(lesson ? (sheet.derivations.length ? 0 : 1) : 3);
     expect(sheet.samples.length).toBeGreaterThanOrEqual(lesson ? 1 : 2);
     expect(sheet.practice.length).toBeGreaterThanOrEqual(lesson ? 3 : 4);
     expect(sheet.other.mistakes.length).toBeGreaterThanOrEqual(lesson ? 1 : 3);
@@ -596,6 +598,140 @@ describe('AS Chapter 1 Kinematics lesson sheets', () => {
   });
 });
 
+describe('AS Chapter 2 Accelerated motion lesson sheets', () => {
+  const as = CHEAT_SHEETS.filter((s) => s.curriculumId === 'as' && s.chapter.number === 2);
+  const g = 9.81;
+  const deg = (d: number) => (d * Math.PI) / 180;
+  const sheet = (code: string) => as.find((s) => s.lessonCode === code)!;
+
+  it('covers all fourteen lessons, 2.1–2.14, one page each', () => {
+    expect(as.map((s) => s.lessonCode).sort((a, b) => Number(a.split('.')[1]) - Number(b.split('.')[1]))).toEqual(
+      Array.from({ length: 14 }, (_, i) => `2.${i + 1}`),
+    );
+    for (const s of as) expect(sheetPages(s).length, s.slug).toBe(1);
+  });
+
+  it('2.1–2.3 acceleration numbers', () => {
+    expect(24 / 8).toBe(3);
+    expect((6 - 24) / 3).toBe(-6);
+    expect(10 / 2.5).toBe(4);
+    expect((5 - 15) / 4).toBe(-2.5);
+    expect(5 + 2 * 6).toBe(17);
+    expect((25 - 5) / 2).toBe(10);
+    expect((8 - 20) / 6).toBe(-2);
+    expect((g * 1.5).toFixed(1)).toBe('14.7');
+    expect(75 / 2.5).toBe(30);
+    expect((0 - 6) / -0.8).toBeCloseTo(7.5, 12);
+    expect((100 / 3.6).toFixed(1)).toBe('27.8');
+    expect((100 / 3.6 / 8).toFixed(2)).toBe('3.47');
+    expect((60 / 3.6 / 5).toFixed(1)).toBe('3.3');
+    expect(30 / 2).toBe(15);
+    expect((-72 / 3.6 / 60).toFixed(2)).toBe('-0.33');
+  });
+
+  it('2.4 and 2.5: gradients and areas match the graphs in the figures', () => {
+    const line = (code: string) =>
+      (sheet(code).diagrams[0].shapes.find((s) => s.kind === 'curve') as Extract<DiagramShape, { kind: 'curve' }>).points;
+    // 2.4: 18 px per s, 12 px per m s⁻¹.
+    const a = (p: Point, q: Point) => -(q[1] - p[1]) / 12 / ((q[0] - p[0]) / 18);
+    const [A, B, C, D] = line('2.4');
+    expect(a(A, B)).toBeCloseTo(3, 6);
+    expect(a(B, C)).toBeCloseTo(0, 6);
+    expect(a(C, D)).toBeCloseTo(-3, 6);
+    // 2.5: 20 px per s, 13 px per m s⁻¹; trapezium area = 90 m.
+    const pts = line('2.5').map(([x, y]) => [(x - 50) / 20, (190 - y) / 13]);
+    let area = 0;
+    for (let i = 1; i < pts.length; i++) area += ((pts[i][1] + pts[i - 1][1]) / 2) * (pts[i][0] - pts[i - 1][0]);
+    expect(area).toBeCloseTo(90, 6);
+    expect(90 / 12).toBe(7.5);
+    expect(8 * 15).toBe(120);
+    expect(0.5 * 20 * 10).toBe(100);
+    expect(0.5 * (6 + 14) * 5).toBe(50);
+  });
+
+  it('2.6 and 2.7 lab numbers; the tape chart strips are the stated lengths', () => {
+    expect(0.05 / 0.05).toBe(1);
+    expect(0.05 / 0.025).toBe(2);
+    expect((2 - 1) / 0.4).toBeCloseTo(2.5, 12);
+    expect(0.1 / 0.2).toBe(0.5);
+    expect((1.5 - 0.5) / 0.8).toBe(1.25);
+    const strips = sheet('2.7').diagrams[0].shapes.filter((s) => s.kind === 'polygon') as Extract<DiagramShape, { kind: 'polygon' }>[];
+    expect(strips.map((s) => (s.points[0][1] - s.points[1][1]) / 20)).toEqual([2, 4, 6]);
+    expect([0.02, 0.04, 0.06].map((l) => +(l / 0.1).toFixed(2))).toEqual([0.2, 0.4, 0.6]);
+    expect((0.4 - 0.2) / 0.1).toBeCloseTo(2, 12);
+    expect(10 * 0.02).toBeCloseTo(0.2, 12);
+    expect(0.035 / 0.1).toBeCloseTo(0.35, 12);
+    expect((0.025 - 0.015) / 0.1 / 0.1).toBeCloseTo(1, 12);
+  });
+
+  it('2.8 and 2.9 suvat numbers', () => {
+    expect(625 / 10).toBe(62.5);
+    expect(0.5 * 2 * 8 ** 2).toBe(64);
+    expect((30 ** 2 - 10 ** 2) / (2 * 400)).toBe(1);
+    expect((15 ** 2 / (2 * g)).toFixed(1)).toBe('11.5');
+    expect(4 + 1.5 * 6).toBe(13);
+    expect(0.5 * (4 + 10) * 3).toBe(21);
+    expect(4 * 3 + 0.5 * 2 * 9).toBe(21);
+    expect(0.5 * 12 * 5).toBe(30);
+  });
+
+  it('2.10: the tangent in the figure touches the curve with the stated gradient', () => {
+    const shapes = sheet('2.10').diagrams[0].shapes;
+    const tangent = shapes.find((s) => s.kind === 'line' && s.role === 'acceleration') as Extract<DiagramShape, { kind: 'line' }>;
+    // 20 px per s, 11 px per m s⁻¹; v = 12(1 − e^(−t/3)) has gradient 4/e at t = 3 s.
+    const grad = -(tangent.to[1] - tangent.from[1]) / 11 / ((tangent.to[0] - tangent.from[0]) / 20);
+    expect(grad).toBeCloseTo(4 / Math.E, 6);
+    expect((12 * (1 - Math.exp(-1)) - 2 * grad).toFixed(1)).toBe('4.6');
+    expect((12 * (1 - Math.exp(-1)) + 2 * grad).toFixed(1)).toBe('10.5');
+    expect(((10.5 - 4.6) / 4).toFixed(2)).toBe('1.48');
+    expect((15 - 3) / 4).toBe(3);
+    expect(46 * 0.5).toBe(23);
+  });
+
+  it('2.11 and 2.12 free fall; the s–t² points lie on gradient g/2', () => {
+    expect(Math.sqrt(40 / g).toFixed(2)).toBe('2.02');
+    expect(Math.sqrt(2 * g * 20).toFixed(1)).toBe('19.8');
+    expect((12 / g).toFixed(2)).toBe('1.22');
+    expect((144 / (2 * g)).toFixed(1)).toBe('7.3');
+    expect((g * 3).toFixed(1)).toBe('29.4');
+    expect((0.5 * g * 9).toFixed(1)).toBe('44.1');
+    expect((2.4 / 0.495 ** 2).toFixed(2)).toBe('9.79');
+    expect(2 * 4.95).toBeCloseTo(9.9, 12);
+    expect((2 * 0.8) / 0.4 ** 2).toBeCloseTo(10, 12);
+    const dots = sheet('2.12').diagrams[0].shapes.filter((s) => s.kind === 'dot') as Extract<DiagramShape, { kind: 'dot' }>[];
+    for (const d of dots) expect((190 - d.at[1]) / 140 / ((d.at[0] - 50) / 1100)).toBeCloseTo(g / 2, 6);
+    const throwLine = sheet('2.11').diagrams[0].shapes.find((s) => s.kind === 'line' && s.role === 'velocity') as Extract<DiagramShape, { kind: 'line' }>;
+    expect(-(throwLine.to[1] - throwLine.from[1]) / 6 / ((throwLine.to[0] - throwLine.from[0]) / 90)).toBeCloseTo(-g, 6);
+  });
+
+  it('2.13 and 2.14 projectiles; the paths are the stated parabolas', () => {
+    expect(Math.sqrt(3.6 / g).toFixed(3)).toBe('0.606');
+    expect((3 * Math.sqrt(3.6 / g)).toFixed(2)).toBe('1.82');
+    expect(Math.sqrt(90 / g).toFixed(2)).toBe('3.03');
+    expect((15 * Math.sqrt(90 / g)).toFixed(1)).toBe('45.4');
+    expect((g * Math.sqrt(90 / g)).toFixed(1)).toBe('29.7');
+    expect((20 * Math.cos(deg(30))).toFixed(1)).toBe('17.3');
+    expect((20 * Math.sin(deg(30))).toFixed(1)).toBe('10.0');
+    expect((20 / g).toFixed(2)).toBe('2.04');
+    expect((17.3 * 2.04).toFixed(1)).toBe('35.3');
+    expect((100 / (2 * g)).toFixed(2)).toBe('5.10');
+    expect(((25 * Math.sin(deg(60))) ** 2 / (2 * g)).toFixed(1)).toBe('23.9');
+    expect(((2 * 15 * Math.sin(deg(40))) / g).toFixed(2)).toBe('1.97');
+    // 2.13: 15 m s⁻¹ from 45 m, 3.3 px per m; lands 45.4 m out on the ground line.
+    const cliff = sheet('2.13').diagrams[0].shapes.find((s) => s.kind === 'curve') as Extract<DiagramShape, { kind: 'curve' }>;
+    const last = cliff.points[cliff.points.length - 1];
+    expect((last[0] - 40) / 3.3).toBeCloseTo(15 * Math.sqrt(90 / g), 6);
+    expect((last[1] - 50) / 3.3).toBeCloseTo(45, 6);
+    for (const [x, y] of cliff.points) expect((y - 50) / 3.3).toBeCloseTo(0.5 * g * ((x - 40) / 3.3 / 15) ** 2, 6);
+    // 2.14: symmetric about the top, which is at H = (u sin θ)²/2g; 6 px per m.
+    const angled = sheet('2.14').diagrams[0].shapes.find((s) => s.kind === 'curve') as Extract<DiagramShape, { kind: 'curve' }>;
+    const ys = angled.points.map((p) => p[1]);
+    expect(angled.points[angled.points.length - 1][1]).toBeCloseTo(150, 6);
+    expect((150 - Math.min(...ys)) / 6).toBeCloseTo((20 * Math.sin(deg(50))) ** 2 / (2 * g), 6);
+    expect((angled.points[angled.points.length - 1][0] - 40) / 6).toBeCloseTo((400 * Math.sin(deg(100))) / g, 6);
+  });
+});
+
 describe('diagram physics', () => {
   it.each([
     [igcse, 'velocity-and-force'],
@@ -846,6 +982,15 @@ describe('downloadable PDFs (scripts/cheatsheet-pdfs.mjs)', () => {
   it('names each data file after its slug (the PDF script relies on it)', () => {
     const files = readdirSync(path.join(__dirname, '..', 'sheets')).map((f) => f.replace(/\.ts$/, ''));
     expect(files.sort()).toEqual(CHEAT_SHEETS.map((s) => s.slug).sort());
+  });
+});
+
+describe('keepUnitsTogether', () => {
+  it('joins numbers to units and the parts of a unit, and nothing else', () => {
+    const nb = '\u00a0';
+    expect(keepUnitsTogether('17 m s⁻¹ in 2.5 s')).toBe(`17${nb}m${nb}s⁻¹ in 2.5${nb}s`);
+    expect(keepUnitsTogether('100 km h⁻¹ over 45 m')).toBe(`100${nb}km${nb}h⁻¹ over 45${nb}m`);
+    expect(keepUnitsTogether('5 spaces and 3 strips')).toBe('5 spaces and 3 strips');
   });
 });
 

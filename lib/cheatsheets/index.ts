@@ -20,6 +20,20 @@ import { as15CombiningDisplacements } from './sheets/as-1-5-combining-displaceme
 import { as16CombiningVelocities } from './sheets/as-1-6-combining-velocities';
 import { as17SubtractingVectors } from './sheets/as-1-7-subtracting-vectors';
 import { as18ScalarsVectors } from './sheets/as-1-8-scalars-and-vectors';
+import { as21MeaningOfAcceleration } from './sheets/as-2-1-meaning-of-acceleration';
+import { as22CalculatingAcceleration } from './sheets/as-2-2-calculating-acceleration';
+import { as23UnitsOfAcceleration } from './sheets/as-2-3-units-of-acceleration';
+import { as24DeducingAcceleration } from './sheets/as-2-4-deducing-acceleration';
+import { as25DeducingDisplacement } from './sheets/as-2-5-deducing-displacement';
+import { as26MeasuringVelocityAcceleration } from './sheets/as-2-6-measuring-velocity-and-acceleration';
+import { as27LabVelocityAcceleration } from './sheets/as-2-7-velocity-and-acceleration-in-the-laboratory';
+import { as28EquationsOfMotion } from './sheets/as-2-8-equations-of-motion';
+import { as29DerivingEquationsOfMotion } from './sheets/as-2-9-deriving-the-equations-of-motion';
+import { as210UniformNonUniform } from './sheets/as-2-10-uniform-and-non-uniform-acceleration';
+import { as211AccelerationGravity } from './sheets/as-2-11-acceleration-caused-by-gravity';
+import { as212DeterminingG } from './sheets/as-2-12-determining-g';
+import { as213ProjectileMotion } from './sheets/as-2-13-projectile-motion';
+import { as214UnderstandingProjectiles } from './sheets/as-2-14-understanding-projectiles';
 
 export type * from './types';
 
@@ -37,6 +51,21 @@ export const CHEAT_SHEETS: readonly CheatSheet[] = [
   as16CombiningVelocities,
   as17SubtractingVectors,
   as18ScalarsVectors,
+  // AS Chapter 2 Accelerated motion.
+  as21MeaningOfAcceleration,
+  as22CalculatingAcceleration,
+  as23UnitsOfAcceleration,
+  as24DeducingAcceleration,
+  as25DeducingDisplacement,
+  as26MeasuringVelocityAcceleration,
+  as27LabVelocityAcceleration,
+  as28EquationsOfMotion,
+  as29DerivingEquationsOfMotion,
+  as210UniformNonUniform,
+  as211AccelerationGravity,
+  as212DeterminingG,
+  as213ProjectileMotion,
+  as214UnderstandingProjectiles,
 ];
 
 export function getCheatSheet(slug: string): CheatSheet | undefined {

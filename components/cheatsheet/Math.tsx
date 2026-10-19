@@ -41,5 +41,17 @@ export function splitMath(text: string): { math: boolean; value: string }[] {
 }
 
 export function MathText({ text }: { text: string }) {
-  return <>{splitMath(text).map((p, i) => (p.math ? <InlineMath key={i} latex={p.value} /> : <span key={i}>{p.value}</span>))}</>;
+  return (
+    <>{splitMath(text).map((p, i) => (p.math ? <InlineMath key={i} latex={p.value} /> : <span key={i}>{keepUnitsTogether(p.value)}</span>))}</>
+  );
+}
+
+/**
+ * Non-breaking spaces inside a unit ("m s⁻¹", "km h⁻¹") and between a number and
+ * its unit ("2.0 s", "45 m"), so a line never breaks in the middle of a quantity.
+ */
+export function keepUnitsTogether(text: string): string {
+  return text
+    .replace(/\b(k?m) (?=[sh]⁻)/g, '$1\u00a0')
+    .replace(/(\d) (?=(?:k?m|cm|s|h|N|kg|J|W|Hz|°C)(?![A-Za-z]))/g, '$1\u00a0');
 }

@@ -1052,3 +1052,28 @@ path.cs-soft {
 .cs-root--single .cs-steps > li > .cs-step__text:only-child {
   grid-column: 1 / -1;
 }
+/* One-page sheets: a derivation step's words and maths share a line when they fit. */
+.cs-root--single .cs-dsteps > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.8rem;
+}
+.cs-root--single .cs-dsteps > li > .cs-math-block {
+  margin-left: auto;
+}
+.cs-root--single .cs-dsteps > li::before {
+  position: static;
+  flex: none;
+  width: 1.5rem;
+  margin-left: -1.5rem;
+}
+.cs-root--single .cs-dsteps > li {
+  align-items: baseline;
+}
+/* Four short boxes sit in one row rather than three plus one. */
+@media print, (min-width: 900px) {
+  .cs-root--single .cs-boxes:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
