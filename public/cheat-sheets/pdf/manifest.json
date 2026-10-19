@@ -16,6 +16,23 @@
       }
     }
   },
+  "a-level-gravitational-fields": {
+    "hash": "5d3714ebfa22331ad75cc76dcdcf58ee30af073ad542364157f3f11f35ea82ad",
+    "files": {
+      "a4": {
+        "file": "a-level-gravitational-fields-a4.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 328407
+      },
+      "letter": {
+        "file": "a-level-gravitational-fields-letter.pdf",
+        "pages": 6,
+        "sheets": 6,
+        "bytes": 330007
+      }
+    }
+  },
   "igcse-circular-motion": {
     "hash": "4488018b14216188455dd0fa98e70a0978e72b4aa4dea210a856656972dd7db9",
     "files": {

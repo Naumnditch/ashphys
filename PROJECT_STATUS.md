@@ -25,7 +25,23 @@ Last updated: 2026-10-17 (revision cheat sheets: new six-section format, precise
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
 
-### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion)
+### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion; 2026-10-19: A Level Gravitational fields)
+
+**2026-10-19 — A Level Chapter 17 Gravitational fields** at
+`/cheat-sheets/a-level-gravitational-fields` (6 pages), same format as Chapter 16. Covers
+all seven Chapter 17 lessons (17.1 field lines is its own; `alsoCovers` 17.2–17.7, including
+the shared IGCSE 24.3 lesson in its A Level role). Derivations: g = GM/r² from Newton's law;
+φ = −GM/r, Ep = −GMm/r, ΔEp = mΔφ and g as the φ–r gradient; orbits (v = √(GM/r),
+T² = 4π²r³/GM); geostationary radius 4.22 × 10⁷ m. Samples: g at the ISS, ΔEp from R to 2R
+(and why mgh doubles it), satellite speed/period, mass of the Earth from the Moon (the
+M ↔ T² swap). 10 practice problems. Constants G = 6.67 × 10⁻¹¹, M_E = 5.97 × 10²⁴ kg,
+R_E = 6.37 × 10⁶ m (they give g = 9.81 at the surface); every number is recomputed in the
+tests, and the figures are checked (radial lines and F point at the centre, the uniform
+field is parallel and evenly spaced, the φ–r curve is ∝ −1/r with the tangent at its true
+slope, v ⟂ F in the orbit). New diagram shape `curve` (open polyline) for plotted graphs.
+Printed heights on US Letter: max 909/980 px. To check against the official syllabus:
+whether "g = −Δφ/Δr" is examined for gravity (it is stated as the gradient of the φ–r graph).
+
 
 **What it is.** A printable revision sheet per lesson *per curriculum* (simulations
 are shared; sheets, like question banks, are curriculum-specific). Live sheets:

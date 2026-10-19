@@ -110,6 +110,11 @@ export function renderDiagram(diagram: Diagram): { paths: SvgPath[]; labels: Svg
         filled(role, `M${f(cx - r)} ${f(cy)} a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0 a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0Z`);
         break;
       }
+      case 'curve': {
+        const role = shape.role ?? 'ink';
+        stroke(role, `${M(shape.points[0])} ${shape.points.slice(1).map(L).join(' ')}`, shape.dashed);
+        break;
+      }
       case 'polygon': {
         const role = shape.role ?? 'ink';
         const d = `${M(shape.points[0])} ${shape.points.slice(1).map(L).join(' ')}Z`;

@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheet-a-level-gravitational-fields',
+    category: 'lesson',
+    type: 'new',
+    title: 'A Level Gravitational fields cheat sheet',
+    description: 'Field strength, potential and orbits: derivations of g = GM/r², φ = −GM/r and T² ∝ r³, geostationary orbits, worked samples and 10 practice problems.',
+    date: '2026-10-19',
+    href: '/cheat-sheets/a-level-gravitational-fields',
+    published: true,
+  },
+  {
     id: 'cheat-sheet-a-level-circular-motion',
     category: 'lesson',
     type: 'new',

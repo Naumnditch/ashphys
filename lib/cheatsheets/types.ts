@@ -129,6 +129,8 @@ export type DiagramShape =
   /** A filled body, e.g. the object moving round the circle. */
   | { kind: 'dot'; at: Point; radius: number; role?: DiagramRole }
   | { kind: 'polygon'; points: Point[]; role?: DiagramRole; fill?: 'soft' | 'none' }
+  /** An open polyline through `points`, e.g. a plotted graph. Use enough points to look smooth. */
+  | { kind: 'curve'; points: Point[]; role?: DiagramRole; dashed?: boolean }
   /** An angle marker: arc from `from` to `to` degrees (anticlockwise as seen on screen, 0 = +x). */
   | { kind: 'arc'; centre: Point; radius: number; from: number; to: number; role?: DiagramRole }
   /** The square corner mark showing two lines meet at 90°. `a` and `b` are directions from `at`. */
