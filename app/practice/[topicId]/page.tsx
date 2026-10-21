@@ -7,6 +7,8 @@ import { PracticeSession } from '@/components/practice/PracticeSession';
 import { LockedContent } from '@/components/subscriptions/LockedContent';
 import { CURRICULA, curriculumForTopic, lessonTitle, syllabusRefLabel, topicCodeFor } from '@/lib/curricula';
 import { resolveCurriculum } from '@/lib/curricula/queries';
+import { getStoredPracticeQuestion } from '@/lib/practice/position';
+import { PracticePositionProvider, PracticeRequestVideoButton } from '@/components/practice/PracticePosition';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,31 +42,41 @@ export default async function PracticePage({
   // Which curriculum's question bank this session uses (see curriculumForTopic).
   const curriculumId = curriculumForTopic(topic.curriculum_ids, searchParams.c, preferred);
   const bank = `curriculum=${curriculumId}`;
+  // Where the student stopped in this bank (practice_attempts), for the
+  // "Request a video" button until the session reports the question on screen.
+  const storedQuestionId = await getStoredPracticeQuestion(user.id, topic.id, curriculumId).catch((err) => {
+    console.error('practice: last-stopped question failed', err);
+    return null;
+  });
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <Link href={`/lessons/${topic.id}?c=${curriculumId}`} className="text-sm text-blue-600 hover:underline mb-6 inline-block">
-        ← Back to the lesson
-      </Link>
+    <PracticePositionProvider initialQuestionId={storedQuestionId}>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link href={`/lessons/${topic.id}?c=${curriculumId}`} className="text-sm text-blue-600 hover:underline mb-6 inline-block">
+          ← Back to the lesson
+        </Link>
 
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-        <div>
-          <div className="text-sm text-gray-400 font-medium mb-1">
-            {syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId))} · Practice
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
+          <div>
+            <div className="text-sm text-gray-400 font-medium mb-1">
+              {syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId))} · Practice
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{lessonTitle(topic.topic_name, curriculumId)}</h1>
+            <p className="text-xs font-semibold text-h-5a67d8 mt-1">{CURRICULA[curriculumId].displayName} question bank</p>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{lessonTitle(topic.topic_name, curriculumId)}</h1>
-          <p className="text-xs font-semibold text-h-5a67d8 mt-1">{CURRICULA[curriculumId].displayName} question bank</p>
-        </div>
-        {allowed && (
           <div className="flex flex-wrap gap-2">
-            <a
-              href={`/api/practice/${topic.id}/worksheet?${bank}`}
-              download
-              className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg whitespace-nowrap"
-            >
-              Download PDF
-            </a>
-            {(user.role === 'teacher' || user.role === 'admin') && (
+            {/* Shown to every student, Free included: the dashboard shows Free the upgrade prompt. */}
+            <PracticeRequestVideoButton lessonId={topic.id} />
+            {allowed && (
+              <a
+                href={`/api/practice/${topic.id}/worksheet?${bank}`}
+                download
+                className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg whitespace-nowrap"
+              >
+                Download PDF
+              </a>
+            )}
+            {allowed && (user.role === 'teacher' || user.role === 'admin') && (
               <a
                 href={`/api/practice/${topic.id}/worksheet?answers=1&${bank}`}
                 download
@@ -74,14 +86,14 @@ export default async function PracticePage({
               </a>
             )}
           </div>
+        </div>
+
+        {allowed ? (
+          <PracticeSession key={curriculumId} topicId={topic.id} curriculumId={curriculumId} />
+        ) : (
+          <LockedContent requiredTier={topic.required_tier} title={topic.topic_name} />
         )}
       </div>
-
-      {allowed ? (
-        <PracticeSession key={curriculumId} topicId={topic.id} curriculumId={curriculumId} />
-      ) : (
-        <LockedContent requiredTier={topic.required_tier} title={topic.topic_name} />
-      )}
-    </div>
+    </PracticePositionProvider>
   );
 }

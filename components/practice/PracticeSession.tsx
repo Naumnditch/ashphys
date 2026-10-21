@@ -9,6 +9,7 @@ import { previewAnswer, FORMAT_HINT } from '@/lib/grading/numericAnswer';
 import { nextQuestionIndex, type QuestionStatus } from '@/lib/practice/progress';
 import { QuestionMap } from '@/components/practice/QuestionMap';
 import { SolutionViewer } from '@/components/solutions/SolutionViewer';
+import { useReportViewedQuestion } from '@/components/practice/PracticePosition';
 
 interface Option {
   id: string;
@@ -163,6 +164,21 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
   }, [topicId]);
 
   const current = queue[index];
+  const statusList = queue.map((q) => statuses[q.id] ?? 'untried');
+
+  // The "Topic Mastered" screen is only for a student who has worked through
+  // the whole set. A streak earned part-way through must not hide questions
+  // that are still untried or skipped, so those always go back to the questions.
+  const finishedAllQuestions = statusList.every((s) => s !== 'untried' && s !== 'skipped');
+  const showingMastered = !!mastery?.mastered && finishedAllQuestions && !result;
+
+  // Tell the header's "Request a video" button which question is on screen.
+  // On the mastered screen it keeps the last question shown.
+  const reportViewed = useReportViewedQuestion();
+  const viewedId = !loading && !error && !showingMastered ? current?.id : undefined;
+  useEffect(() => {
+    if (viewedId) reportViewed(viewedId);
+  }, [viewedId, reportViewed]);
 
   // When the current question first appeared, so the attempt log can record
   // how long it took. Reset whenever the question changes.
@@ -212,8 +228,6 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
     }
   };
 
-  const statusList = queue.map((q) => statuses[q.id] ?? 'untried');
-
   const goTo = (i: number) => {
     setSelected('');
     setResult(null);
@@ -258,12 +272,7 @@ export function PracticeSession({ topicId, curriculumId }: { topicId: string; cu
 
   const streakNeeded = mastery.streakNeeded || 5;
 
-  // The "Topic Mastered" screen is only for a student who has worked through
-  // the whole set. A streak earned part-way through must not hide questions
-  // that are still untried or skipped, so those always go back to the questions.
-  const finishedAllQuestions = statusList.every((s) => s !== 'untried' && s !== 'skipped');
-
-  if (mastery.mastered && finishedAllQuestions && !result) {
+  if (showingMastered) {
     return (
       <div className="text-center py-10">
         <div className="w-16 h-16 rounded-full bg-green-50 mx-auto mb-6 flex items-center justify-center text-3xl">

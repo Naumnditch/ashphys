@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   user: null as null | { id: string; role: string },
-  features: { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false },
+  features: { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false, requestQuestionId: false },
   query: vi.fn(),
 }));
 
@@ -26,7 +26,7 @@ const patch = (body: unknown) =>
 beforeEach(() => {
   mocks.query.mockReset();
   mocks.user = { id: 'admin-1', role: 'admin' };
-  mocks.features = { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false };
+  mocks.features = { rlsRole: false, questionNumber: false, requestYoutubeId: false, lessonVideos: false, videoRequestRls: false, requestOpens: false, requestQuestionId: false };
 });
 
 describe('GET /api/admin/video-requests', () => {
@@ -62,6 +62,7 @@ describe('GET /api/admin/video-requests', () => {
     expect(res.status).toBe(200);
     const sql: string = mocks.query.mock.calls[0][0];
     expect(sql).not.toMatch(/r\.question_number/);
+    expect(sql).not.toMatch(/r\.question_id|JOIN problems/);
     expect(sql).not.toMatch(/FROM lesson_videos/);
     expect(sql).not.toMatch(/SELECT \*/);
     expect(sql).toMatch(/ORDER BY r\.created_at DESC/);
@@ -71,12 +72,29 @@ describe('GET /api/admin/video-requests', () => {
   });
 
   it('selects the new columns once the migrations are applied', async () => {
-    mocks.features = { rlsRole: true, questionNumber: true, requestYoutubeId: true, lessonVideos: true, videoRequestRls: true, requestOpens: true };
+    mocks.features = { rlsRole: true, questionNumber: true, requestYoutubeId: true, lessonVideos: true, videoRequestRls: true, requestOpens: true, requestQuestionId: true };
     mocks.query.mockResolvedValueOnce({ rows: [] });
     await GET();
     const sql: string = mocks.query.mock.calls[0][0];
     expect(sql).toMatch(/r\.question_number/);
     expect(sql).toMatch(/FROM lesson_videos/);
+  });
+
+  it("shows the practice question a request is about once question_id exists", async () => {
+    mocks.features = { rlsRole: true, questionNumber: true, requestYoutubeId: true, lessonVideos: false, videoRequestRls: true, requestOpens: true, requestQuestionId: true };
+    mocks.query.mockResolvedValueOnce({
+      rows: [
+        { id: REQ_ID, student_id: 'stu-1', description: 'd', status: 'open', created_at: '2026-10-21', question_number: '7',
+          question_id: 'q-1', question_text: 'A 2 kg trolley…', question_bank: 'as', first_name: 'Pia', last_name: 'Plus', lesson_videos: [] },
+        { id: 'r-2', student_id: 'stu-1', description: 'd', status: 'open', created_at: '2026-10-20', question_number: null,
+          question_id: null, question_text: null, question_bank: null, first_name: 'Pia', last_name: 'Plus', lesson_videos: [] },
+      ],
+    });
+    const body = await (await GET()).json();
+    const sql: string = mocks.query.mock.calls[0][0];
+    expect(sql).toMatch(/LEFT JOIN problems qp ON qp\.id = r\.question_id/);
+    expect(body.requests[0].question).toEqual({ id: 'q-1', text: 'A 2 kg trolley…', bank: 'AS Level (Cambridge 9702)' });
+    expect(body.requests[1].question).toBeNull();
   });
 
   it('returns a JSON error (not a bare 500) when the query fails', async () => {
@@ -102,7 +120,7 @@ describe('PATCH /api/admin/video-requests', () => {
   });
 
   it('also stores youtube_id when that column exists', async () => {
-    mocks.features = { rlsRole: false, questionNumber: true, requestYoutubeId: true, lessonVideos: false, videoRequestRls: false, requestOpens: false };
+    mocks.features = { rlsRole: false, questionNumber: true, requestYoutubeId: true, lessonVideos: false, videoRequestRls: false, requestOpens: false, requestQuestionId: false };
     mocks.query.mockResolvedValueOnce({ rowCount: 1 });
     await patch({ id: REQ_ID, status: 'fulfilled', youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ' });
     const [sql, params] = mocks.query.mock.calls[0];

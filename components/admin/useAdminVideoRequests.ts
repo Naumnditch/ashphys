@@ -10,6 +10,8 @@ export interface AdminVideoRequest {
   studentId: string;
   description: string;
   questionNumber: string | null;
+  /** The practice question picked in the form (video_requests.question_id), when there is one. */
+  question?: { id: string; text: string; bank: string } | null;
   status: AdminVideoRequestStatus;
   youtubeUrl: string | null;
   adminNote: string | null;

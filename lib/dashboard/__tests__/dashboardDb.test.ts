@@ -10,8 +10,8 @@
  * The connecting role must be able to CREATE ROLE (like Supabase's
  * `postgres`). If the database has no `users` table yet, the minimal
  * snapshot database/tests/base-schema.sql is loaded first; then the
- * migrations database/seeds/2026-10-14-*.sql are applied (they are
- * idempotent). Every test runs inside a transaction that is rolled back.
+ * migrations database/seeds/2026-10-14-*.sql and 2026-10-21-*.sql are
+ * applied (they are idempotent). Every test runs inside a transaction that is rolled back.
  * Without TEST_DATABASE_URL the whole file is skipped.
  */
 
@@ -45,7 +45,8 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
       );
     }
     const dir = path.join(root, 'database/seeds');
-    for (const file of readdirSync(dir).filter((f) => /^2026-10-14-.*\.sql$/.test(f)).sort()) {
+    // The 2026-10-14 migrations, then later additive ones (2026-10-21 video_requests.question_id).
+    for (const file of readdirSync(dir).filter((f) => /^2026-10-(14|21)-.*\.sql$/.test(f)).sort()) {
       await db.query(readFileSync(path.join(dir, file), 'utf8'));
     }
   });
@@ -497,6 +498,56 @@ describe.skipIf(!url)('dashboard database (TEST_DATABASE_URL)', () => {
     });
   });
 
+
+  describe('video_requests.question_id (2026-10-21 migration)', () => {
+    const migration = () => readFileSync(path.join(root, 'database/seeds/2026-10-21-video-request-question-id.sql'), 'utf8');
+
+    it('is nullable, so existing and general requests stay valid, and re-running it changes nothing', async () => {
+      const alice = await makeUser();
+      const old = await db.query(`INSERT INTO video_requests (student_id, description) VALUES ($1, 'from before') RETURNING id, question_id`, [alice]);
+      expect(old.rows[0].question_id).toBeNull();
+      await db.query(migration());
+      const col = await db.query(
+        `SELECT is_nullable, data_type FROM information_schema.columns
+         WHERE table_schema = 'public' AND table_name = 'video_requests' AND column_name = 'question_id'`
+      );
+      expect(col.rows).toEqual([{ is_nullable: 'YES', data_type: 'uuid' }]);
+      const fks = await db.query(`SELECT count(*)::int AS n FROM pg_constraint WHERE conname = 'video_requests_question_id_fkey'`);
+      expect(fks.rows[0].n).toBe(1);
+      expect((await db.query(`SELECT question_id FROM video_requests WHERE id = $1`, [old.rows[0].id])).rows[0].question_id).toBeNull();
+    });
+
+    it('only points at real questions, and deleting the question keeps the request', async () => {
+      const alice = await makeUser();
+      const { lessonId, problemId } = await makeChapter(await makeCourse(), 61);
+      await db.query('SAVEPOINT fk');
+      await expect(
+        db.query(`INSERT INTO video_requests (student_id, description, question_id) VALUES ($1, 'x', $2)`, [alice, randomUUID()])
+      ).rejects.toMatchObject({ code: '23503' });
+      await db.query('ROLLBACK TO SAVEPOINT fk');
+      const r = await db.query(
+        `INSERT INTO video_requests (student_id, description, topic_id, question_id) VALUES ($1, 'x', $2, $3) RETURNING id`,
+        [alice, lessonId, problemId]
+      );
+      await db.query(`DELETE FROM problems WHERE id = $1`, [problemId]);
+      const after = await db.query(`SELECT topic_id, question_id FROM video_requests WHERE id = $1`, [r.rows[0].id]);
+      expect(after.rows[0]).toEqual({ topic_id: lessonId, question_id: null });
+    });
+
+    it('a student can store question_id on their own request under row-level security', async () => {
+      const alice = await makeUser();
+      const { lessonId, problemId } = await makeChapter(await makeCourse(), 62);
+      const mine = await as(alice, async () => {
+        await db.query(`INSERT INTO video_requests (student_id, description, topic_id, question_id) VALUES ($1, 'x', $2, $3)`, [
+          alice,
+          lessonId,
+          problemId,
+        ]);
+        return db.query(`SELECT question_id FROM video_requests WHERE question_id = $1`, [problemId]);
+      });
+      expect(mine.rows).toEqual([{ question_id: problemId }]);
+    });
+  });
 
   describe('screenshot bucket (migration 06)', () => {
     it('is private and limited to 4 MB jpg/png/webp, and re-running keeps it that way', async () => {

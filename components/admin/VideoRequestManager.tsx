@@ -250,6 +250,11 @@ export function VideoRequestManager({ fetchImpl }: { fetchImpl?: typeof fetch } 
                     {r.topicName ? ` · ${r.topicName}` : ''} · {new Date(r.createdAt).toLocaleDateString()}
                   </div>
                   {r.questionNumber && <p className="text-xs font-semibold text-gray-600 mb-1">Question: {r.questionNumber}</p>}
+                  {r.question && (
+                    <p className="text-xs text-gray-600 mb-1 line-clamp-3" title={r.question.text}>
+                      <span className="font-semibold">{r.question.bank} practice question:</span> {r.question.text}
+                    </p>
+                  )}
                   <p className="text-sm text-gray-700 mb-1.5">{r.description}</p>
                   {r.screenshotUrl && (
                     <a href={r.screenshotUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 underline">

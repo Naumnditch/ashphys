@@ -6,7 +6,7 @@
  *   TEST_DATABASE_URL=postgres://…/ashphys_test npm run test:db
  *
  * Expects the database prepared by lib/dashboard/__tests__/dashboardDb.test.ts
- * (base schema + 2026-10-14 migrations); skipped without TEST_DATABASE_URL.
+ * (base schema + 2026-10-14 and 2026-10-21 migrations); skipped without TEST_DATABASE_URL.
  * Rows it creates are deleted afterwards (users cascade).
  */
 
@@ -35,6 +35,9 @@ describe.skipIf(!url)('student video requests (TEST_DATABASE_URL)', () => {
   const alice = randomUUID();
   const bob = randomUUID();
   let lib: typeof import('@/lib/videoRequests/student');
+  let courseId: string | null = null;
+  let lessonId = '';
+  let questionId = '';
 
   beforeAll(async () => {
     process.env.DATABASE_URL = url;
@@ -48,11 +51,23 @@ describe.skipIf(!url)('student video requests (TEST_DATABASE_URL)', () => {
       bob,
       `${bob}@test.local`,
     ]);
+    // A lesson with one practice question, for question_id.
+    const course = await db.query(`INSERT INTO courses (title, code) VALUES ('Student DB test', '0625') RETURNING id`);
+    courseId = course.rows[0].id;
+    const chapter = await db.query(`INSERT INTO chapters (course_id, chapter_number, title) VALUES ($1, 951, 'T') RETURNING id`, [courseId]);
+    const topic = await db.query(`INSERT INTO topics (chapter_id, topic_name, "order") VALUES ($1, 'T.1', 0) RETURNING id`, [chapter.rows[0].id]);
+    lessonId = topic.rows[0].id;
+    const problem = await db.query(`INSERT INTO problems (chapter_id, topic_id, question_text) VALUES ($1, $2, 'Q') RETURNING id`, [
+      chapter.rows[0].id,
+      lessonId,
+    ]);
+    questionId = problem.rows[0].id;
     lib = await import('@/lib/videoRequests/student');
   });
 
   afterAll(async () => {
     await db?.query(`DELETE FROM users WHERE id = ANY($1)`, [[alice, bob]]);
+    if (courseId) await db?.query(`DELETE FROM courses WHERE id = $1`, [courseId]);
     await db?.end();
     const { closePool } = await import('@/lib/db/client');
     await closePool();
@@ -99,6 +114,14 @@ describe.skipIf(!url)('student video requests (TEST_DATABASE_URL)', () => {
           })
         ).rejects.toThrow(/already in use/);
         expect(await owner(bobsId)).toMatchObject({ student_id: bob });
+      });
+
+      it('stores the chosen practice question (question_id) with the lesson', async () => {
+        const id = await lib.createVideoRequest({ id: alice }, {
+          description: `practice question (${mode})`, topicId: lessonId, chapterId: null, questionNumber: '1', questionId, screenshotPath: null,
+        });
+        const row = (await db.query(`SELECT topic_id, question_id, question_number FROM video_requests WHERE id = $1`, [id])).rows[0];
+        expect(row).toEqual({ topic_id: lessonId, question_id: questionId, question_number: '1' });
       });
 
       it("lists only the student's own requests", async () => {

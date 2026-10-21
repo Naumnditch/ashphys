@@ -96,4 +96,43 @@ describe('POST /api/video-requests', () => {
     const r2 = await post({ description: 'x', requireQuestion: true, lessonId: 'bbbbbbbb-0000-4000-8000-000000000002' });
     expect((await r2.json()).error).toMatch(/question number or a screenshot/);
   });
+
+  describe('a practice question (questionId)', () => {
+    const LESSON = 'bbbbbbbb-0000-4000-8000-000000000002';
+    const QUESTION = 'eeeeeeee-0000-4000-8000-000000000001';
+    // The open-request count, then the question lookup.
+    const withQuestion = (row: { topic_id: string; number: number } | null) =>
+      mocks.query.mockImplementation((async (sql: string) =>
+        /FROM problems/.test(sql) ? { rows: row ? [row] : [] } : { rows: [{ n: 0 }] }) as never);
+
+    it('stores the question with its number when it belongs to the lesson', async () => {
+      withQuestion({ topic_id: LESSON, number: 7 });
+      const res = await post({ description: 'x', lessonId: LESSON, questionId: QUESTION });
+      expect(res.status).toBe(200);
+      expect(mocks.create.mock.calls[0][1]).toMatchObject({ topicId: LESSON, questionId: QUESTION, questionNumber: '7' });
+    });
+
+    it("keeps the student's own question number and takes the lesson from the question when none is given", async () => {
+      withQuestion({ topic_id: LESSON, number: 7 });
+      await post({ description: 'x', questionId: QUESTION, questionNumber: '7b' });
+      expect(mocks.create.mock.calls[0][1]).toMatchObject({ topicId: LESSON, questionId: QUESTION, questionNumber: '7b' });
+    });
+
+    it('refuses a question from another lesson, an unknown one, or a malformed id', async () => {
+      withQuestion({ topic_id: 'ffffffff-0000-4000-8000-000000000009', number: 1 });
+      const r1 = await post({ description: 'x', lessonId: LESSON, questionId: QUESTION });
+      expect(r1.status).toBe(400);
+      expect((await r1.json()).error).toMatch(/not in the chosen lesson/);
+      withQuestion(null);
+      expect((await post({ description: 'x', lessonId: LESSON, questionId: QUESTION })).status).toBe(400);
+      expect((await post({ description: 'x', lessonId: LESSON, questionId: "1' OR 1=1" })).status).toBe(400);
+      expect(mocks.create).not.toHaveBeenCalled();
+    });
+
+    it('a general request (no questionId) stores no question', async () => {
+      await post({ description: 'x', lessonId: LESSON });
+      expect(mocks.create.mock.calls[0][1]).toMatchObject({ topicId: LESSON, questionId: null });
+      expect(mocks.query.mock.calls.some((c) => /FROM problems/.test(String((c as unknown[])[0])))).toBe(false);
+    });
+  });
 });

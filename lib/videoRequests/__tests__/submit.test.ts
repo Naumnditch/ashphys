@@ -45,6 +45,14 @@ describe('submitVideoRequest', () => {
     expect(putFile).not.toHaveBeenCalled();
   });
 
+  it('sends the chosen practice question id with the request', async () => {
+    const { fetchImpl, calls } = server({ save: () => json(200, { ok: true, id: 'new-id' }) });
+    await submitVideoRequest({ description: 'x', lessonId: 'L1', questionId: 'Q-ID' }, { fetchImpl });
+    expect(calls.at(-1)?.body).toMatchObject({ lessonId: 'L1', questionId: 'Q-ID' });
+    await submitVideoRequest({ description: 'x', lessonId: 'L1', questionId: null }, { fetchImpl });
+    expect(calls.at(-1)?.body.questionId).toBeUndefined();
+  });
+
   it('uploads a valid screenshot, then saves with its path and request id', async () => {
     const { fetchImpl, calls } = server({});
     const putFile = vi.fn(async () => ({ ok: true as const }));

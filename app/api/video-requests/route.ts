@@ -7,6 +7,9 @@
  * form — a Plus/Pro-only feature must reject a free user's request even if
  * they reach this endpoint directly.
  *
+ * An optional `questionId` (a practice question, from the dashboard form)
+ * must belong to the chosen lesson; it is stored in video_requests.question_id.
+ *
  * student_id always comes from the session. A screenshot must be the one
  * POST /api/video-requests/upload minted for this student; its request id
  * becomes the row's id. If the row can't be saved, the uploaded file is
@@ -58,6 +61,7 @@ export async function POST(req: NextRequest) {
       lessonId?: unknown;
       chapterId?: unknown;
       questionNumber?: unknown;
+      questionId?: unknown;
       screenshotPath?: unknown;
       requestId?: unknown;
       requireQuestion?: unknown;
@@ -84,11 +88,39 @@ export async function POST(req: NextRequest) {
     if (description.length > MAX_DESCRIPTION) {
       return await rejectAndClean(400, `keep the description under ${MAX_DESCRIPTION} characters.`, screenshotPath);
     }
-    const questionNumber = typeof body.questionNumber === 'string' && body.questionNumber.trim() ? body.questionNumber.trim() : null;
+    let questionNumber = typeof body.questionNumber === 'string' && body.questionNumber.trim() ? body.questionNumber.trim() : null;
     if (questionNumber && questionNumber.length > MAX_QUESTION_NUMBER) {
       return await rejectAndClean(400, 'the question number is too long.', screenshotPath);
     }
-    const topicId = optionalUuid(body.lessonId) ?? optionalUuid(body.topicId);
+    let topicId = optionalUuid(body.lessonId) ?? optionalUuid(body.topicId);
+
+    // A practice question picked in the dashboard form. It must be a question
+    // of the chosen lesson; with no lesson, it brings its own. Its number
+    // fills question_number, so lists that show the number keep working.
+    const questionId = optionalUuid(body.questionId);
+    if (body.questionId !== undefined && body.questionId !== null && body.questionId !== '' && !questionId) {
+      return await rejectAndClean(400, 'that question could not be found. Pick it again.', screenshotPath);
+    }
+    if (questionId) {
+      const found = await query(
+        `SELECT q.topic_id, q.number FROM (
+           SELECT p.id, p.topic_id,
+                  COALESCE(p.problem_number, row_number() OVER (
+                    PARTITION BY p.topic_id, p.curriculum_id ORDER BY COALESCE(p.problem_number, p."order"), p."order"
+                  )) AS number
+           FROM problems p
+           WHERE p.topic_id = (SELECT topic_id FROM problems WHERE id = $1)
+         ) q WHERE q.id = $1`,
+        [questionId]
+      );
+      const question = found.rows[0];
+      if (!question || (topicId && question.topic_id !== topicId)) {
+        return await rejectAndClean(400, 'that question is not in the chosen lesson. Pick it again.', screenshotPath);
+      }
+      topicId ??= question.topic_id as string;
+      questionNumber ??= String(question.number);
+    }
+
     // The homepage form asks for a lesson and for a question number or a screenshot.
     if (body.requireQuestion === true) {
       if (!topicId) return await rejectAndClean(400, 'choose the lesson you are stuck on.', screenshotPath);
@@ -114,6 +146,7 @@ export async function POST(req: NextRequest) {
       topicId,
       chapterId: optionalUuid(body.chapterId),
       questionNumber,
+      questionId,
       screenshotPath,
     });
     return NextResponse.json({ ok: true, success: true, id });

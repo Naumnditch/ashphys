@@ -1,5 +1,6 @@
 /**
- * Which optional schema pieces (the 2026-10-14 migrations) exist in the
+ * Which optional schema pieces (the 2026-10-14 migrations, and the
+ * 2026-10-21 video_requests.question_id column) exist in the
  * database this deployment talks to.
  *
  * Why: on 2026-10-14 code that needs migrations 01–05 reached production
@@ -29,6 +30,8 @@ export interface SchemaFeatures {
   videoRequestRls: boolean;
   /** Table video_request_opens (migration 05). */
   requestOpens: boolean;
+  /** video_requests.question_id (2026-10-21-video-request-question-id.sql). */
+  requestQuestionId: boolean;
 }
 
 const TTL_MS = 60_000;
@@ -46,7 +49,9 @@ export async function getSchemaFeatures(): Promise<SchemaFeatures> {
        to_regclass('public.lesson_videos') IS NOT NULL AS lesson_videos,
        EXISTS (SELECT 1 FROM pg_policies
                WHERE schemaname = 'public' AND tablename = 'video_requests' AND policyname = 'video_requests_insert_own') AS video_request_rls,
-       to_regclass('public.video_request_opens') IS NOT NULL AS request_opens`
+       to_regclass('public.video_request_opens') IS NOT NULL AS request_opens,
+       EXISTS (SELECT 1 FROM information_schema.columns
+               WHERE table_schema = 'public' AND table_name = 'video_requests' AND column_name = 'question_id') AS request_question_id`
   );
   const r = res.rows[0];
   const value: SchemaFeatures = {
@@ -56,6 +61,7 @@ export async function getSchemaFeatures(): Promise<SchemaFeatures> {
     lessonVideos: r.lesson_videos,
     videoRequestRls: r.video_request_rls,
     requestOpens: r.request_opens,
+    requestQuestionId: r.request_question_id,
   };
   cached = { at: Date.now(), value };
   return value;

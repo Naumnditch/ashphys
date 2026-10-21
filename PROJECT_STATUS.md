@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-21 ("Request a video" button on every practice page → the dashboard's Video Solve Requests tab with the lesson and last-stopped question pre-filled and editable; new nullable `video_requests.question_id`, migration `2026-10-21-video-request-question-id.sql` NOT applied — see "Request a video from practice pages" below). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,119 @@ Last updated: 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Request a video from practice pages (NEW 2026-10-21, not yet deployed)
+
+**Needs migration `database/seeds/2026-10-21-video-request-question-id.sql`** for the
+chosen question to be stored. It is additive (one nullable column, FK, partial index),
+idempotent and independent of 01–06. Without it everything still works: the request
+is saved with its lesson and the question's number in `question_number`, only
+`question_id` is not kept (`lib/db/schemaFeatures.ts` → `requestQuestionId`, cached 60 s,
+so applying it takes effect without a redeploy). Checked 2026-10-21: production has no
+`question_id` column yet.
+
+What changed:
+- **Button** `components/practice/RequestVideoButton.tsx` (`lessonId`, optional
+  `questionId`, optional `label`). "Request a video for this question" with a
+  question, "…for this lesson" without. Existing secondary button style, camera
+  icon, `focus-visible` ring. It is a `<Link>` to
+  `/dashboard?tab=videos&lesson={id}&question={id}&from={encoded practice path}`
+  (`lib/videoRequests/requestLink.ts` → `videoRequestHref`). IDs only, never text.
+- **Where it is mounted**: the practice page header (`app/practice/[topicId]/page.tsx`),
+  first in the button row next to "Download PDF". There is no practice layout file and
+  only ONE practice route (`/practice/[topicId]` renders every practice set, every
+  curriculum bank), so this one mount covers all of them. Shown to every logged-in
+  student, Free and locked lessons included. At 375×667 it sits at y≈268, above the
+  progress map.
+- **Last-stopped question.** Nothing new is tracked. `PracticePosition.tsx` is a small
+  context between the header and `PracticeSession`: the session reports the question
+  it is showing (its own `index` state; it opens on the first untried question, then
+  skipped, then wrong, as before), and until it has, the server's answer is used:
+  `lib/practice/position.ts` reads the student's `practice_attempts` rows for this
+  lesson's bank (the same append-only log the progress map uses; the `question_attempts`
+  view shows the same rows). Rules in `lib/practice/lastStopped.ts`: question on screen
+  → last question answered → first unanswered → last question. On the "Topic Mastered"
+  screen the button keeps the last question shown. Skips (localStorage) only matter
+  through what the session shows.
+- **Dashboard params** (`app/dashboard/page.tsx` → `parseVideoRequestParams`): `lesson`
+  must be a UUID of a lesson in the form's list; `question` a UUID of a `problems` row
+  of that lesson (with no `lesson`, a known question brings its own). Anything else is
+  dropped silently and the form starts as a general request. `from` is kept only when
+  it starts with `/`, is not `//`, has no backslash/whitespace/control characters,
+  parses to this origin and matches a known route (`/practice/<uuid>`, `/lessons/<uuid>`);
+  it is rebuilt keeping only `?c=<curriculum>`. `tab=videos` uses the existing tab
+  handling; leaving the tab removes `lesson`, `question`, `from` from the URL.
+- **Form** (`VideoRequestForm`): chapter → lesson → new **Question** dropdown (only when a
+  lesson is chosen): "General (no specific question)" + the lesson's questions as
+  "Q7 — first 70 characters…", numbered like the practice page. The pre-selected one is
+  marked "★ … (where you stopped)" and the select gets a blue ring while it is chosen,
+  with a hint underneath. Changing the lesson clears the question and loads that
+  lesson's list from `GET /api/video-requests/questions?lesson=` (cached per lesson;
+  the pre-filled lesson's list is server-rendered). The free-text "Question number"
+  field shows only for "General". After a successful submit a "← Back to practice" link
+  (from `from`) appears in the success message.
+- **Bank choice** (`lib/videoRequests/questionOptions.ts`): a lesson has one bank per
+  curriculum; the list is the bank of the pre-selected question, else the bank the
+  practice page would open for this student (`curriculumForTopic`). Question text is only
+  included when the student's tier reaches the lesson's `required_tier` (numbers only
+  otherwise). The endpoint has the form's gate (Plus/Pro or admin).
+- **`POST /api/video-requests`** takes `questionId`: it must be a UUID of a question in
+  the chosen lesson (400 "that question is not in the chosen lesson" otherwise); with no
+  lesson it supplies its lesson; its practice number fills `question_number` when the
+  student typed none (so the student grid and admin list keep showing "Question 7").
+  `createVideoRequest` writes `question_id` when the column exists (RLS path unchanged:
+  the column is covered by migration 03's table grants and policies).
+- **Admin** `/admin/video-requests` shows "<curriculum> practice question: <text>" for
+  requests with a `question_id`, so the teacher knows which bank's Q7 it is.
+- **Free tier** unchanged: the button shows, the Videos tab shows the Plus/Pro upgrade
+  prompt where the form would be (the params are ignored).
+
+Tests & checks (2026-10-21):
+- `components/practice/__tests__/RequestVideoButton.test.tsx` (4): label with/without
+  `questionId`, label override, href (ids + encoded `from`), icon + focus ring.
+- `lib/videoRequests/__tests__/requestLink.test.ts` (13): unknown lesson/question ids
+  ignored, question from another lesson ignored, non-UUIDs never reach a lookup,
+  external/protocol-relative/backslash/`javascript:`/absolute-own-domain `from` rejected,
+  `?c=` kept and other params dropped, link labels, href shape.
+- `lib/practice/__tests__/lastStopped.test.ts` (5): first unanswered, then the last
+  question when all are answered; on-screen and last-answered precedence; stale ids.
+- `components/practice/__tests__/requestVideoFlow.test.tsx` (3, jsdom integration): the
+  practice page's button follows the session to Q2, click → `/dashboard?tab=videos` with
+  that lesson and question; the dashboard selects the Videos tab with chapter, lesson and
+  Q2 selected; changing to Q3 and submitting posts `questionId` Q3; "Back to practice";
+  lesson change reloads the list and General clears the question; unknown ids → general.
+- API: `questions/__tests__/route.test.ts` (5), `questionId` cases in the request route
+  test (+4), admin list question text (+1), submit helper (+1).
+- DB (`npm run test:db`, now 38, was 30): the migration is nullable, keeps older rows,
+  re-runs cleanly, FK refuses unknown questions and deleting a question keeps the request;
+  a student stores `question_id` under RLS; `createVideoRequest` stores it in both modes;
+  `lib/practice/__tests__/positionDb.test.ts` (3): first question, then last answered,
+  per bank. Ran against a local PG16 (SSL on, non-superuser owner).
+- Full suite 1865 passed, 38 DB tests skipped without `TEST_DATABASE_URL` (38/38 pass with
+  it), 1 failed = the same pre-existing live-DNS messaging test. `tsc` clean, `next build`
+  clean (font stub, restored), ESLint `next/core-web-vitals` ad hoc on all 32 changed files:
+  0 problems.
+- **Local run as a student** (Next dev + Playwright/Chromium at 375×667, against a local
+  DB built from the live table definitions plus migrations 01–05 and 2026-10-21; 16/16
+  checks): the Plus student had answered Q1 of 3.1 Momentum; the practice page opened on
+  Q2 and the button said "Request a video for this question" for Q2, above the fold, with
+  a visible focus ring. Click → `/dashboard?tab=videos&lesson=…&question=…&from=%2Fpractice%2F…`,
+  Videos tab selected, chapter/lesson/Q2 pre-filled and marked. Switching the lesson to
+  3.2 Impulse reloaded the list; back to 3.1, chose Q3, submitted → the row has
+  `question_id` = Q3, `question_number` '3', `topic_id` 3.1. "Back to practice" returned
+  to the set. A tampered link (unknown lesson, external `from`) gave a blank general form,
+  no error. The Free student saw the button and got the upgrade prompt.
+
+Manual steps:
+1. Apply `database/seeds/2026-10-21-video-request-question-id.sql` to production (psql or
+   the Supabase SQL editor; it contains `;`, so not via MCP `execute_sql`, see gotchas).
+   Independent of the other pending migrations; safe before or after the deploy.
+2. Deploy (merge to `main`).
+
+Not done / notes:
+- `ashphyss` (stale mirror) not touched, as before.
+- Pre-existing, unchanged: at 375px the document is ~404px wide (navbar "Dashboard"
+  button and the help button overflow), on the practice page as elsewhere.
 
 ### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion; 2026-10-19: A Level Gravitational fields, Coulomb's law, AS Chapter 1 one-page lesson sheets)
 
@@ -1769,6 +1882,26 @@ Unfinished / follow-ups:
 
 Judgement calls that shape later work. Newest first.
 
+- **2026-10-21 — "Request a video": last-stopped = what the practice page already knows.**
+  No new tracking: the question on screen (PracticeSession's own state) wins, then the
+  last `practice_attempts` row in this lesson's bank, then the first unanswered question,
+  then the last one. Skips stay in localStorage and are not read server-side. The viewed
+  question is not persisted.
+- **2026-10-21 — `video_requests.question_id` is nullable with `ON DELETE SET NULL`** to
+  `problems(id)`, added by an additive migration; nothing renamed or dropped, and
+  `question_number` is still written (filled from the question's practice number) so
+  every existing reader keeps working. The API rejects (400) a question that is not in
+  the chosen lesson instead of silently dropping it; the dashboard URL, by contrast,
+  drops unknown ids silently, as asked.
+- **2026-10-21 — `from` allow-list = `/practice/<uuid>` and `/lessons/<uuid>` only**, rebuilt
+  from the parsed URL keeping just `?c=`. Wider than "practice" only by the lesson page,
+  whose link reads "Back to the lesson".
+- **2026-10-21 — One bank per dropdown.** A lesson's questions differ per curriculum; the
+  dropdown lists the bank of the pre-selected question (else the student's default bank),
+  so "Q7" always means the question the student saw. The admin list names the bank.
+- **2026-10-21 — The button is a link, mounted in the page header**, not a layout: there is
+  no practice layout and `/practice/[topicId]` is the only practice route. Free students
+  see it (the dashboard shows them the upgrade prompt), as asked.
 - **2026-10-14 — Curriculum view: lesson type is derived, not stored.** Lessons are
   `topics` rows, which have no type column; the `lessons` table (the one with
   `lesson_type`) is still empty. Row icon mapping: has a simulation → flask ("Simulation");

@@ -48,6 +48,8 @@ function writeTabToUrl(tab: DashboardTab, extra?: Record<string, string>) {
   // One-off params belong to the tab they were opened with.
   if (tab !== 'videos') {
     url.searchParams.delete('lesson');
+    url.searchParams.delete('question');
+    url.searchParams.delete('from');
     url.searchParams.delete('request');
   }
   for (const [k, v] of Object.entries(extra ?? {})) url.searchParams.set(k, v);

@@ -26,6 +26,8 @@ export interface VideoRequestInput {
   lessonId?: string | null;
   chapterId?: string | null;
   questionNumber?: string | null;
+  /** A practice question of `lessonId` (the dashboard form's question dropdown). */
+  questionId?: string | null;
   file?: File | null;
   /** Homepage form: a lesson plus a question number or a screenshot are required. */
   requireQuestion?: boolean;
@@ -151,6 +153,7 @@ export async function submitVideoRequest(input: VideoRequestInput, deps: SubmitD
         lessonId: input.lessonId || undefined,
         chapterId: input.chapterId || undefined,
         questionNumber: questionNumber ?? undefined,
+        questionId: input.questionId || undefined,
         screenshotPath,
         requestId,
         requireQuestion: input.requireQuestion || undefined,

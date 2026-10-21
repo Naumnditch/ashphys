@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts",
+    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/practice/__tests__/positionDb.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

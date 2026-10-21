@@ -16,6 +16,9 @@ import { TutoringPanel } from '@/components/tutoring/TutoringPanel';
 import { getMyVideoRequests } from '@/lib/videoRequests/student';
 import type { StudentVideoRequest } from '@/lib/videoRequests/types';
 import { getVideoRequestFormOptions } from '@/lib/videoRequests/formOptions';
+import { getRequestQuestionOptions, lessonOfQuestion } from '@/lib/videoRequests/questionOptions';
+import { parseVideoRequestParams } from '@/lib/videoRequests/requestLink';
+import type { RequestQuestionOption } from '@/lib/videoRequests/types';
 import { getStudentDashboard, type StudentProgress, type StudentStreaks } from '@/lib/dashboard/data';
 import { formatPercent, isNewStudent } from '@/lib/dashboard/format';
 
@@ -39,7 +42,7 @@ function Chip({ children, title }: { children: React.ReactNode; title?: string }
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: { tab?: string; lesson?: string; request?: string };
+  searchParams: { tab?: string; lesson?: string; question?: string; from?: string; request?: string };
 }) {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login');
@@ -61,6 +64,27 @@ export default async function DashboardPage({
   // Same gate as before (and as POST /api/video-requests): Plus and Pro.
   const canRequest = tier >= TIER_PLUS;
   const formOptions = canRequest ? await getVideoRequestFormOptions() : { chapters: [], topics: [] };
+
+  // ?lesson= / ?question= / ?from= from a practice page's "Request a video"
+  // button (or ?lesson= from a weakness link). Unknown ids are dropped and the
+  // form starts as a general request; `from` must be a known on-site route.
+  const knownLessons = new Set<string>(formOptions.topics.map((t: { id: string }) => t.id));
+  const questionOwner = canRequest
+    ? await lessonOfQuestion(searchParams.question).catch((err) => {
+        console.error('dashboard: question lookup failed', err);
+        return null;
+      })
+    : null;
+  const prefill = parseVideoRequestParams(searchParams, {
+    isKnownLesson: (id) => knownLessons.has(id),
+    lessonOfQuestion: () => questionOwner,
+  });
+  const initialQuestions: RequestQuestionOption[] = prefill.lessonId
+    ? ((await getRequestQuestionOptions(user, prefill.lessonId, prefill.questionId).catch((err) => {
+        console.error('dashboard: question options failed', err);
+        return null;
+      }))?.questions ?? [])
+    : [];
 
   const isNew = dashboard ? isNewStudent(dashboard.progress, dashboard.streaks) : false;
   const header = (
@@ -120,7 +144,10 @@ export default async function DashboardPage({
             canRequest={canRequest}
             chapters={formOptions.chapters}
             topics={formOptions.topics}
-            initialTopicId={searchParams.lesson}
+            initialTopicId={prefill.lessonId ?? undefined}
+            initialQuestionId={prefill.questionId ?? undefined}
+            initialQuestions={initialQuestions}
+            returnTo={prefill.from}
             justSubmitted={searchParams.request === 'sent'}
           />
         ),

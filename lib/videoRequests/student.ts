@@ -117,6 +117,8 @@ export interface NewVideoRequest {
   topicId: string | null;
   chapterId: string | null;
   questionNumber: string | null;
+  /** The practice question (problems row); the API has checked it belongs to topicId. */
+  questionId?: string | null;
   screenshotPath: string | null;
 }
 
@@ -135,6 +137,11 @@ export async function createVideoRequest(student: { id: string }, input: NewVide
     params.push(input.questionNumber);
     extraCols = ', question_number';
     extraVals = `, $${params.length}`;
+  }
+  if (f.requestQuestionId) {
+    params.push(input.questionId ?? null);
+    extraCols += ', question_id';
+    extraVals += `, $${params.length}::uuid`;
   }
   return withStudentDb(student, f, async (db) => {
     const result = await db.query(

@@ -6,7 +6,7 @@ import { VideoRequestForm } from '@/components/video-requests/VideoRequestForm';
 import { VideoRequestsGrid } from '@/components/dashboard/VideoRequestsGrid';
 import { useDashboard } from '@/components/dashboard/DashboardTabs';
 import { recordActivity } from '@/lib/activity/client';
-import type { StudentVideoRequest } from '@/lib/videoRequests/types';
+import type { RequestQuestionOption, StudentVideoRequest } from '@/lib/videoRequests/types';
 
 interface Chapter { id: string; chapter_number: number; title: string }
 interface Topic { id: string; chapter_id: string; topic_name: string }
@@ -21,12 +21,20 @@ export function VideosTab({
   chapters,
   topics,
   initialTopicId,
+  initialQuestionId,
+  initialQuestions,
+  returnTo,
   justSubmitted,
 }: {
   canRequest: boolean;
   chapters: Chapter[];
   topics: Topic[];
+  /** Validated by the page (lib/videoRequests/requestLink.ts): unknown ids never get here. */
   initialTopicId?: string;
+  initialQuestionId?: string;
+  initialQuestions?: RequestQuestionOption[];
+  /** Safe on-site path for "Back to practice" after a submit. */
+  returnTo?: string | null;
   justSubmitted?: boolean;
 }) {
   const { videoRequests } = useDashboard();
@@ -57,7 +65,16 @@ export function VideosTab({
           </div>
         )}
         {canRequest ? (
-          <VideoRequestForm key={initialTopicId ?? 'none'} chapters={chapters} topics={topics} initialTopicId={initialTopicId} onSubmitted={reload} />
+          <VideoRequestForm
+            key={`${initialTopicId ?? 'none'}:${initialQuestionId ?? 'none'}`}
+            chapters={chapters}
+            topics={topics}
+            initialTopicId={initialTopicId}
+            initialQuestionId={initialQuestionId}
+            initialQuestions={initialQuestions}
+            returnTo={returnTo}
+            onSubmitted={reload}
+          />
         ) : (
           <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
             <div className="text-3xl mb-2" aria-hidden="true">🔒</div>

@@ -17,6 +17,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { CURRICULA, isCurriculumId } from '@/lib/curricula';
 import { getCurrentUser } from '@/lib/auth/session';
 import { query } from '@/lib/db/client';
 import { withRlsContext } from '@/lib/db/rls';
@@ -46,6 +47,11 @@ async function screenshotUrl(path: string | null): Promise<string | null> {
   }
 }
 
+/** "AS Level (Cambridge 9702)" for a problems.curriculum_id. */
+function bankName(curriculumId: unknown): string {
+  return isCurriculumId(curriculumId) ? CURRICULA[curriculumId].displayName : String(curriculumId ?? '');
+}
+
 export async function GET() {
   const admin = await getCurrentUser();
   if (!admin) return NextResponse.json({ success: false, error: 'Not signed in' }, { status: 401 });
@@ -57,6 +63,11 @@ export async function GET() {
       `SELECT r.id, r.student_id, r.description, r.screenshot_path, r.status, r.youtube_url, r.admin_note,
               r.created_at, r.topic_id,
               ${features.questionNumber ? 'r.question_number' : 'NULL::text AS question_number'},
+              ${
+                features.requestQuestionId
+                  ? 'r.question_id, qp.question_text AS question_text, qp.curriculum_id AS question_bank'
+                  : 'NULL::uuid AS question_id, NULL::text AS question_text, NULL::text AS question_bank'
+              },
               u.first_name, u.last_name, u.email,
               t.topic_name, c.chapter_number, c.title AS chapter_title,
               ${
@@ -73,6 +84,7 @@ export async function GET() {
        JOIN users u ON u.id = r.student_id
        LEFT JOIN topics t ON t.id = r.topic_id
        LEFT JOIN chapters c ON c.id = r.chapter_id
+       ${features.requestQuestionId ? 'LEFT JOIN problems qp ON qp.id = r.question_id' : ''}
        ORDER BY r.created_at DESC`
     );
     const lessons = await getLessonPickerGroups();
@@ -83,6 +95,7 @@ export async function GET() {
         studentId: r.student_id,
         description: r.description,
         questionNumber: r.question_number,
+        question: r.question_id && r.question_text ? { id: r.question_id, text: r.question_text, bank: bankName(r.question_bank) } : null,
         status: r.status,
         youtubeUrl: r.youtube_url,
         adminNote: r.admin_note,

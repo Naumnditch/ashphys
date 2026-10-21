@@ -27,3 +27,11 @@ export interface StudentVideoRequest {
 export function readyVideoCount(requests: Pick<StudentVideoRequest, 'status' | 'youtubeId' | 'openedAt'>[]): number {
   return requests.filter((r) => r.status === 'fulfilled' && r.youtubeId && !r.openedAt).length;
 }
+
+/** One entry of the request form's question dropdown (lib/videoRequests/questionOptions.ts). */
+export interface RequestQuestionOption {
+  id: string;
+  /** The number the practice page shows ("Question 7 of 20"). */
+  number: number;
+  label: string;
+}
