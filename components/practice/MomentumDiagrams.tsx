@@ -7,12 +7,14 @@
  * they render live in React and in the worksheet PDF with no asset hosting.
  * The A Level circular motion and gravitation figures live in
  * CircularGravityDiagrams.tsx and are merged in below, as are the 17.4
- * Coulomb CHALLENGING-tier figures (CoulombChallengeDiagrams.tsx).
+ * Coulomb CHALLENGING-tier figures (CoulombChallengeDiagrams.tsx) and the
+ * AS Chapter 6 momentum bank figures (MomentumBankDiagrams.tsx).
  */
 
 import { CIRCULAR_GRAVITY_DIAGRAMS } from './CircularGravityDiagrams';
 import { KINEMATICS_DIAGRAMS } from './KinematicsDiagrams';
 import { COULOMB_CHALLENGE_DIAGRAMS } from './CoulombChallengeDiagrams';
+import { MOMENTUM_BANK_DIAGRAMS } from './MomentumBankDiagrams';
 
 const INK = 'rgb(var(--h-1b2a41))';
 const MUTE = 'rgb(var(--h-4a5a72))';
@@ -610,6 +612,7 @@ const DIAGRAMS: Record<string, React.ReactNode> = {
   ...CIRCULAR_GRAVITY_DIAGRAMS,
   ...KINEMATICS_DIAGRAMS,
   ...COULOMB_CHALLENGE_DIAGRAMS,
+  ...MOMENTUM_BANK_DIAGRAMS,
   'momentum-stick-1': (
     <Frame>
       <Trolley x={40} y={70} width={70} mass="2 kg" arrow={{ label: '6 m/s', dir: 1, color: TEAL }} />

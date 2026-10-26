@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -1168,6 +1168,46 @@ Unfinished / follow-ups:
   separate, deliberate production-promotion step for whoever reviews this
   branch to take next, not something this session's harness permits it to
   do unprompted.
+
+### AS Chapter 6 Momentum practice banks (NEW 2026-10-26)
+- Owner's request: momentum practice "starting with normal momentum, with creative
+  ideas, then jump into collisions", pushed to the respective lessons. Built for the
+  AS curriculum (the owner's Grade 11 class): a fresh 20-question tier-ordered bank
+  (same tiers as the Kinematics banks: Q1-6 Foundation 1 mark, Q7-13 Intermediate
+  2, Q14-18 Challenging 3-5, Q19-20 Stretch 5-6) for each of
+  **6.1 The idea of momentum** (`196ffab0-…`), **6.2 Conservation of momentum and
+  collisions** (`42c67aa7-…`) and **6.3 Understanding collisions** (`ac47b348-…`).
+  60 questions: 46 numeric, 14 MCQ (correct letter rotated C/A/D/B — the practice
+  page shows options in stored order), 41 with a figure.
+- Content: 6.1 = p = mv, vector sign, Δp on rebound, total momentum, p = √(2mEk),
+  creative contexts (cheetah, honeybee, curling stone, hailstone, Earth's orbital
+  momentum, "hardest to stop" ranking, equal-p car vs truck stopping distance/time,
+  deducing m and v from p and Ek). 6.2 = conservation principle, sticking/bouncing/
+  recoil, unknown mass, astronaut + wrench, rifle recoil, dart-into-trolley speed
+  measurement, sand-sack trapdoor trap, relay push, brick-throwing cart, crash
+  reconstruction from skid marks. 6.3 = elastic vs (perfectly) inelastic, KE lost,
+  relative speed of approach = separation, Newton's-cradle exchange, spring release,
+  "impossible collision" (KE increases), bounce-height KE loss, ballistic pendulum,
+  neutron moderation (28.4% to C-12), stacked basketball/tennis-ball drop (9h).
+- Rows: the lessons' 20 old AS rows (no attempts/submissions/Q&A/quiz links) were
+  UPDATEd in place, each reused by a new question of the SAME answer_type so MCQ
+  option rows are reused and no numeric row keeps stray options; 40 rows INSERTed
+  with uuid5 ids. Applied 2026-10-26 via `execute_sql` (one call per lesson, no
+  BEGIN/COMMIT) and verified: all 60 rows and every option set md5-match the
+  generator.
+- Files: `database/seeds/2026-10-26-as-momentum-collisions.py` (edit this) →
+  `.sql` beside it + `components/practice/momentumBankDiagramData.ts` (both
+  generated). Figures: `components/practice/MomentumBankDiagrams.tsx` —
+  parametric SVG `CollisionPanels` (BEFORE/AFTER or single panel; trolley, ball,
+  block, puck, person, car; wall; ice), `Lineup` cards, `DropBounce` (incl.
+  stacked balls), `BallisticPendulum`, plus `MotionGraph` reused for the p–t graph;
+  merged into `getDiagram()` in MomentumDiagrams.tsx. All SVG (no HTML tables), so
+  every figure prints in the worksheet PDF.
+- Tests: `lib/practice/__tests__/asMomentumCollisionsSeed.test.ts` (122): every
+  numeric answer recomputed independently, real grader bare/with unit/2-3 s.f./±20%/
+  wrong sign, 23 "common mistake" answers graded wrong, MCQ 4 options 1 correct,
+  correct letters spread, old rows reused by type, figures render finite SVG.
+  Full suite: only the known live-DNS test fails. `tsc` + `next build` clean.
 
 ### AS Level Kinematics & Accelerated motion practice banks (NEW 2026-10-09)
 - A fresh, tier-ordered 20-question (Q1-Q20) AS-curriculum bank for every
