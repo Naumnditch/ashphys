@@ -15,6 +15,16 @@ import type { Announcement } from './types';
  */
 export const UPDATES: Announcement[] = [
   {
+    id: 'cheat-sheets-as-momentum',
+    category: 'lesson',
+    type: 'new',
+    title: 'AS Momentum: 7 one-page cheat sheets',
+    description: 'A printable page for every Chapter 6 lesson: momentum, conservation, elastic and inelastic collisions, explosions, 2D collisions and Newton’s laws.',
+    date: '2026-10-26',
+    href: '/cheat-sheets?c=as',
+    published: true,
+  },
+  {
     id: 'cheat-sheets-as-accelerated-motion',
     category: 'lesson',
     type: 'new',

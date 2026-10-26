@@ -34,6 +34,13 @@ import { as211AccelerationGravity } from './sheets/as-2-11-acceleration-caused-b
 import { as212DeterminingG } from './sheets/as-2-12-determining-g';
 import { as213ProjectileMotion } from './sheets/as-2-13-projectile-motion';
 import { as214UnderstandingProjectiles } from './sheets/as-2-14-understanding-projectiles';
+import { as61IdeaOfMomentum } from './sheets/as-6-1-idea-of-momentum';
+import { as62ConservationOfMomentum } from './sheets/as-6-2-conservation-of-momentum';
+import { as63UnderstandingCollisions } from './sheets/as-6-3-understanding-collisions';
+import { as64ExplosionsCrashLandings } from './sheets/as-6-4-explosions-and-crash-landings';
+import { as65CollisionsTwoDimensions } from './sheets/as-6-5-collisions-in-two-dimensions';
+import { as66MomentumNewtonsLaws } from './sheets/as-6-6-momentum-and-newtons-laws';
+import { as67UnderstandingMotion } from './sheets/as-6-7-understanding-motion';
 
 export type * from './types';
 
@@ -66,6 +73,14 @@ export const CHEAT_SHEETS: readonly CheatSheet[] = [
   as212DeterminingG,
   as213ProjectileMotion,
   as214UnderstandingProjectiles,
+  // AS Chapter 6 Momentum.
+  as61IdeaOfMomentum,
+  as62ConservationOfMomentum,
+  as63UnderstandingCollisions,
+  as64ExplosionsCrashLandings,
+  as65CollisionsTwoDimensions,
+  as66MomentumNewtonsLaws,
+  as67UnderstandingMotion,
 ];
 
 export function getCheatSheet(slug: string): CheatSheet | undefined {

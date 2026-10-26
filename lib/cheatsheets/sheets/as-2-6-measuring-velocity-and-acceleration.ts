@@ -100,6 +100,15 @@ export const as26MeasuringVelocityAcceleration: CheatSheet = {
         {
           kind: 'polygon',
           points: [
+            [30, 168],
+            [30, 146],
+            [100, 146],
+            [100, 168],
+          ],
+        },
+        {
+          kind: 'polygon',
+          points: [
             [58, 146],
             [58, 112],
             [72, 112],

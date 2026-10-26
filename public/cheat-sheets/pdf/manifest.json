@@ -357,36 +357,36 @@
     }
   },
   "as-2-6-measuring-velocity-and-acceleration": {
-    "hash": "50b2b7044b10a93e77dbedaf7640872760d917f90447e41375ef16a6622cb71c",
+    "hash": "ba6db759b89936054b213ecf7fee5cb801fcb2026db5f777ab5bfb6a28a2d926",
     "files": {
       "a4": {
         "file": "as-2-6-measuring-velocity-and-acceleration-a4.pdf",
         "pages": 1,
         "sheets": 1,
-        "bytes": 155614
+        "bytes": 155616
       },
       "letter": {
         "file": "as-2-6-measuring-velocity-and-acceleration-letter.pdf",
         "pages": 1,
         "sheets": 1,
-        "bytes": 156032
+        "bytes": 156036
       }
     }
   },
   "as-2-7-velocity-and-acceleration-in-the-laboratory": {
-    "hash": "0c8a9a0907693730201378d9f38821043e1e637b3ca3a3aff5805d7cb9769ce3",
+    "hash": "c85801782d2739843be39b2bbc322729bca8879e19a66551b7a39c98547339eb",
     "files": {
       "a4": {
         "file": "as-2-7-velocity-and-acceleration-in-the-laboratory-a4.pdf",
         "pages": 1,
         "sheets": 1,
-        "bytes": 150512
+        "bytes": 150521
       },
       "letter": {
         "file": "as-2-7-velocity-and-acceleration-in-the-laboratory-letter.pdf",
         "pages": 1,
         "sheets": 1,
-        "bytes": 150887
+        "bytes": 150896
       }
     }
   },
@@ -421,6 +421,125 @@
         "pages": 1,
         "sheets": 1,
         "bytes": 153144
+      }
+    }
+  },
+  "as-6-1-idea-of-momentum": {
+    "hash": "8c7d1dfab541a4c91a4e348b4b614b8a4b1caf66750f8f6dd9880a0e76a76cc0",
+    "files": {
+      "a4": {
+        "file": "as-6-1-idea-of-momentum-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 159998
+      },
+      "letter": {
+        "file": "as-6-1-idea-of-momentum-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 160437
+      }
+    }
+  },
+  "as-6-2-conservation-of-momentum": {
+    "hash": "fb2c3b88379cfbc66c25037560f97e90f0bcc42a5bbc63ff7d37d39c72fb43ba",
+    "files": {
+      "a4": {
+        "file": "as-6-2-conservation-of-momentum-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 157036
+      },
+      "letter": {
+        "file": "as-6-2-conservation-of-momentum-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 157258
+      }
+    }
+  },
+  "as-6-3-understanding-collisions": {
+    "hash": "6881ea7814867d4e7cfca9aacd94ea50355e47ad5295fddb6e471f6919dedd0b",
+    "files": {
+      "a4": {
+        "file": "as-6-3-understanding-collisions-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 158483
+      },
+      "letter": {
+        "file": "as-6-3-understanding-collisions-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 158841
+      }
+    }
+  },
+  "as-6-4-explosions-and-crash-landings": {
+    "hash": "380745750e8fccc30de1d7dd646033ea1ff2c684be7f40a97437f3946f826be4",
+    "files": {
+      "a4": {
+        "file": "as-6-4-explosions-and-crash-landings-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 147227
+      },
+      "letter": {
+        "file": "as-6-4-explosions-and-crash-landings-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 147796
+      }
+    }
+  },
+  "as-6-5-collisions-in-two-dimensions": {
+    "hash": "a87ebb00280044bae5b9e6757ad5cd61548d1f11c43879e556ce5e913eb9b349",
+    "files": {
+      "a4": {
+        "file": "as-6-5-collisions-in-two-dimensions-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 177675
+      },
+      "letter": {
+        "file": "as-6-5-collisions-in-two-dimensions-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 177770
+      }
+    }
+  },
+  "as-6-6-momentum-and-newtons-laws": {
+    "hash": "c2d8524e6d2682c6c15c3f2169fb8b630227b6539cb0157b828b7c361f2d07af",
+    "files": {
+      "a4": {
+        "file": "as-6-6-momentum-and-newtons-laws-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 151063
+      },
+      "letter": {
+        "file": "as-6-6-momentum-and-newtons-laws-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 151620
+      }
+    }
+  },
+  "as-6-7-understanding-motion": {
+    "hash": "b2f2a41f8dd64499c4186c471b154d58625d0a7998d04f52bccf26dc0eda9856",
+    "files": {
+      "a4": {
+        "file": "as-6-7-understanding-motion-a4.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 161661
+      },
+      "letter": {
+        "file": "as-6-7-understanding-motion-letter.pdf",
+        "pages": 1,
+        "sheets": 1,
+        "bytes": 161963
       }
     }
   },

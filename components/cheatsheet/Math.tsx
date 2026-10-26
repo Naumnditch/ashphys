@@ -53,5 +53,6 @@ export function MathText({ text }: { text: string }) {
 export function keepUnitsTogether(text: string): string {
   return text
     .replace(/\b(k?m) (?=[sh]⁻)/g, '$1\u00a0')
+    .replace(/\bkg (?=m\u00a0s⁻)/g, 'kg\u00a0')
     .replace(/(\d) (?=(?:k?m|cm|s|h|N|kg|J|W|Hz|°C)(?![A-Za-z]))/g, '$1\u00a0');
 }

@@ -111,7 +111,7 @@ describe('cheat sheet registry', () => {
     // The A Level sheet also covers the other Chapter 16 lessons, in A Level only.
     expect(cheatSheetFor('744a91d7-6b75-4fd2-b3c7-17689e965446', 'a-level')).toBe(alevel);
     expect(cheatSheetFor('0245e29c-acd6-5c5f-b1b3-bf9431a0fa6b', 'ib')).toBeUndefined();
-    expect(cheatSheetsFor('as')).toHaveLength(22);
+    expect(cheatSheetsFor('as')).toHaveLength(29);
     expect(getCheatSheet('nope')).toBeUndefined();
   });
 
@@ -655,7 +655,7 @@ describe('AS Chapter 2 Accelerated motion lesson sheets', () => {
     expect((2 - 1) / 0.4).toBeCloseTo(2.5, 12);
     expect(0.1 / 0.2).toBe(0.5);
     expect((1.5 - 0.5) / 0.8).toBe(1.25);
-    const strips = sheet('2.7').diagrams[0].shapes.filter((s) => s.kind === 'polygon') as Extract<DiagramShape, { kind: 'polygon' }>[];
+    const strips = sheet('2.7').diagrams[0].shapes.filter((s) => s.kind === 'polygon' && s.fill === 'soft') as Extract<DiagramShape, { kind: 'polygon' }>[];
     expect(strips.map((s) => (s.points[0][1] - s.points[1][1]) / 20)).toEqual([2, 4, 6]);
     expect([0.02, 0.04, 0.06].map((l) => +(l / 0.1).toFixed(2))).toEqual([0.2, 0.4, 0.6]);
     expect((0.4 - 0.2) / 0.1).toBeCloseTo(2, 12);
@@ -729,6 +729,85 @@ describe('AS Chapter 2 Accelerated motion lesson sheets', () => {
     expect(angled.points[angled.points.length - 1][1]).toBeCloseTo(150, 6);
     expect((150 - Math.min(...ys)) / 6).toBeCloseTo((20 * Math.sin(deg(50))) ** 2 / (2 * g), 6);
     expect((angled.points[angled.points.length - 1][0] - 40) / 6).toBeCloseTo((400 * Math.sin(deg(100))) / g, 6);
+  });
+});
+
+describe('AS Chapter 6 Momentum lesson sheets', () => {
+  const as = CHEAT_SHEETS.filter((s) => s.curriculumId === 'as' && s.chapter.number === 6);
+  const deg = (d: number) => (d * Math.PI) / 180;
+  const sheet = (code: string) => as.find((s) => s.lessonCode === code)!;
+  const ek = (m: number, v: number) => 0.5 * m * v * v;
+
+  it('covers all seven lessons, 6.1–6.7, one page each', () => {
+    expect(as.map((s) => s.lessonCode).sort()).toEqual(['6.1', '6.2', '6.3', '6.4', '6.5', '6.6', '6.7']);
+    for (const s of as) expect(sheetPages(s).length, s.slug).toBe(1);
+  });
+
+  it('6.1–6.3 momentum, conservation and kinetic energy', () => {
+    expect(0.06 * (-15 - 25)).toBeCloseTo(-2.4, 12);
+    expect(70 * 8).toBe(560);
+    expect(6 / 0.4).toBeCloseTo(15, 12);
+    expect(2 * 3 + 1.5 * -4).toBe(0);
+    expect(0.2 * (3 - -5)).toBeCloseTo(1.6, 12);
+    expect((2 * 3 + 1 * 0) / 3).toBe(2);
+    expect((4 * 5) / 5).toBe(4);
+    expect((0.5 * 6 - 0.5 * -1.5) / 1.5).toBeCloseTo(2.5, 12);
+    expect((2 * 4 - 3 * 2) / 5).toBeCloseTo(0.4, 12);
+    expect(ek(2, 3)).toBe(9);
+    expect(ek(3, 2)).toBe(6);
+    expect((ek(0.1, 8) - ek(0.1, 6)).toFixed(1)).toBe('1.4');
+    // Elastic 1.0 kg at 6.0 on 2.0 kg at rest: v1 = −2.0, v2 = 4.0 conserve p and Ek, and separate at 6.0.
+    expect(1 * -2 + 2 * 4).toBe(6);
+    expect(ek(1, -2) + ek(2, 4)).toBe(ek(1, 6));
+    expect(4 - -2).toBe(6);
+  });
+
+  it('6.4 recoil and 6.5 two dimensions', () => {
+    expect((0.01 * 400) / 4).toBeCloseTo(1, 12);
+    expect(ek(0.01, 400) + ek(4, 1)).toBeCloseTo(802, 9);
+    expect((40 * 3) / 60).toBe(2);
+    expect((0.5 * 12) / 1.5).toBe(4);
+    const vx = 5 - 3 * Math.cos(deg(53));
+    const vy = 3 * Math.sin(deg(53));
+    expect(vx.toFixed(1)).toBe('3.2');
+    expect(vy.toFixed(1)).toBe('2.4');
+    expect(Math.hypot(vx, vy).toFixed(1)).toBe('4.0');
+    expect(((Math.atan2(vy, vx) * 180) / Math.PI).toFixed(0)).toBe('37');
+    expect(Math.hypot(4, 4) / 2).toBeCloseTo(2.83, 2);
+    expect(Math.hypot(6, 6).toFixed(1)).toBe('8.5');
+    expect(ek(2, 3) + ek(2, 4)).toBe(ek(2, 5));
+  });
+
+  it('6.6 and 6.7 force as rate of change of momentum', () => {
+    expect(0.15 * (30 - -20)).toBeCloseTo(7.5, 12);
+    expect(7.5 / 0.01).toBeCloseTo(750, 9);
+    expect((1000 * 20) / 8).toBe(2500);
+    expect(2 * 15).toBe(30);
+    expect(12 / 0.04).toBeCloseTo(300, 9);
+    expect(120 * 0.5).toBe(60);
+    expect(60 / 60).toBe(1);
+    expect(60 / 80).toBe(0.75);
+    expect(50 * 2000).toBe(1e5);
+  });
+
+  it('figures: arrows are to scale and momentum balances', () => {
+    // 6.1: 2.4 px per m s⁻¹, 25 in and 15 out.
+    const [u, v] = arrows(sheet('6.1').diagrams[0]).filter((a) => a.role === 'velocity');
+    expect(vec(u)[0] / 2.4).toBeCloseTo(25, 6);
+    expect(vec(v)[0] / 2.4).toBeCloseTo(-15, 6);
+    // 6.2: 20 px per m s⁻¹; 2.0 × 3.0 before = 3.0 × 2.0 after.
+    const [before, after] = arrows(sheet('6.2').diagrams[0]).filter((a) => a.role === 'velocity');
+    expect(2 * (vec(before)[0] / 20)).toBeCloseTo(3 * (vec(after)[0] / 20), 6);
+    // 6.5: equal masses, so the after arrows add up to the before arrow.
+    const [uA, vA, vB] = arrows(sheet('6.5').diagrams[0]).filter((a) => a.role === 'velocity');
+    expect(vec(vA)[0] + vec(vB)[0]).toBeCloseTo(vec(uA)[0], 6);
+    expect(vec(vA)[1] + vec(vB)[1]).toBeCloseTo(0, 6);
+    expect(Math.hypot(...vec(vA)) / 20).toBeCloseTo(3, 6);
+    expect(Math.hypot(...vec(vB)) / 20).toBeCloseTo(4, 6);
+    // 6.7: the third-law pair is equal and opposite.
+    const [fA, fB] = arrows(sheet('6.7').diagrams[0]).filter((a) => a.role === 'force');
+    expect(vec(fA)[0]).toBeCloseTo(-vec(fB)[0], 6);
+    expect(vec(fA)[1]).toBe(0);
   });
 });
 
@@ -990,6 +1069,7 @@ describe('keepUnitsTogether', () => {
     const nb = '\u00a0';
     expect(keepUnitsTogether('17 m s⁻¹ in 2.5 s')).toBe(`17${nb}m${nb}s⁻¹ in 2.5${nb}s`);
     expect(keepUnitsTogether('100 km h⁻¹ over 45 m')).toBe(`100${nb}km${nb}h⁻¹ over 45${nb}m`);
+    expect(keepUnitsTogether('2.4 kg m s⁻¹')).toBe(`2.4${nb}kg${nb}m${nb}s⁻¹`);
     expect(keepUnitsTogether('5 spaces and 3 strips')).toBe('5 spaces and 3 strips');
   });
 });

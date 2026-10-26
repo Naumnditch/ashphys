@@ -89,6 +89,7 @@ export const as27LabVelocityAcceleration: CheatSheet = {
       height: 220,
       shapes: [
         ...LENGTHS.map((_, i) => ({ kind: 'polygon' as const, points: strip(i), fill: 'soft' as const })),
+        ...LENGTHS.map((_, i) => ({ kind: 'polygon' as const, points: strip(i) })),
         ...LENGTHS.flatMap((l, i) =>
           Array.from({ length: 6 }, (_, k) => ({ kind: 'dot' as const, at: [xAt(0.1 * i + 0.05), yAt(l * (0.08 + (0.84 * k) / 5))] as Point, radius: 1.8 })),
         ),
