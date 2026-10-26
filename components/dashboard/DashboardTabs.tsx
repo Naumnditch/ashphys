@@ -81,12 +81,15 @@ export function DashboardTabs({
   tabParam,
   initialRequests,
   initialUnread,
+  initialUnreadNotes = 0,
   header,
   panels,
 }: {
   tabParam: string | null;
   initialRequests: StudentVideoRequest[];
   initialUnread: number;
+  /** Teacher notes on the progress report not opened yet (badge + default tab). */
+  initialUnreadNotes?: number;
   header?: ReactNode;
   panels: Record<DashboardTab, ReactNode>;
 }) {
@@ -94,15 +97,17 @@ export function DashboardTabs({
   const unread = useUnreadCount(initialUnread);
   const ready = readyVideoCount(videoRequests.requests);
   const initialReady = useRef(readyVideoCount(initialRequests));
+  const initialNotes = useRef(initialUnreadNotes);
+  const [unreadNotes, setUnreadNotes] = useState(initialUnreadNotes);
 
   const [tab, setTab] = useState<DashboardTab | null>(() =>
-    tabParam ? resolveDashboardTab(tabParam, null, initialReady.current) : null
+    tabParam ? resolveDashboardTab(tabParam, null, initialReady.current, initialNotes.current) : null
   );
 
   // Resolve (no ?tab=: localStorage, then the default) and normalise the URL.
   // Re-runs when a <Link> to /dashboard?tab=… re-renders the page.
   useEffect(() => {
-    const next = resolveDashboardTab(tabParam, tabParam ? null : readStoredTab(), initialReady.current);
+    const next = resolveDashboardTab(tabParam, tabParam ? null : readStoredTab(), initialReady.current, initialNotes.current);
     setTab(next);
     storeTab(next);
     writeTabToUrl(next);
@@ -113,6 +118,14 @@ export function DashboardTabs({
     storeTab(next);
     writeTabToUrl(next, extra);
   }, []);
+
+  // Opening the report reads the teacher's notes: clear the badge (the card
+  // keeps its "New" tag until the next visit, so the student still spots it).
+  useEffect(() => {
+    if (tab !== 'report' || unreadNotes === 0) return;
+    setUnreadNotes(0);
+    fetch('/api/student/report/seen', { method: 'POST' }).catch(() => {});
+  }, [tab, unreadNotes]);
 
   const tabRefs = useRef<Partial<Record<DashboardTab, HTMLButtonElement | null>>>({});
   const tablistRef = useRef<HTMLDivElement>(null);
@@ -147,6 +160,8 @@ export function DashboardTabs({
       <Badge count={unread} label={`${unread} unread message${unread === 1 ? '' : 's'}`} />
     ) : id === 'videos' ? (
       <Badge count={ready} label={`${ready} video${ready === 1 ? '' : 's'} ready to watch`} />
+    ) : id === 'report' ? (
+      <Badge count={unreadNotes} label={`${unreadNotes} new note${unreadNotes === 1 ? '' : 's'} from your teacher`} />
     ) : null;
 
   return (

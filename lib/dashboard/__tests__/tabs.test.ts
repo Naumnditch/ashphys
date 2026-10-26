@@ -9,10 +9,11 @@ import {
 } from '@/lib/dashboard/tabs';
 
 describe('dashboard tab routing', () => {
-  it('has the five tabs in the specified order', () => {
-    expect(DASHBOARD_TABS).toEqual(['messages', 'curriculum', 'classes', 'videos', 'tutoring']);
+  it('has the six tabs in the specified order', () => {
+    expect(DASHBOARD_TABS).toEqual(['messages', 'report', 'curriculum', 'classes', 'videos', 'tutoring']);
     expect(DASHBOARD_TAB_INFO.map((t) => t.title)).toEqual([
       'Messages',
+      'My Progress Report',
       'Browse the Curriculum',
       'Join a Class',
       'Video Solve Requests',
@@ -54,5 +55,13 @@ describe('dashboard tab routing', () => {
     expect(isDashboardTab('Videos')).toBe(false);
     expect(isDashboardTab(undefined)).toBe(false);
     expect(dashboardTabHref('videos', { lesson: 'abc' })).toBe('/dashboard?tab=videos&lesson=abc');
+  });
+
+  it('an unread teacher note opens the report unless the URL asks for a tab', () => {
+    expect(resolveDashboardTab(null, 'tutoring', 0, 1)).toBe('report');
+    expect(resolveDashboardTab(null, null, 2, 1)).toBe('report');
+    expect(resolveDashboardTab('videos', 'tutoring', 0, 1)).toBe('videos');
+    expect(resolveDashboardTab('nope', null, 0, 1)).toBe('report');
+    expect(resolveDashboardTab(null, 'tutoring', 0, 0)).toBe('tutoring');
   });
 });

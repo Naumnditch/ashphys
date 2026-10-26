@@ -112,6 +112,12 @@ export default async function AdminStudentDetailPage({
           <p className="text-sm text-gray-500 break-all">{profile.email}</p>
         </div>
         <div className="flex flex-wrap gap-2 text-sm">
+          <Link href={`/admin/students/${profile.id}/report`} className="px-3 py-1.5 rounded-lg bg-gray-900 text-white font-semibold hover:bg-gray-700">
+            📊 Progress report & note
+          </Link>
+          <a href={`/api/reports/${profile.id}/pdf`} className="px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-50">
+            Report PDF
+          </a>
           <Link href="/admin/access" className="px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-50">
             Manage access
           </Link>

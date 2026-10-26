@@ -8,6 +8,7 @@ import { FULFILLED, request } from './fixtures';
 
 const PANELS: Record<DashboardTab, React.ReactNode> = {
   messages: <p>messages panel</p>,
+  report: <p>report panel</p>,
   curriculum: <p>curriculum panel</p>,
   classes: <p>classes panel</p>,
   videos: <p>videos panel</p>,
@@ -100,18 +101,18 @@ describe('DashboardTabs routing', () => {
   it('wires tablist / tab / tabpanel ARIA and moves with the arrow keys', async () => {
     renderTabs('messages');
     const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(5);
+    expect(tabs).toHaveLength(6);
     expect(screen.getByRole('tablist').getAttribute('aria-orientation')).toBe('vertical');
     const panel = screen.getByRole('tabpanel');
     expect(panel.getAttribute('aria-labelledby')).toBe('dashboard-tab-messages');
     expect(tabs[0].getAttribute('aria-controls')).toBe('dashboard-panel-messages');
-    expect(tabs.map((t) => t.getAttribute('tabindex'))).toEqual(['0', '-1', '-1', '-1', '-1']);
+    expect(tabs.map((t) => t.getAttribute('tabindex'))).toEqual(['0', '-1', '-1', '-1', '-1', '-1']);
 
     fireEvent.keyDown(tabs[0], { key: 'ArrowDown' });
-    expect(selected()?.id).toBe('dashboard-tab-curriculum');
-    expect(document.activeElement?.id).toBe('dashboard-tab-curriculum');
+    expect(selected()?.id).toBe('dashboard-tab-report');
+    expect(document.activeElement?.id).toBe('dashboard-tab-report');
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' });
-    expect(selected()?.id).toBe('dashboard-tab-classes');
+    expect(selected()?.id).toBe('dashboard-tab-curriculum');
     fireEvent.keyDown(document.activeElement!, { key: 'End' });
     expect(selected()?.id).toBe('dashboard-tab-tutoring');
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' });
@@ -134,5 +135,33 @@ describe('DashboardTabs badges', () => {
       window.dispatchEvent(new Event('focus'));
     });
     await waitFor(() => expect(screen.getAllByLabelText('1 video ready to watch').length).toBeGreaterThan(0));
+  });
+});
+
+describe('DashboardTabs teacher-note badge', () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it('opens the report for an unread note, shows the badge, then marks the notes read', async () => {
+    const fetchMock = mockFetch();
+    vi.stubGlobal('fetch', fetchMock);
+    window.localStorage.setItem(DASHBOARD_TAB_STORAGE_KEY, 'tutoring');
+    window.history.replaceState(null, '', '/dashboard');
+    render(<DashboardTabs tabParam={null} initialRequests={[]} initialUnread={0} initialUnreadNotes={1} panels={PANELS} />);
+    await waitFor(() => expect(selected()?.id).toBe('dashboard-tab-report'));
+    await waitFor(() =>
+      expect(
+        (fetchMock.mock.calls as unknown[][]).some(([u, init]) => String(u) === '/api/student/report/seen' && (init as RequestInit | undefined)?.method === 'POST')
+      ).toBe(true)
+    );
+    expect(screen.queryByLabelText(/new note/)).toBeNull();
+  });
+
+  it('shows the badge on the report tab while another tab is open', async () => {
+    vi.stubGlobal('fetch', mockFetch());
+    render(<DashboardTabs tabParam="messages" initialRequests={[]} initialUnread={0} initialUnreadNotes={2} panels={PANELS} />);
+    expect(screen.getAllByLabelText('2 new notes from your teacher').length).toBeGreaterThan(0);
   });
 });
