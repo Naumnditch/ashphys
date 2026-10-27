@@ -5,6 +5,7 @@
  */
 
 import type { CurriculumId } from '@/lib/curricula';
+import type { Ink } from '@/lib/reports/ink';
 
 export interface ReportLesson {
   topicId: string;
@@ -131,6 +132,10 @@ export interface TeacherNote {
   createdAt: string;
   updatedAt: string;
   readAt: string | null;
+  /** Handwritten note from the pen pad (shown under any typed text). */
+  ink: Ink | null;
+  /** Handwritten signature (shown instead of the typed one, which stays as its label). */
+  signatureInk: Ink | null;
 }
 
 export interface StudentReport {

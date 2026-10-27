@@ -12,6 +12,8 @@
 
 import path from 'node:path';
 import PDFDocument from 'pdfkit';
+import SVGtoPDF from 'svg-to-pdfkit';
+import { inkBox, inkSvg, type Ink } from '@/lib/reports/ink';
 import type { StudentReport } from '@/lib/reports/types';
 import { formatMinutes, pct } from '@/lib/reports/insights';
 
@@ -224,22 +226,59 @@ function snapshot(L: Layout, r: StudentReport) {
   L.y = y + h + GAP;
 }
 
+/** Draws stored handwriting (generated SVG, never client markup) into the PDF. */
+function drawInk(doc: Doc, ink: Ink, x: number, y: number, w: number, h: number) {
+  const { svg } = inkSvg(ink);
+  SVGtoPDF(doc, svg, x, y, { width: w, height: h, preserveAspectRatio: 'xMinYMin meet' });
+}
+
+/** Size of handwriting in the PDF: the writing keeps its size on the pad (pad width = card width), capped in height. */
+export function inkSize(ink: Ink, fullWidth: number, maxHeight: number) {
+  const box = inkBox(ink);
+  let w = fullWidth * Math.min(1, box.w / ink.w);
+  let h = (w * box.h) / box.w;
+  if (h > maxHeight) {
+    w *= maxHeight / h;
+    h = maxHeight;
+  }
+  return { w, h };
+}
+
 function teacherNote(L: Layout, r: StudentReport) {
   const note = r.notes[0];
   if (!note) return;
   const { doc } = L;
+  const IW = CW - 32;
   const body = pdfText(note.body.replace(/\n{3,}/g, '\n\n')).replace(/[ \t]*\n[ \t]*/g, '\n');
   doc.font('regular').fontSize(9.5);
-  const bh = doc.heightOfString(body, { width: CW - 32, lineGap: 1.5 });
-  const h = 26 + bh + 28;
+  const bh = body ? doc.heightOfString(body, { width: IW, lineGap: 1.5 }) + 6 : 0;
+  const ink = note.ink ? inkSize(note.ink, IW, 360) : null;
+  const sig = note.signatureInk ? inkSize(note.signatureInk, 1e6, 34) : null;
+  const sigBlock = sig ? sig.h + 16 : 18;
+  const h = 28 + bh + (ink ? ink.h + 10 : 0) + sigBlock + 8;
   L.ensure(Math.min(h, BOTTOM - M));
   const y = L.y;
   doc.roundedRect(M, y, CW, h, 7).lineWidth(0.8).fillAndStroke('#fffbeb', '#fde68a');
   doc.rect(M, y + 4, 3.5, h - 8).fill('#f59e0b');
   doc.font('bold').fontSize(9.5).fillColor('#78350f').text('A note from your teacher', M + 16, y + 11, { lineBreak: false });
   doc.font('regular').fontSize(8).fillColor('#92400e').text(date(note.createdAt), M, y + 12, { width: CW - 14, align: 'right', lineBreak: false });
-  doc.font('regular').fontSize(9.5).fillColor(INK).text(body, M + 16, y + 28, { width: CW - 32, lineGap: 1.5 });
-  doc.font('bold').fontSize(9.5).fillColor('#78350f').text(`— ${pdfText(note.signature)}`, M + 16, y + h - 20, { width: CW - 32, align: 'right', lineBreak: false });
+  let yy = y + 28;
+  if (body) {
+    doc.font('regular').fontSize(9.5).fillColor(INK).text(body, M + 16, yy, { width: IW, lineGap: 1.5 });
+    yy += bh;
+  }
+  if (note.ink && ink) {
+    doc.roundedRect(M + 12, yy - 3, Math.min(IW + 8, ink.w + 8), ink.h + 6, 4).fill('#ffffff');
+    drawInk(doc, note.ink, M + 16, yy, ink.w, ink.h);
+    yy += ink.h + 10;
+  }
+  if (note.signatureInk && sig) {
+    const sx = M + CW - 16 - sig.w;
+    drawInk(doc, note.signatureInk, sx, yy, sig.w, sig.h);
+    doc.font('bold').fontSize(8).fillColor('#78350f').text(pdfText(note.signature), M + 16, yy + sig.h + 2, { width: IW, align: 'right', lineBreak: false });
+  } else {
+    doc.font('bold').fontSize(9.5).fillColor('#78350f').text(`— ${pdfText(note.signature)}`, M + 16, yy + 2, { width: IW, align: 'right', lineBreak: false });
+  }
   L.y = y + h + GAP;
 }
 

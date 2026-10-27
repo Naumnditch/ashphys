@@ -1,16 +1,21 @@
 'use client';
 
 /**
- * Staff side of the report's teacher note: write a note (signed the way the
- * student should see it), pin up to 5 focus lessons, optionally drop it in
- * the student's mailbox, and edit or delete earlier notes. Saving refreshes
- * the server-rendered report so the preview below matches what the student sees.
+ * Staff side of the report's teacher note: type it and/or handwrite it with a
+ * pen (tablet stylus, finger or mouse), sign it (typed name + an optional
+ * handwritten signature that is remembered for next time), pin up to 5 focus
+ * lessons, optionally drop it in the student's mailbox, and edit or delete
+ * earlier notes. Saving refreshes the server-rendered report so the preview
+ * matches what the student sees.
  */
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { TeacherNote } from '@/lib/reports/types';
+import { NOTE_PAD, SIGNATURE_PAD, type Ink } from '@/lib/reports/ink';
 import { TeacherNoteCard } from '@/components/report/TeacherNoteCard';
+import { InkPad } from '@/components/report/InkPad';
+import { InkImage } from '@/components/report/InkImage';
 
 export interface LessonOptionGroup {
   label: string;
@@ -38,14 +43,18 @@ export function ReportNoteEditor({
   studentId: string;
   studentFirstName: string;
   notes: TeacherNote[];
-  defaultSignature: string;
+  defaultSignature: { text: string; ink: Ink | null };
   lessonGroups: LessonOptionGroup[];
   canNotify: boolean;
 }) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [body, setBody] = useState('');
-  const [signature, setSignature] = useState(defaultSignature);
+  const [signature, setSignature] = useState(defaultSignature.text);
+  const [mode, setMode] = useState<'type' | 'hand'>('type');
+  const [ink, setInk] = useState<Ink | null>(null);
+  const [signatureInk, setSignatureInk] = useState<Ink | null>(defaultSignature.ink);
+  const [signing, setSigning] = useState(false);
   const [focus, setFocus] = useState<string[]>([]);
   const [notify, setNotify] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -61,6 +70,10 @@ export function ReportNoteEditor({
     setEditingId(n.id);
     setBody(n.body);
     setSignature(n.signature);
+    setInk(n.ink);
+    setSignatureInk(n.signatureInk);
+    setMode(n.ink && !n.body ? 'hand' : 'type');
+    setSigning(false);
     setFocus(n.focusTopicIds);
     setNotify(false);
     setStatus(null);
@@ -69,6 +82,7 @@ export function ReportNoteEditor({
   function reset() {
     setEditingId(null);
     setBody('');
+    setInk(null);
     setFocus([]);
     setNotify(false);
   }
@@ -96,7 +110,7 @@ export function ReportNoteEditor({
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { body, signature, focusTopicIds: focus, ...(editingId ? { id: editingId } : { notify }) };
+    const payload = { body, signature, focusTopicIds: focus, ink, signatureInk, ...(editingId ? { id: editingId } : { notify }) };
     const json = await send(editingId ? 'PATCH' : 'POST', payload);
     if (!json) return;
     setStatus({
@@ -149,33 +163,63 @@ export function ReportNoteEditor({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
-          {STARTERS.map((s) => (
+        <div className="inline-flex rounded-lg bg-gray-100 p-1" role="tablist" aria-label="How to write the note">
+          {(
+            [
+              ['type', '⌨️ Type'],
+              ['hand', '✍️ Handwrite'],
+            ] as const
+          ).map(([id, text]) => (
             <button
-              key={s}
+              key={id}
               type="button"
-              onClick={() => setBody((b) => (b ? `${b.trimEnd()} ${s}` : s))}
-              className="rounded-full border border-gray-200 px-2.5 py-1 text-xs text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+              role="tab"
+              aria-selected={mode === id}
+              onClick={() => setMode(id)}
+              className={`min-h-[36px] rounded-md px-3.5 text-sm font-medium ${mode === id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
             >
-              {s.trim()}
+              {text}
+              {id === 'type' && body.trim() && mode !== 'type' && ' •'}
+              {id === 'hand' && ink && mode !== 'hand' && ' •'}
             </button>
           ))}
         </div>
 
-        <label className="block">
-          <span className="sr-only">Note</span>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={5}
-            maxLength={NOTE_MAX}
-            placeholder={`e.g. Well done on circular motion, ${studentFirstName}! Your weak spot is units — convert to SI before you calculate. Redo the 3 questions still marked wrong before Friday.`}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-[15px] leading-relaxed focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-          <span className="block text-right text-[11px] text-gray-400 tabular-nums">
-            {body.length}/{NOTE_MAX}
-          </span>
-        </label>
+        {mode === 'type' ? (
+          <>
+            <div className="flex flex-wrap gap-1.5">
+              {STARTERS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setBody((b) => (b ? `${b.trimEnd()} ${s}` : s))}
+                  className="rounded-full border border-gray-200 px-2.5 py-1 text-xs text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                >
+                  {s.trim()}
+                </button>
+              ))}
+            </div>
+            <label className="block">
+              <span className="sr-only">Note</span>
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                rows={5}
+                maxLength={NOTE_MAX}
+                placeholder={`e.g. Well done on circular motion, ${studentFirstName}! Your weak spot is units — convert to SI before you calculate. Redo the 3 questions still marked wrong before Friday.`}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-[15px] leading-relaxed focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+              <span className="block text-right text-[11px] text-gray-400 tabular-nums">
+                {body.length}/{NOTE_MAX}
+              </span>
+            </label>
+          </>
+        ) : (
+          <InkPad value={ink} onChange={setInk} pad={NOTE_PAD} variant="note" label={`Handwritten note to ${studentFirstName}`} />
+        )}
+        {body.trim() && ink && (
+          <p className="text-xs text-gray-500">Both are saved: the typed text shows first, your handwriting under it.</p>
+        )}
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block text-sm">
@@ -186,6 +230,29 @@ export function ReportNoteEditor({
               maxLength={80}
               className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
+            <span className="mt-2 flex flex-wrap items-center gap-2">
+              {signatureInk && !signing ? (
+                <>
+                  <span className="rounded-md border border-gray-200 bg-white px-2 py-1">
+                    <InkImage ink={signatureInk} label={`Handwritten signature of ${signature}`} height={40} />
+                  </span>
+                  <button type="button" onClick={() => setSigning(true)} className="text-xs font-medium text-blue-700 hover:underline">
+                    Redraw
+                  </button>
+                  <button type="button" onClick={() => setSignatureInk(null)} className="text-xs font-medium text-gray-500 hover:underline">
+                    Use typed only
+                  </button>
+                </>
+              ) : !signing ? (
+                <button
+                  type="button"
+                  onClick={() => setSigning(true)}
+                  className="inline-flex min-h-[36px] items-center gap-1.5 rounded-md border border-dashed border-gray-300 px-3 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  ✍️ Add my handwritten signature
+                </button>
+              ) : null}
+            </span>
           </label>
           <label className="block text-sm">
             <span className="text-xs font-medium text-gray-600">Pin focus lessons (optional, up to {FOCUS_MAX})</span>
@@ -211,6 +278,18 @@ export function ReportNoteEditor({
             </select>
           </label>
         </div>
+
+        {signing && (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-semibold text-gray-700">Sign with your pen — it’s remembered for your next notes</span>
+              <button type="button" onClick={() => setSigning(false)} className="text-xs font-semibold text-blue-700 hover:underline">
+                ✓ Use this signature
+              </button>
+            </div>
+            <InkPad value={signatureInk} onChange={setSignatureInk} pad={SIGNATURE_PAD} variant="signature" label="Your signature" defaultColor="blue" />
+          </div>
+        )}
 
         {focus.length > 0 && (
           <ul className="flex flex-wrap gap-1.5" aria-label="Pinned focus lessons">
@@ -239,7 +318,7 @@ export function ReportNoteEditor({
           )}
           <button
             type="submit"
-            disabled={busy || !body.trim() || !signature.trim()}
+            disabled={busy || (!body.trim() && !ink) || !signature.trim()}
             className="ml-auto min-h-[40px] rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {busy ? 'Saving…' : editingId ? 'Save changes' : 'Save note'}
@@ -266,7 +345,7 @@ export function ReportNoteEditor({
                     {new Date(n.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} · {n.signature}
                     {n.readAt ? ' · read' : ' · unread'}
                   </div>
-                  <p className="line-clamp-2 whitespace-pre-line text-gray-800">{n.body}</p>
+                  <p className="line-clamp-2 whitespace-pre-line text-gray-800">{n.body || (n.ink ? '✍️ Handwritten note' : '')}{n.body && n.ink ? ' · ✍️ + handwriting' : ''}</p>
                 </div>
                 <button type="button" onClick={() => startEdit(n)} className="text-xs font-medium text-blue-700 hover:underline">
                   Edit

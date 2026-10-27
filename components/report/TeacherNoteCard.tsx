@@ -5,6 +5,7 @@
  */
 
 import type { TeacherNote } from '@/lib/reports/types';
+import { InkImage } from '@/components/report/InkImage';
 
 const TZ = 'Europe/Istanbul';
 export const fmtDate = (iso: string | null, withYear = true) =>
@@ -30,8 +31,22 @@ export function TeacherNoteCard({ note, isNew, older }: { note: TeacherNote; isN
           {note.updatedAt.slice(0, 16) !== note.createdAt.slice(0, 16) && ` · edited ${fmtDate(note.updatedAt, false)}`}
         </span>
       </div>
-      <div className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-gray-900">{note.body}</div>
-      <p className="mt-3 text-right text-[15px] font-semibold italic text-amber-900">— {note.signature}</p>
+      {note.body && <div className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-gray-900">{note.body}</div>}
+      {note.ink && (
+        <div className="mt-3 rounded-lg bg-white/70 px-2 py-2 ring-1 ring-amber-100">
+          <InkImage ink={note.ink} label={`Handwritten note from ${note.signature}`} />
+        </div>
+      )}
+      <div className="mt-3 flex flex-col items-end">
+        {note.signatureInk ? (
+          <>
+            <InkImage ink={note.signatureInk} label={`Signed by ${note.signature}`} height={52} />
+            <span className="text-xs font-semibold text-amber-900">{note.signature}</span>
+          </>
+        ) : (
+          <p className="text-[15px] font-semibold italic text-amber-900">— {note.signature}</p>
+        )}
+      </div>
       {older && older.length > 0 && (
         <details className="mt-3 border-t border-amber-200/80 pt-2 text-sm">
           <summary className="cursor-pointer select-none text-xs font-medium text-amber-900/80">
@@ -43,7 +58,8 @@ export function TeacherNoteCard({ note, isNew, older }: { note: TeacherNote; isN
                 <div className="text-xs text-amber-800/70">
                   {fmtDate(n.createdAt)} · {n.signature}
                 </div>
-                <div className="whitespace-pre-line">{n.body}</div>
+                {n.body && <div className="whitespace-pre-line">{n.body}</div>}
+                {n.ink && <InkImage ink={n.ink} label={`Handwritten note from ${n.signature}`} className="mt-1" />}
               </li>
             ))}
           </ul>

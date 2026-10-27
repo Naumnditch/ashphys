@@ -169,7 +169,7 @@ describe('badges', () => {
 describe('note input', () => {
   it('trims, requires a body and a signature, and limits focus lessons', () => {
     const ok = parseNoteInput({ body: '  Well done \r\n', signature: ' Mr.   A ', focusTopicIds: ['11111111-1111-4111-8111-111111111111', '11111111-1111-4111-8111-111111111111'] });
-    expect(ok).toEqual({ ok: true, value: { body: 'Well done', signature: 'Mr. A', focusTopicIds: ['11111111-1111-4111-8111-111111111111'] } });
+    expect(ok).toEqual({ ok: true, value: { body: 'Well done', signature: 'Mr. A', focusTopicIds: ['11111111-1111-4111-8111-111111111111'], ink: null, signatureInk: null } });
     expect(parseNoteInput({ body: ' ', signature: 'x' }).ok).toBe(false);
     expect(parseNoteInput({ body: 'x', signature: '' }).ok).toBe(false);
     expect(parseNoteInput({ body: 'x'.repeat(4001), signature: 'x' }).ok).toBe(false);

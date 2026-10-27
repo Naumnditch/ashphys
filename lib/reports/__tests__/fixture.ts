@@ -81,6 +81,8 @@ export function sampleReport(opts: { note?: Partial<TeacherNote> | null; answere
             createdAt: '2026-10-26T18:30:00.000Z',
             updatedAt: '2026-10-26T18:30:00.000Z',
             readAt: null,
+            ink: null,
+            signatureInk: null,
             ...(opts.note ?? {}),
           },
         ];
@@ -114,4 +116,34 @@ export function sampleReport(opts: { note?: Partial<TeacherNote> | null; answere
     notes,
     teacherFocus,
   };
+}
+
+/** Wavy cursive-like lines of "handwriting" on the note pad, with pen pressure. */
+export function sampleInk(lines = 3): import('@/lib/reports/ink').Ink {
+  const strokes = [];
+  for (let line = 0; line < lines; line++) {
+    const baseY = 70 + line * 56;
+    let x = 80;
+    const words = 4 + line;
+    for (let w = 0; w < words && x < 900; w++) {
+      const len = 70 + ((w * 37 + line * 53) % 90);
+      const p: number[] = [];
+      for (let t = 0; t <= len; t += 3) {
+        const loop = Math.sin(t / 6) * 14;
+        p.push(x + t + Math.cos(t / 6) * 5, baseY - 10 + loop * (t % 30 < 15 ? 1 : 0.6), 0.35 + 0.4 * Math.abs(Math.sin(t / 9)));
+      }
+      strokes.push({ c: 'blue' as const, s: 5, pen: true, p });
+      x += len + 26;
+    }
+  }
+  return { v: 1, w: 1000, h: 560, strokes };
+}
+
+/** A looping signature on the signature pad. */
+export function sampleSignature(): import('@/lib/reports/ink').Ink {
+  const p: number[] = [];
+  for (let t = 0; t <= 400; t += 2) {
+    p.push(60 + t * 1.15, 110 - Math.sin(t / 14) * 38 * (1 - t / 520) - (t < 60 ? (60 - t) * 0.6 : 0), 0.3 + 0.5 * Math.abs(Math.cos(t / 20)));
+  }
+  return { v: 1, w: 600, h: 200, strokes: [{ c: 'blue', s: 6, pen: true, p }] };
 }
