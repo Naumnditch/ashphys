@@ -1,9 +1,9 @@
-import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { query } from '@/lib/db/client';
 import { PracticeSession } from '@/components/practice/PracticeSession';
+import { PracticeShell, PracticeTopBar } from '@/components/practice/PracticeShell';
 import { LockedContent } from '@/components/subscriptions/LockedContent';
 import { CURRICULA, curriculumForTopic, lessonTitle, syllabusRefLabel, topicCodeFor } from '@/lib/curricula';
 import { resolveCurriculum } from '@/lib/curricula/queries';
@@ -36,52 +36,42 @@ export default async function PracticePage({
   if (!topic) notFound();
 
   const [tier, { curriculumId: preferred }] = await Promise.all([getUserTier(user.id), resolveCurriculum(null, user.id)]);
-  const allowed = user.role === 'admin' || tier >= topic.required_tier;
+  const isAdmin = user.role === 'admin';
+  const allowed = isAdmin || tier >= topic.required_tier;
   // Which curriculum's question bank this session uses (see curriculumForTopic).
   const curriculumId = curriculumForTopic(topic.curriculum_ids, searchParams.c, preferred);
   const bank = `curriculum=${curriculumId}`;
 
+  const lesson = {
+    title: lessonTitle(topic.topic_name, curriculumId),
+    refLabel: `${syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId))} · Practice`,
+    bankLabel: `${CURRICULA[curriculumId].displayName} question bank`,
+    backHref: `/lessons/${topic.id}?c=${curriculumId}`,
+  };
+  const downloads = {
+    worksheet: `/api/practice/${topic.id}/worksheet?${bank}`,
+    answerKey: user.role === 'teacher' || isAdmin ? `/api/practice/${topic.id}/worksheet?answers=1&${bank}` : null,
+  };
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <Link href={`/lessons/${topic.id}?c=${curriculumId}`} className="text-sm text-blue-600 hover:underline mb-6 inline-block">
-        ← Back to the lesson
-      </Link>
-
-      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
-        <div>
-          <div className="text-sm text-gray-400 font-medium mb-1">
-            {syllabusRefLabel(curriculumId, topicCodeFor(topic, curriculumId))} · Practice
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{lessonTitle(topic.topic_name, curriculumId)}</h1>
-          <p className="text-xs font-semibold text-h-5a67d8 mt-1">{CURRICULA[curriculumId].displayName} question bank</p>
-        </div>
-        {allowed && (
-          <div className="flex flex-wrap gap-2">
-            <a
-              href={`/api/practice/${topic.id}/worksheet?${bank}`}
-              download
-              className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg whitespace-nowrap"
-            >
-              Download PDF
-            </a>
-            {(user.role === 'teacher' || user.role === 'admin') && (
-              <a
-                href={`/api/practice/${topic.id}/worksheet?answers=1&${bank}`}
-                download
-                className="text-sm font-semibold border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg whitespace-nowrap"
-              >
-                Answer key PDF
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-
+    <PracticeShell>
       {allowed ? (
-        <PracticeSession key={curriculumId} topicId={topic.id} curriculumId={curriculumId} />
+        <PracticeSession
+          key={curriculumId}
+          topicId={topic.id}
+          curriculumId={curriculumId}
+          lesson={lesson}
+          downloads={downloads}
+          isAdmin={isAdmin}
+        />
       ) : (
-        <LockedContent requiredTier={topic.required_tier} title={topic.topic_name} />
+        <>
+          <PracticeTopBar lesson={lesson} />
+          <div className="flex-1 overflow-y-auto p-6">
+            <LockedContent requiredTier={topic.required_tier} title={topic.topic_name} />
+          </div>
+        </>
       )}
-    </div>
+    </PracticeShell>
   );
 }

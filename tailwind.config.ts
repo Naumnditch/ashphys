@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import plugin from 'tailwindcss/plugin';
 import hexList from './app/theme-hex.json';
 
 // Colors resolve through CSS variables (app/theme.css) so every existing
@@ -64,7 +65,15 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Practice page: question and solution side by side on desktop, iPad
+    // landscape and large phones held sideways; stacked otherwise. A variant
+    // rather than a `screens` entry: an object screen would switch off the
+    // `min-[900px]:` style variants other pages use.
+    plugin(({ addVariant }) => {
+      addVariant('split', '@media (min-width: 1024px), (min-width: 700px) and (orientation: landscape)');
+    }),
+  ],
 };
 
 export default config;

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts",
+    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/handwriting/__tests__/handwritingDb.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "next": "^14.2.32",
     "nodemailer": "^9.0.3",
     "pdfkit": "^0.20.2",
+    "perfect-freehand": "^1.2.3",
     "pg": "^8.11.3",
     "plotly.js-dist-min": "^2.26.2",
     "react": "18.3.1",

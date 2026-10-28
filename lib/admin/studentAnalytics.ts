@@ -200,7 +200,7 @@ export async function getStudentAnalytics(studentId: string, weeks = 12): Promis
          (SELECT COUNT(DISTINCT entity_id) FROM analytics_events WHERE user_id = $1 AND event_type = 'lesson_view')::int AS lessons,
          (SELECT COUNT(*) FROM analytics_events WHERE user_id = $1 AND event_type = 'simulation_start')::int AS sims,
          (SELECT COUNT(*) FROM analytics_events WHERE user_id = $1 AND event_type = 'download')::int AS downloads,
-         (SELECT COUNT(DISTINCT solution_id) FROM solution_access_log WHERE user_id = $1 AND action = 'view_full')::int AS solutions,
+         (SELECT COUNT(DISTINCT COALESCE(solution_id, problem_id)) FROM solution_access_log WHERE user_id = $1 AND action = 'view_full')::int AS solutions,
          (SELECT COUNT(*) FROM video_requests WHERE student_id = $1)::int AS video_requests
        FROM gaps`,
       [studentId, ACTIVE_GAP_MINUTES]

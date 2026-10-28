@@ -52,8 +52,13 @@ export function HelpCta({ hasVideoAccess }: { hasVideoAccess: boolean }) {
 
   if (hidden) return null;
 
+  // The practice page fills the screen: on its stacked (narrow) layout the pill
+  // would cover the answer bar, so it only floats there when side by side. The
+  // wrong-answer feedback links to video requests instead.
+  const practice = pathname.startsWith('/practice/');
+
   return (
-    <div ref={rootRef} className="fixed bottom-4 right-4 z-40 print:hidden">
+    <div ref={rootRef} className={`fixed bottom-4 right-4 z-40 print:hidden ${practice ? 'hidden split:block' : ''}`}>
       {open && (
         <div
           id="help-cta-panel"

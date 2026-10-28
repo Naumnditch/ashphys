@@ -4,6 +4,10 @@
  * solution already unlocked can be revisited for free); Pro is unlimited.
  * A solution can also carry its own tier floor (tier_required), which
  * blocks regardless of remaining views.
+ *
+ * Handwritten worked solutions on practice questions (2026-10-28) go
+ * through the same gate and the same view budget: their target is the
+ * question (`{ problemId }`), logged in solution_access_log.problem_id.
  */
 
 import { query } from '@/lib/db/client';
@@ -12,10 +16,18 @@ import type { AccessReason, SolutionAccessDTO } from './types';
 
 export type AccessLogAction = 'view_preview' | 'view_full' | 'blocked' | 'attempted_upgrade';
 
-async function hasUnlocked(userId: string, solutionId: string): Promise<boolean> {
-  const r = await query(`SELECT 1 FROM solution_access_log WHERE user_id = $1 AND solution_id = $2 AND action = 'view_full' LIMIT 1`, [
+/** What a view is spent on: a catalog solution (its id) or a practice question's handwritten solution. */
+export type SolutionTarget = string | { problemId: string };
+
+function targetColumn(target: SolutionTarget): ['solution_id' | 'problem_id', string] {
+  return typeof target === 'string' ? ['solution_id', target] : ['problem_id', target.problemId];
+}
+
+export async function hasUnlocked(userId: string, target: SolutionTarget): Promise<boolean> {
+  const [column, id] = targetColumn(target);
+  const r = await query(`SELECT 1 FROM solution_access_log WHERE user_id = $1 AND ${column} = $2 AND action = 'view_full' LIMIT 1`, [
     userId,
-    solutionId,
+    id,
   ]);
   return r.rows.length > 0;
 }
@@ -66,35 +78,36 @@ async function spendView(userId: string, viewLimit: number | null): Promise<bool
 export async function resolveSolutionAccess(
   userId: string,
   tier: number,
-  solutionId: string,
+  target: SolutionTarget,
   solutionTierRequired: string
 ): Promise<SolutionAccessDTO> {
   const viewLimit = viewLimitFor(tier);
 
   if (tier < tierRequiredRank(solutionTierRequired)) {
     const viewsUsed = await currentViewsUsed(userId);
-    await logAccess(userId, solutionId, 'blocked');
+    await logAccess(userId, target, 'blocked');
     return { allowed: false, reason: 'tier_required', viewsUsed, viewLimit };
   }
 
-  if (await hasUnlocked(userId, solutionId)) {
+  if (await hasUnlocked(userId, target)) {
     const viewsUsed = await currentViewsUsed(userId);
-    await logAccess(userId, solutionId, 'view_full');
+    await logAccess(userId, target, 'view_full');
     return { allowed: true, reason: 'ok', viewsUsed, viewLimit };
   }
 
   const spent = await spendView(userId, viewLimit);
   const viewsUsed = await currentViewsUsed(userId);
   if (!spent) {
-    await logAccess(userId, solutionId, 'blocked');
+    await logAccess(userId, target, 'blocked');
     return { allowed: false, reason: 'limit_reached', viewsUsed, viewLimit };
   }
-  await logAccess(userId, solutionId, 'view_full');
+  await logAccess(userId, target, 'view_full');
   return { allowed: true, reason: 'ok', viewsUsed, viewLimit };
 }
 
-export async function logAccess(userId: string, solutionId: string, action: AccessLogAction): Promise<void> {
-  await query(`INSERT INTO solution_access_log (user_id, solution_id, action) VALUES ($1, $2, $3)`, [userId, solutionId, action]);
+export async function logAccess(userId: string, target: SolutionTarget, action: AccessLogAction): Promise<void> {
+  const [column, id] = targetColumn(target);
+  await query(`INSERT INTO solution_access_log (user_id, ${column}, action) VALUES ($1, $2, $3)`, [userId, id, action]);
 }
 
 export function accessReasonMessage(reason: AccessReason): string {

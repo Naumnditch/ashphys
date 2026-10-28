@@ -428,14 +428,20 @@ function timelineSources(categories: ActivityCategory[], hasActivityEvents: bool
        WHERE ps.student_id = $1`,
     ],
     solution: [
+      // problem_id rows are handwritten worked solutions on practice questions.
       `SELECT l.accessed_at, 'solution',
-              CASE l.action WHEN 'view_full' THEN 'Opened a solution'
-                            WHEN 'view_preview' THEN 'Previewed a solution'
-                            WHEN 'blocked' THEN 'Blocked from a solution'
-                            WHEN 'attempted_upgrade' THEN 'Tried to unlock a solution'
-                            ELSE 'Solution: ' || l.action END,
-              s.problem_title
-       FROM solution_access_log l LEFT JOIN solutions s ON s.id = l.solution_id
+              COALESCE(
+                CASE l.action WHEN 'view_full' THEN 'Opened a '
+                              WHEN 'view_preview' THEN 'Previewed a '
+                              WHEN 'blocked' THEN 'Blocked from a '
+                              WHEN 'attempted_upgrade' THEN 'Tried to unlock a ' END
+                  || CASE WHEN l.problem_id IS NOT NULL THEN 'handwritten solution' ELSE 'solution' END,
+                'Solution: ' || l.action),
+              COALESCE(s.problem_title, NULLIF(concat_ws(' · ', t.topic_name, 'Q' || pr.problem_number), ''))
+       FROM solution_access_log l
+       LEFT JOIN solutions s ON s.id = l.solution_id
+       LEFT JOIN problems pr ON pr.id = l.problem_id
+       LEFT JOIN topics t ON t.id = pr.topic_id
        WHERE l.user_id = $1`,
     ],
     request: [

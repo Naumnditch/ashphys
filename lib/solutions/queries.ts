@@ -72,7 +72,7 @@ export async function listPublishedSolutions(
 }
 
 export async function getUnlockedSolutionIds(userId: string): Promise<Set<string>> {
-  const r = await query(`SELECT DISTINCT solution_id FROM solution_access_log WHERE user_id = $1 AND action = 'view_full'`, [userId]);
+  const r = await query(`SELECT DISTINCT solution_id FROM solution_access_log WHERE user_id = $1 AND action = 'view_full' AND solution_id IS NOT NULL`, [userId]);
   return new Set(r.rows.map((row) => row.solution_id as string));
 }
 

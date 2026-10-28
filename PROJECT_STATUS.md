@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,183 @@ Last updated: 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Handwritten worked solutions & full-screen practice page (NEW 2026-10-28)
+
+**What it is.** Every practice question (`/practice/[topicId]`) has a handwriting
+workspace for admins: the owner writes the worked solution by hand (Apple Pencil,
+mouse or finger). A student sees that handwriting, read-only, only after answering
+that question **incorrectly**, through the same tier gate as interactive solutions.
+
+**Practice page layout** (`components/practice/PracticeShell.tsx`, `PracticeSession.tsx`):
+the page is now a full-viewport app (`fixed inset-0`, `100dvh`, page scroll and iOS
+bounce locked while it is open; the site navbar/footer sit underneath, unused). Minimal
+top bar: back to the lesson, lesson title + syllabus ref + bank, question navigation
+(‹ Q3 / 20 ▾ ›, the ▾ opens the existing `QuestionMap` in a popover), mastery streak
+and answered count, a "PDF ▾" menu (worksheet / answer key, same links as before),
+and for admins a **✎ Write / 👁 Student view** switch. Below it, side by side from the
+`split:` variant (≥1024px, or ≥700px in landscape — a Tailwind plugin variant in
+`tailwind.config.ts`, NOT a `screens` entry, because an object screen switches off the
+`min-[900px]:` variants the curriculum page uses; `courseLayout.test.tsx` caught it):
+left ≈37% = question, figure, options/input, feedback and the optional interactive
+solution, scrolling inside the column only when long, with Skip/Check/Next pinned at
+its bottom; right ≈63% = the canvas (admin) or the solution viewer (student). Stacked
+below that (iPad portrait, phones): question on top, the solution panel underneath at
+60% height with a Hide/Show toggle; students only get the panel after a wrong answer
+on a question that has handwriting. The floating "Need help?" pill stays on the split
+layout but is hidden on the stacked one (it covered the answer bar); the wrong-answer
+feedback there gets a "🎥 Request a video" link to the same place. Enter now submits a
+typed answer. Scoring, mastery, skips, worksheets and the interactive solution are
+unchanged (same API calls).
+
+**Admin canvas** (`components/handwriting/`, loaded with `next/dynamic` only when the
+viewer is an admin in Write mode: its chunk is ~17 KB gzip incl. perfect-freehand, so
+students never download it):
+- `engine.ts` — imperative canvas engine (pointer input, rendering, pan/zoom; React is
+  not on the hot path). Layers: the stage's CSS background is the paper (grid 32 px /
+  lines 40 px, moves with the view), `base` canvas = committed strokes (Path2D cached
+  per stroke, culled to the visible area, a new stroke painted incrementally), `live`
+  canvas (multiply-blended) = stroke in progress with coalesced + predicted pointer
+  events, lasso, selection box, eraser ring. Canvases sized to devicePixelRatio (≤3),
+  ResizeObserver redraws on resize; strokes are in fixed logical coordinates (CSS px
+  at 100%), so zoom/pan/resize never touch the data.
+- Tools: pen (pressure from `PointerEvent.pressure` for pens, simulated from speed for
+  mouse/finger), highlighter (multiply), eraser (whole strokes, or pixel = cuts strokes
+  and splits them; shapes become polylines first), lasso (select ≥50% inside → drag to
+  move, Delete key / bin to delete, palette recolours the selection), shapes (line,
+  arrow, rectangle, ellipse; Shift snaps to 15° / square), hand. Colour palette + custom
+  colour, size and opacity sliders per tool (remembered in localStorage
+  `ashphys:handwriting-tools`). Undo/redo (Ctrl/Cmd+Z, Ctrl+Shift+Z/Ctrl+Y, 200 steps),
+  clear page, pages (add / delete / ‹ › / background blank-grid-lined per page).
+  Keys: P H E L S, +/−/0, Space+drag pans, Esc deselects.
+- Input rules: a pen always uses the tool and, while down, touches are ignored (palm);
+  **"Pencil only"** (auto-on the first time a pencil touches the canvas, remembered in
+  `ashphys:handwriting-pencil-only`) makes one finger pan; two fingers always pan +
+  pinch-zoom; a second finger landing on a <250 ms one-finger stroke cancels it;
+  mouse wheel pans, Ctrl/Cmd+wheel (and trackpad pinch) zooms at the cursor, middle
+  button / Space / hand tool pans. `touch-action: none`, iOS `gesturestart` and
+  `touchmove` default prevented, no callout/selection on the canvas.
+- Zoom bar: −, % (click = 100%), +, fit to ink, full screen. **Full screen** uses the
+  Fullscreen API (webkit-prefixed too) with a CSS fallback (`fixed inset-0`, Esc exits)
+  where only `<video>` may go full screen (iPhone); in full screen the toolbar floats
+  as a compact pill with an exit button.
+- **Autosave** (`useHandwritingDoc.ts`): debounced 1 s, one request in flight, edits
+  during a save are saved right after, failures retry with backoff (2 s → 30 s), leaving
+  the question or hiding the tab flushes, `beforeunload` warns while unsaved. Status
+  badge: Saved ✓ / Saving… / error text. Each save sends `baseVersion`; a save from a
+  stale tab/device gets 409 and a "Keep this version / Load the other version" banner.
+- Admin **Student view** shows exactly what students get (server snapshots).
+
+**Student viewer** (`HandwrittenSolution.tsx` + `HandwritingViewer.tsx`, ~3 KB gzip,
+lazy): the server-rendered SVG pages stacked, drag/one-finger pan, pinch / Ctrl+wheel /
+buttons / double-click zoom, arrow keys, fit, 100%, full screen. Pan/zoom only rewrite
+the SVG `viewBox` (crisp at any zoom, no React re-render of the ink). No tools, no write
+calls. States: loading → "No handwritten solution for this question yet" (the
+explanation stays the fallback) | offer ("Opening it uses 1 of your N remaining solution
+views", button) | open | locked (teaser of the top 30% of page 1, fading out, + "You've
+used your free solution views" + See plans, which logs `attempted_upgrade`).
+
+**Tier logic — the interactive solutions gate, not a copy.** `lib/solutions/access.ts`
+now takes a target: a catalog solution id (as before) or `{ problemId }`. Handwritten
+solutions spend from the **same** lifetime budget (`user_solution_views`, Free 2, Plus 5,
+Pro unlimited), an unlocked one reopens free, every open/block is logged in
+`solution_access_log` (new `problem_id` column). GET (status) never spends; POST (open)
+runs `resolveSolutionAccess`; Pro, admins and already-unlocked open straight away. The
+lesson's own `required_tier` gate applies first, as for the questions. The admin
+student timeline shows "Opened a handwritten solution · <lesson> · Q<n>", and the
+analytics "solutions opened" count includes them.
+
+**Schema** — migration `database/seeds/2026-10-28-question-handwriting.sql` (idempotent;
+independent of the unapplied 2026-10-14 migrations — it creates the `ashphys_user` role
+and `app_current_user_id()` / `app_is_admin()` itself with migration 03's exact
+definitions):
+
+| column | |
+|---|---|
+| `id` uuid PK | |
+| `lesson_id` uuid → `topics` (cascade) | "lesson" = topics row, as everywhere |
+| `question_id` uuid → `problems` (cascade) | UNIQUE (`lesson_id`, `question_id`) |
+| `doc` jsonb | vector strokes: `{ v: 1, pages: [{ id, background, strokes: [{ id, tool: pen/highlighter/shape, shape?: line/arrow/rect/ellipse/polyline, color #rrggbb, width, opacity, pressure: bool, points: [[x, y, p]] }] }] }` — a stroke's page index is its page's position |
+| `snapshots` jsonb | server-rendered SVG per non-empty page `[{ x, y, width, height, body }]` |
+| `preview` jsonb | teaser of page 1 (strokes wholly inside its top 30% only) |
+| `page_count`, `stroke_count` int | 0 strokes = cleared → students see nothing |
+| `version` int | +1 per save (optimistic concurrency) |
+| `created_at`, `updated_at` timestamptz, `created_by`, `updated_by` → users | |
+
+Plus `solution_access_log.problem_id` uuid → problems (cascade) + index
+(`user_id`, `problem_id`).
+
+**Policies** (row-level security as `ashphys_user` via `withRlsContext`, the 2026-10-14
+pattern; there is no Supabase Auth so `auth.uid()` is useless here):
+- `question_handwriting_read` SELECT: `app_is_admin() OR app_answered_incorrectly(question_id)`;
+- `question_handwriting_admin_insert` / `_update` / `_delete`: `app_is_admin()` only;
+- `app_answered_incorrectly(uuid)` (SECURITY DEFINER, `search_path = public`) = the
+  caller has a `practice_attempts` row for that problem with `is_correct = false`;
+- RLS on; grants to `ashphys_user` only; `anon` / `authenticated` grants on the table and
+  function revoked (Supabase's default privileges), so the REST API exposes nothing.
+- The API checks the same things first (defence in depth): admin-only writes
+  (`requireAdmin`), "answer first" 403 that does not reveal whether a solution exists,
+  zod validation of every number/colour/enum (`lib/handwriting/schema.ts`; limits 30
+  pages, 6000 strokes/page, 10 000 points/stroke, 300 000 points, 4 MB body), and the SVG
+  is generated on the server from validated numbers only (never client markup).
+- **No storage bucket**: snapshots are a few KB–hundreds of KB of SVG text, stored in the
+  same row so the read policy covers them and a save is one transaction. DB was 37 MB on
+  2026-10-28; a dense two-page solution is roughly 0.3–0.7 MB (doc + SVG). Revisit
+  (move snapshots to a private bucket with signed URLs) if hundreds of solutions push the
+  database towards its plan limit.
+
+**API**
+- `GET/PUT /api/admin/handwriting/[problemId]` — load / save `{ doc, baseVersion, force? }`
+  (403 non-admin, 409 stale, 413 too large).
+- `GET /api/practice/[topicId]/handwriting/[problemId]` — status (no ink except the
+  teaser when out of views); `POST` — open (tier gate, logs, returns page snapshots);
+  `POST …/interest` — upgrade click.
+
+**Files.** `lib/handwriting/` (types, geometry, svg, schema, view, store, dto),
+`components/handwriting/` (engine, HandwritingEditor, useHandwritingDoc, useFullscreen,
+controls, icons, HandwritingViewer, HandwritingTeaser, HandwrittenSolution),
+`components/practice/PracticeShell.tsx`, routes above; edited `PracticeSession.tsx`,
+practice `page.tsx`, `HelpCta.tsx`, `lib/solutions/access.ts` + `queries.ts`,
+`lib/admin/students.ts` + `studentAnalytics.ts`, `tailwind.config.ts`. New dependency
+`perfect-freehand` (MIT, 4.5 KB; the unmerged `claude/student-progress-report` branch uses
+it the same way for report ink).
+
+**Tests & checks (2026-10-28).**
+- `lib/handwriting/__tests__/model.test.ts` (26): outlines deterministic (reload draws the
+  same), dots, shape paths, 15° snap, pixel eraser splits/keeps/erases and cuts shapes,
+  stroke-eraser hits, lasso, move, validation rejects markup in colours/ids, NaN,
+  pressure > 1, unknown tools, oversize; snapshots cropped to ink, highlighter multiply,
+  teaser holds only the top strokes.
+- `lib/handwriting/__tests__/handwritingDb.test.ts` (17, `npm run test:db`): the real
+  routes against Postgres — admin save/reload exact, version + 409, invalid strokes 400,
+  students 403 on the admin API **and** 42501 / 0 rows writing directly as
+  `ashphys_user`; the read policy shows a row to admins and to students who answered
+  wrong, not to students who were only right, never answered, or anonymous; unanswered
+  and correct → 403 `answer_first`; Free wrong → costs a view, opens, reopens free; out of
+  views → teaser only + logged block; Pro unlimited; another student's wrong answer
+  unlocks nothing; lesson tier gate first; wrong lesson 404; cleared → nothing. Passes on
+  a fresh database without the 2026-10-14 migrations and on one with them; idempotent.
+- Full suite: 2038 passed, 47 DB tests skipped without `TEST_DATABASE_URL` (47/47 pass
+  with it: 30 existing + 17 new), 1 failed (the pre-existing live-DNS messaging test).
+  `tsc` clean, `next build` clean, ESLint (`next/core-web-vitals`, ad hoc) clean on every
+  new/changed file. Student bundle: `/practice/[topicId]` 42.3 → 48.4 kB (first load
+  139 → 145 kB); the editor (~17 KB gzip) and viewer (~3 KB gzip) are separate lazy chunks.
+- Playwright against `next start` + a local replica of the live schema (39 admin + 44
+  student checks, all pass): mouse strokes autosave; a CDP pen stroke records pressure
+  0.2–0.88 and turns Pencil only on; one finger then pans (no ink), two fingers pinch-zoom;
+  with Pencil only off a finger draws and a second finger cancels a young stroke; zoom
+  buttons, 100%, fit, Ctrl+wheel, Space+drag; highlighter, arrow, undo/redo; lasso select,
+  move and Delete; pixel eraser splits a stroke, stroke eraser removes one; second page
+  with lined background; reload restores the document byte-for-byte; full screen fills
+  1280×800 with the floating toolbar and exits; switching question flushes an unsaved
+  stroke and opens that question's own canvas; no console errors. Students: no admin UI,
+  the editor chunk never loads, unanswered/correct make no handwriting request and the API
+  says 403, wrong → offer → viewer (zoom, pan, Ctrl+wheel, full screen), views counted,
+  2-page solution, no-handwriting fallback, out-of-views teaser + lock, Pro opens
+  directly; no page scroll at 1280×800, 1024×768, 820×1180 (stacked) and 390×844
+  (stacked; panel collapses; no empty panel when there is no handwriting).
+- Not testable here: a physical iPad/Apple Pencil and Android device (pen and touch were
+  driven through Chromium's CDP pen/touch events). Worth a quick real-device pass.
 
 ### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion; 2026-10-19: A Level Gravitational fields, Coulomb's law, AS Chapter 1 one-page lesson sheets)
 
@@ -1825,6 +2002,22 @@ Unfinished / follow-ups:
 ## Decisions
 
 Judgement calls that shape later work. Newest first.
+
+- **2026-10-28 — Handwritten solutions share the interactive solutions' view budget.**
+  "Respect the existing tier logic" was read as one gate and one budget: opening a new
+  handwritten solution spends a Free/Plus solution view exactly like an interactive one
+  (Pro unlimited), and the out-of-views state shows a teaser like `static_preview`. The
+  view is only spent when the student presses "Show the worked solution" (never on the
+  automatic status check), so a wrong answer alone costs nothing.
+- **2026-10-28 — "Answered incorrectly" = any wrong attempt on that question, ever.** Once
+  a student has got it wrong they may reopen the solution (it also stays unlocked under
+  the view budget). The page itself only shows it right after a wrong answer, never
+  after a correct one or before answering.
+- **2026-10-28 — Practice page is a full-viewport app**, covering the site navbar/footer
+  with its own minimal top bar, so it can fit one screen on every device without
+  touching the root layout. Back arrow → lesson.
+- **2026-10-28 — Snapshots in the database, not Storage** (see the section above for the
+  size estimate and when to revisit).
 
 - **2026-10-14 — Curriculum view: lesson type is derived, not stored.** Lessons are
   `topics` rows, which have no type column; the `lessons` table (the one with
