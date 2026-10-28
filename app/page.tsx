@@ -231,7 +231,7 @@ export default async function HomePage() {
                 /admin/updates). Below the headline and film, so it never moves them
                 or competes for the first paint; nothing renders without an update. */}
             {siteUpdates.length > 0 && (
-              <div id="whats-new" className="order-4 lg:col-span-12 w-full scroll-mt-24">
+              <div id="latest-update" className="order-4 lg:col-span-12 w-full scroll-mt-24">
                 <WhatsNew updates={siteUpdates} />
               </div>
             )}
