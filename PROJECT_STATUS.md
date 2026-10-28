@@ -110,7 +110,7 @@ lesson's own `required_tier` gate applies first, as for the questions. The admin
 student timeline shows "Opened a handwritten solution · <lesson> · Q<n>", and the
 analytics "solutions opened" count includes them.
 
-**Schema** — migration `database/seeds/2026-10-28-question-handwriting.sql` (idempotent;
+**Schema** — migration `database/seeds/2026-10-28-question-handwriting.sql` (**APPLIED to production 2026-10-28** by pasting it into the Supabase SQL editor — the MCP `apply_migration` tool timed out four times on its confirmation prompt; verified afterwards: table, RLS on, 4 policies, 3 functions, `solution_access_log.problem_id`, no anon/authenticated grants. Before it was applied, preview deployments (which share the production database) showed "Could not load the handwriting"; the routes now degrade gracefully — admin 503 with a setup message, students "no solution" — if it is ever missing; idempotent;
 independent of the unapplied 2026-10-14 migrations — it creates the `ashphys_user` role
 and `app_current_user_id()` / `app_is_admin()` itself with migration 03's exact
 definitions):
