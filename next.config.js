@@ -8,10 +8,11 @@ const nextConfig = {
     // PDFKit reads its own data files from disk, so it must be loaded from
     // node_modules rather than bundled.
     serverComponentsExternalPackages: ['pdfkit', 'svg-to-pdfkit'],
-    // The worksheet PDF reads its fonts at runtime; make sure the deployed
-    // function ships them.
+    // The worksheet and progress-report PDFs read their fonts at runtime;
+    // make sure the deployed functions ship them.
     outputFileTracingIncludes: {
-      '/api/practice/[topicId]/worksheet': ['./lib/practice/fonts/**/*']
+      '/api/practice/[topicId]/worksheet': ['./lib/practice/fonts/**/*'],
+      '/api/reports/[studentId]/pdf': ['./lib/practice/fonts/**/*']
     }
   }
 };

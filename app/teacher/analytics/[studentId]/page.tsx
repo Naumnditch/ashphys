@@ -70,12 +70,20 @@ export default async function StudentAnalyticsPage({ params }: { params: { stude
           <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
           <p className="text-gray-500 text-sm mt-1">{summary.email}</p>
         </div>
-        <a
-          href={`/api/teacher/analytics/export?view=student&studentId=${summary.student_id}`}
-          className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg self-start"
-        >
-          Export wrong answers
-        </a>
+        <div className="flex flex-wrap gap-2 self-start">
+          <Link
+            href={`/teacher/analytics/${summary.student_id}/report`}
+            className="text-sm font-semibold border border-gray-300 hover:bg-gray-50 text-gray-800 px-4 py-2 rounded-lg"
+          >
+            📊 Progress report & note
+          </Link>
+          <a
+            href={`/api/teacher/analytics/export?view=student&studentId=${summary.student_id}`}
+            className="text-sm font-semibold bg-gray-900 hover:bg-black text-on-ink px-4 py-2 rounded-lg"
+          >
+            Export wrong answers
+          </a>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">

@@ -18,6 +18,9 @@ import type { StudentVideoRequest } from '@/lib/videoRequests/types';
 import { getVideoRequestFormOptions } from '@/lib/videoRequests/formOptions';
 import { getStudentDashboard, type StudentProgress, type StudentStreaks } from '@/lib/dashboard/data';
 import { formatPercent, isNewStudent } from '@/lib/dashboard/format';
+import { getStudentReport } from '@/lib/reports/data';
+import type { StudentReport } from '@/lib/reports/types';
+import { StudentReportView } from '@/components/report/StudentReportView';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +47,8 @@ export default async function DashboardPage({
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login');
 
-  const [tier, requests, dashboard, unread, emailPref, curriculum] = await Promise.all([
+  const isStudentUser = user.role === 'student';
+  const [tier, requests, dashboard, unread, emailPref, curriculum, report] = await Promise.all([
     getUserTier(user.id),
     getMyVideoRequests(user).catch((err): StudentVideoRequest[] => {
       console.error('dashboard: video requests failed', err);
@@ -57,7 +61,14 @@ export default async function DashboardPage({
     unreadCount(user).catch(() => 0),
     query(`SELECT email_notifications FROM users WHERE id = $1`, [user.id]).then((r) => Boolean(r.rows[0]?.email_notifications ?? true)),
     resolveCurriculum(null, user.id),
+    isStudentUser
+      ? getStudentReport(user.id).catch((err): StudentReport | null => {
+          console.error('dashboard: progress report failed', err);
+          return null;
+        })
+      : Promise.resolve(null),
   ]);
+  const unreadNotes = report ? report.notes.filter((n) => !n.readAt).length : 0;
   // Same gate as before (and as POST /api/video-requests): Plus and Pro.
   const canRequest = tier >= TIER_PLUS;
   const formOptions = canRequest ? await getVideoRequestFormOptions() : { chapters: [], topics: [] };
@@ -99,6 +110,7 @@ export default async function DashboardPage({
       tabParam={searchParams.tab ?? null}
       initialRequests={requests}
       initialUnread={unread}
+      initialUnreadNotes={unreadNotes}
       header={header}
       panels={{
         messages:
@@ -113,6 +125,19 @@ export default async function DashboardPage({
           ) : (
             <StudentInbox firstName={user.firstName} initialEmailNotifications={emailPref} />
           ),
+        report: report ? (
+          <StudentReportView report={report} pdfHref="/api/reports/me/pdf" showEmptyNote />
+        ) : isStudentUser ? (
+          <p className="text-sm text-gray-600">Your report couldn’t load just now. Please refresh the page in a moment.</p>
+        ) : (
+          <p className="text-sm text-gray-600">
+            Progress reports are for student accounts. Open any student from{' '}
+            <Link href={user.role === 'admin' ? '/admin/students' : '/teacher/analytics'} className="text-blue-600 underline">
+              {user.role === 'admin' ? 'Admin → Students' : 'your class analytics'}
+            </Link>{' '}
+            to see their report and write them a note.
+          </p>
+        ),
         curriculum: <CurriculumTab initialCurriculum={curriculum.curriculumId} tier={tier} progress={dashboard?.progress ?? null} />,
         classes: <ClassesTab />,
         videos: (

@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -201,6 +201,122 @@ it the same way for report ink).
   (stacked; panel collapses; no empty panel when there is no handwriting).
 - Not testable here: a physical iPad/Apple Pencil and Android device (pen and touch were
   driven through Chromium's CDP pen/touch events). Worth a quick real-device pass.
+
+### Student progress report (NEW 2026-10-27)
+
+Owner: "a report for each single student — weak points, strong points, what to
+focus on and revise — visual, concise, understood by anyone, name in bold at the
+top, a place for my own comment the student can read and know it's from me, in the
+student dashboard, downloadable as PDF."
+
+**Where it lives**
+- Student: new dashboard tab **📊 My Progress Report** (`?tab=report`, 2nd tab).
+  A red badge counts unread teacher notes; an unread note also makes `report` the
+  default tab (it beats the remembered tab, never an explicit `?tab=`). Opening the
+  tab POSTs `/api/student/report/seen`; the note keeps its "New" tag until the next visit.
+- Admin: `/admin/students/[id]/report` (button "📊 Progress report & note" and
+  "Report PDF" on `/admin/students/[id]`). Teacher: `/teacher/analytics/[id]/report`
+  (button on their student page; only students in their sections).
+  Staff see the exact student view with the note editor in place of the note.
+- PDF: `GET /api/reports/me/pdf` (student) or `/api/reports/[studentId]/pdf`
+  (admin / the student's teacher). Real A4 PDF from PDFKit (`lib/reports/pdf.ts`,
+  bundled DejaVu fonts, traced via `outputFileTracingIncludes`), 1–2 pages. Logged as
+  a `download` event with `entity_type = 'student_report'`.
+
+**What the report shows** (`components/report/StudentReportView.tsx`, server render)
+- Header: **name in bold** (all-lower-case names are title-cased), class / school /
+  curricula, date, Download PDF.
+- Snapshot: progress score 0–100 in a ring + level (Excellent ≥85 · On track ≥70 ·
+  Developing ≥50 · Needs support; "Getting started" under 10 answers), trend chip (last
+  14 days vs the 14 before, ±8 points, ≥5 answers each), 4 KPIs (questions done,
+  accuracy + first-try, lessons mastered/practised, active days + time in 30 days with
+  streak) and earned badges (milestones, mastered, streak, sharp shooter, first-try pro,
+  unit-perfect, challenge climber, steady worker, improving).
+  Score = 40% accuracy (latest answer per question) + 25% right first time + 15%
+  consistency (12 active days in 30 = full) + 20% lesson progress (½ mastered share,
+  ½ questions done in started lessons). Explained in a fold-out on the page and in the PDF.
+- Teacher's note (amber card, "A note from your teacher", dated, signed "— <signature>",
+  earlier notes folded).
+- **What to do next**: the teacher's pinned focus lessons first, then the top 4 rules
+  that fire (`lib/reports/insights.ts → actionPlan`): fix still-wrong questions,
+  revise the weakest lesson (links its revision sheet if one exists), units (≥3 and
+  ≥15% of wrong answers), recent dip, unreadable answers, challenging vs easy gap or
+  "step up", retry-dependence (first-try ≥20 points below final), rushing (<25 s and
+  <60%), consistency (<6 days in 30), hints (>40%), skipped, unfinished banks, or
+  "keep going" for an excellent student with nothing to fix.
+- Strong points / Focus areas (`rankByAccuracy`, ≥5 answers, no overlap; a "strength"
+  must be ≥60%, a focus <90%), with Practise / Revision sheet / Lesson / Ask for a video.
+- Charts (plain SVG): weekly right vs wrong (12 weeks), study calendar heat map (84
+  days, Istanbul time), accuracy by lesson (+ by chapter fold-out), accuracy by
+  difficulty, why answers were wrong (donut). Questions to go back to (top 5, still
+  wrong first, Retry links). Study habits.
+- Chapter labels follow the curriculum the lesson was practised in: a shared lesson
+  practised from the A Level bank reads "A Level · Chapter 22 · Coulomb's law", not
+  IGCSE Chapter 17 (`chapterOf` in `lib/reports/data.ts`).
+
+**Data** (`lib/reports/data.ts → getStudentReport`): reuses `getStudentAnalytics`
+(same numbers as the admin analytics block) plus per-lesson stats, daily activity,
+the 14/28-day trend and notes. Reads go through the owner connection scoped to one
+authorised student id — **it does not need migrations 01–05** (unlike the dashboard's
+progress chips). If it fails, the tab shows a short "couldn't load" note.
+
+**Teacher notes**: table `student_report_notes` (migration
+`database/seeds/2026-10-27-student-report-notes.sql`, **applied to production
+2026-10-27**): `signature` (how the note is signed, remembered per author),
+`body` ≤ 4000, `focus_topic_ids` ≤ 5 (kept in the order picked, unknown ids dropped),
+`read_at` (editing a note marks it unread again). RLS on, no policies (API roles see
+nothing). API `app/api/reports/[studentId]/notes` (GET/POST/PATCH/DELETE): admins for
+anyone, teachers for their own sections' students. POST `notify: true` (admins only)
+also sends the note to the student's mailbox (and email) via `sendToSubscribers`.
+Editor (`components/report/ReportNoteEditor.tsx`): starter phrases, signature,
+focus-lesson picker (lessons they practised first, then every chapter), live preview
+of what the student sees with read status, edit/delete history.
+
+Tests: `lib/reports/__tests__/insights.test.ts` (16: names, score, bands, trend,
+streaks, calendar, strengths/focus, every plan rule and its order, badges, note
+validation), `lib/reports/__tests__/pdf.test.ts` (3: read back with pdfjs — name
+before note, sections present, ≤ 2 pages; empty report 1 page; emoji stripping),
+dashboard tab tests updated (6 tabs, note badge, unread note → report, seen POST).
+`lib/reports/__tests__/fixture.ts` is a realistic report built through the real
+insight functions. Every new SQL statement was run against production for a real
+student. Full suite: only the known live-DNS test fails. `tsc`, ESLint and
+`next build` clean. Checked in Chromium at 375 / 1000 / 1280 px (no horizontal
+scroll) including the staff editor.
+
+#### Handwritten notes & signatures (pen / stylus, 2026-10-27)
+
+Owner: "a place where I can write with my pen (tablet) as a signature and as a
+handwritten note, uploaded to the progress report and given to the student in the PDF."
+
+- Note editor has **⌨️ Type / ✍️ Handwrite** tabs (both can be used; typed text shows
+  first, handwriting under it). Handwrite = a lined-paper pen pad
+  (`components/report/InkPad.tsx`): pressure-sensitive stylus, finger or mouse; 4 ink
+  colours (blue, black, red, green), 3 pen sizes, Undo / Redo / Clear, **Full screen**
+  (Escape or Done closes). `touch-action: none` so writing never scrolls the page.
+  **Palm rejection:** once a stylus touches the pad, finger touches are ignored
+  ("Let fingers write too" turns them back on). Coalesced pointer events for smooth lines.
+- **Handwritten signature**: "✍️ Add my handwritten signature" opens a signature strip;
+  it is remembered per teacher (`staff_signatures`) and pre-filled on the next note.
+  The typed "Signed as" name stays as the label under it (and in emails / alt text).
+- Stored as **stroke data, not images** (`lib/reports/ink.ts`): `{ v, w, h, strokes:
+  [{ c: colour key, s: size, pen, p: [x, y, pressure, …] }] }`, re-validated on the
+  server (pad size must match, colours from a whitelist, numbers only, clamped and
+  rounded, ≤ 1500 strokes / 30 000 points). Drawn as SVG generated by our code
+  (perfect-freehand pen outlines, so stylus pressure gives real thick/thin lines),
+  cropped to what was written and kept at the size it was written on the pad.
+  Report: `components/report/InkImage.tsx` in the note card. PDF: the same SVG via
+  svg-to-pdfkit, vector (sharp at any zoom), capped at 360 pt high.
+- A note needs typed text **or** handwriting. Mailbox notification for a
+  handwriting-only note says "It's handwritten — open your report to read it".
+- Migration `database/seeds/2026-10-27-02-report-note-handwriting.sql` (**applied to
+  production**): `student_report_notes.ink`, `.signature_ink` (jsonb), body check
+  relaxed to "body or ink", table `staff_signatures (user_id, ink, updated_at)`, RLS on.
+- New dependency `perfect-freehand` (MIT).
+- Tests: `lib/reports/__tests__/ink.test.ts` (validation incl. injected colours and
+  non-numbers, outlines, cropped SVG, handwriting-only notes, PDF with handwriting and
+  signature). Checked in Chromium with simulated stylus input (CDP pen events with
+  varying force): pressure recorded 0.3–0.9, a finger touch after the pen ignored,
+  signature saved, payload posted; full-screen opens/closes.
 
 ### Revision cheat sheets (NEW 2026-10-17: IGCSE + A Level Circular motion; 2026-10-19: A Level Gravitational fields, Coulomb's law, AS Chapter 1 one-page lesson sheets)
 
