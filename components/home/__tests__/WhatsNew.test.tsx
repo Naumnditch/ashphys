@@ -202,4 +202,26 @@ describe('WhatsNew (hero slot)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Watch' }));
     expect(screen.getByRole('dialog', { name: 'An older update' })).toBeTruthy();
   });
+
+  it('hero variant: seen on first look — poster image and the loop load straight away', () => {
+    const { container } = render(<WhatsNew updates={[LATEST, OLDER]} variant="hero" />);
+    expect(screen.getByText('New')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: LATEST.title })).toBeTruthy();
+    const img = container.querySelector('[data-testid="whats-new-media"] img')!;
+    expect(img.getAttribute('src')).toBe(LATEST.posterUrl);
+    const video = container.querySelector('video')!;
+    expect(video.muted).toBe(true);
+    expect(video.hasAttribute('playsinline')).toBe(true);
+    expect([...video.querySelectorAll('source')].map((s) => s.getAttribute('src'))).toEqual([LATEST.loopWebmUrl, LATEST.loopMp4Url]);
+    expect(screen.getByRole('link', { name: 'Try a practice question' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Watch the video' }));
+    expect(screen.getByRole('dialog', { name: LATEST.title })).toBeTruthy();
+  });
+
+  it('hero variant under reduced motion: poster only', () => {
+    reduce = true;
+    const { container } = render(<WhatsNew updates={[LATEST]} variant="hero" />);
+    expect(container.querySelector('video')).toBeNull();
+    expect(container.querySelector('[data-testid="whats-new-media"] img')).toBeTruthy();
+  });
 });

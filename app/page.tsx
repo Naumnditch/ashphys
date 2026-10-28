@@ -218,8 +218,14 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div id="film" className="order-2 lg:col-span-7 scroll-mt-24 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-              <HeroVideo />
+            <div
+              id="film"
+              className={`${siteUpdates.length > 0 ? 'order-first lg:order-2' : 'order-2'} lg:col-span-7 scroll-mt-24 animate-fade-in-up`}
+              style={{ animationDelay: '200ms' }}
+            >
+              {/* The latest "What's New" announcement takes the film's place, so it is seen on
+                  first look; the film shows whenever there is no live announcement. */}
+              {siteUpdates.length > 0 ? <WhatsNew updates={siteUpdates} variant="hero" /> : <HeroVideo />}
             </div>
 
             {/* Mobile & tablet only: after the video, per the required reading order. */}
@@ -227,19 +233,10 @@ export default async function HomePage() {
               <HeroCtas />
             </div>
 
-            {/* "What's New": the latest announcement video (site_updates, managed at
-                /admin/updates). Below the headline and film, so it never moves them
-                or competes for the first paint; nothing renders without an update. */}
-            {siteUpdates.length > 0 && (
-              <div id="latest-update" className="order-4 lg:col-span-12 w-full scroll-mt-24">
-                <WhatsNew updates={siteUpdates} />
-              </div>
-            )}
-
             {/* Video walkthrough requests: one full-width row under both columns. */}
             <div
               id="request-video"
-              className="order-5 lg:col-span-12 lg:max-w-3xl lg:mx-auto w-full scroll-mt-24 animate-fade-in-up"
+              className="order-4 lg:col-span-12 lg:max-w-3xl lg:mx-auto w-full scroll-mt-24 animate-fade-in-up"
               style={{ animationDelay: '280ms' }}
             >
               <VideoRequestCta viewer={requestViewer} />

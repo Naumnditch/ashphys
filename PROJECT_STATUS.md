@@ -32,6 +32,14 @@ from real footage of the site; the first one announces Handwritten Worked
 Solutions, with the owner's own stored handwriting replayed as if being
 written; future announcements repeatable (capture → render → publish).
 
+**Placement update (2026-10-28, later):** the owner wanted the announcement seen on first
+look, so while an update is live it **takes the old Three.js film's place** in the hero's media
+column (`<WhatsNew variant="hero">`: video with a NEW · date badge, then title, summary, CTA,
+Watch the video, Previous updates). On phones it sits **above** the headline. The loop and a
+real poster `<img>` load straight away there (it is the hero's media now, as the film was); the
+big play button hides while the loop plays. With no live update the old film comes back. The
+row layout described below is still the component's default (`variant="row"`), now unused.
+
 **On the homepage** (`components/home/WhatsNew.tsx`, wired in `app/page.tsx`
 as its own row under the headline/film, above the video-request CTA — the
 existing hero is untouched and nothing renders when there is no live update):

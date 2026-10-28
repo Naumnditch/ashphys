@@ -18,7 +18,7 @@ import { formatUpdateDate, type SiteUpdate } from '@/lib/siteUpdates/types';
  * so neither ever becomes the page's Largest Contentful Paint element: LCP
  * stays the hero's own content, as before this card existed.
  */
-export function WhatsNew({ updates }: { updates: SiteUpdate[] }) {
+export function WhatsNew({ updates, variant = 'row' }: { updates: SiteUpdate[]; variant?: 'row' | 'hero' }) {
   const [playing, setPlaying] = useState<SiteUpdate | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
@@ -26,6 +26,79 @@ export function WhatsNew({ updates }: { updates: SiteUpdate[] }) {
   if (!latest) return null;
   const previous = updates.slice(1);
   const hasVideo = Boolean(latest.videoMp4Url || latest.videoWebmUrl || latest.loopMp4Url || latest.loopWebmUrl);
+
+  const overlays = (
+    <>
+      {drawerOpen && (
+        <UpdatesDrawer
+          updates={previous}
+          onClose={() => setDrawerOpen(false)}
+          onWatch={(u) => {
+            setDrawerOpen(false);
+            setPlaying(u);
+          }}
+        />
+      )}
+      {playing && <VideoModal update={playing} reducedMotion={reducedMotion} onClose={() => setPlaying(null)} />}
+    </>
+  );
+
+  if (variant === 'hero') {
+    // In the hero's media column, seen on first look: the loop plays right away (muted).
+    return (
+      <section aria-labelledby="whats-new-title" data-testid="whats-new">
+        <div className="theme-light relative overflow-hidden rounded-2xl bg-gray-100 shadow-2xl shadow-blue-950/20 ring-1 ring-black/5">
+          {hasVideo ? (
+            <LoopPlayer update={latest} reducedMotion={reducedMotion} onOpen={() => setPlaying(latest)} eager />
+          ) : latest.posterUrl ? (
+            <div className="relative aspect-video w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element -- storage/static URL in a fixed-ratio box */}
+              <img src={latest.posterUrl} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+            </div>
+          ) : null}
+          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 py-1 pl-1 pr-3 shadow-sm ring-1 ring-black/5 backdrop-blur-sm">
+            <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">New</span>
+            {latest.publishedAt && (
+              <time dateTime={latest.publishedAt} className="text-xs font-medium text-gray-700">
+                {formatUpdateDate(latest.publishedAt)}
+              </time>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-col gap-3">
+          <div className="min-w-0">
+            <h2 id="whats-new-title" className="text-lg sm:text-xl font-bold tracking-tight text-gray-900">
+              {latest.title}
+            </h2>
+            {latest.summary && <p className="mt-1 text-sm leading-relaxed text-gray-600">{latest.summary}</p>}
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+            {latest.ctaLabel && latest.ctaHref && <CtaLink href={latest.ctaHref}>{latest.ctaLabel}</CtaLink>}
+            {hasVideo && (
+              <button
+                type="button"
+                onClick={() => setPlaying(latest)}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-800 hover:text-black underline-offset-4 hover:underline"
+              >
+                <PlayIcon className="h-4 w-4" /> Watch the video
+              </button>
+            )}
+            {previous.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                className="text-sm font-medium text-gray-500 hover:text-gray-900 underline-offset-4 hover:underline"
+                aria-haspopup="dialog"
+              >
+                Previous updates
+              </button>
+            )}
+          </div>
+        </div>
+        {overlays}
+      </section>
+    );
+  }
 
   return (
     <section
@@ -82,17 +155,7 @@ export function WhatsNew({ updates }: { updates: SiteUpdate[] }) {
         </div>
       </div>
 
-      {drawerOpen && (
-        <UpdatesDrawer
-          updates={previous}
-          onClose={() => setDrawerOpen(false)}
-          onWatch={(u) => {
-            setDrawerOpen(false);
-            setPlaying(u);
-          }}
-        />
-      )}
-      {playing && <VideoModal update={playing} reducedMotion={reducedMotion} onClose={() => setPlaying(null)} />}
+      {overlays}
     </section>
   );
 }
@@ -165,10 +228,21 @@ function loopSources(u: SiteUpdate): { webm: string | null; mp4: string | null }
   return { webm: u.videoWebmUrl, mp4: u.videoMp4Url };
 }
 
-function LoopPlayer({ update, reducedMotion, onOpen }: { update: SiteUpdate; reducedMotion: boolean; onOpen: () => void }) {
+function LoopPlayer({
+  update,
+  reducedMotion,
+  onOpen,
+  eager = false,
+}: {
+  update: SiteUpdate;
+  reducedMotion: boolean;
+  onOpen: () => void;
+  /** Above the fold (hero): poster and loop load straight away, like the hero film did. */
+  eager?: boolean;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const [near, setNear] = useState(false);
+  const [near, setNear] = useState(eager);
   const [visible, setVisible] = useState(false);
   const [started, setStarted] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -217,14 +291,19 @@ function LoopPlayer({ update, reducedMotion, onOpen }: { update: SiteUpdate; red
   }, [animate, visible, paused]);
 
   return (
-    <div ref={box} className="relative aspect-video w-full overflow-hidden bg-gray-100 lg:rounded-none" data-testid="whats-new-media">
+    <div ref={box} className="relative aspect-video w-full overflow-hidden bg-gray-100" data-testid="whats-new-media">
       <button
         type="button"
         onClick={onOpen}
         className="group absolute inset-0 block h-full w-full focus:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-blue-500"
         aria-label={`Watch the video: ${update.title}`}
       >
-        {near && update.posterUrl && <PosterCanvas src={update.posterUrl} />}
+        {eager && update.posterUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- storage/static URL in a fixed-ratio box
+          <img src={update.posterUrl} alt="" decoding="async" fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          near && update.posterUrl && <PosterCanvas src={update.posterUrl} />
+        )}
         {update.posterUrl && (
           <noscript>
             {/* eslint-disable-next-line @next/next/no-img-element -- no-JS fallback */}
@@ -248,7 +327,11 @@ function LoopPlayer({ update, reducedMotion, onOpen }: { update: SiteUpdate; red
             {mp4 && <source src={mp4} type="video/mp4" />}
           </video>
         )}
-        <span className="absolute inset-0 flex items-center justify-center">
+        <span
+          className={`absolute inset-0 flex items-center justify-center transition-opacity ${
+            eager && started && !paused ? 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100' : ''
+          }`}
+        >
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/55 text-white shadow-lg ring-1 ring-white/30 backdrop-blur-sm transition-transform group-hover:scale-110">
             <PlayIcon className="h-6 w-6 translate-x-[1px]" />
           </span>
