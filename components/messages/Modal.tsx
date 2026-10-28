@@ -38,14 +38,14 @@ export function Modal({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-scrim/40 sm:p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="fb-backdrop-in fixed inset-0 z-50 flex items-stretch sm:items-center justify-center bg-scrim/40 sm:p-6" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className={`flex w-full flex-col bg-white shadow-2xl outline-none sm:rounded-2xl sm:max-h-[92vh] ${wide ? 'sm:max-w-4xl' : 'sm:max-w-2xl'} animate-fade-in-up`}
+        className={`flex w-full flex-col bg-white shadow-2xl outline-none sm:rounded-2xl sm:max-h-[92vh] ${wide ? 'sm:max-w-4xl' : 'sm:max-w-2xl'} fb-dialog-in`}
       >
         <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-5 py-4">
           <div className="min-w-0">

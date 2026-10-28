@@ -52,7 +52,7 @@ export function QuestionMap({
       {/* One bar for the whole set, in the same colours as the squares. */}
       <div className="flex h-2 rounded-full overflow-hidden bg-gray-100 gap-px mb-3" aria-hidden="true">
         {(['correct', 'wrong', 'skipped'] as const).map((k) =>
-          s[k] > 0 ? <div key={k} className={BAR[k]} style={{ width: `${(s[k] / s.total) * 100}%` }} /> : null
+          s[k] > 0 ? <div key={k} className={`${BAR[k]} transition-[width] duration-500 ease-out motion-reduce:transition-none`} style={{ width: `${(s[k] / s.total) * 100}%` }} /> : null
         )}
       </div>
 
