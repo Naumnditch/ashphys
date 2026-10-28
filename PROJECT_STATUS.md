@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-28, latest (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,205 @@ Last updated: 2026-10-28 (handwritten worked solutions on every practice questio
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Hero "What's New" announcement videos + video pipeline (NEW 2026-10-28)
+
+Owner: a reusable "What's New" slot in the hero that plays a short video made
+from real footage of the site; the first one announces Handwritten Worked
+Solutions, with the owner's own stored handwriting replayed as if being
+written; future announcements repeatable (capture → render → publish).
+
+**On the homepage** (`components/home/WhatsNew.tsx`, wired in `app/page.tsx`
+as its own row under the headline/film, above the video-request CTA — the
+existing hero is untouched and nothing renders when there is no live update):
+NEW badge, date (UTC, same on server and browser), title, one-line summary,
+CTA button styled like the hero's primary button, "Watch the video", and
+"Previous updates" (a right-hand drawer of older live announcements, each
+with Watch + its CTA). The media box is a fixed `aspect-video` from the first
+paint (no layout shift). Nothing — not even the poster — loads until the card
+is within 200 px of the viewport (IntersectionObserver); then a muted,
+`playsInline`, `loop`, `preload="metadata"` 720p loop plays only while ≥25 %
+visible, pauses when scrolled away, has its own pause button (WCAG 2.2.2), and
+under `prefers-reduced-motion` shows the poster only. Click → modal player
+(portal to `<body>`): 1080p film with controls, WebVTT captions (`<track
+default>`, CORS-enabled when the file is on Storage), focus on Close, Tab
+trapped, Escape/backdrop close, focus returns to the opener, page scroll
+locked. WebM first, MP4 fallback.
+
+**Data** — migration `database/seeds/2026-10-28-site-updates.sql`
+(**NOT yet applied to production** — the Supabase MCP `apply_migration` call timed out on its confirmation prompt (as it did for the handwriting migration); paste the file into the Supabase SQL editor, then `2026-10-28-site-updates-first-announcement.sql`. Until then the homepage renders exactly as before (the read fails quietly, logged once per server instance) and /admin/updates shows a setup message. Idempotent; it re-creates the role and the two helper functions with the same definitions as the handwriting migration, so it runs on its own): table `site_updates` (`id, slug UNIQUE, title, summary,
+video_mp4_url, video_webm_url, poster_url, cta_label, cta_href, published_at,
+is_active, created_by` + `loop_mp4_url, loop_webm_url` (the 720p hero loop;
+the full film is the fallback), `captions_vtt_url`, `created_at, updated_at`).
+CHECKs mirror the form: slug format, lengths, and every URL must be `https://…`
+or a site path starting with a single `/` (no `javascript:`, `data:`,
+`//host`). Row-level security, the 2026-10-14 pattern (`withRlsContext` as
+`ashphys_user`): `site_updates_public_read` = active AND published_at ≤ now()
+(a future date = scheduled) OR `app_is_admin()`; insert/update/delete =
+`app_is_admin()` only; anon/authenticated grants revoked (no REST exposure).
+Public Storage bucket `site-updates` (50 MB/file; mp4, webm, jpeg, webp, png,
+vtt); no storage.objects policies, so only the server (service key, after
+`requireAdmin`) can write — the admin form uploads straight to Storage with a
+signed upload URL (videos are far over Vercel's ~4.5 MB body limit).
+`lib/siteUpdates/` (types/status, zod validation, queries; the homepage read
+runs as an anonymous visitor and any failure — e.g. migration missing — just
+means "no update").
+
+**Admin** — `/admin/updates` (sidebar: Content → "What's New (homepage)";
+admin-gated by the admin layout, every API route checks `requireAdmin`, and
+RLS refuses non-admin writes): list with Live / Scheduled / Draft /
+Unpublished and "In the hero now"; create (slug suggested from the title),
+edit, Publish (published_at = now unless set), Unpublish, Delete; one upload
+slot per file (full MP4/WebM, loop MP4/WebM, poster, captions) — each upload
+gets a fresh path so caches never serve a stale video. API:
+`GET/POST /api/admin/site-updates`, `PUT/PATCH/DELETE …/[id]`,
+`POST …/upload`.
+
+**The first announcement** (`video/updates/handwritten-worked-solutions/`):
+showcase questions found by question text, newest first: **A** "3.7 Circular motion
+(extension)" Q50 (A Level bank), conical pendulum, 374 strokes, version 202,
+updated 2026-10-28 08:58 UTC; **B** "24.3 Gravitation and orbits (extension)"
+Q16, Phobos → mass of Mars, 136 strokes, version 65, updated 08:37 UTC. Both
+match the owner's description; neither has timestamps (written before the
+timestamp change) → **synthesized pacing** for both (A fitted ×10.3, B
+similar). No erased strokes exist to replay (the format stores none). Footage:
+local production build against a local replica of the live schema seeded with
+those two lessons (149 questions, 3 handwriting rows) and two TEST accounts
+("Test Student", "Demo Teacher"; random credentials, env only). Shots:
+practice page, typed wrong answer, feedback + Free offer ("uses 1 of your 2
+remaining solution views" — the tier moment), viewer reference + ink-hidden
+plate at 3×, a 180-frame real zoom → pan → pan → full-screen interaction, the
+same for B, tablet-landscape (1366×1024) references/plates/full screen, the
+admin canvas + toolbar, and a real writing clip: the admin canvas on a demo
+question fed the owner's own "T = 2.26 N" pen points through Chromium pen
+input (local demo DB only). Outputs (`video/out/handwritten-worked-solutions/`,
+not committed except the four web files): master **43.6 s** 1920×1080 30 fps
+`film-1080p.mp4` (H.264 CRF 20 yuv420p faststart, 13.9 MB) + `.webm` (VP9,
+7.8 MB); hero loop 1280×720 14.1 s `loop-720p.mp4` 2.73 MB + `.webm` 2.30 MB
+(two-pass under 3 MB, Reveal + Navigate, seamless dissolve to its first
+frame); vertical 1080×1920 `vertical-1080x1920.mp4` 11.2 MB + `.webm` 5.8 MB;
+`poster.webp` (33 KB, 1280×720, pen mid-reveal on Question A's diagram and
+geometry sketch) + `.jpg`; `captions.srt/.vtt` (12 cues, the burned-in ones).
+Silent. Published as static files in `public/video/updates/handwritten-worked-solutions/`
+(26 MB, served by Vercel — this session could not reach Supabase Storage) and
+the row in `database/seeds/2026-10-28-site-updates-first-announcement.sql`
+(CTA "Try a practice question" → `/curriculum?c=a-level`)
+
+**Video pipeline** — separate npm workspace `video/` (Remotion 4.0.534 +
+React 19 there only, Playwright, perfect-freehand, `@remotion/transitions`,
+`@remotion/google-fonts` Inter = the site font; `@remotion/lottie` not used —
+no animation in this video was better as Lottie than as code). Full workflow,
+config reference, policies and the replay's internals: **`video/README.md`**.
+In short: `fetch-strokes` (finds the showcase questions in
+`question_handwriting` by question text, newest first, shows the match, saves
+only with `--confirm`) → `export-demo-data` + `seed` (local DB with the
+showcase lessons, TEST accounts from env) → run the site locally → `capture`
+→ Studio / `verify` → `npm run video:build -- --update=<slug>` → `publish`
+(Storage + row) or /admin/updates.
+**Remotion licence: free** — free for individuals and companies with up to 3
+employees (LICENSE.md of v4.0.534, read 2026-10-28); AshPhys is one teacher.
+Buy a company licence if AshPhys grows to 4+ employees.
+
+**Handwriting replay** (`video/src/handwriting/`): draws the stored strokes
+with the site's own geometry (finished strokes = `strokeSvg()` markup,
+byte-identical to the student snapshot; the stroke in progress grows point by
+point through perfect-freehand with its stored pressure, `last: false` like
+the live canvas), in stored order (= writing order), with an Apple
+Pencil–style stylus + tip dot, a spring camera that follows the pen region to
+region, soft highlight pulses that are gone before the last frame. Pacing:
+real timestamps when strokes have them (pauses capped at 0.4 s, then one global
+speed-up), else synthesized (duration ∝ length, eased pen, pauses growing with
+travel / new line / colour / section). **Pixel check** (`npm run verify`):
+the last frame vs the real viewer showing the stored page, at 3× —
+mean channel difference 0.002/255 (A) and 0.001/255 (B), 0.001 % of pixels differ by > 24/255 (anti-aliasing), 99.97 % / 99.95 % of the stored ink matched pixel for pixel and **0** ink pixels missing or extra beyond one device pixel. Getting there found a real snag: Chromium snaps the viewer's SVG
+to whole CSS px (711.39 → 711) but nothing snaps inside Remotion's
+transformed layers, so the ink first landed ⅓ px off; the replay now sits at
+the snapped box (`snap.ts`). Debug composition `ReplayCheck` in Studio:
+replay / reference / stored snapshot / difference / side-by-side, stroke
+indices, HUD.
+
+**Canvas timestamps (schema change, backward compatible, no migration).**
+Strokes drawn from now on store per-point time and a start time:
+`points: [[x, y, pressure, t]]` (t = ms since the stroke's first point, from
+the pointer events' own timestamps, coalesced events included) and `t0` (ms
+since the Unix epoch). Shapes get `t0` and `[…, 0]` / `[…, duration]`.
+`lib/handwriting/types.ts` (`HwPoint = [x, y, pressure, t?]`, `t0?`),
+`schema.ts` (accepts 3- or 4-number points; keeps timing only when every point
+of a stroke has it, made non-decreasing, never fails a save over timing; t ≤ 1
+h), `geometry.ts` (lasso move and eraser cuts carry t along, interpolated),
+`engine.ts` (records it). Old strokes load exactly as before; the student SVG
+is identical with or without timing (tested); the snapshot never contains it.
+Verified in the real canvas: 10 Chromium pen strokes saved with `t0` and
+per-point `t` (e.g. last point 1625 ms). Bodies grow ~15–20 % for new strokes.
+
+**Tests & checks (2026-10-28).** Site: `tsc` clean; vitest 2101 passed, 1 failed (the
+pre-existing live-DNS email test); DB tests 55/55 with `TEST_DATABASE_URL`
+(30 existing + 17 handwriting + 8 new site_updates: admin-only API, publish /
+unpublish / schedule, newest first, unsafe links and duplicate slugs refused,
+RLS: anonymous and students read only live rows and can never write, the table
+itself refuses unsafe URLs); new unit tests: `WhatsNew.test.tsx` (11),
+`siteUpdates.test.ts` (12), `timestamps.test.ts` (8); ESLint
+(`next/core-web-vitals`) clean on every new/changed file; `next build` clean.
+Bundles: `/` 9.8 → 12.9 kB (first load 106 → 110 kB); `/admin/updates` 4.2 kB
+(zod kept server-side). Video workspace: `tsc` clean, vitest 11/11 (pacing,
+real-timestamp compression, fit, holds, state, pages, and that A and B replay
+every stored stroke exactly once in stored order with untouched points),
+`npm run verify` passes. Real browser (Playwright, local build): 47/47 hero
+checks on desktop Chrome 1440×900, iPad Pro 11 landscape (Safari UA) and Pixel 7
+(Chromium engine for all three — no WebKit or real devices here): muted inline
+autoplay when visible, pause when scrolled away and via its button, no video
+bytes before the card is near, fixed 16:9 box (CLS 0), LCP never the slot,
+modal plays the 1080p film with 12 caption cues, Tab/Shift+Tab trapped,
+Escape closes from Close / the video / the CTA and focus returns, existing
+hero intact, reduced motion → drawn poster only; 18/18 admin checks
+(anonymous → login, student redirected and API 403, create with slug
+suggestion, unsafe link refused, upload error shown clearly without Storage,
+edit, publish → hero switches, previous updates, unpublish, delete).
+**Lighthouse** (12.8, local, `main` vs this branch on the same machine and
+data): mobile 7 runs each — median score 95 vs 96, LCP ~2.91 s vs ~2.67 s,
+TBT similar, CLS 0 except one run each caused by the existing floating-formula
+decoration (pre-existing); desktop 3 runs — 100 vs 100, LCP 635 vs 617 ms.
+LCP element is the logo on both. A first version that showed the poster as an
+`<img>` did regress desktop LCP (~640 → ~810 ms, the poster became the LCP
+element when the card is partly in view), hence the canvas poster.
+**Known limitation:** while keyboard focus is on one of Chromium's own
+media-control buttons inside the modal's video, Chromium does not deliver
+Escape to the page at all (not even to a capture listener); Tab/Shift+Tab
+still reach Close, and Escape works from Close, the video element and the
+CTA. Not tested here: real iPad Safari / Android devices (worth a quick pass).
+
+**Handwriting inconsistencies noticed (not edited — fix in the admin canvas and re-capture):**
+- **A — stored order ≠ the storyboard's order.** Stored (= written) order:
+  force diagram → vertical components with "T = __ N" left blank → horizontal
+  components → "Rearrange for T (time)" → the "°" of cos 30° and the **2.26**
+  filled into "T = 2.26 N" (strokes 226–233) → geometry sketch and r working
+  down to r = 0.5 m → the final rearranged lines and T = 1.87 s. The replay
+  keeps the stored order (captions say "Diagrams, components and colour-coded
+  working" rather than naming a sequence).
+- **A — stray red dot** (stroke 234, one point) to the right of the
+  "∵ a_c = 4π²r/T²" line; visible on the page.
+- **A — stray light-green dot** (stroke 22, one point) inside the "mg" of
+  "T cos α = mg"; almost hidden.
+- **A — "T²" in the pink "∴ Fc = m·4π²r/T²"**: the T reads like a "+" ("+²").
+- **B — "GT²"** in M = 4π²r³/(GT²): the G and T run together (reads like
+  "GTT²" / "Gπ²" at a glance).
+- **B — "×10²³"**: the exponent is split ("10² ³"); readable.
+- **B** — the ³ of (9.38×10⁶)³ and the ² of (2.76×10⁴)² were added after the
+  final line was started (strokes 121–122); replayed as written. The two
+  crossed-out m's are strokes 39 (right m) then 40 (left m), red, replayed as
+  written.
+- Not handwriting, but in frame: the typed feedback shows "the answer was
+  1.868 s" for A (handwriting ends at 1.87 s) and the raw "6.412e23 kg" for B.
+
+**Files.** `components/home/WhatsNew.tsx` (+ test), `app/page.tsx`,
+`lib/siteUpdates/*` (+ unit and DB tests), `app/api/admin/site-updates/**`,
+`app/admin/updates/page.tsx`, `components/admin/SiteUpdateManager.tsx`,
+`AdminSidebar.tsx`/`AdminIcons.tsx`, `lib/storage/directUpload.ts` (optional
+content type), `lib/handwriting/{types,schema,geometry}.ts` +
+`components/handwriting/engine.ts` (timestamps) + `__tests__/timestamps.test.ts`,
+`database/seeds/2026-10-28-site-updates.sql`, `video/**`, root
+`package.json` (`video:build`, `video:studio`, `test:db` incl. the new DB
+test), `tsconfig.json` / `vitest.config.ts` (exclude `video/`).
 
 ### Handwritten worked solutions & full-screen practice page (NEW 2026-10-28)
 
@@ -120,7 +319,7 @@ definitions):
 | `id` uuid PK | |
 | `lesson_id` uuid → `topics` (cascade) | "lesson" = topics row, as everywhere |
 | `question_id` uuid → `problems` (cascade) | UNIQUE (`lesson_id`, `question_id`) |
-| `doc` jsonb | vector strokes: `{ v: 1, pages: [{ id, background, strokes: [{ id, tool: pen/highlighter/shape, shape?: line/arrow/rect/ellipse/polyline, color #rrggbb, width, opacity, pressure: bool, points: [[x, y, p]] }] }] }` — a stroke's page index is its page's position |
+| `doc` jsonb | vector strokes: `{ v: 1, pages: [{ id, background, strokes: [{ id, tool: pen/highlighter/shape, shape?: line/arrow/rect/ellipse/polyline, color #rrggbb, width, opacity, pressure: bool, t0?, points: [[x, y, p, t?]] }] }] }` — a stroke's page index is its page's position. **Since 2026-10-28** new strokes also carry `t` (ms since the stroke's first point) on every point and `t0` (ms since the Unix epoch at the stroke's start); older strokes have neither and stay valid (see "Canvas timestamps" in the What's New section) |
 | `snapshots` jsonb | server-rendered SVG per non-empty page `[{ x, y, width, height, body }]` |
 | `preview` jsonb | teaser of page 1 (strokes wholly inside its top 30% only) |
 | `page_count`, `stroke_count` int | 0 strokes = cleared → students see nothing |
@@ -2118,6 +2317,22 @@ Unfinished / follow-ups:
 ## Decisions
 
 Judgement calls that shape later work. Newest first.
+
+- **2026-10-28 — What's New lives in `site_updates`, separate from `lib/announcements/updates.ts`.**
+  The hand-kept feed (pill, homepage feed, /updates) is untouched; the new table only drives the
+  video card in the hero. Extra columns beyond the brief: `loop_mp4_url`/`loop_webm_url` (the
+  720p hero loop; the 1080p film plays in the modal), `captions_vtt_url`, `created_at`/`updated_at`.
+- **2026-10-28 — Hero card placement**: its own full-width row under the headline + film, above
+  the video-request CTA, so the existing hero does not move and the card is never above the fold
+  on phones. Its poster is drawn into a `<canvas>` so it can never become the page's LCP element.
+- **2026-10-28 — Replay order = stored order**, even where the storyboard listed another order:
+  the canvas appends strokes in the order they are written, and the brief says not to alter the
+  handwriting. Pacing is synthesized for strokes without timestamps (all strokes before today).
+- **2026-10-28 — First announcement served from `public/video/updates/` (static, 26 MB in git)**
+  because this session could not reach Supabase Storage; the bucket + admin upload path is built
+  and tested for the next ones. Move these into the bucket whenever convenient.
+- **2026-10-28 — Video tooling is its own workspace** (`video/`, React 19 + Remotion 4.0.534
+  there only); the site's tsconfig/vitest exclude it and Vercel never installs it.
 
 - **2026-10-28 — Handwritten solutions share the interactive solutions' view budget.**
   "Respect the existing tier logic" was read as one gate and one budget: opening a new

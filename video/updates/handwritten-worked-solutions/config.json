@@ -1,0 +1,498 @@
+{
+  "slug": "handwritten-worked-solutions",
+  "title": "New: Handwritten Worked Solutions",
+  "summary": "Get a practice question wrong and watch the full worked solution, written by hand by your teacher. Zoom in, pan around, go full screen.",
+  "cta": {
+    "label": "Try a practice question",
+    "href": "/curriculum?c=a-level"
+  },
+  "fps": 30,
+  "brand": {
+    "logo": "brand/logo.png",
+    "url": "ashphys.org",
+    "font": "Inter",
+    "colors": {
+      "ink": "#111827",
+      "muted": "#4b5563",
+      "page": "#f9fafb",
+      "surface": "#ffffff",
+      "accent": "#2563eb",
+      "accentSoft": "#dbeafe",
+      "highlight": "#fde68a",
+      "grid": "#dfe3ea"
+    }
+  },
+  "showcase": {
+    "A": {
+      "questionIncludes": [
+        "0.20 kg bob",
+        "1.0 m string",
+        "horizontal circle",
+        "30°"
+      ],
+      "answer": "1.868"
+    },
+    "B": {
+      "questionIncludes": [
+        "Phobos",
+        "9.38 × 10⁶ m",
+        "2.76 × 10⁴ s",
+        "mass of Mars"
+      ],
+      "answer": "6.412e23"
+    }
+  },
+  "transition": {
+    "type": "fade",
+    "seconds": 0.4
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "type": "title",
+      "seconds": 4,
+      "kicker": "New",
+      "title": "Handwritten Worked Solutions",
+      "subtitle": "Real solutions, written by hand",
+      "captions": [
+        {
+          "from": 0.3,
+          "to": 3.8,
+          "text": "New on AshPhys: handwritten worked solutions"
+        }
+      ]
+    },
+    {
+      "id": "problem",
+      "type": "screens",
+      "seconds": 5,
+      "device": "browser",
+      "shots": [
+        {
+          "capture": "a-question",
+          "at": 0
+        },
+        {
+          "capture": "a-typed",
+          "at": 1.5
+        },
+        {
+          "capture": "a-feedback",
+          "at": 2.6
+        }
+      ],
+      "cursor": [
+        {
+          "at": 0.4,
+          "target": "a-question:answerInput"
+        },
+        {
+          "at": 1.2,
+          "target": "a-question:answerInput",
+          "click": true
+        },
+        {
+          "at": 2.0,
+          "target": "a-typed:checkButton"
+        },
+        {
+          "at": 2.4,
+          "target": "a-typed:checkButton",
+          "click": true
+        },
+        {
+          "at": 3.6,
+          "target": "a-feedback:openSolution"
+        },
+        {
+          "at": 4.4,
+          "target": "a-feedback:openSolution",
+          "click": true
+        }
+      ],
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1
+        },
+        {
+          "at": 0.9,
+          "zoom": 1.32,
+          "focus": "a-question:questionPanel"
+        },
+        {
+          "at": 3.0,
+          "zoom": 1.12,
+          "focus": "a-feedback:feedback+openSolution"
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 2.5,
+          "text": "A student answers a question and gets it wrong"
+        },
+        {
+          "from": 2.6,
+          "to": 4.9,
+          "text": "Instead of just the answer, they can open the full solution"
+        }
+      ]
+    },
+    {
+      "id": "reveal",
+      "type": "handwriting",
+      "seconds": 14,
+      "strokes": "A",
+      "plate": "a-plate",
+      "reference": "a-solution",
+      "device": "browser",
+      "replay": {
+        "pauseCompression": 0.4,
+        "endHold": 1.4,
+        "startDelay": 0.5
+      },
+      "camera": {
+        "mode": "follow",
+        "maxZoom": 2.6,
+        "minZoom": 1.5,
+        "settle": 1.2
+      },
+      "highlights": [
+        {
+          "label": "T = 2.26 N",
+          "strokes": [
+            [
+              88,
+              92
+            ],
+            [
+              229,
+              233
+            ]
+          ]
+        },
+        {
+          "label": "r = 0.5 m",
+          "strokes": [
+            [
+              296,
+              303
+            ]
+          ]
+        },
+        {
+          "label": "T = 1.87 s",
+          "strokes": [
+            [
+              363,
+              373
+            ]
+          ]
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 4.5,
+          "text": "Every step, written by hand, by your teacher"
+        },
+        {
+          "from": 4.6,
+          "to": 9.0,
+          "text": "Diagrams, components and colour-coded working"
+        },
+        {
+          "from": 9.1,
+          "to": 13.8,
+          "text": "All the way to the final answer"
+        }
+      ]
+    },
+    {
+      "id": "navigate",
+      "type": "sequence",
+      "seconds": 6,
+      "capture": "a-zoompan",
+      "device": "browser",
+      "callouts": [
+        {
+          "from": 0.5,
+          "to": 3.5,
+          "text": "Pinch to zoom",
+          "anchor": "a-solution-2x:viewer",
+          "side": "left"
+        },
+        {
+          "from": 4.0,
+          "to": 5.9,
+          "text": "Fullscreen",
+          "anchor": "a-solution-2x:fullscreenButton",
+          "side": "left"
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 3.8,
+          "text": "Zoom in and pan around the page"
+        },
+        {
+          "from": 3.9,
+          "to": 5.9,
+          "text": "Or go full screen"
+        }
+      ],
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1
+        },
+        {
+          "at": 0.35,
+          "zoom": 1.3,
+          "focus": "a-solution-2x:viewer"
+        },
+        {
+          "at": 4.6,
+          "zoom": 1
+        }
+      ]
+    },
+    {
+      "id": "variety",
+      "type": "handwriting",
+      "seconds": 7,
+      "strokes": "B",
+      "plate": "b-plate",
+      "reference": "b-solution",
+      "device": "browser",
+      "replay": {
+        "pauseCompression": 0.4,
+        "endHold": 1.2,
+        "startDelay": 0.3
+      },
+      "camera": {
+        "mode": "follow",
+        "maxZoom": 2.4,
+        "minZoom": 1.5,
+        "settle": 1.0
+      },
+      "highlights": [
+        {
+          "label": "M = 6.41×10²³ kg",
+          "strokes": [
+            [
+              118,
+              120
+            ],
+            [
+              123,
+              135
+            ]
+          ]
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 3.4,
+          "text": "Derivations, written out line by line"
+        },
+        {
+          "from": 3.5,
+          "to": 6.8,
+          "text": "Down to the final numerical answer"
+        }
+      ]
+    },
+    {
+      "id": "behind",
+      "type": "screens",
+      "seconds": 5,
+      "device": "tablet",
+      "shots": [
+        {
+          "capture": "admin-canvas",
+          "at": 0
+        }
+      ],
+      "clip": {
+        "capture": "admin-writing",
+        "at": 0.6
+      },
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1
+        },
+        {
+          "at": 0.7,
+          "zoom": 1.2,
+          "focus": "admin-canvas:toolbar+canvas"
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 4.8,
+          "text": "Written by hand, by your teacher"
+        }
+      ],
+      "callouts": [
+        {
+          "from": 0.5,
+          "to": 2.6,
+          "text": "Pen · highlighter · eraser · lasso · colours",
+          "anchor": "admin-canvas:toolbar",
+          "side": "top"
+        }
+      ]
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "seconds": 5,
+      "title": "Try it free on any practice question",
+      "button": "Try a practice question",
+      "note": "Free and Plus include solution views. Pro is unlimited.",
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 4.8,
+          "text": "Try it free on any practice question at ashphys.org"
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "heroLoop": {
+      "scenes": [
+        "reveal",
+        "navigate"
+      ],
+      "width": 1280,
+      "height": 720,
+      "maxBytes": 3000000,
+      "captions": false,
+      "loop": true,
+      "sceneOverrides": {
+        "reveal": {
+          "seconds": 8.5,
+          "replay": {
+            "pauseCompression": 0.4,
+            "endHold": 0.9,
+            "startDelay": 0.3
+          }
+        }
+      }
+    },
+    "vertical": {
+      "width": 1080,
+      "height": 1920,
+      "sceneOverrides": {
+        "problem": {
+          "camera": [
+            {
+              "at": 0,
+              "zoom": 1.55,
+              "focus": "a-question:questionPanel"
+            },
+            {
+              "at": 2.5,
+              "zoom": 1.55,
+              "focus": "a-feedback:feedback"
+            },
+            {
+              "at": 3.5,
+              "zoom": 1.6,
+              "focus": "a-feedback:openSolution"
+            }
+          ]
+        },
+        "reveal": {
+          "plate": "a-plate-tablet",
+          "reference": "a-solution-tablet",
+          "device": "tablet",
+          "camera": {
+            "mode": "follow",
+            "minZoom": 1.7,
+            "maxZoom": 3.0,
+            "settle": 1.2
+          }
+        },
+        "navigate": {
+          "camera": [
+            {
+              "at": 0,
+              "zoom": 1.2
+            },
+            {
+              "at": 0.35,
+              "zoom": 1.75,
+              "focus": "a-solution-2x:viewer"
+            },
+            {
+              "at": 4.6,
+              "zoom": 1.1
+            }
+          ],
+          "callouts": [
+            {
+              "from": 0.5,
+              "to": 3.5,
+              "text": "Pinch to zoom",
+              "anchor": "a-solution-2x:viewer",
+              "side": "bottom"
+            },
+            {
+              "from": 4.0,
+              "to": 5.9,
+              "text": "Fullscreen",
+              "anchor": "a-solution-2x:fullscreenButton",
+              "side": "bottom"
+            }
+          ]
+        },
+        "variety": {
+          "plate": "b-plate-tablet",
+          "reference": "b-solution-tablet",
+          "device": "tablet",
+          "camera": {
+            "mode": "follow",
+            "minZoom": 1.6,
+            "maxZoom": 2.8,
+            "settle": 1.0
+          }
+        },
+        "behind": {
+          "camera": [
+            {
+              "at": 0,
+              "zoom": 1.0
+            },
+            {
+              "at": 0.7,
+              "zoom": 1.5,
+              "focus": "admin-canvas:canvas"
+            }
+          ],
+          "callouts": [
+            {
+              "from": 0.5,
+              "to": 2.6,
+              "text": "Pen · highlighter · eraser · lasso",
+              "anchor": "admin-canvas:toolbar",
+              "side": "top"
+            }
+          ]
+        }
+      }
+    },
+    "poster": {
+      "variant": "heroLoop",
+      "scene": "reveal",
+      "at": 5.3
+    }
+  }
+}

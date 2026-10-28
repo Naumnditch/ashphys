@@ -44,7 +44,7 @@ export function isFreehand(stroke: HwStroke): boolean {
 
 /** Filled outline polygon of a pen/highlighter stroke. */
 export function freehandOutline(stroke: HwStroke, last = true): number[][] {
-  return getStroke(stroke.points, freehandOptions(stroke, last));
+  return getStroke(stroke.points as number[][], freehandOptions(stroke, last));
 }
 
 /** Compact number for path data: at most 2 decimals, no trailing zeros. */
@@ -314,7 +314,7 @@ export function eraseFromStroke(stroke: HwStroke, from: Vec, to: Vec, r: number,
   return pieces;
 }
 
-/** Densify freehand points (interpolating pressure) so the eraser cuts precisely. */
+/** Densify freehand points (interpolating pressure, and time when recorded) so the eraser cuts precisely. */
 function densifyPressure(points: HwPoint[], step: number): HwPoint[] {
   const out: HwPoint[] = [];
   for (let i = 0; i < points.length; i++) {
@@ -325,7 +325,9 @@ function densifyPressure(points: HwPoint[], step: number): HwPoint[] {
     const n = Math.floor(Math.hypot(b[0] - a[0], b[1] - a[1]) / step);
     for (let k = 1; k < n; k++) {
       const t = k / n;
-      out.push([round1(a[0] + (b[0] - a[0]) * t), round1(a[1] + (b[1] - a[1]) * t), round2(a[2] + (b[2] - a[2]) * t)]);
+      const q: HwPoint = [round1(a[0] + (b[0] - a[0]) * t), round1(a[1] + (b[1] - a[1]) * t), round2(a[2] + (b[2] - a[2]) * t)];
+      if (a[3] !== undefined && b[3] !== undefined) q.push(Math.round(a[3] + (b[3] - a[3]) * t));
+      out.push(q);
     }
   }
   return out;
@@ -352,7 +354,10 @@ export function strokeInLasso(stroke: HwStroke, lasso: Vec[]): boolean {
 }
 
 export function translateStroke(stroke: HwStroke, dx: number, dy: number): HwStroke {
-  return { ...stroke, points: stroke.points.map(([x, y, p]) => [round1(x + dx), round1(y + dy), p] as HwPoint) };
+  return {
+    ...stroke,
+    points: stroke.points.map(([x, y, p, t]) => (t === undefined ? [round1(x + dx), round1(y + dy), p] : [round1(x + dx), round1(y + dy), p, t])),
+  };
 }
 
 export const round1 = (n: number) => Math.round(n * 10) / 10;

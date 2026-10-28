@@ -150,6 +150,13 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M18 6 6 18" />
     </>
   ),
+  megaphone: (
+    <>
+      <path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1Z" />
+      <path d="M17 9a4 4 0 0 1 0 6" />
+      <path d="M8 15l1 5" />
+    </>
+  ),
   alert: (
     <>
       <circle cx="12" cy="12" r="9" />

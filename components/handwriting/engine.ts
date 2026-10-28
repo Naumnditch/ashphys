@@ -75,8 +75,9 @@ export interface EngineCallbacks {
 type Vec = [number, number];
 
 type Action =
-  | { kind: 'ink'; pointerId: number; pointerType: string; stroke: HwStroke; startedAt: number; lastScreen: Vec; predicted: HwPoint[] }
-  | { kind: 'shape'; pointerId: number; pointerType: string; from: Vec; to: Vec; startedAt: number }
+  // origin: the first event's timeStamp; each point's t is measured from it (replay pacing).
+  | { kind: 'ink'; pointerId: number; pointerType: string; stroke: HwStroke; startedAt: number; origin: number; lastScreen: Vec; predicted: HwPoint[] }
+  | { kind: 'shape'; pointerId: number; pointerType: string; from: Vec; to: Vec; startedAt: number; t0: number }
   | { kind: 'erase'; pointerId: number; pointerType: string; last: Vec; working: HwStroke[]; changed: boolean; mode: EraserMode; startedAt: number }
   | { kind: 'lasso'; pointerId: number; pointerType: string; points: Vec[]; startedAt: number }
   | { kind: 'move'; pointerId: number; pointerType: string; start: Vec; dx: number; dy: number; startedAt: number }
@@ -452,7 +453,7 @@ export class HandwritingEngine {
       ctx.restore();
     } else if (a?.kind === 'shape') {
       this.applyWorldTransform(ctx);
-      this.drawStroke(ctx, this.shapeStroke(a.from, a.to, 'preview'));
+      this.drawStroke(ctx, this.shapeStroke(a.from, a.to, 'preview', a.t0));
     } else if (a?.kind === 'move') {
       this.applyWorldTransform(ctx);
       for (const s of this.page.strokes) if (this.selection.has(s.id)) this.drawStroke(ctx, s, a.dx, a.dy);
@@ -715,16 +716,17 @@ export class HandwritingEngine {
           width: this.tool.width,
           opacity: this.tool.opacity,
           pressure: e.pointerType === 'pen',
+          t0: Date.now(),
           points: [],
         };
-        const a: Action = { kind: 'ink', ...base, stroke, lastScreen: screen, predicted: [] };
+        const a: Action = { kind: 'ink', ...base, stroke, origin: e.timeStamp, lastScreen: screen, predicted: [] };
         a.stroke.points.push(this.inkPoint(a, e));
         this.action = a;
         this.requestRender(false, true);
         break;
       }
       case 'shape':
-        this.action = { kind: 'shape', ...base, from: w, to: w };
+        this.action = { kind: 'shape', ...base, from: w, to: w, t0: Date.now() };
         break;
       case 'eraser': {
         const a: Action = { kind: 'erase', ...base, last: w, working: this.page.strokes, changed: false, mode: this.tool.eraserMode };
@@ -755,7 +757,7 @@ export class HandwritingEngine {
   private inkPoint(a: Extract<Action, { kind: 'ink' }>, ev: PointerEvent): HwPoint {
     const [x, y] = this.world(this.local(ev));
     const pressure = a.stroke.pressure ? (ev.pressure > 0 ? ev.pressure : 0.5) : 0.5;
-    return [round1(x), round1(y), round2(pressure)];
+    return [round1(x), round1(y), round2(pressure), Math.max(0, Math.round(ev.timeStamp - a.origin))];
   }
 
   private addInkPoint(a: Extract<Action, { kind: 'ink' }>, ev: PointerEvent) {
@@ -789,7 +791,7 @@ export class HandwritingEngine {
     this.requestRender(changed, true);
   }
 
-  private shapeStroke(from: Vec, to: Vec, id: string): HwStroke {
+  private shapeStroke(from: Vec, to: Vec, id: string, t0: number): HwStroke {
     let end = to;
     if (this.shiftDown) end = this.tool.shape === 'line' || this.tool.shape === 'arrow' ? snapAngle(from, to) : squareBox(from, to);
     return {
@@ -800,9 +802,10 @@ export class HandwritingEngine {
       width: this.tool.width,
       opacity: this.tool.opacity,
       pressure: false,
+      t0,
       points: [
-        [round1(from[0]), round1(from[1]), 0.5],
-        [round1(end[0]), round1(end[1]), 0.5],
+        [round1(from[0]), round1(from[1]), 0.5, 0],
+        [round1(end[0]), round1(end[1]), 0.5, Math.max(0, Date.now() - t0)],
       ],
     };
   }
@@ -825,7 +828,7 @@ export class HandwritingEngine {
       }
       case 'shape': {
         const len = Math.hypot(a.to[0] - a.from[0], a.to[1] - a.from[1]) * this.view.scale;
-        if (len >= 3) this.commit([...this.page.strokes, this.shapeStroke(a.from, a.to, newId())]);
+        if (len >= 3) this.commit([...this.page.strokes, this.shapeStroke(a.from, a.to, newId(), a.t0)]);
         break;
       }
       case 'erase':

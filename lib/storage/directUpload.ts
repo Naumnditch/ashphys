@@ -14,13 +14,18 @@
  */
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ErMPHrHNjnj-9MFC3IGUyA_KqZ7owcy';
 
-export async function putFileToSignedUrl(signedUrl: string, file: File): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function putFileToSignedUrl(
+  signedUrl: string,
+  file: File,
+  contentType?: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
   try {
     const res = await fetch(signedUrl, {
       method: 'PUT',
       headers: {
         apikey: SUPABASE_PUBLISHABLE_KEY,
-        'Content-Type': file.type || 'application/pdf',
+        // Browsers often give .vtt files no type; the caller can say what it is.
+        'Content-Type': contentType || file.type || 'application/pdf',
         'x-upsert': 'true',
       },
       body: file,

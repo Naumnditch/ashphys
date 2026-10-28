@@ -42,6 +42,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
       { href: '/admin/past-papers', label: 'Past papers', icon: 'papers' },
       { href: '/admin/booklets', label: 'Booklets', icon: 'booklets' },
       { href: '/admin/courses', label: 'Engineering courses', icon: 'courses' },
+      { href: '/admin/updates', label: "What's New (homepage)", icon: 'megaphone' },
     ],
   },
   {

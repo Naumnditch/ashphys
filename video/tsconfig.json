@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": { "@site/*": ["../*"] },
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "remotion.config.ts", "webpack-override.d.mts"],
+  "exclude": ["node_modules", "out", "public"]
+}

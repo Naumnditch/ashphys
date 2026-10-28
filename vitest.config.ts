@@ -11,5 +11,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['**/__tests__/**/*.test.{ts,tsx}'],
+    // video/ is its own workspace with its own tests (npm --prefix video test).
+    exclude: ['**/node_modules/**', 'video/**'],
   },
 });

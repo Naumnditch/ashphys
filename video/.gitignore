@@ -1,0 +1,5 @@
+node_modules
+# Local-only: demo database export, captured footage, renders.
+.cache
+public/captures
+out

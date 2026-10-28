@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/handwriting/__tests__/handwritingDb.test.ts",
-    "typecheck": "tsc --noEmit"
+    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/handwriting/__tests__/handwritingDb.test.ts lib/siteUpdates/__tests__/siteUpdatesDb.test.ts",
+    "typecheck": "tsc --noEmit",
+    "video:build": "node video/scripts/build.mjs",
+    "video:studio": "npm --prefix video run studio"
   },
   "dependencies": {
     "axios": "^1.7.1",

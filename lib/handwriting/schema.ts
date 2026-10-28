@@ -18,7 +18,11 @@ export const MAX_BODY_BYTES = 4_000_000;
 
 const COORD_LIMIT = 1_000_000;
 const coord = z.number().finite().min(-COORD_LIMIT).max(COORD_LIMIT);
-const point = z.tuple([coord, coord, z.number().finite().min(0).max(1)]);
+const pressure = z.number().finite().min(0).max(1);
+/** ms since the stroke's first point; a stroke longer than an hour is not a real stroke. */
+const elapsed = z.number().finite().min(0).max(3_600_000);
+// [x, y, pressure] (every stroke before 2026-10-28) or [x, y, pressure, t].
+const point = z.union([z.tuple([coord, coord, pressure]), z.tuple([coord, coord, pressure, elapsed])]);
 const id = z.string().regex(/^[A-Za-z0-9_-]{1,40}$/, 'bad id');
 
 const stroke = z
@@ -30,6 +34,7 @@ const stroke = z
     width: z.number().finite().min(0.5).max(120),
     opacity: z.number().finite().min(0.05).max(1),
     pressure: z.boolean(),
+    t0: z.number().finite().min(0).max(1e14).optional(),
     points: z.array(point).min(1).max(MAX_POINTS_PER_STROKE),
   })
   .refine((s) => s.tool !== 'shape' || (s.shape !== undefined && (s.shape === 'polyline' || s.points.length >= 2)), {
@@ -48,6 +53,22 @@ const docSchema = z.object({
 });
 
 export type ParseResult = { ok: true; doc: HandwritingDoc } | { ok: false; error: string };
+
+/**
+ * Rounds a stroke's points. Timestamps are kept only when every point has
+ * one (a stroke is timed as a whole or not at all) and are made
+ * non-decreasing; odd timing never makes a save fail, it is just dropped.
+ */
+function normalizePoints(points: number[][]): HwPoint[] {
+  const timed = points.every((q) => q.length === 4);
+  let last = 0;
+  return points.map((q) => {
+    const base: HwPoint = [round1(q[0]), round1(q[1]), round2(q[2])];
+    if (!timed) return base;
+    last = Math.max(last, Math.round(q[3]));
+    return [base[0], base[1], base[2], last];
+  });
+}
 
 export function parseHandwritingDoc(input: unknown): ParseResult {
   const parsed = docSchema.safeParse(input);
@@ -72,7 +93,8 @@ export function parseHandwritingDoc(input: unknown): ParseResult {
         width: round2(s.width),
         opacity: round2(s.opacity),
         pressure: s.pressure,
-        points: s.points.map(([x, y, pr]) => [round1(x), round1(y), round2(pr)] as HwPoint),
+        ...(s.t0 !== undefined ? { t0: Math.round(s.t0) } : {}),
+        points: normalizePoints(s.points),
       })),
     })),
   };

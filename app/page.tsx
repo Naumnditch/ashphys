@@ -10,6 +10,8 @@ import { AnnouncementTicker } from '@/components/announcements/AnnouncementTicke
 import { getVisibleUpdates } from '@/lib/announcements/format';
 import { UPDATES } from '@/lib/announcements/updates';
 import { VideoRequestCta, type RequestViewer } from '@/components/home/VideoRequestCta';
+import { WhatsNew } from '@/components/home/WhatsNew';
+import { getLiveSiteUpdates } from '@/lib/siteUpdates/queries';
 import { getCurrentUser } from '@/lib/auth/session';
 import { getUserTier, TIER_PLUS } from '@/lib/subscriptions/getUserTier';
 
@@ -137,7 +139,12 @@ async function getRequestViewer(): Promise<RequestViewer> {
 }
 
 export default async function HomePage() {
-  const [stats, plans, requestViewer] = await Promise.all([getStats(), getPlans(), getRequestViewer()]);
+  const [stats, plans, requestViewer, siteUpdates] = await Promise.all([
+    getStats(),
+    getPlans(),
+    getRequestViewer(),
+    getLiveSiteUpdates(),
+  ]);
   const now = Date.now();
   const updates = getVisibleUpdates(UPDATES, now);
 
@@ -220,10 +227,19 @@ export default async function HomePage() {
               <HeroCtas />
             </div>
 
+            {/* "What's New": the latest announcement video (site_updates, managed at
+                /admin/updates). Below the headline and film, so it never moves them
+                or competes for the first paint; nothing renders without an update. */}
+            {siteUpdates.length > 0 && (
+              <div id="whats-new" className="order-4 lg:col-span-12 w-full scroll-mt-24">
+                <WhatsNew updates={siteUpdates} />
+              </div>
+            )}
+
             {/* Video walkthrough requests: one full-width row under both columns. */}
             <div
               id="request-video"
-              className="order-4 lg:col-span-12 lg:max-w-3xl lg:mx-auto w-full scroll-mt-24 animate-fade-in-up"
+              className="order-5 lg:col-span-12 lg:max-w-3xl lg:mx-auto w-full scroll-mt-24 animate-fade-in-up"
               style={{ animationDelay: '280ms' }}
             >
               <VideoRequestCta viewer={requestViewer} />

@@ -14,8 +14,13 @@ export type HwTool = 'pen' | 'highlighter' | 'shape';
 export type HwShape = 'line' | 'arrow' | 'rect' | 'ellipse' | 'polyline';
 export type HwBackground = 'blank' | 'grid' | 'lined';
 
-/** [x, y, pressure 0–1]. Strokes drawn without a pen record 0.5. */
-export type HwPoint = [number, number, number];
+/**
+ * [x, y, pressure 0–1, t?]. Strokes drawn without a pen record 0.5.
+ * `t` (ms since the stroke's first point) is recorded for strokes drawn since
+ * 2026-10-28 so they can be replayed at the writer's pace; older strokes have
+ * three numbers and stay valid. Nothing that draws a stroke reads `t`.
+ */
+export type HwPoint = [x: number, y: number, pressure: number, t?: number];
 
 export interface HwStroke {
   id: string;
@@ -30,6 +35,8 @@ export interface HwStroke {
   opacity: number;
   /** True when the points carry real pen pressure; otherwise it is simulated from speed. */
   pressure: boolean;
+  /** When the stroke was started, ms since the Unix epoch (strokes drawn since 2026-10-28). */
+  t0?: number;
   points: HwPoint[];
 }
 
