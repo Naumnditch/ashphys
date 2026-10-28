@@ -20,7 +20,7 @@ import { getCurrentUser, type CurrentUser } from '@/lib/auth/session';
 import { fail, UUID_RE } from '@/lib/messaging/http';
 import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { getViewStatus, hasUnlocked, resolveSolutionAccess } from '@/lib/solutions/access';
-import { findQuestion, readHandwritingAs, type QuestionRef } from '@/lib/handwriting/store';
+import { findQuestion, isHandwritingSchemaMissing, readHandwritingAs, type QuestionRef } from '@/lib/handwriting/store';
 import type { HandwritingViewDTO } from '@/lib/handwriting/dto';
 
 export const dynamic = 'force-dynamic';
@@ -79,6 +79,8 @@ export async function GET(_req: NextRequest, ctx: Params) {
       preview: canOpen ? null : row.preview,
     });
   } catch (err) {
+    // Before the migration there is simply no handwriting to show.
+    if (isHandwritingSchemaMissing(err)) return respond({ available: false });
     console.error('[handwriting] status failed', err);
     return fail('Could not load the worked solution.', 500);
   }
@@ -107,6 +109,8 @@ export async function POST(_req: NextRequest, ctx: Params) {
       ...(access.allowed ? { pages: row.snapshots ?? [] } : { preview: row.preview }),
     });
   } catch (err) {
+    // Before the migration there is simply no handwriting to show.
+    if (isHandwritingSchemaMissing(err)) return respond({ available: false });
     console.error('[handwriting] open failed', err);
     return fail('Could not open the worked solution.', 500);
   }

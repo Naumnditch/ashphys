@@ -209,3 +209,14 @@ describe('snapshots', () => {
     expect(renderPreview(emptyDoc())).toBeNull();
   });
 });
+
+describe('missing migration', () => {
+  it('recognises the errors a database without migration "question_handwriting" raises', async () => {
+    const { isHandwritingSchemaMissing } = await import('@/lib/handwriting/store');
+    expect(isHandwritingSchemaMissing({ code: '22023', message: 'role "ashphys_user" does not exist' })).toBe(true);
+    expect(isHandwritingSchemaMissing({ code: '42P01', message: 'relation "question_handwriting" does not exist' })).toBe(true);
+    expect(isHandwritingSchemaMissing({ code: '42883', message: 'function app_answered_incorrectly(uuid) does not exist' })).toBe(true);
+    expect(isHandwritingSchemaMissing({ code: '22023', message: 'something else' })).toBe(false);
+    expect(isHandwritingSchemaMissing(new Error('connection refused'))).toBe(false);
+  });
+});

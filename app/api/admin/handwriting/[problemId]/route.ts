@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fail, requireAdmin, UUID_RE } from '@/lib/messaging/http';
 import { MAX_BODY_BYTES, parseHandwritingDoc } from '@/lib/handwriting/schema';
-import { findQuestion, getHandwritingForAdmin, saveHandwriting } from '@/lib/handwriting/store';
+import { findQuestion, getHandwritingForAdmin, isHandwritingSchemaMissing, saveHandwriting, SCHEMA_MISSING_MESSAGE } from '@/lib/handwriting/store';
 import type { AdminHandwritingDTO, SaveHandwritingDTO } from '@/lib/handwriting/dto';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +30,7 @@ export async function GET(_req: NextRequest, { params }: { params: { problemId: 
       : { doc: null, version: 0, updatedAt: null };
     return NextResponse.json({ success: true, ...body });
   } catch (err) {
+    if (isHandwritingSchemaMissing(err)) return fail(SCHEMA_MISSING_MESSAGE, 503);
     console.error('[handwriting] admin load failed', err);
     return fail('Could not load the handwriting.', 500);
   }
@@ -69,6 +70,7 @@ export async function PUT(req: NextRequest, { params }: { params: { problemId: s
     const out: SaveHandwritingDTO = { version: result.version, updatedAt: result.updatedAt, strokeCount: result.strokeCount };
     return NextResponse.json({ success: true, ...out });
   } catch (err) {
+    if (isHandwritingSchemaMissing(err)) return fail(SCHEMA_MISSING_MESSAGE, 503);
     console.error('[handwriting] admin save failed', err);
     return fail('Could not save the handwriting.', 500);
   }

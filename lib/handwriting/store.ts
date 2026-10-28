@@ -38,6 +38,24 @@ export interface StoredHandwriting {
   updatedAt: string;
 }
 
+/**
+ * True when the database hasn't had migration "question_handwriting" yet
+ * (no ashphys_user role, table or function). Routes then degrade instead of
+ * failing: students see no solution, admins get a setup message.
+ */
+export function isHandwritingSchemaMissing(err: unknown): boolean {
+  const e = err as { code?: string; message?: string };
+  return (
+    e?.code === '42P01' || // undefined table
+    e?.code === '42883' || // undefined function
+    e?.code === '42704' || // undefined object (role)
+    (e?.code === '22023' && /role "ashphys_user" does not exist/.test(e.message ?? ''))
+  );
+}
+
+export const SCHEMA_MISSING_MESSAGE =
+  'Handwritten solutions are not set up on this database yet (migration "question_handwriting" has not been applied).';
+
 const iso = (v: unknown) => (v instanceof Date ? v.toISOString() : String(v));
 
 export async function getHandwritingForAdmin(admin: { id: string }, q: QuestionRef): Promise<StoredHandwriting | null> {
