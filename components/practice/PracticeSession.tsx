@@ -13,6 +13,8 @@ import { SolutionViewer } from '@/components/solutions/SolutionViewer';
 import { PracticeTopBar, type LessonInfo } from '@/components/practice/PracticeShell';
 import { HandwrittenSolution, type SolutionState } from '@/components/handwriting/HandwrittenSolution';
 import { Popover } from '@/components/handwriting/controls';
+import { SoundToggle } from '@/components/SoundToggle';
+import { animateReveal, celebrateCorrect, celebrateMilestone, primeFeedback, shakeIncorrect } from '@/lib/feedback';
 
 // The heaviest piece of the page, loaded only when a canvas is shown: the
 // admin's (writing the teacher solution) or a student's own workspace.
@@ -162,6 +164,11 @@ export function PracticeSession({
   const [solutionState, setSolutionState] = useState<SolutionState | null>(null);
   const [menu, setMenu] = useState<{ id: 'map' | 'downloads'; anchor: HTMLElement } | null>(null);
   const questionScroll = useRef<HTMLDivElement>(null);
+  // Answer feedback (lib/feedback): where confetti starts, what shakes, and
+  // whether the answer just checked finished the set (bigger celebration).
+  const feedbackBox = useRef<HTMLDivElement>(null);
+  const answerArea = useRef<HTMLDivElement>(null);
+  const milestone = useRef(false);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -251,6 +258,8 @@ export function PracticeSession({
 
   const handleCheck = async () => {
     if (!current || !selected.trim()) return;
+    // Still inside the click/Enter: unlock audio now, the result arrives after an await.
+    primeFeedback();
     setChecking(true);
     try {
       const res = await fetch(`/api/practice/${topicId}/submit`, {
@@ -267,6 +276,12 @@ export function PracticeSession({
         setChecking(false);
         return;
       }
+      // Purely for the celebration: this correct answer completed the set or mastered the lesson.
+      const answered = (s: QuestionStatus | undefined) => s === 'correct' || s === 'wrong';
+      milestone.current =
+        !!data.data.isCorrect &&
+        ((!queue.every((q) => answered(statuses[q.id])) && queue.every((q) => q.id === current.id || answered(statuses[q.id]))) ||
+          (!mastery?.mastered && !!data.data.mastery?.mastered));
       setResult({
         isCorrect: data.data.isCorrect,
         correctAnswerLabel: data.data.correctAnswerLabel,
@@ -284,6 +299,23 @@ export function PracticeSession({
       setChecking(false);
     }
   };
+
+  // Celebrate or shake once per checked answer, after the feedback box has rendered.
+  // Fire-and-forget: none of it delays the Next button.
+  useEffect(() => {
+    if (!result) return;
+    if (result.isCorrect) {
+      (milestone.current ? celebrateMilestone : celebrateCorrect)(feedbackBox.current);
+    } else {
+      shakeIncorrect(answerArea.current?.querySelector('[data-selected], input'));
+    }
+    milestone.current = false;
+  }, [result]);
+
+  // The optional interactive solution expands rather than appearing all at once.
+  const revealOnMount = useCallback((el: HTMLDivElement | null) => {
+    if (el) animateReveal(el);
+  }, []);
 
   const statusList = queue.map((q) => statuses[q.id] ?? 'untried');
 
@@ -430,7 +462,9 @@ export function PracticeSession({
       <div className="hidden shrink-0 items-center gap-2 md:flex" title={`${mastery.correctStreak}/${streakNeeded} in a row to master · ${mastery.totalCorrect}/${mastery.totalAttempted} correct overall`}>
         <div className="flex items-center gap-1" aria-hidden="true">
           {Array.from({ length: streakNeeded }).map((_, i) => (
-            <div key={i} className={`h-1.5 w-4 rounded-full ${i < mastery.correctStreak ? 'bg-green-500' : 'bg-gray-200'}`} />
+            <div key={i} className="h-1.5 w-4 overflow-hidden rounded-full bg-gray-200">
+              <div className={`fb-progress-fill h-full w-full rounded-full bg-green-500 ${i < mastery.correctStreak ? 'scale-x-100' : 'scale-x-0'}`} />
+            </div>
           ))}
         </div>
         <span className="text-xs tabular-nums text-gray-500">
@@ -438,6 +472,8 @@ export function PracticeSession({
           <span className="hidden xl:inline"> · {summary.correct + summary.wrong} of {summary.total} answered</span>
         </span>
       </div>
+
+      <SoundToggle />
 
       {downloadsMenu}
 
@@ -480,7 +516,7 @@ export function PracticeSession({
         {topBar}
         <div className="flex flex-1 items-center justify-center overflow-y-auto p-6">
           <div className="text-center">
-            <div className="w-16 h-16 rounded-full bg-green-50 mx-auto mb-6 flex items-center justify-center text-3xl">
+            <div className="fb-pop w-16 h-16 rounded-full bg-green-50 mx-auto mb-6 flex items-center justify-center text-3xl">
               🏆
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Topic Mastered!</h2>
@@ -491,7 +527,7 @@ export function PracticeSession({
             <div className="flex items-center justify-center gap-3">
               <Link
                 href={`/curriculum/${topic.chapterId}${curriculumId ? `?c=${curriculumId}` : ''}`}
-                className="bg-gray-900 hover:bg-black text-on-ink px-5 py-2.5 rounded-lg font-semibold text-sm"
+                className="fb-lift bg-gray-900 hover:bg-black text-on-ink px-5 py-2.5 rounded-lg font-semibold text-sm"
               >
                 Back to Chapter
               </Link>
@@ -500,7 +536,7 @@ export function PracticeSession({
                   setMastery({ ...mastery, mastered: false, correctStreak: 0 });
                   goTo(nextQuestionIndex(statusList, queue.length - 1));
                 }}
-                className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-lg font-semibold text-sm"
+                className="fb-press border border-gray-300 hover:bg-gray-50 text-gray-700 px-5 py-2.5 rounded-lg font-semibold text-sm"
               >
                 Keep Practicing
               </button>
@@ -571,18 +607,25 @@ export function PracticeSession({
             )}
             <p className="mb-5 text-base leading-relaxed text-gray-900">{current.questionText}</p>
 
+            <div ref={answerArea}>
             {current.answerType === 'multiple_choice' && (
               <div className="space-y-2">
                 {current.options.map((opt) => {
                   const isSelected = selected === opt.id;
                   const showCorrect = result && opt.text === result.correctAnswerLabel;
                   const showWrong = result && isSelected && !result.isCorrect;
+                  const mark = showCorrect ? '✓' : showWrong ? '✕' : isSelected && !result ? '✓' : null;
                   return (
                     <button
                       key={opt.id}
                       disabled={!!result}
-                      onClick={() => setSelected(opt.id)}
-                      className={`w-full rounded-lg border px-3.5 py-2.5 text-left text-[15px] transition-colors ${
+                      data-selected={isSelected || undefined}
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        primeFeedback();
+                        setSelected(opt.id);
+                      }}
+                      className={`relative w-full rounded-lg border py-2.5 pl-3.5 pr-10 text-left text-[15px] transition-colors duration-200 ease-out ${
                         showCorrect
                           ? 'border-green-400 bg-green-50 text-green-900'
                           : showWrong
@@ -594,6 +637,17 @@ export function PracticeSession({
                     >
                       <span className="mr-2 font-semibold">{opt.letter}.</span>
                       {opt.text}
+                      {mark && (
+                        <span
+                          key={mark + (result ? 'r' : '')}
+                          aria-hidden="true"
+                          className={`fb-pop absolute right-3 top-1/2 -mt-2.5 flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold text-white ${
+                            showCorrect ? 'bg-green-600' : showWrong ? 'bg-red-500' : 'bg-blue-600'
+                          }`}
+                        >
+                          {mark}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -618,7 +672,9 @@ export function PracticeSession({
                   onChange={(e) => setSelected(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !result && void handleCheck()}
                   placeholder="Your answer"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-[15px] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                  className={`w-full rounded-lg border px-4 py-2.5 text-[15px] transition-colors duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                    answeredWrong ? 'border-red-400' : 'border-gray-300'
+                  }`}
                 />
                 <p className="mt-2 text-xs text-gray-500">{FORMAT_HINT}</p>
                 {answerPreview && (
@@ -637,17 +693,21 @@ export function PracticeSession({
                 onChange={(e) => setSelected(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !result && void handleCheck()}
                 placeholder="Your answer"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-[15px] focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50"
+                className={`w-full rounded-lg border px-4 py-2.5 text-[15px] transition-colors duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 ${
+                  answeredWrong ? 'border-red-400' : 'border-gray-300'
+                }`}
               />
             )}
+            </div>
 
             {/* Feedback */}
             {result && (
               <div
+                ref={feedbackBox}
                 role="status"
-                className={`mt-4 rounded-xl border p-4 ${result.isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
+                className={`fb-fade-in mt-4 rounded-xl border p-4 ${result.isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}
               >
-                <p className={`mb-1.5 font-semibold ${result.isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                <p className={`mb-1.5 font-semibold ${result.isCorrect ? 'fb-pop-in text-green-800' : 'text-red-800'}`}>
                   {result.isCorrect ? '✓ Correct!' : `✕ Not quite — the answer was ${result.correctAnswerLabel}`}
                 </p>
                 {result.feedback && !result.isCorrect && (
@@ -708,7 +768,7 @@ export function PracticeSession({
                   ✨ {solutionOpenFor === current.id ? 'Hide interactive solution' : 'Interactive solution (optional)'}
                 </button>
                 {solutionOpenFor === current.id && (
-                  <div className="mt-3">
+                  <div ref={revealOnMount} className="mt-3">
                     <SolutionViewer key={current.solutionId} id={current.solutionId} embedded />
                   </div>
                 )}
@@ -723,14 +783,14 @@ export function PracticeSession({
                 <button
                   onClick={handleSkip}
                   disabled={checking}
-                  className="shrink-0 rounded-lg border border-gray-300 px-5 py-2.5 text-[15px] font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+                  className="fb-press shrink-0 rounded-lg border border-gray-300 px-5 py-2.5 text-[15px] font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
                 >
                   Skip for now
                 </button>
                 <button
                   onClick={handleCheck}
                   disabled={!selected.trim() || checking}
-                  className="flex-1 rounded-lg bg-gray-900 py-2.5 text-[15px] font-semibold text-on-ink hover:bg-black disabled:opacity-40"
+                  className="fb-lift flex-1 rounded-lg bg-gray-900 py-2.5 text-[15px] font-semibold text-on-ink hover:bg-black disabled:opacity-40"
                 >
                   {checking ? 'Checking…' : 'Check Answer'}
                 </button>
@@ -738,7 +798,7 @@ export function PracticeSession({
             ) : (
               <button
                 onClick={handleNext}
-                className="w-full rounded-lg bg-gray-900 py-2.5 text-[15px] font-semibold text-on-ink hover:bg-black"
+                className="fb-lift w-full rounded-lg bg-gray-900 py-2.5 text-[15px] font-semibold text-on-ink hover:bg-black"
               >
                 Next Question →
               </button>

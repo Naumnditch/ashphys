@@ -411,12 +411,12 @@ function VideoModal({ update, reducedMotion, onClose }: { update: SiteUpdate; re
   return (
     <Portal>
       <div
-        className="theme-light fixed inset-0 z-[100] flex items-center justify-center bg-scrim/80 p-3 sm:p-6"
+        className="theme-light fb-backdrop-in fixed inset-0 z-[100] flex items-center justify-center bg-scrim/80 p-3 sm:p-6"
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
-        <div ref={panel} role="dialog" aria-modal="true" aria-labelledby="whats-new-modal-title" className="w-full max-w-5xl">
+        <div ref={panel} role="dialog" aria-modal="true" aria-labelledby="whats-new-modal-title" className="fb-dialog-in w-full max-w-5xl">
           <div className="mb-3 flex items-center justify-between gap-4">
             <h2 id="whats-new-modal-title" className="text-base sm:text-lg font-semibold text-white">
               {update.title}
@@ -467,7 +467,7 @@ function UpdatesDrawer({ updates, onClose, onWatch }: { updates: SiteUpdate[]; o
   return (
     <Portal>
       <div
-        className="fixed inset-0 z-[90] flex justify-end bg-scrim/40"
+        className="fb-backdrop-in fixed inset-0 z-[90] flex justify-end bg-scrim/40"
         onMouseDown={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}

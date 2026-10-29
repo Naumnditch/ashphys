@@ -117,7 +117,7 @@ export function Mailbox({
 
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(null), toast.tone === 'warn' ? 15000 : 6000);
+    const t = setTimeout(() => setToast(null), toastLife(toast));
     return () => clearTimeout(t);
   }, [toast]);
 
@@ -247,23 +247,36 @@ export function Mailbox({
         onDraftsChanged={loadDrafts}
       />
 
-      {toast && <SendToast notice={toast} onClose={() => setToast(null)} />}
+      {/* Keyed by the notice object so a new send restarts the slide-in and fade timing. */}
+      {toast && <SendToast key={toastKey(toast)} notice={toast} onClose={() => setToast(null)} />}
     </div>
   );
 }
 
-/** The result of a send: a dark pill for success, an amber card when an email didn't go out. */
+const toastLife = (notice: SendNotice) => (notice.tone === 'warn' ? 15000 : 6000);
+const toastKeys = new WeakMap<SendNotice, number>();
+let nextToastKey = 0;
+function toastKey(notice: SendNotice): number {
+  if (!toastKeys.has(notice)) toastKeys.set(notice, ++nextToastKey);
+  return toastKeys.get(notice)!;
+}
+
+/**
+ * The result of a send: a dark pill for success, an amber card when an email didn't go out.
+ * Slides in at the top right and fades out just before Mailbox removes it.
+ */
 export function SendToast({ notice, onClose }: { notice: SendNotice; onClose: () => void }) {
+  const life = { '--fb-toast-life': `${toastLife(notice) - 300}ms` } as React.CSSProperties;
   if (notice.tone === 'ok') {
     return (
-      <div role="status" className="fixed bottom-4 left-1/2 z-[60] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-center text-sm font-medium text-on-ink shadow-lg animate-fade-in-up">
+      <div role="status" style={life} className="fb-toast fixed right-4 top-4 z-[60] max-w-[calc(100vw-2rem)] rounded-full bg-gray-900 px-4 py-2 text-center text-sm font-medium text-on-ink shadow-lg">
         {notice.title}
         {notice.detail && <span className="font-normal text-gray-300"> · {notice.detail}</span>}
       </div>
     );
   }
   return (
-    <div role="alert" className="fixed bottom-4 left-1/2 z-[60] w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 rounded-xl border border-amber-300 bg-amber-50 p-3 pr-10 text-sm shadow-lg animate-fade-in-up">
+    <div role="alert" style={life} className="fb-toast fixed right-4 top-4 z-[60] w-[min(34rem,calc(100vw-2rem))] rounded-xl border border-amber-300 bg-amber-50 p-3 pr-10 text-sm shadow-lg">
       <p className="flex items-center gap-2 font-semibold text-amber-900">
         <MailIcon name="alert" className="h-4 w-4 shrink-0" />
         {notice.title}

@@ -28,7 +28,7 @@ body {
 }
 
 .btn {
-  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium transition-colors;
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium;
 }
 
 .btn-primary {
@@ -149,4 +149,119 @@ body {
     --viz-1: #3987e5;
     --viz-2: #d95926;
   }
+}
+
+/* ------------------------------------------------------------------------
+   Interaction feedback (lib/feedback). Transform/opacity only; every
+   transform below is switched off under prefers-reduced-motion at the end,
+   leaving instant state changes or plain fades.
+   ------------------------------------------------------------------------ */
+
+/* Buttons: a gentle press everywhere; primary calls to action also lift on hover. */
+.btn,
+.fb-press,
+.fb-lift {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn:active:not(:disabled),
+.fb-press:active:not(:disabled),
+.fb-lift:active:not(:disabled) {
+  transform: scale(0.97);
+}
+/* hover: hover keeps a tap on a phone from leaving the button "lifted". */
+@media (hover: hover) {
+  .btn-primary:hover,
+  .fb-lift:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px -6px rgb(0 0 0 / 0.35);
+  }
+  .btn-primary:active,
+  .fb-lift:active:not(:disabled) {
+    transform: scale(0.97);
+    box-shadow: none;
+  }
+}
+
+@keyframes fbFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fbFadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+@keyframes fbPop {
+  0% { opacity: 0; transform: scale(0.4); }
+  60% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes fbPopIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes fbRise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fbDialogIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes fbToastIn {
+  from { opacity: 0; transform: translate(16px, -4px); }
+  to { opacity: 1; transform: translate(0, 0); }
+}
+
+/* Check-mark / trophy pop. */
+.fb-pop { animation: fbPop 260ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+/* The "Correct" badge: a small scale-and-fade. */
+.fb-pop-in { animation: fbPopIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: left center; }
+.fb-fade-in { animation: fbFade 200ms ease-out both; }
+
+/* Main content on each navigation (app/template.tsx). `backwards`, not `both`:
+   a transform left on the wrapper would trap position:fixed descendants. */
+.fb-page-enter { animation: fbRise 200ms ease-out backwards; }
+.fb-page-enter-fade { animation: fbFade 200ms ease-out backwards; }
+
+/* Modals: backdrop fades, dialog scales 0.96 → 1. */
+.fb-backdrop-in { animation: fbFade 200ms ease-out both; }
+.fb-dialog-in { animation: fbDialogIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Toasts: slide in from the top right, fade away after --fb-toast-life. */
+.fb-toast {
+  animation:
+    fbToastIn 240ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    fbFadeOut 300ms ease-in var(--fb-toast-life, 5700ms) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .fb-press,
+  .fb-lift,
+  .btn:active,
+  .fb-press:active,
+  .fb-lift:active,
+  .btn-primary:hover,
+  .fb-lift:hover {
+    transform: none !important;
+  }
+  .fb-pop,
+  .fb-pop-in,
+  .fb-page-enter,
+  .fb-dialog-in {
+    animation-name: fbFade;
+  }
+  .fb-toast {
+    animation-name: fbFade, fbFadeOut;
+  }
+  .fb-progress-fill {
+    transition: none !important;
+  }
+}
+
+/* Progress bars: a fill that grows with transform rather than width. */
+.fb-progress-fill {
+  transform-origin: left center;
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1), background-color 300ms ease;
 }

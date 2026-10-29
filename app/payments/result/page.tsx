@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { query } from '@/lib/db/client';
+import { CelebrateOnMount } from '@/components/feedback/CelebrateOnMount';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,13 +23,16 @@ export default async function PaymentResultPage({
   const order = await getOrder(searchParams.orderId);
   const status = searchParams.status;
   const success = status === 'success';
+  // Only a real plan purchase celebrates (not a test charge or an add-on booking).
+  const upgraded = success && !!order && !order.is_test && !order.addon_name;
 
   return (
     <div className="min-h-screen bg-h-faf7f0 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white border border-h-e4ddcc rounded-xl p-8 text-center">
+        {upgraded && <CelebrateOnMount onceKey={`order:${order.platform_order_id}`} />}
         <div
           className={`w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ${
-            success ? 'bg-h-e6f2ee text-h-2e7d6b' : 'bg-h-fbeae7 text-h-b34a3c'
+            success ? 'fb-pop bg-h-e6f2ee text-h-2e7d6b' : 'bg-h-fbeae7 text-h-b34a3c'
           }`}
         >
           {success ? '✓' : '✕'}
@@ -53,7 +57,7 @@ export default async function PaymentResultPage({
             {order.shopier_payment_id && <div>Shopier ID: {order.shopier_payment_id}</div>}
           </div>
         )}
-        <Link href="/" className="inline-block text-[13.5px] font-semibold text-on-ink bg-h-1b2a41 px-5 py-2.5 rounded-lg">
+        <Link href="/" className="fb-lift inline-block text-[13.5px] font-semibold text-on-ink bg-h-1b2a41 px-5 py-2.5 rounded-lg">
           Back to AshPhys
         </Link>
       </div>

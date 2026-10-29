@@ -44,9 +44,9 @@ export function SoftPaywallModal({ eligible }: { eligible: boolean }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-scrim/40" onClick={dismiss}>
+    <div className="fb-backdrop-in fixed inset-0 z-[100] flex items-center justify-center px-4 bg-scrim/40" onClick={dismiss}>
       <div
-        className="relative bg-white rounded-2xl max-w-sm w-full p-7 text-center shadow-xl"
+        className="fb-dialog-in relative bg-white rounded-2xl max-w-sm w-full p-7 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -64,7 +64,7 @@ export function SoftPaywallModal({ eligible }: { eligible: boolean }) {
         <Link
           href="/pricing"
           onClick={seePlans}
-          className="block text-center text-sm font-semibold px-5 py-2.5 rounded-lg bg-gray-900 hover:bg-black text-on-ink mb-2"
+          className="fb-lift block text-center text-sm font-semibold px-5 py-2.5 rounded-lg bg-gray-900 hover:bg-black text-on-ink mb-2"
         >
           See plans
         </Link>

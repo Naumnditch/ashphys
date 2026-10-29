@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -136,6 +136,75 @@ invisible to Bob, admin queue side by side + consent record + badge, approve + v
 "Student solution by Alice A." beside "Teacher solution" with the badge and steps, tabs at
 820px, dashboard list + withdraw, gone after withdrawal; no page scroll at 1440×900 and 390×844;
 no console errors).
+
+### Answer feedback: confetti, sounds and motion (NEW 2026-10-28)
+
+**What it does.** Practice page (`/practice/[topicId]`): a correct answer fires three
+confetti bursts (from the feedback box and from the left and right edges, brand blues /
+indigo / chart orange / green / amber, ~1.7 s) and a two-note rising chime; the "✓ Correct!"
+line scales and fades in. A wrong answer shakes the chosen option (or the typed answer) for
+300 ms with one red ring pulse and plays a soft falling tone (peak gain 0.12 vs 0.2 for the
+chime); never confetti. A correct answer that **completes the set** (no question left untried
+or skipped) or **newly masters the lesson** gets the milestone instead: three waves of
+confetti (~3.5 s) and a C-major arpeggio fanfare (0.8 s). The 🏆 on the "Topic Mastered!"
+screen pops in. Options fade between states and show a ✓ / ✕ that pops in; the streak pills
+fill with a transform; the progress-map bar transitions its widths; the optional interactive
+solution expands (height + opacity, 280 ms ease-out). None of it touches answer checking,
+scoring, tier gating or any API call; everything is fire-and-forget, the confetti canvas is
+`pointer-events: none`, so Next works mid-burst.
+
+Elsewhere: `.btn` (site-wide) and the new `.fb-press` / `.fb-lift` classes press to 0.97 on
+`:active`, primary CTAs lift 1 px on hover (hover-capable devices only); modals (soft paywall,
+mailbox `Modal`, What's New video modal + drawer backdrop) fade the backdrop and scale the
+dialog 0.96 → 1; the mailbox send toast now slides in at the **top right** and fades out
+300 ms before it is removed; `app/template.tsx` fades and rises the main content (200 ms) on
+every navigation (fade only on `/practice/…`, whose fixed shell a transform would re-anchor;
+`animation-fill-mode: backwards` so no transform stays on the wrapper). `/payments/result` for
+a real plan purchase (not a test charge or add-on) shows one gold sparkle burst, once per
+order per tab (`sessionStorage`), with the fanfare only if the page already had a user
+interaction (a fresh redirect from Shopier has none, so in practice it is silent).
+
+**Sounds are synthesized** (Web Audio, `lib/feedback/sounds.ts`), not files: no request,
+nothing to preload or license, instant start. correct = E5 659 Hz → A5 880 Hz sine (+ a quiet
+octave), 0.26 s; incorrect = E4 330 Hz → A3 220 Hz triangle through a 1.1 kHz low-pass,
+0.34 s; fanfare = C5 E5 G5 C6, 0.8 s. The AudioContext is only created inside a click /
+tap / Enter (`primeFeedback()` runs synchronously in the option click and Check handler,
+before the submit `await`), with iOS's silent-buffer unlock; a cue that cannot start within
+150 ms is dropped, never played late.
+
+**Mute**: speaker button (`components/SoundToggle.tsx`) in the practice top bar, on by
+default, saved in `localStorage['ashphys:sound-muted'] = '1'`, synced across toggles by the
+`ashphys:sound-muted` window event. Not in the site navbar (crowded on phones; the only
+sounds are on the practice page and the rarely-audible payment result).
+
+**Switches for testing**: `localStorage.setItem('ashphys:sound-muted','1')` = no sound;
+`localStorage.setItem('ashphys:confetti','off')` = no confetti; emulating
+`prefers-reduced-motion: reduce` (DevTools → Rendering) = no confetti and no transform
+animation anywhere (shake, pop, lift, press, page rise, dialog scale become fades or nothing),
+sounds still play unless muted.
+
+**Code.** `lib/feedback/index.ts` (public API: `celebrateCorrect`, `celebrateMilestone`,
+`celebrateUpgrade`, `shakeIncorrect`, `animateReveal`, `playSound`, `primeFeedback`,
+`setSoundMuted`, `isSoundMuted`, `prefersReducedMotion`), `lib/feedback/sounds.ts`
+(lazy), keyframes and classes at the end of `app/globals.css` (`fb-*`),
+`components/SoundToggle.tsx`, `components/feedback/CelebrateOnMount.tsx`, `app/template.tsx`.
+New dependency **canvas-confetti 1.9.4** (ISC) + `@types/canvas-confetti`; dynamic import,
+one shared full-screen canvas drawn in a worker. Bundle: `/practice/[topicId]` 48.4 → 50.8 kB;
+confetti is its own 4.3 kB gz chunk and the sound recipes 0.7 kB gz, both fetched on first use.
+
+**Checks (2026-10-28).** `lib/feedback/__tests__/feedback.test.ts` (10: cue lengths and
+loudness budgets, mute persistence + event, nothing plays before a gesture or while muted,
+shake/reveal fall back under reduced motion, no throw without Web Audio / WAAPI, no confetti
+when off). Full suite 2113 passed, 1 failed (the pre-existing live-DNS messaging test); `tsc`
+and `next build` clean; ESLint clean on every changed file except a pre-existing
+`react/no-unescaped-entities` in the paywall copy. Playwright against `next dev` with a
+temporary harness page (mocked practice API, not committed): correct → 3 bursts + 659/880 Hz,
+Next clickable ~0.4 s later mid-confetti; wrong → shake + pulse + 330/220 Hz, no confetti;
+last question → fanfare + 8 bursts; mute saves, survives reload, silences; reduced motion →
+no canvas, badge only fades, no shake, buttons untransformed, sound still plays; 390×844 touch
+→ chime after taps, no horizontal overflow; route transition leaves no transform; no console
+errors anywhere. Not checked: real iOS/Android audio (Chromium only), the payment result
+celebration (needs a Shopier order row), the paywall and mailbox toast in a live session.
 
 ### Hero "What's New" announcement videos + video pipeline (NEW 2026-10-28)
 
@@ -2459,6 +2528,11 @@ Judgement calls that shape later work. Newest first.
   controls along its whole bottom edge on every layout (it covered "Share my solution");
   the wrong-answer "🎥 Request a video" link now shows on every layout instead.
 
+- **2026-10-28 — Feedback sounds are synthesized, not audio files.** The brief allowed either;
+  Web Audio costs no request or preload, starts instantly and needs no licence. Milestone =
+  a correct answer that completes the set or newly masters the lesson (never on a wrong one).
+  The tick sound on option select and a toast "pop" (both optional) were left out: in a
+  classroom they would be noise.
 - **2026-10-28 — What's New lives in `site_updates`, separate from `lib/announcements/updates.ts`.**
   The hand-kept feed (pill, homepage feed, /updates) is untouched; the new table only drives the
   video card in the hero. Extra columns beyond the brief: `loop_mp4_url`/`loop_webm_url` (the
