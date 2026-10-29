@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/handwriting/__tests__/handwritingDb.test.ts lib/siteUpdates/__tests__/siteUpdatesDb.test.ts",
+    "test:db": "vitest run --no-file-parallelism lib/dashboard/__tests__/dashboardDb.test.ts lib/videoRequests/__tests__/studentDb.test.ts lib/handwriting/__tests__/handwritingDb.test.ts lib/siteUpdates/__tests__/siteUpdatesDb.test.ts lib/sharedSolutions/__tests__/sharedSolutionsDb.test.ts",
     "typecheck": "tsc --noEmit",
     "video:build": "node video/scripts/build.mjs",
     "video:studio": "npm --prefix video run studio"

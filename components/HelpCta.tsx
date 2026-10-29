@@ -13,6 +13,10 @@ const HIDDEN_PREFIXES = [
   '/tutoring',
   // The dashboard has both services as tabs.
   '/dashboard',
+  // The practice page fills the screen and its controls reach the bottom edge
+  // on every layout (answer bar; the student's workspace and share bar); its
+  // wrong-answer feedback links to video requests instead.
+  '/practice',
   '/book',
   '/success',
   '/unsubscribe',
@@ -52,13 +56,8 @@ export function HelpCta({ hasVideoAccess }: { hasVideoAccess: boolean }) {
 
   if (hidden) return null;
 
-  // The practice page fills the screen: on its stacked (narrow) layout the pill
-  // would cover the answer bar, so it only floats there when side by side. The
-  // wrong-answer feedback links to video requests instead.
-  const practice = pathname.startsWith('/practice/');
-
   return (
-    <div ref={rootRef} className={`fixed bottom-4 right-4 z-40 print:hidden ${practice ? 'hidden split:block' : ''}`}>
+    <div ref={rootRef} className="fixed bottom-4 right-4 z-40 print:hidden">
       {open && (
         <div
           id="help-cta-panel"

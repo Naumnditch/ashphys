@@ -1,13 +1,14 @@
 'use client';
 
 /**
- * The teacher's handwritten worked solution for one question, read-only.
- * Rendered by the practice page after a wrong answer (and for admins in
- * "Student view"). The server decides everything: it answers only after a
- * wrong answer, and applies the same tier gate as interactive solutions —
- * Free and Plus spend one of their solution views to open a new one (shown
- * before it is spent), Pro is unlimited; out of views shows a teaser and
- * the upgrade card.
+ * The worked solutions for one question, read-only: the teacher's
+ * handwritten solution and, when students have shared approved ones, those
+ * beside it (SolutionsBoard). Rendered by the practice page after a wrong
+ * answer (and for admins in "Student view"). The server decides everything:
+ * it answers only after a wrong answer, and applies the same tier gate as
+ * interactive solutions — Free and Plus spend one of their solution views to
+ * open a question's solutions (shown before it is spent), Pro is unlimited;
+ * out of views shows a teaser and the upgrade card.
  */
 
 import dynamic from 'next/dynamic';
@@ -15,11 +16,17 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { HandwritingViewDTO } from '@/lib/handwriting/dto';
 import type { HwSnapshot } from '@/lib/handwriting/types';
+import type { StudentSolutionDTO } from '@/lib/sharedSolutions/types';
 import { HandwritingTeaser } from './HandwritingTeaser';
 
 const HandwritingViewer = dynamic(() => import('./HandwritingViewer').then((m) => m.HandwritingViewer), {
   ssr: false,
   loading: () => <Centered>Loading the worked solution…</Centered>,
+});
+
+const SolutionsBoard = dynamic(() => import('./SolutionsBoard'), {
+  ssr: false,
+  loading: () => <Centered>Loading the worked solutions…</Centered>,
 });
 
 export type SolutionState = 'loading' | 'none' | 'offer' | 'open' | 'locked' | 'error';
@@ -29,7 +36,7 @@ type State =
   | { kind: 'none' }
   | { kind: 'error'; message: string }
   | { kind: 'offer'; data: HandwritingViewDTO; opening: boolean }
-  | { kind: 'open'; pages: HwSnapshot[] }
+  | { kind: 'open'; pages: HwSnapshot[]; students: StudentSolutionDTO[] }
   | { kind: 'locked'; data: HandwritingViewDTO };
 
 async function call(url: string, method: 'GET' | 'POST'): Promise<{ status: number; body: (HandwritingViewDTO & { success?: boolean; error?: string; reason?: string }) | null }> {
@@ -41,11 +48,14 @@ export function HandwrittenSolution({
   topicId,
   problemId,
   label,
+  questionLabel,
   onState,
 }: {
   topicId: string;
   problemId: string;
   label: string;
+  /** "question 3": names the panes when student solutions sit beside the teacher's. */
+  questionLabel?: string;
   onState?: (s: SolutionState) => void;
 }) {
   const [state, setState] = useState<State>({ kind: 'loading' });
@@ -59,7 +69,7 @@ export function HandwrittenSolution({
     if (!body || (!body.success && status !== 403)) return { kind: 'error', message: body?.error || 'Could not load the worked solution.' };
     // 403 "answer first" (or a locked lesson): nothing to show here.
     if (status === 403 || !body.available || !body.access) return { kind: 'none' };
-    if (body.access.allowed && body.pages) return { kind: 'open', pages: body.pages };
+    if (body.access.allowed && body.pages) return { kind: 'open', pages: body.pages, students: body.studentSolutions ?? [] };
     if (body.access.reason === 'limit_reached' || body.access.reason === 'tier_required') return { kind: 'locked', data: body };
     return { kind: 'offer', data: body, opening: false };
   };
@@ -115,15 +125,28 @@ export function HandwrittenSolution({
         </Centered>
       );
     case 'open':
-      return <HandwritingViewer pages={state.pages} label={label} />;
+      return state.students.length > 0 ? (
+        <SolutionsBoard teacherPages={state.pages} students={state.students} label={questionLabel ?? label} />
+      ) : (
+        <HandwritingViewer pages={state.pages} label={label} />
+      );
     case 'offer': {
       const a = state.data.access!;
       const left = a.viewLimit === null ? null : Math.max(0, a.viewLimit - a.viewsUsed);
+      const teacher = (state.data.pageCount ?? 0) > 0;
+      const students = state.data.studentSolutionCount ?? 0;
+      const studentText = `${students} student solution${students === 1 ? '' : 's'}`;
       return (
         <Centered>
           <div className="max-w-sm text-center">
             <div className="mb-3 text-3xl" aria-hidden="true">✍️</div>
-            <p className="mb-1 font-semibold text-gray-900">Your teacher wrote out the solution to this one.</p>
+            <p className="mb-1 font-semibold text-gray-900">
+              {students === 0
+                ? 'Your teacher wrote out the solution to this one.'
+                : teacher
+                  ? `Your teacher’s worked solution and ${studentText} are ready.`
+                  : `${studentText} to this question, checked by your teacher.`}
+            </p>
             {left !== null && (
               <p className="mb-4 text-sm text-gray-600">
                 Opening it uses 1 of your {left} remaining solution view{left === 1 ? '' : 's'}. Solutions you have opened stay open.
@@ -135,7 +158,7 @@ export function HandwrittenSolution({
               disabled={state.opening}
               className="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-on-ink hover:bg-black disabled:opacity-50"
             >
-              {state.opening ? 'Opening…' : 'Show the worked solution'}
+              {state.opening ? 'Opening…' : students > 0 ? 'Show the solutions' : 'Show the worked solution'}
             </button>
           </div>
         </Centered>

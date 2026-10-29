@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-28, latest (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; **migration `shared_solutions` is NOT yet applied to production**). Previously 2026-10-28, latest (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,116 @@ Last updated: 2026-10-28, latest (homepage "What's New" announcement videos: `si
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### Student workspace & "Share my solution" (NEW 2026-10-29)
+
+**What it is.** On every practice question a student now has their own private
+workspace in the right-hand panel ("✎ My working"): the same handwriting canvas
+the teacher uses, plus a "📝 Typed steps" box, both autosaved. Under it,
+**Share my solution** (enabled only once strokes or steps are saved) opens a form:
+display name (default first name + last initial, editable), "I worked out this
+solution myself.", the licence line "I allow AshPhys to publish this solution,
+with my display name, on the platform and use it in future materials.", the age
+question the first time, and for under-18s a parent/guardian checkbox that is
+required. Submitting copies the saved working into a `pending` submission.
+An admin reviews it at **/admin/shared-solutions** (sidebar → Requests → Student
+solutions, with a pending badge; also an overview card) next to the question,
+its answer/explanation and the teacher's handwritten solution: approve, reject
+with an optional reason the student sees, and "Verified against mark scheme".
+Approved solutions appear in the question's worked-solution panel as "Teacher
+solution" | "Student solution by <name>" side by side (≥1280px; tabs below that),
+verified ones first with a badge. Students see their submissions and status in
+the workspace and in a new dashboard tab **My Shared Solutions** (`?tab=solutions`),
+and can withdraw a pending or approved one at any time (final; gone from every
+public view at once).
+
+**Migration** `database/seeds/2026-10-29-shared-solutions.sql` — **NOT applied to
+production yet.** Paste it into the Supabase SQL editor (idempotent; standalone:
+it repeats the role/helper functions of the handwriting migration). Apply it
+BEFORE this branch reaches `main`: until then students' "My working" panel says
+"Your workspace isn't available yet" (teacher solutions, admin pages and the
+sidebar badge keep working; the admin queue shows a setup message). Preview
+deployments share the production database, so they show the same until then.
+- `users.age_band` (`under_18` | `18_plus`, NULL = never asked) + `age_band_declared_at`.
+- `student_workspaces` (`user_id`, `question_id` UNIQUE together, `doc` jsonb in the
+  question_handwriting format, `steps_text` ≤ 5000, `stroke_count`, `version` = canvas
+  version (0 = only steps saved; saving steps never bumps it), timestamps).
+- `shared_solutions` (`id, question_id, user_id, display_name, strokes, snapshots,
+  stroke_count, steps_text, status shared_solution_status (pending/approved/rejected/
+  withdrawn), verified, verified_by/at, consent_version, consent_text, consented_at,
+  parent_consent_at, reviewed_by/at, rejection_reason, withdrawn_at, created_at`).
+  Index on (`question_id`, `status`) as asked, plus (`user_id`, `created_at`), a
+  partial index for the pending queue, and a partial UNIQUE (`user_id`,
+  `question_id`) WHERE status IN (pending, approved): one live submission per
+  question. Extra columns beyond the brief: `snapshots`/`stroke_count` (server SVG,
+  as for teacher solutions), `consent_text` (the exact wording), `verified_by/at`,
+  `withdrawn_at`.
+
+**Who may do what** (row-level security as `ashphys_user`, same scheme as the
+handwriting migration; the API checks the same things first):
+- `student_workspaces`: owner only, every command. Admins and teachers can't read a
+  private workspace either — they see what a student chose to share.
+- `shared_solutions` SELECT: the author (any status), admins, and anyone else only
+  for `approved` rows of a question they answered incorrectly
+  (`app_answered_incorrectly`, the teacher solution's rule).
+- INSERT: `app_is_student()`, as themselves, `pending` with no review fields, and
+  `parent_consent_at IS NOT NULL OR app_declared_adult()` (unknown age = under 18).
+- UPDATE: the author may only set `withdrawn` (pending/approved rows); admins may
+  only review non-withdrawn rows. Column grants: the app role can UPDATE only
+  `status`, `verified`, `rejection_reason`, so the submitted content is immutable.
+  BEFORE UPDATE trigger `shared_solutions_guard` (app role only; owner/FK cascades
+  pass): withdrawn is final, withdrawing changes nothing else, never back to
+  pending, stamps `reviewed_by/at`, `verified_by/at`, `withdrawn_at`, clears the
+  reason unless rejected. DELETE: no policy (withdrawn rows stay as the consent
+  record; deleting the user deletes them).
+
+**Visibility & tiers.** Approved student solutions travel with the teacher's
+solution through the existing gate, unchanged: lesson `required_tier`, only after
+a wrong answer, and the same Free 2 / Plus 5 / Pro unlimited solution-view budget —
+opening a question's worked solutions spends ONE view and shows the teacher's and
+the students' together (target `{ problemId }`). A question with approved student
+solutions but no teacher solution now opens too ("Your teacher hasn't written out a
+solution to this question yet" in the teacher pane).
+
+**API** (`lib/practice/questionGate.ts` = sign-in + question-in-lesson + lesson tier, shared with the handwriting route):
+- `GET/PUT/PATCH /api/practice/[topicId]/workspace/[problemId]` — load; save canvas `{ doc, baseVersion, force? }` (409 stale, 413); save steps `{ stepsText }`.
+- `GET/POST /api/practice/[topicId]/workspace/[problemId]/share` — form defaults + own submissions for the question; share (400 `age_required` / `parent_consent_required` / `empty`, 403 non-students, 409 `already_shared` / `consent_changed`).
+- `GET /api/shared-solutions` (own, all questions) · `PATCH /api/shared-solutions/[id]` `{ action: 'withdraw' }`.
+- `GET /api/admin/shared-solutions?status=pending|approved|rejected|withdrawn|all` · `PATCH /api/admin/shared-solutions/[id]` `{ action: approve | reject (reason?) | verify | unverify }`.
+- `GET/POST /api/practice/[topicId]/handwriting/[problemId]` now also return `studentSolutionCount` and (when allowed) `studentSolutions` (`id, displayName, verified, approvedAt, pages, stepsText` — no author id or consent data).
+
+**Files.** `database/seeds/2026-10-29-shared-solutions.sql`; `lib/sharedSolutions/`
+(consent, validate, types, store), `lib/workspace/store.ts`, `lib/practice/questionGate.ts`;
+`components/workspace/` (StudentWorkspace, ShareSolutionDialog, SharedStatus),
+`components/handwriting/SolutionsBoard.tsx`, `components/admin/SharedSolutionReview.tsx`,
+`components/dashboard/SharedSolutionsTab.tsx`, `app/admin/shared-solutions/page.tsx`, the
+routes above; edited `HandwritingEditor` + `useHandwritingDoc` (endpoint is a prop now:
+admin solution or student workspace), `HandwrittenSolution`, `PracticeSession` (student
+panel: "My working" ⇄ "Worked solution" after a wrong answer; `?q=<problemId>` opens a
+question), practice `page.tsx`, `HelpCta` (hidden on practice pages — see Decisions),
+`lib/admin/overview.ts`, `AdminSidebar`/`AdminIcons`/admin overview, dashboard tabs.
+The editor chunk (~17 KB gzip) now also loads for students, lazily, when "My working"
+is shown; `/practice/[topicId]` first load 145 → 146 kB.
+
+**Tests & checks (2026-10-29).** `lib/sharedSolutions/__tests__/sharedSolutionsDb.test.ts`
+(17, `npm run test:db`): submit → pending → withdraw; snapshot not live link; one live per
+question, empty workspace, stale consent, bad names, teachers refused; pending/rejected
+invisible to other students (API and raw SQL); review queue with question + teacher
+solution; reject with reason → student sees it → shares again; approved appears with the
+display name beside the teacher solution, verified flag, no author id in the payload;
+students can't approve/verify/edit/forge/delete directly (42501); under-18 refused without
+parental consent (API, and raw INSERT for under-18 and never-asked), age can't be flipped;
+withdrawn disappears and can't be re-approved; student solutions without a teacher solution;
+tier gate; 401s; deleting a reviewer keeps the review. A mutation check (insert policy without
+the parent clause) makes the under-18 test fail. Unit (12) + component (15: share dialog,
+workspace share button/withdraw, side-by-side board). Full suite 2203 passed, 1 failed (the
+pre-existing live-DNS test); `tsc`, `next build`, ESLint (`next/core-web-vitals`, ad hoc) clean.
+Playwright against `next start` + a local replica of the live schema: 27/27 checks (admin
+canvas, student canvas + steps autosave, share disabled until saved, under-18 dialog, pending,
+invisible to Bob, admin queue side by side + consent record + badge, approve + verify, Bob sees
+"Student solution by Alice A." beside "Teacher solution" with the badge and steps, tabs at
+820px, dashboard list + withdraw, gone after withdrawal; no page scroll at 1440×900 and 390×844;
+no console errors).
 
 ### Hero "What's New" announcement videos + video pipeline (NEW 2026-10-28)
 
@@ -2325,6 +2435,27 @@ Unfinished / follow-ups:
 ## Decisions
 
 Judgement calls that shape later work. Newest first.
+
+- **2026-10-29 — Approved student solutions use the teacher solution's gate, not a new one.**
+  "Respect the existing tier gating if it applies" — it does: same lesson tier, same
+  "after a wrong answer" rule, same view budget; one view opens a question's teacher and
+  student solutions together. (Not "visible to all logged-in students".)
+- **2026-10-29 — Age is a self-declared band, asked once.** `users.age_band` (no date of
+  birth stored). Unknown = under 18 (parental consent required). The first answer is kept;
+  students can't change it (an admin can, in SQL), so they can't flip it to skip the parent
+  box. A student who turns 18 keeps ticking the parent box until an admin updates it.
+- **2026-10-29 — Parental consent is a checkbox the student ticks**, recorded as
+  `parent_consent_at` with the exact wording in `consent_text`. Nothing contacts or
+  verifies the parent.
+- **2026-10-29 — Only students share** (`role = 'student'`); teachers get the workspace
+  without the share button; admins write the teacher solution instead.
+- **2026-10-29 — Withdrawn rows are kept** (status + `withdrawn_at`, content and consent
+  record intact, shown to nobody but the author and admins). Withdrawn is final; the student
+  can share a new copy. Rejected rows can be re-approved by an admin; approved can be
+  "unpublished" by rejecting.
+- **2026-10-29 — "Need help?" pill hidden on practice pages.** The right panel now has
+  controls along its whole bottom edge on every layout (it covered "Share my solution");
+  the wrong-answer "🎥 Request a video" link now shows on every layout instead.
 
 - **2026-10-28 — What's New lives in `site_updates`, separate from `lib/announcements/updates.ts`.**
   The hand-kept feed (pill, homepage feed, /updates) is untouched; the new table only drives the

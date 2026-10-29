@@ -14,10 +14,16 @@ import { PracticeTopBar, type LessonInfo } from '@/components/practice/PracticeS
 import { HandwrittenSolution, type SolutionState } from '@/components/handwriting/HandwrittenSolution';
 import { Popover } from '@/components/handwriting/controls';
 
-// Admin-only, and the heaviest piece of the page: students never download it.
+// The heaviest piece of the page, loaded only when a canvas is shown: the
+// admin's (writing the teacher solution) or a student's own workspace.
 const HandwritingEditor = dynamic(() => import('@/components/handwriting/HandwritingEditor'), {
   ssr: false,
   loading: () => <p className="flex h-full items-center justify-center text-sm text-gray-400">Loading the canvas…</p>,
+});
+// Students: their own canvas, typed steps and "Share my solution".
+const StudentWorkspace = dynamic(() => import('@/components/workspace/StudentWorkspace'), {
+  ssr: false,
+  loading: () => <p className="flex h-full items-center justify-center text-sm text-gray-400">Loading your workspace…</p>,
 });
 
 interface Option {
@@ -105,6 +111,8 @@ function writeSkipped(topicId: string, statuses: Record<string, QuestionStatus>)
 
 const ADMIN_MODE_KEY = 'ashphys:practice-admin-mode';
 type AdminMode = 'write' | 'preview';
+/** A student's panel: their own working, or (after a wrong answer) the worked solutions. */
+type StudentMode = 'work' | 'solution';
 
 export function PracticeSession({
   topicId,
@@ -112,12 +120,15 @@ export function PracticeSession({
   lesson,
   downloads = null,
   isAdmin = false,
+  initialProblemId = null,
 }: {
   topicId: string;
   curriculumId?: string;
   lesson: LessonInfo;
   downloads?: PracticeDownloads | null;
   isAdmin?: boolean;
+  /** Open on this question (?q= — e.g. from the dashboard's shared solutions). */
+  initialProblemId?: string | null;
 }) {
   // Each curriculum has its own question bank for a lesson, so skips are
   // remembered per bank. IGCSE keeps the key it had before curricula existed.
@@ -145,6 +156,7 @@ export function PracticeSession({
   // Layout state: the solution panel (collapsible when stacked on narrow
   // screens), the question map and downloads menus, and the admin's mode.
   const [adminMode, setAdminMode] = useState<AdminMode>('write');
+  const [studentMode, setStudentMode] = useState<StudentMode>('work');
   const [panelOpen, setPanelOpen] = useState(isAdmin);
   // What the student's solution panel ended up showing ('none' = no handwriting for this question).
   const [solutionState, setSolutionState] = useState<SolutionState | null>(null);
@@ -198,12 +210,14 @@ export function PracticeSession({
       setQueue(questions);
       setStatuses(initial);
       // Start where "next" would: the first untried question, then skipped, then wrong.
-      setIndex(nextQuestionIndex(questions.map((q) => initial[q.id]), questions.length - 1));
+      const linked = initialProblemId ? questions.findIndex((q) => q.id === initialProblemId) : -1;
+      setIndex(linked >= 0 ? linked : nextQuestionIndex(questions.map((q) => initial[q.id]), questions.length - 1));
       setLoading(false);
     } catch {
       setError('Something went wrong. Please try again.');
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the link only picks the first question
   }, [topicId, bankQuery, skipKey]);
 
   useEffect(() => {
@@ -279,6 +293,7 @@ export function PracticeSession({
     setSolutionOpenFor(null);
     setMenu(null);
     if (!isAdmin) setPanelOpen(false);
+    setStudentMode('work');
     setSolutionState(null);
     setIndex(i);
   };
@@ -304,12 +319,20 @@ export function PracticeSession({
     goTo(nextQuestionIndex(queue.map((q) => updated[q.id] ?? 'untried'), index));
   };
 
-  // A wrong answer is the only thing that can reveal the handwritten solution
-  // (the server checks it too). Open the panel when stacked on a small screen.
+  // A wrong answer is the only thing that can reveal the worked solutions
+  // (the server checks it too): switch the student's panel to them, and open
+  // the panel when stacked on a small screen.
   const answeredWrong = !!result && !result.isCorrect;
   useEffect(() => {
-    if (answeredWrong) setPanelOpen(true);
+    if (!answeredWrong) return;
+    setStudentMode('solution');
+    setPanelOpen(true);
   }, [answeredWrong]);
+
+  const showStudentPanel = (mode: StudentMode) => {
+    setStudentMode(mode);
+    setPanelOpen(true);
+  };
 
   const toggleMenu = (id: 'map' | 'downloads') => (e: React.MouseEvent<HTMLElement>) => {
     const anchor = e.currentTarget;
@@ -489,9 +512,14 @@ export function PracticeSession({
   }
 
   const questionLabel = `question ${current.number}`;
-  const panelTitle = isAdmin ? (adminMode === 'write' ? 'Admin: write solution' : 'Student view') : 'Worked solution';
-  // Students on a stacked (narrow) layout only get the panel once there is something to show.
-  const studentPanelHidden = !isAdmin && (!answeredWrong || solutionState === 'none');
+  const studentShowsSolution = !isAdmin && answeredWrong && studentMode === 'solution';
+  const panelTitle = isAdmin
+    ? adminMode === 'write'
+      ? 'Admin: write solution'
+      : 'Student view'
+    : studentShowsSolution
+      ? 'Worked solution'
+      : 'My working';
 
   return (
     <>
@@ -648,7 +676,7 @@ export function PracticeSession({
                       {solutionState !== 'none' && (
                         <button
                           type="button"
-                          onClick={() => setPanelOpen(true)}
+                          onClick={() => showStudentPanel('solution')}
                           className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 split:hidden"
                         >
                           ✍️ Worked solution
@@ -657,7 +685,7 @@ export function PracticeSession({
                       {!isAdmin && (
                         <Link
                           href="/dashboard?tab=videos"
-                          className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 split:hidden"
+                          className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50"
                         >
                           🎥 Request a video
                         </Link>
@@ -718,20 +746,42 @@ export function PracticeSession({
           </div>
         </section>
 
-        {/* Right: the admin's canvas, or the student's read-only solution. */}
+        {/* Right: the admin's canvas, or the student's own workspace / read-only worked solutions. */}
         <section
           aria-label={panelTitle}
           className={`flex min-h-0 flex-col border-t border-gray-200 split:border-l split:border-t-0 ${
-            studentPanelHidden ? 'hidden split:flex' : panelOpen ? 'shrink-0 basis-[60%] split:basis-auto' : 'shrink-0'
+            panelOpen ? 'shrink-0 basis-[60%] split:basis-auto' : 'shrink-0'
           }`}
         >
           <div className="flex h-10 shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3">
-            <span
-              className={`text-xs font-semibold ${isAdmin ? 'rounded-md bg-violet-50 px-2 py-0.5 text-violet-700' : 'text-gray-700'}`}
-            >
-              {isAdmin ? (adminMode === 'write' ? '✎ ' : '👁 ') : '✍️ '}
-              {panelTitle}
-            </span>
+            {!isAdmin && answeredWrong ? (
+              <div className="flex shrink-0 rounded-lg border border-gray-200 p-0.5" role="radiogroup" aria-label="Show in this panel">
+                {(
+                  [
+                    ['work', '✎ My working'],
+                    ['solution', '✍️ Worked solution'],
+                  ] as [StudentMode, string][]
+                ).map(([mode, text]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="radio"
+                    aria-checked={studentMode === mode}
+                    onClick={() => showStudentPanel(mode)}
+                    className={`rounded-md px-2 py-0.5 text-xs font-semibold ${studentMode === mode ? 'bg-gray-900 text-on-ink' : 'text-gray-700 hover:bg-gray-100'}`}
+                  >
+                    {text}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span
+                className={`text-xs font-semibold ${isAdmin ? 'rounded-md bg-violet-50 px-2 py-0.5 text-violet-700' : 'text-gray-700'}`}
+              >
+                {isAdmin ? (adminMode === 'write' ? '✎ ' : '👁 ') : '✎ '}
+                {panelTitle}
+              </span>
+            )}
             <span className="truncate text-xs text-gray-400">· Q{current.number}</span>
             <button
               type="button"
@@ -745,25 +795,17 @@ export function PracticeSession({
           <div className={`relative min-h-0 flex-1 ${panelOpen ? '' : 'hidden'} split:block`}>
             {isAdmin && adminMode === 'write' ? (
               <HandwritingEditor key={current.id} problemId={current.id} label={questionLabel} />
-            ) : isAdmin || answeredWrong ? (
+            ) : isAdmin || studentShowsSolution ? (
               <HandwrittenSolution
                 key={current.id}
                 topicId={topicId}
                 problemId={current.id}
                 label={`Worked solution to ${questionLabel}`}
+                questionLabel={questionLabel}
                 onState={setSolutionState}
               />
             ) : (
-              <div className="flex h-full items-center justify-center p-8 text-center">
-                <div className="max-w-xs">
-                  <div className="mb-3 text-3xl" aria-hidden="true">✍️</div>
-                  <p className="text-sm text-gray-500">
-                    {result?.isCorrect
-                      ? 'Nice work. On to the next one.'
-                      : 'Check your answer. If it’s wrong, your teacher’s worked solution opens here when there is one.'}
-                  </p>
-                </div>
-              </div>
+              <StudentWorkspace key={current.id} topicId={topicId} problemId={current.id} label={questionLabel} />
             )}
           </div>
         </section>

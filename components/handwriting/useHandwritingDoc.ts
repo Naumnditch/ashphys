@@ -9,6 +9,12 @@
  * the editor asks which version to keep. Only one save is in flight at a
  * time; edits made meanwhile are saved right after. Failed saves retry with
  * backoff, and leaving the question (unmount) flushes a pending save.
+ *
+ * `endpoint` answers GET → { doc, version, updatedAt } and PUT { doc,
+ * baseVersion, force } → { version, updatedAt }: the admin's handwritten
+ * solution (/api/admin/handwriting/…) or a student's own workspace
+ * (/api/practice/…/workspace/…). `onLoaded` gets the whole GET response, for
+ * callers that keep more than the canvas in the same record.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -30,7 +36,7 @@ function freshDoc(): HandwritingDoc {
   return emptyDoc(newId());
 }
 
-export function useHandwritingDoc(problemId: string) {
+export function useHandwritingDoc(endpoint: string, onLoaded?: (data: Record<string, unknown>) => void) {
   const [doc, setDocState] = useState<HandwritingDoc>(freshDoc);
   const [save, setSave] = useState<SaveState>({ status: 'loading' });
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -47,6 +53,8 @@ export function useHandwritingDoc(problemId: string) {
   const retryDelay = useRef(2000);
   const alive = useRef(true);
   const loaded = useRef(false);
+  const onLoadedRef = useRef(onLoaded);
+  onLoadedRef.current = onLoaded;
 
   const set = (next: HandwritingDoc) => {
     docRef.current = next;
@@ -70,7 +78,7 @@ export function useHandwritingDoc(problemId: string) {
       inFlight.current = true;
       status({ status: 'saving' });
       try {
-        const res = await fetch(`/api/admin/handwriting/${problemId}`, {
+        const res = await fetch(endpoint, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ doc: sent, baseVersion: versionRef.current, force }),
@@ -109,7 +117,7 @@ export function useHandwritingDoc(problemId: string) {
         }
       }
     },
-    [problemId]
+    [endpoint]
   );
 
   const markDirty = useCallback(() => {
@@ -154,7 +162,7 @@ export function useHandwritingDoc(problemId: string) {
     status({ status: 'loading' });
     setLoadError(null);
     try {
-      const res = await fetch(`/api/admin/handwriting/${problemId}`, { cache: 'no-store' });
+      const res = await fetch(endpoint, { cache: 'no-store' });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.success) throw new Error(data?.error || `Could not load (HTTP ${res.status})`);
       versionRef.current = data.version;
@@ -164,11 +172,12 @@ export function useHandwritingDoc(problemId: string) {
       loaded.current = true;
       set(data.doc ?? freshDoc());
       syncHistory();
+      onLoadedRef.current?.(data);
       status({ status: 'saved', savedAt: data.updatedAt });
     } catch (err) {
       if (alive.current) setLoadError(err instanceof Error ? err.message : 'Could not load the handwriting.');
     }
-  }, [problemId]);
+  }, [endpoint]);
 
   /** Conflict: keep this tab's version (overwrite) or take the other one. */
   const resolveConflict = useCallback(

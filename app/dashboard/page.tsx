@@ -21,6 +21,7 @@ import { formatPercent, isNewStudent } from '@/lib/dashboard/format';
 import { getStudentReport } from '@/lib/reports/data';
 import type { StudentReport } from '@/lib/reports/types';
 import { StudentReportView } from '@/components/report/StudentReportView';
+import { SharedSolutionsTab } from '@/components/dashboard/SharedSolutionsTab';
 
 export const dynamic = 'force-dynamic';
 
@@ -150,6 +151,11 @@ export default async function DashboardPage({
           />
         ),
         tutoring: <TutoringPanel userId={user.id} embedded />,
+        solutions: isStudentUser ? (
+          <SharedSolutionsTab />
+        ) : (
+          <p className="text-sm text-gray-600">Sharing worked solutions is for student accounts.</p>
+        ),
       }}
     />
   );

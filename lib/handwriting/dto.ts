@@ -1,6 +1,7 @@
 /** Shapes of the handwriting API responses (client-safe). */
 
 import type { AccessReason } from '@/lib/solutions/types';
+import type { StudentSolutionDTO } from '@/lib/sharedSolutions/types';
 import type { HandwritingDoc, HwSnapshot } from './types';
 
 export interface HandwritingAccessDTO {
@@ -16,13 +17,20 @@ export interface HandwritingAccessDTO {
 
 /**
  * GET (status) and POST (open) on /api/practice/[topicId]/handwriting/[problemId].
- * `pages` only when access.allowed; `preview` only when the viewer is out of views.
+ * The question's worked solutions: the teacher's handwriting and any approved
+ * student solutions, behind one gate (opening them spends one view, not one each).
+ * `pages` / `studentSolutions` only when access.allowed; `preview` (the
+ * teacher's teaser) only when the viewer is out of views.
  */
 export interface HandwritingViewDTO {
   available: boolean;
+  /** Pages of the teacher's solution; 0 when there is none yet (only student solutions). */
   pageCount?: number;
+  /** How many approved student solutions there are (no content until access is allowed). */
+  studentSolutionCount?: number;
   access?: HandwritingAccessDTO;
   pages?: HwSnapshot[];
+  studentSolutions?: StudentSolutionDTO[];
   preview?: HwSnapshot | null;
 }
 

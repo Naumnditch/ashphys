@@ -49,6 +49,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     title: 'Requests',
     items: [
       { href: '/admin/video-requests', label: 'Video requests', icon: 'video', pending: 'videoRequests' },
+      { href: '/admin/shared-solutions', label: 'Student solutions', icon: 'shared', pending: 'sharedSolutions' },
       { href: '/admin/tutoring-bookings', label: 'Tutoring bookings', icon: 'tutoring', pending: 'tutoringToSchedule' },
       { href: '/admin/payment-requests', label: 'Payment receipts', icon: 'receipts', pending: 'paymentReceipts' },
     ],

@@ -9,8 +9,8 @@ import {
 } from '@/lib/dashboard/tabs';
 
 describe('dashboard tab routing', () => {
-  it('has the six tabs in the specified order', () => {
-    expect(DASHBOARD_TABS).toEqual(['messages', 'report', 'curriculum', 'classes', 'videos', 'tutoring']);
+  it('has the seven tabs in the specified order', () => {
+    expect(DASHBOARD_TABS).toEqual(['messages', 'report', 'curriculum', 'classes', 'videos', 'tutoring', 'solutions']);
     expect(DASHBOARD_TAB_INFO.map((t) => t.title)).toEqual([
       'Messages',
       'My Progress Report',
@@ -18,6 +18,7 @@ describe('dashboard tab routing', () => {
       'Join a Class',
       'Video Solve Requests',
       '1-on-1 Tutoring',
+      'My Shared Solutions',
     ]);
   });
 

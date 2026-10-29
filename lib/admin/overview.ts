@@ -3,6 +3,7 @@
  */
 
 import { query } from '@/lib/db/client';
+import { countPendingSharedSolutions } from '@/lib/sharedSolutions/store';
 
 export const OVERVIEW_DAYS = 30;
 
@@ -12,6 +13,7 @@ export interface PendingCounts {
   videoRequests: number;
   tutoringToSchedule: number;
   unreadMessages: number;
+  sharedSolutions: number;
 }
 
 export interface DailyPoint {
@@ -35,14 +37,15 @@ export interface OverviewData {
 
 /** Things waiting on an admin; drives the sidebar badges and the overview's attention row. */
 export async function getPendingCounts(): Promise<PendingCounts> {
-  const res = await query(`
+  // Separate query: it answers 0 (not an error) before the shared_solutions migration.
+  const [res, sharedSolutions] = await Promise.all([query(`
     SELECT
       (SELECT COUNT(*) FROM users WHERE role = 'teacher' AND status = 'inactive') AS teacher_applications,
       (SELECT COUNT(*) FROM payment_requests WHERE status = 'pending') AS payment_receipts,
       (SELECT COUNT(*) FROM video_requests WHERE status = 'open') AS video_requests,
       (SELECT COUNT(*) FROM addon_purchases WHERE status = 'paid') AS tutoring_to_schedule,
       (SELECT COUNT(*) FROM messages WHERE direction = 'inbound' AND read_at IS NULL) AS unread_messages
-  `);
+  `), countPendingSharedSolutions()]);
   const r = res.rows[0];
   return {
     teacherApplications: Number(r.teacher_applications),
@@ -50,6 +53,7 @@ export async function getPendingCounts(): Promise<PendingCounts> {
     videoRequests: Number(r.video_requests),
     tutoringToSchedule: Number(r.tutoring_to_schedule),
     unreadMessages: Number(r.unread_messages),
+    sharedSolutions,
   };
 }
 

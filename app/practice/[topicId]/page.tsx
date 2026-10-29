@@ -7,6 +7,7 @@ import { PracticeShell, PracticeTopBar } from '@/components/practice/PracticeShe
 import { LockedContent } from '@/components/subscriptions/LockedContent';
 import { CURRICULA, curriculumForTopic, lessonTitle, syllabusRefLabel, topicCodeFor } from '@/lib/curricula';
 import { resolveCurriculum } from '@/lib/curricula/queries';
+import { UUID_RE } from '@/lib/messaging/http';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +28,7 @@ export default async function PracticePage({
   searchParams,
 }: {
   params: { topicId: string };
-  searchParams: { c?: string };
+  searchParams: { c?: string; q?: string };
 }) {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/login');
@@ -63,6 +64,7 @@ export default async function PracticePage({
           lesson={lesson}
           downloads={downloads}
           isAdmin={isAdmin}
+          initialProblemId={searchParams.q && UUID_RE.test(searchParams.q) ? searchParams.q : null}
         />
       ) : (
         <>

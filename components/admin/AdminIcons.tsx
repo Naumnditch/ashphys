@@ -73,6 +73,13 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.1v.2h6v-.2c0-.9.4-1.6 1-2.1A7 7 0 0 0 12 2Z" />
     </>
   ),
+  shared: (
+    <>
+      <path d="M4 20h3.5L18 9.5 14.5 6 4 16.5Z" />
+      <path d="m12.5 8 3.5 3.5" />
+      <path d="M13 20h7" />
+    </>
+  ),
   courses: (
     <>
       <path d="m2 9 10-5 10 5-10 5Z" />

@@ -1,9 +1,11 @@
 'use client';
 
 /**
- * Admin-only handwriting workspace for one practice question. Loaded with
- * next/dynamic from the practice page only when the viewer is an admin, so
- * students never download it (the API refuses them anyway).
+ * Handwriting canvas for one practice question. Loaded with next/dynamic
+ * from the practice page: for an admin it edits the teacher's worked
+ * solution (the default endpoint, admin-only on the server); for a student it
+ * edits their own private workspace (`endpoint` = /api/practice/…/workspace/…),
+ * and only once they open "My working".
  *
  * Tools: pen, highlighter, eraser (whole strokes or pixel), lasso (select,
  * move, delete, recolour), shapes (line, arrow, rectangle, ellipse; Shift
@@ -39,7 +41,7 @@ import {
   TrashIcon,
   UndoIcon,
 } from './icons';
-import { emptyPage, newId, type HwBackground, type HwShape } from '@/lib/handwriting/types';
+import { countStrokes, emptyPage, newId, type HwBackground, type HwShape } from '@/lib/handwriting/types';
 import type { View } from '@/lib/handwriting/view';
 
 type ShapeKind = Exclude<HwShape, 'polyline'>;
@@ -125,7 +127,21 @@ const styleKeyOf = (tool: ToolId): StyleKey => (tool === 'highlighter' ? 'highli
 
 type MenuId = 'style' | 'eraser' | 'shape' | 'page';
 
-export default function HandwritingEditor({ problemId, label }: { problemId: string; label?: string }) {
+export default function HandwritingEditor({
+  problemId,
+  label,
+  endpoint,
+  onLoaded,
+  onSaveState,
+}: {
+  problemId: string;
+  label?: string;
+  /** Where the document is loaded from and saved to (default: the admin's handwritten solution). */
+  endpoint?: string;
+  onLoaded?: (data: Record<string, unknown>) => void;
+  /** Save status plus how many strokes the current document has (all saved when status is 'saved'). */
+  onSaveState?: (state: SaveState & { strokeCount: number }) => void;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<HandwritingEngine | null>(null);
@@ -133,7 +149,7 @@ export default function HandwritingEditor({ problemId, label }: { problemId: str
   const views = useRef(new Map<string, View>());
 
   const fs = useFullscreen(rootRef);
-  const hw = useHandwritingDoc(problemId);
+  const hw = useHandwritingDoc(endpoint ?? `/api/admin/handwriting/${problemId}`, onLoaded);
   const [pageIndex, setPageIndex] = useState(0);
   const [prefs, setPrefs] = useState<ToolPrefs>(DEFAULT_PREFS);
   const [pencilOnly, setPencilOnly] = useState<'auto' | 'on' | 'off'>('auto');
@@ -141,6 +157,12 @@ export default function HandwritingEditor({ problemId, label }: { problemId: str
   const [selection, setSelection] = useState<{ count: number; rect: ScreenRect | null }>({ count: 0, rect: null });
   const [menu, setMenu] = useState<{ id: MenuId; anchor: HTMLElement } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+
+  const onSaveStateRef = useRef(onSaveState);
+  onSaveStateRef.current = onSaveState;
+  useEffect(() => {
+    onSaveStateRef.current?.({ ...hw.save, strokeCount: countStrokes(hw.doc) });
+  }, [hw.save, hw.doc]);
 
   const idx = Math.min(pageIndex, hw.doc.pages.length - 1);
   const page = hw.doc.pages[idx];

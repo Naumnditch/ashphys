@@ -1,26 +1,32 @@
 /**
- * The teacher's handwritten worked solution for one practice question.
+ * The worked solutions for one practice question: the teacher's handwritten
+ * solution and any approved student solutions (shared by students, reviewed
+ * by an admin), shown side by side.
  *
- * GET  — status: is there one, and would opening it spend a view? No content
- *        except the teaser for viewers who are out of views. No side effects.
+ * GET  — status: is there anything, and would opening it spend a view? No
+ *        content except the teacher's teaser for viewers who are out of views.
+ *        No side effects.
  * POST — open it: runs the solutions tier gate (lib/solutions/access.ts —
  *        Free/Plus view caps shared with interactive solutions, Pro unlimited),
- *        logs the view, and returns the page snapshots if allowed.
+ *        logs the view, and returns the teacher's page snapshots and the
+ *        student solutions if allowed. One view opens all of a question's
+ *        solutions (the target is the question).
  *
  * A student gets anything only after answering the question incorrectly at
  * least once; before that both answer 403 without saying whether a solution
- * exists. The rule is enforced by the read policy on question_handwriting
- * (the query runs under row-level security as the student), not just here.
- * Admins always see it. The lesson's own tier gate (topics.required_tier)
- * applies first, exactly as for the practice questions themselves.
+ * exists. The rule is enforced by the read policies on question_handwriting
+ * and shared_solutions (the queries run under row-level security as the
+ * student), not just here. Admins always see them. The lesson's own tier
+ * gate (topics.required_tier) applies first, exactly as for the practice
+ * questions themselves.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser, type CurrentUser } from '@/lib/auth/session';
-import { fail, UUID_RE } from '@/lib/messaging/http';
-import { getUserTier } from '@/lib/subscriptions/getUserTier';
+import { fail } from '@/lib/messaging/http';
+import { practiceQuestionGate } from '@/lib/practice/questionGate';
 import { getViewStatus, hasUnlocked, resolveSolutionAccess } from '@/lib/solutions/access';
-import { findQuestion, isHandwritingSchemaMissing, readHandwritingAs, type QuestionRef } from '@/lib/handwriting/store';
+import { isHandwritingSchemaMissing, readHandwritingAs } from '@/lib/handwriting/store';
+import { readApprovedSolutionsAs } from '@/lib/sharedSolutions/store';
 import type { HandwritingViewDTO } from '@/lib/handwriting/dto';
 
 export const dynamic = 'force-dynamic';
@@ -28,17 +34,6 @@ export const dynamic = 'force-dynamic';
 type Params = { params: { topicId: string; problemId: string } };
 
 const ADMIN_ACCESS = { allowed: true, costsView: false, reason: 'ok', viewsUsed: 0, viewLimit: null } as const;
-
-async function gate({ params }: Params): Promise<NextResponse | { user: CurrentUser; tier: number; q: QuestionRef }> {
-  const user = await getCurrentUser();
-  if (!user) return fail('Please log in first', 401);
-  if (!UUID_RE.test(params.topicId) || !UUID_RE.test(params.problemId)) return fail('Question not found', 404);
-  const q = await findQuestion(params.problemId, params.topicId);
-  if (!q) return fail('Question not found', 404);
-  const tier = await getUserTier(user.id);
-  if (user.role !== 'admin' && tier < q.requiredTier) return fail('This lesson requires a higher plan', 403);
-  return { user, tier, q };
-}
 
 const answerFirst = () =>
   NextResponse.json({ success: false, error: 'Answer this question first.', reason: 'answer_first' }, { status: 403 });
@@ -49,26 +44,26 @@ function respond(body: HandwritingViewDTO) {
 
 export async function GET(_req: NextRequest, ctx: Params) {
   try {
-    const g = await gate(ctx);
+    const g = await practiceQuestionGate(ctx.params);
     if (g instanceof NextResponse) return g;
     const { user, tier, q } = g;
+    const isAdmin = user.role === 'admin';
 
-    if (user.role === 'admin') {
-      const { row } = await readHandwritingAs(user, q, true);
-      if (!row) return respond({ available: false });
-      return respond({ available: true, pageCount: row.pageCount, access: ADMIN_ACCESS, pages: row.snapshots ?? [] });
-    }
+    const [{ answeredIncorrectly, row }, students] = await Promise.all([
+      readHandwritingAs(user, q, isAdmin),
+      readApprovedSolutionsAs(user, q.problemId, isAdmin),
+    ]);
+    if (!isAdmin && !answeredIncorrectly) return answerFirst();
+    if (!row && students.count === 0) return respond({ available: false });
+    const found = { available: true, pageCount: row?.pageCount ?? 0, studentSolutionCount: students.count };
 
-    const { answeredIncorrectly, row } = await readHandwritingAs(user, q, false);
-    if (!answeredIncorrectly) return answerFirst();
-    if (!row) return respond({ available: false });
+    if (isAdmin) return respond({ ...found, access: ADMIN_ACCESS, pages: row?.snapshots ?? [], studentSolutions: students.solutions });
 
     const target = { problemId: q.problemId };
     const [unlocked, { viewsUsed, viewLimit }] = await Promise.all([hasUnlocked(user.id, target), getViewStatus(user.id, tier)]);
     const canOpen = unlocked || viewLimit === null || viewsUsed < viewLimit;
     return respond({
-      available: true,
-      pageCount: row.pageCount,
+      ...found,
       access: {
         allowed: unlocked || viewLimit === null,
         costsView: !unlocked && viewLimit !== null && canOpen,
@@ -76,7 +71,7 @@ export async function GET(_req: NextRequest, ctx: Params) {
         viewsUsed,
         viewLimit,
       },
-      preview: canOpen ? null : row.preview,
+      preview: canOpen ? null : (row?.preview ?? null),
     });
   } catch (err) {
     // Before the migration there is simply no handwriting to show.
@@ -88,25 +83,28 @@ export async function GET(_req: NextRequest, ctx: Params) {
 
 export async function POST(_req: NextRequest, ctx: Params) {
   try {
-    const g = await gate(ctx);
+    const g = await practiceQuestionGate(ctx.params);
     if (g instanceof NextResponse) return g;
     const { user, tier, q } = g;
 
-    const { answeredIncorrectly, row } = await readHandwritingAs(user, q, true);
-    if (user.role === 'admin') {
-      if (!row) return respond({ available: false });
-      return respond({ available: true, pageCount: row.pageCount, access: ADMIN_ACCESS, pages: row.snapshots ?? [] });
-    }
-    if (!answeredIncorrectly) return answerFirst();
-    if (!row) return respond({ available: false });
+    const [{ answeredIncorrectly, row }, students] = await Promise.all([
+      readHandwritingAs(user, q, true),
+      readApprovedSolutionsAs(user, q.problemId, true),
+    ]);
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin && !answeredIncorrectly) return answerFirst();
+    if (!row && students.count === 0) return respond({ available: false });
+    const found = { available: true, pageCount: row?.pageCount ?? 0, studentSolutionCount: students.count };
+    const content = { pages: row?.snapshots ?? [], studentSolutions: students.solutions };
+
+    if (isAdmin) return respond({ ...found, access: ADMIN_ACCESS, ...content });
 
     // Read first, then spend: a view is never spent on a solution that isn't there.
     const access = await resolveSolutionAccess(user.id, tier, { problemId: q.problemId }, 'free');
     return respond({
-      available: true,
-      pageCount: row.pageCount,
+      ...found,
       access: { ...access, costsView: false },
-      ...(access.allowed ? { pages: row.snapshots ?? [] } : { preview: row.preview }),
+      ...(access.allowed ? content : { preview: row?.preview ?? null }),
     });
   } catch (err) {
     // Before the migration there is simply no handwriting to show.

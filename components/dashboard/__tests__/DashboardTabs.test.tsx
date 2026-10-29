@@ -13,6 +13,7 @@ const PANELS: Record<DashboardTab, React.ReactNode> = {
   classes: <p>classes panel</p>,
   videos: <p>videos panel</p>,
   tutoring: <p>tutoring panel</p>,
+  solutions: <p>solutions panel</p>,
 };
 
 let serverRequests: StudentVideoRequest[] = [];
@@ -101,12 +102,12 @@ describe('DashboardTabs routing', () => {
   it('wires tablist / tab / tabpanel ARIA and moves with the arrow keys', async () => {
     renderTabs('messages');
     const tabs = screen.getAllByRole('tab');
-    expect(tabs).toHaveLength(6);
+    expect(tabs).toHaveLength(7);
     expect(screen.getByRole('tablist').getAttribute('aria-orientation')).toBe('vertical');
     const panel = screen.getByRole('tabpanel');
     expect(panel.getAttribute('aria-labelledby')).toBe('dashboard-tab-messages');
     expect(tabs[0].getAttribute('aria-controls')).toBe('dashboard-panel-messages');
-    expect(tabs.map((t) => t.getAttribute('tabindex'))).toEqual(['0', '-1', '-1', '-1', '-1', '-1']);
+    expect(tabs.map((t) => t.getAttribute('tabindex'))).toEqual(['0', '-1', '-1', '-1', '-1', '-1', '-1']);
 
     fireEvent.keyDown(tabs[0], { key: 'ArrowDown' });
     expect(selected()?.id).toBe('dashboard-tab-report');
@@ -114,11 +115,11 @@ describe('DashboardTabs routing', () => {
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' });
     expect(selected()?.id).toBe('dashboard-tab-curriculum');
     fireEvent.keyDown(document.activeElement!, { key: 'End' });
-    expect(selected()?.id).toBe('dashboard-tab-tutoring');
+    expect(selected()?.id).toBe('dashboard-tab-solutions');
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' });
     expect(selected()?.id).toBe('dashboard-tab-messages');
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowUp' });
-    expect(selected()?.id).toBe('dashboard-tab-tutoring');
+    expect(selected()?.id).toBe('dashboard-tab-solutions');
   });
 });
 

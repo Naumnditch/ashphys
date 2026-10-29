@@ -1,5 +1,5 @@
 /**
- * The student dashboard's six tabs and how the active one is chosen.
+ * The student dashboard's tabs and how the active one is chosen.
  * Pure (no browser or server imports), so both the page and tests use it.
  *
  * Order of precedence:
@@ -11,7 +11,7 @@
  *      otherwise "messages".
  */
 
-export const DASHBOARD_TABS = ['messages', 'report', 'curriculum', 'classes', 'videos', 'tutoring'] as const;
+export const DASHBOARD_TABS = ['messages', 'report', 'curriculum', 'classes', 'videos', 'tutoring', 'solutions'] as const;
 export type DashboardTab = (typeof DASHBOARD_TABS)[number];
 
 export const DASHBOARD_TAB_STORAGE_KEY = 'ashphys:dashboard-tab';
@@ -44,6 +44,12 @@ export const DASHBOARD_TAB_INFO: readonly DashboardTabInfo[] = [
     icon: '🧑‍🏫',
     title: '1-on-1 Tutoring',
     description: 'Book a private tutoring session with a physics teacher — discounted for Pro members.',
+  },
+  {
+    id: 'solutions',
+    icon: '🤝',
+    title: 'My Shared Solutions',
+    description: 'Solutions you shared from your practice workspace, and whether your teacher approved them.',
   },
 ];
 
