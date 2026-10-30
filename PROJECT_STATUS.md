@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-10-30 (second announcement video **Share Your Solution** (~30 s, real footage + hand-drawn notes) and the hero "What's New" slot is now a **newest-first playlist** with a Next button — see "Share Your Solution video + hero playlist"; its production row is in **unpublished**: press Publish at /admin/updates once this branch is deployed). Previously 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -205,6 +205,117 @@ no canvas, badge only fades, no shake, buttons untransformed, sound still plays;
 → chime after taps, no horizontal overflow; route transition leaves no transform; no console
 errors anywhere. Not checked: real iOS/Android audio (Chromium only), the payment result
 celebration (needs a Shopier order row), the paywall and mailbox toast in a live session.
+
+### Share Your Solution video + hero playlist (NEW 2026-10-29/30)
+
+Owner: a ~30 s announcement for student solution sharing, real footage of the
+site plus handwriting "written" over it with rough hand-drawn marks; and the
+hero's video slot as a list — newest first, a Next button when one ends.
+
+**The video** (`video/updates/share-your-solution/`: `config.json`, `capture.mjs`).
+29.8 s, 1920×1080, 30 fps, silent. Storyboard: title card ("NEW · Share your
+solution", red rough underline, handwritten "students can now publish their
+working") → ① *Solve it your way* (the demo student's workspace on A Level
+24.3 Q16, Phobos → mass of Mars: the pen writes "M = 6.41 × 10²³ kg" and boxes
+it, the last typed steps go in, "✓ Saved" circled — "saves as you go") → ②
+*Add your name* (Share my solution → display name typed as the fictional
+**"Sam T."**, under 18, the three consent boxes ticked, Share for review →
+"Pending review" circled, "sent for review") → ③ *Your teacher checks it*
+(/admin/shared-solutions, Sam's solution beside the teacher's, Approve with a
+big green tick, "Verified against mark scheme" ticked, the header badge
+circled — "checked against the mark scheme") → ④ *Your name, under your
+solution* (a second test student after a wrong answer: "Teacher solution" |
+"Student solution by Sam T. ✓ Verified", "Sam T." handwritten under the
+sheet with a double underline) → "Change your mind? Withdraw anytime" (arrow
+to Withdraw, then "Withdrawn") → end card "Your work. Your name." / "Try a
+practice question" / ashphys.org. Wipe/slide transitions between steps, fade
+into the end card; spring camera zooms; cursor with click ripples; a stylus
+while the pen writes. Captions burned into the 1080p master only (6 cues,
+also `.srt`/`.vtt`); the hero version has none.
+- **Handwriting**: "Altrament" does not exist on npm (404, 2026-10-29). Used the
+  single-stroke **Shadows Into Light** font that ships with **Vara.js**
+  (`vara@1.4.1`, font OFL 1.1, Vara MIT) — font JSON only, drawn frame by
+  frame by our own code (`video/src/handwriting/strokeFont.ts`,
+  `src/components/Handwritten.tsx`), because Vara's runtime animates with
+  requestAnimationFrame, which Remotion can't render. Marks: **roughjs 4.6.6**
+  (`src/components/RoughMark.tsx`), fixed seed per shape. Placed by a new
+  `annotations` list on any scene (`src/components/Annotations.tsx`; kinds
+  note, step, underline, double-underline, circle, box, tick, arrow). Also
+  new in the template: a transition per scene (adds `wipe`), camera `shift`.
+  Documented in `video/README.md` → *Annotations*.
+- **Demo data, no real people**: local Postgres with the production schema and
+  the 24.3 lesson (read-only export through the Supabase connector; the
+  teacher's Q16 handwriting from the committed `strokes/B.json`), TEST
+  accounts only ("Test Student", "Demo Teacher", new optional "Test Reader" =
+  `TEST_STUDENT2_*`), random credentials, never committed. The student's
+  canvas working is real pen input into the real workspace, written with the
+  same stroke font (not the teacher's strokes); typed steps are real
+  keystrokes. The only email on screen (admin card header) is blurred by the
+  capture. The seed now applies the shared-solutions migration and resets the
+  test students' workspaces, shared solutions and age answer.
+- **Outputs** (`video/out/share-your-solution/`, not committed except the web
+  files): `film-1080p.mp4` 10.18 MB (H.264 CRF 20) + `.webm` 5.79 MB (VP9);
+  hero version `loop-720p.mp4` 4.55 MB + `.webm` 3.80 MB — the whole 29.8 s
+  story at 1280×720, two-pass under `maxBytes` 5 MB, `loop: false`, no
+  captions; `poster.webp` 57 KB (1280×720, "Sam T." under the solution) +
+  `.jpg` 143 KB; `captions.vtt/.srt`. No vertical cut.
+- **Re-render**: `cd video && npm run seed -- --reset-only --student-tier=pro`
+  (with the TEST_* variables), then `CAPTURE_BASE_URL=http://localhost:3100
+  npm run capture -- --update=share-your-solution`, then (site root)
+  `npm run video:build -- --update=share-your-solution`, then `cd video &&
+  npm run publish -- --update=share-your-solution --target=static --sql`.
+
+**Published** as static files in `public/video/updates/share-your-solution/`
+(24 MB, suffix `mvu6uty4`) and the row
+`database/seeds/2026-10-29-site-updates-share-your-solution.sql`: title
+"Share Your Solution" (the hero adds its own NEW badge, so no "New:" prefix,
+as with the first one), CTA "Try a practice question" → `/curriculum?c=a-level`,
+`published_at` fixed at **2026-10-29 23:50 UTC**. **Applied to production
+2026-10-29 through the Supabase connector as UNPUBLISHED (`is_active = false`)**:
+the files only exist once this branch is deployed, and a live row before that
+would put a broken video at the top of the homepage. **After the deploy:**
+/admin/updates → Share Your Solution → Publish (keeps the 29 Oct date), or
+`UPDATE site_updates SET is_active = true, updated_at = now() WHERE slug = 'share-your-solution';`.
+The Handwritten Worked Solutions row is unchanged.
+
+**Hero playlist** (`components/home/WhatsNew.tsx`, `variant="hero"` only — the
+row variant, /updates and `HeroVideo` (the fallback film) are unchanged):
+the live updates sorted newest first by `published_at` in code
+(`newestFirst`, `lib/siteUpdates/types.ts`), so Share Your Solution (29 Oct)
+plays first and Handwritten Worked Solutions (28 Oct) second. The current
+one's video plays **once** (muted, inline; no loop in the hero). When it ends,
+an end card over the player shows the next one's poster (fetched only now),
+"Up next" + its title and a large **Next video ›**; on the last one, **Back to
+the latest** and **Replay**. No auto-advance. ‹ › and "1 / 2" sit beside the
+pause button whenever there are 2+ (› disabled on the last, ‹ on the first).
+NEW badge only on the newest; the date chip, title, summary, CTA, Watch the
+video (full-film modal) and Previous updates (now: those older than the one
+showing) follow the current item. Kept: poster image + fade-in video, pause
+when scrolled away (a played-out video no longer restarts when scrolled back),
+reduced motion → no video, poster + modal, arrows still switch. Real buttons
+with labels ("Next video: Handwritten Worked Solutions"), 44 px targets on
+phones (the pause button too), focus rings, an `aria-live="polite"` line
+("Video 2 of 2: …"). End card text sits clear of the date chip and the
+controls down to 375 px.
+
+**Tests & checks (2026-10-30).** Site: `tsc` clean; vitest 2151 passed, 1 failed
+(the pre-existing live-DNS email test); new: 10 hero-playlist tests in
+`WhatsNew.test.tsx` (order by date whatever the input order, plays once, end
+card → Next loads item 2 with its title/date/sources, NEW only on the newest,
+› disabled + Back to the latest + Replay on the last, ‹, no restart after the
+end, reduced motion never plays but arrows switch, one update → no controls,
+Previous updates follows the current) + `newestFirst` in `siteUpdates.test.ts`;
+ESLint (`next/core-web-vitals`) clean on the changed files; `next build`
+clean (`/` 14.4 kB, first load 111 kB). Real browser (Playwright, local
+production build with both rows): 55/55 checks at 1280 px and 375 px (+
+reduced motion) — Share Your Solution first and playing, seek near the end →
+end card → Next → Handwritten Worked Solutions plays, 2 / 2, no NEW, 28 Oct,
+› disabled, Back to the latest / Replay, ‹ works, Next button inside the 16:9
+player and 44 px, no horizontal scroll, no console errors. Video workspace:
+`tsc` clean, vitest 18/18 (7 new: path flattening, layout, write-on progress,
+rough marks' fixed seeds). The first video was not re-rendered (its captures
+aren't in this container); the template changes keep its timing identical
+(no per-scene transitions or annotations in its config).
 
 ### Hero "What's New" announcement videos + video pipeline (NEW 2026-10-28)
 

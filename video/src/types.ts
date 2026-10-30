@@ -30,6 +30,8 @@ export interface CameraKey {
   zoom: number;
   /** Rect to centre on; omitted = the whole screen. */
   focus?: RectRef;
+  /** Move the focus off centre, in fractions of the output (e.g. [0, 0.1] puts it 10 % lower, leaving room for a label above). */
+  shift?: [number, number];
 }
 
 export interface CursorKey {
@@ -46,10 +48,64 @@ export interface Callout {
   side?: 'left' | 'right' | 'top' | 'bottom';
 }
 
+export type TransitionType = 'fade' | 'slide' | 'wipe' | 'none';
+
+export interface TransitionConfig {
+  type: TransitionType;
+  seconds: number;
+  /** slide / wipe: where the incoming scene comes from (default from-right). */
+  direction?: 'from-left' | 'from-right' | 'from-top' | 'from-bottom';
+}
+
+/**
+ * Hand-drawn marks over the footage (src/components/Annotations.tsx): notes in
+ * a handwriting stroke font and rough.js shapes, written on frame by frame.
+ * They point at real UI and never stand in for it. Positions follow the
+ * camera when anchored to a captured rectangle; sizes are px at 1080p.
+ */
+export interface Annotation {
+  kind: 'note' | 'step' | 'underline' | 'double-underline' | 'circle' | 'box' | 'arrow' | 'tick';
+  /** Scene seconds when the pen starts. */
+  from: number;
+  /** Seconds the pen takes (default: from the length of the line). */
+  draw?: number;
+  /** Fades out by this time (default: stays to the end of the scene). */
+  to?: number;
+  /** The real UI it marks: "shotId:rectName" (follows the camera). */
+  anchor?: RectRef;
+  /** Or a point on the output in fractions of its width and height (a note's top-left; with align, its top-centre or top-right). */
+  at?: [number, number];
+  /** Or a fixed rect on the output, in fractions (for marks on the title and end cards, which have no captures). */
+  rect?: [number, number, number, number];
+  /** note: which side of the anchor it sits on (default top). */
+  side?: 'left' | 'right' | 'top' | 'bottom';
+  align?: 'left' | 'center' | 'right';
+  /** Nudge, px at 1080p. */
+  offset?: [number, number];
+  /** note / step: the words; step: also `number`. */
+  text?: string;
+  number?: string;
+  /** Handwriting cap height, px at 1080p (default 56). */
+  size?: number;
+  /** marker (blue, default) | red | green | ink | highlight | any CSS colour. */
+  color?: string;
+  /** circle / box / underline: space around the anchor, px at 1080p. */
+  pad?: number;
+  /** arrow: where it starts, output fractions or a rect ("shot:rect"); it ends at the anchor's edge. */
+  start?: [number, number] | RectRef;
+  /** note: underline its own words once written. */
+  underline?: 'single' | 'double';
+  /** rough.js seed (default: from the annotation's position in the list). */
+  seed?: number;
+}
+
 interface SceneBase {
   id: string;
   seconds: number;
   captions?: Caption[];
+  /** The transition into this scene (default: the config's). */
+  transition?: TransitionConfig;
+  annotations?: Annotation[];
 }
 
 export interface TitleScene extends SceneBase {
@@ -145,12 +201,12 @@ export interface UpdateConfig {
   fps: number;
   brand: BrandConfig;
   showcase: Record<string, { questionIncludes: string[]; answer?: string }>;
-  transition: { type: 'fade' | 'slide' | 'none'; seconds: number };
+  transition: TransitionConfig;
   scenes: Scene[];
   outputs: {
     heroLoop?: Partial<VariantConfig> & { maxBytes?: number };
     vertical?: Partial<VariantConfig>;
-    poster?: { scene: string; at: number };
+    poster?: { variant?: VariantName; scene: string; at: number };
   };
   capture?: Record<string, unknown>;
 }
@@ -183,6 +239,8 @@ export interface Shot {
   rects: Record<string, Rect>;
   ink?: InkTransform;
   pointer?: ([number, number] | null)[];
+  /** Per frame: 'pen' while the step wrote with the pen (null = mouse). */
+  tools?: ('pen' | null)[];
   events?: { frame: number; kind: 'pinch' | 'press' | 'click' }[];
 }
 
@@ -209,5 +267,8 @@ export interface AnnouncementData {
   /** Absolute start frame of each scene (after transitions). */
   starts: Record<string, number>;
   durationInFrames: number;
+  /** The config's default transition length. */
   transitionFrames: number;
+  /** Per scene: the transition into it (index 0 has none). */
+  transitions: (TransitionConfig & { frames: number })[];
 }

@@ -3,7 +3,9 @@
 The pipeline behind the homepage **What's New** slot: real footage of the
 running site, captured with Playwright, assembled by a template-driven
 Remotion composition, encoded with ffmpeg, published to the `site_updates`
-table. The first announcement is `updates/handwritten-worked-solutions/`.
+table. The announcements so far: `updates/handwritten-worked-solutions/`
+(28 Oct 2026) and `updates/share-your-solution/` (29 Oct 2026). The hero
+plays the live ones as a playlist, newest first (see *Publish* below).
 
 This folder is its **own npm workspace**: nothing here is installed with the
 site or on Vercel (the site's `tsconfig.json` and `vitest.config.ts` exclude
@@ -14,7 +16,7 @@ site stays on React 18.
 video/
   updates/<slug>/config.json     the announcement: scenes, captions, cameras, outputs
   updates/<slug>/capture.mjs     its shot list against the real site
-  updates/<slug>/strokes/*.json  showcase handwriting, read from the database
+  updates/<slug>/strokes/*.json  showcase handwriting, read from the database (if the update replays any)
   scripts/                       export-demo-data, seed, fetch-strokes, capture, build, verify, publish
   src/                           the Remotion template (no announcement is hard-coded in it)
   public/brand/logo.png          the site logo (copied from public/assets/logo.png)
@@ -26,8 +28,10 @@ video/
 
 - **Everything on screen comes from the real site.** Stills and interaction
   clips are screenshots of a real build; device frames, captions, cursors,
-  callouts and the CTA card are the only things drawn. Never mock up UI.
-- **Handwriting is never redrawn.** The replay draws the stored strokes with
+  callouts, annotations (hand-drawn notes and marks, below) and the CTA card
+  are the only things drawn. Annotations point at real UI; they never stand
+  in for it. Never mock up UI.
+- **The teacher's handwriting is never redrawn.** The replay draws the stored strokes with
   the site's own geometry (`lib/handwriting/geometry.ts`, `svg.ts`): no fonts,
   no OCR, no tracing. Inconsistencies are listed for the author to fix in the
   admin canvas, then re-captured — never edited in the video.
@@ -36,8 +40,10 @@ video/
   `DEMO_DB_ALLOW_REMOTE=1` (a staging copy, never production).
 - **Test accounts only**, credentials from environment variables
   (`TEST_STUDENT_EMAIL`, `TEST_STUDENT_PASSWORD`, `TEST_ADMIN_EMAIL`,
-  `TEST_ADMIN_PASSWORD`), never logged, never committed. The seed names them
-  "Test Student" / "Demo Teacher". Before every screenshot the capture blurs
+  `TEST_ADMIN_PASSWORD`, and optionally `TEST_STUDENT2_EMAIL` /
+  `TEST_STUDENT2_PASSWORD`), never logged, never committed. The seed names them
+  "Test Student" / "Demo Teacher" / "Test Reader". Names a student types in
+  the footage (a display name) are made up ("Sam T."). Before every screenshot the capture blurs
   anything that looks like an email address and reports it. No real students,
   receipts or payment data are ever loaded into the demo database (the export
   reads lessons, questions, plans and the showcase lessons' handwriting only).
@@ -50,8 +56,9 @@ video/
 ## Adding an announcement
 
 All commands run from `video/` unless noted. Install once:
-`npm --prefix video install` (from the site root) — needs Node 22 and ffmpeg
-with libx264/libvpx-vp9/libwebp.
+`npm --prefix video install` (from the site root) — needs Node 22.18+ (a
+capture script imports `src/handwriting/strokeFont.ts`, run through Node's own
+type stripping) and ffmpeg with libx264/libvpx-vp9/libwebp.
 
 1. **Config.** Copy `updates/handwritten-worked-solutions/` to
    `updates/<slug>/` and edit `config.json` (see *Config* below). The slug is
@@ -69,14 +76,20 @@ with libx264/libvpx-vp9/libwebp.
    ```
    SOURCE_DATABASE_URL=<production> npm run export-demo-data -- --update=<slug>
    DATABASE_URL=postgresql://…@localhost:5433/ashphys TEST_STUDENT_EMAIL=… TEST_STUDENT_PASSWORD=… \
-     TEST_ADMIN_EMAIL=… TEST_ADMIN_PASSWORD=… npm run seed [-- --student-tier=free|plus|pro]
+     TEST_ADMIN_EMAIL=… TEST_ADMIN_PASSWORD=… [TEST_STUDENT2_EMAIL=… TEST_STUDENT2_PASSWORD=…] \
+     npm run seed [-- --student-tier=free|plus|pro]
    ```
    The export is read-only and writes `.cache/demo/` (schema DDL + the
    showcase lessons' rows). The seed loads it into an empty local database,
-   applies the handwriting and site-updates migrations, creates the two test
-   accounts, and resets the test student (no attempts, no solution views).
+   applies the handwriting, site-updates and shared-solutions migrations,
+   creates the test accounts, and resets the test students (no attempts, no
+   solution views, no workspaces or shared solutions, no age answer).
    `npm run seed -- --reset-only` just resets before another capture. The app
    connects with TLS, so local Postgres needs `ssl = on` (any self-signed cert).
+   No database URL at hand? The same two read-only queries can be run through
+   the Supabase connector and their result written to `.cache/demo/` (that
+   is how the share-your-solution capture got its data; its handwriting row
+   came from `updates/handwritten-worked-solutions/strokes/B.json`).
 4. **Run the site** against it (from the site root):
    `DATABASE_URL=… JWT_SECRET=<random> npm run build && npx next start -p 3100`.
 5. **Capture.**
@@ -84,10 +97,13 @@ with libx264/libvpx-vp9/libwebp.
    CAPTURE_BASE_URL=http://localhost:3100 TEST_…=… npm run capture -- --update=<slug> [--only=shot,shot]
    ```
    `capture.mjs` scripts the real UI with the helpers in `scripts/capture.mjs`:
-   `session(role, 'desktop'|'tablet', scale?)` (logs in through the real login
-   page; desktop 1920×1080 @2x, tablet landscape 1366×1024 @2x), `shot(id, …,
+   `session(role, form, scale?)` (role `student` | `admin` | `reader` — the
+   second test student; logs in through the real login page; form `desktop`
+   1920×1080, `desktop-tall` 1920×1200 for pages whose key controls sit just
+   below a 1080 px fold, `tablet` landscape 1366×1024, all @2x), `shot(id, …,
    {rects})` (PNG + named element rectangles), `sequence(id, …, frames, step)`
-   (a real interaction recorded frame by frame, with the pointer path),
+   (a real interaction recorded frame by frame, with the pointer path; a step
+   returns `tool: 'pen'` while it writes, so the video draws a stylus),
    `inkTransform` / `setInkVisible` (the viewer's exact transform; the
    "plate" = the same view with the ink hidden), `pen()` (Chromium pen input).
    Output: `public/captures/<slug>/` + `manifest.json`.
@@ -110,12 +126,24 @@ with libx264/libvpx-vp9/libwebp.
      files into the site's `public/video/updates/<slug>/`, prints the row's SQL), or
    - by hand at **/admin/updates**: New announcement → title/slug/summary/CTA →
      upload each file into its slot → Save & publish. Unpublish/Publish/Edit
-     later from the same page. The hero shows the newest live row.
+     later from the same page.
+
+   The hero plays every live row as a playlist, newest `published_at` first:
+   each video plays once, then an end card offers the next (older) one; ‹ ›
+   and "1 / 2" switch at any time (`components/home/WhatsNew.tsx`). Give the
+   hero cut `"loop": false` so it ends cleanly instead of dissolving into its
+   first frame. Static files only exist once the branch that adds them is
+   deployed, so insert such a row unpublished (`is_active = false`, a fixed
+   `published_at`) and press Publish at /admin/updates after the deploy (it
+   keeps that date) — see `database/seeds/2026-10-29-site-updates-share-your-solution.sql`.
 
 Set `CHROME_PATH` to use a local Chrome/chrome-headless-shell for capture and
-render. Remotion launches Chrome with `--no-proxy-server`, so behind an HTTPS
-proxy (Google Fonts must load) point `CHROME_PATH` at a small wrapper that
-swaps in `--proxy-server=…` (keep TLS verification on).
+render. Remotion launches Chrome with `--no-proxy-server` and
+`--proxy-server='direct://' --proxy-bypass-list=*`, so behind an HTTPS proxy
+(Google Fonts must load) point `CHROME_PATH` at a small wrapper that drops
+those three and passes `--proxy-server=<your proxy>
+--proxy-bypass-list="localhost;127.0.0.1"` instead (keep TLS verification on;
+the proxy's CA must be in the NSS store, `~/.pki/nssdb`).
 
 ## Config
 
@@ -127,12 +155,14 @@ swaps in `--proxy-server=…` (keep TLS verification on).
   "brand": { "logo": "brand/logo.png", "url": "ashphys.org", "font": "Inter",
              "colors": { "ink", "muted", "page", "surface", "accent", "accentSoft", "highlight", "grid" } },
   "showcase": { "A": { "questionIncludes": ["…"], "answer": "…" } },
-  "transition": { "type": "fade" | "slide" | "none", "seconds": 0.4 },
-  "scenes": [ /* in order; each { id, type, seconds, captions?: [{ from, to, text }] } */ ],
+  "capture": { /* anything the update's capture.mjs reads, e.g. the question it works on */ },
+  "transition": { "type": "fade" | "slide" | "wipe" | "none", "seconds": 0.4, "direction": "from-right" },
+  "scenes": [ /* in order; each { id, type, seconds, captions?: [{ from, to, text }],
+                 transition?: { … } (the one into this scene), annotations?: [ … ] } */ ],
   "outputs": {
     "heroLoop": { "scenes": [ids], "width", "height", "maxBytes", "captions": false, "loop": true, "sceneOverrides": {} },
     "vertical": { "width": 1080, "height": 1920, "sceneOverrides": { "<scene id>": { /* any scene fields */ } } },
-    "poster": { "scene": "<id>", "at": seconds }
+    "poster": { "variant": "heroLoop", "scene": "<id>", "at": seconds }
   }
 }
 ```
@@ -143,13 +173,51 @@ Scene types (times are seconds from the scene's start; rectangles are
 | type | fields |
 |---|---|
 | `title` | `kicker`, `title` (words spring in), `subtitle` |
-| `screens` | `device` (`browser`/`tablet`), `shots: [{ capture, at }]` (cuts), `clip: { capture, at }` (a captured sequence over them), `cursor: [{ at, target, click? }]`, `camera: [{ at, zoom, focus? }]` (spring Ken Burns), `callouts: [{ from, to, text, anchor, side }]` |
+| `screens` | `device` (`browser`/`tablet`), `shots: [{ capture, at }]` (cuts), `clip: { capture, at }` (a captured sequence over them), `cursor: [{ at, target, click? }]`, `camera: [{ at, zoom, focus?, shift? }]` (spring Ken Burns; `shift: [x, y]` moves the focus off centre by fractions of the output, e.g. to leave room for a label), `callouts: [{ from, to, text, anchor, side }]` |
 | `handwriting` | `strokes` (key), `plate` / `reference` (captures), `device`, `replay: { pauseCompression, startDelay, endHold, penSpeed }`, `camera: { mode: "follow", minZoom, maxZoom, settle }`, `highlights: [{ label, strokes: [[first, last], …] }]` |
 | `sequence` | `capture` (frame sequence), `device`, `camera`, `callouts` |
 | `cta` | `title`, `button` (styled like the hero's primary button), `note` |
 
 Captions are burned in from this list and written to `.srt`/`.vtt` from the
 same resolved timeline, so they always agree.
+
+### Annotations (hand-drawn notes and marks)
+
+Any scene can carry `annotations`, written on frame by frame over the footage
+(`src/components/Annotations.tsx`, drawn in output pixels so line widths
+don't change with the camera; anchored ones follow it):
+
+| kind | what | placement |
+|---|---|---|
+| `note` | handwriting (`text`, `\n` for lines; `size` = cap height px at 1080p, default 56; `underline: "single" \| "double"`) | beside `anchor` (`side`, `align`) or at `at: [x, y]` (output fractions, top-left; `align: "center"` for top-centre) |
+| `step` | a digit (`number`) in a rough ring + `text`, on a paper card that pops in | `at` (default top-left) |
+| `underline` / `double-underline` / `circle` / `box` | rough.js marks round or under the `anchor` (`pad`) | `anchor`, or `rect: [x, y, w, h]` (output fractions; title and end cards) |
+| `tick` | a rough check mark (`size`) | centred on `anchor` / `at` |
+| `arrow` | a curved rough arrow from `start` (output fractions or a rect) to the `anchor`'s edge | |
+
+Every annotation takes `from` (scene seconds the pen starts), optional `draw`
+(seconds; default from the length of the line), `to` (fades out by then),
+`color` (`marker` blue, `red`, `green`, `ink`, `highlight` or any CSS colour),
+`offset` (px at 1080p) and `seed`.
+
+- **Handwriting font**: the single-stroke "Shadows Into Light" font that ships
+  with Vara.js (`vara@1.4.1`, `fonts/Shadows-Into-Light/shadows-into-light.json`;
+  the font is Kimberly Geswein's, SIL Open Font License 1.1; Vara is MIT).
+  Only the font JSON is used: Vara's runtime animates with
+  `requestAnimationFrame`, which Remotion can't render frame by frame.
+  `src/handwriting/strokeFont.ts` flattens its paths to polylines (no DOM),
+  lays text out like Vara (plus letter spacing, small raised runs for
+  powers, a hand-drawn π the font lacks) and works out what is on the page at
+  any progress, with the pen-tip position. A white halo under the ink keeps
+  it legible over busy UI. (The brief asked for "Altrament" + rough.js; there
+  is no package by that name on npm — checked 2026-10-29.)
+- **Marks**: `roughjs@4.6.6` (MIT) generator → path data → the same polylines
+  (`src/components/RoughMark.tsx`). Every shape has a fixed seed, so each
+  frame draws the identical shape (frames render independently and in parallel).
+- The same stroke font also writes the demo student's working into the real
+  canvas through Chromium pen input in `updates/share-your-solution/capture.mjs`
+  (the stored strokes in the footage are real canvas strokes; the teacher's
+  strokes are never reused as a student's).
 
 ## The handwriting replay
 
@@ -214,5 +282,6 @@ identical with or without it, and lasso moves / eraser cuts carry it along.
 ## Tests
 
 `npm test` (timeline, camera-free logic, the showcase strokes replay exactly
-once in stored order with untouched points), `npm run typecheck`,
+once in stored order with untouched points; the stroke font's path flattening,
+layout, write-on progress and the rough marks' fixed seeds), `npm run typecheck`,
 `npm run verify -- --update=<slug>` (pixel check against the real viewer).

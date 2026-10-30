@@ -1,19 +1,23 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { formatUpdateDate, type SiteUpdate } from '@/lib/siteUpdates/types';
+import { formatUpdateDate, newestFirst, type SiteUpdate } from '@/lib/siteUpdates/types';
 
 /**
- * The hero's "What's New" slot: the newest published site_updates row with a
- * short muted loop, a modal player (controls + captions) and a drawer of
- * older announcements. Renders nothing when there is no update.
+ * The homepage's "What's New" announcements (site_updates rows, newest first).
  *
- * The loop never competes with the page's first paint: no video or poster
- * bytes are fetched until the card is within 200px of the viewport, it plays
- * only while at least a quarter of it is visible, and visitors who prefer
- * reduced motion get the poster alone (the modal stays one click away).
+ * - `variant="hero"`: the hero's media column, seen on first look — a
+ *   playlist of the live announcements, newest first (see HeroPlaylist).
+ * - `variant="row"`: the newest one as a card with a short muted loop, a
+ *   modal player (controls + captions) and a drawer of older announcements.
+ * Renders nothing when there is no update.
+ *
+ * The loop never competes with the page's first paint: in the row, no video
+ * or poster bytes are fetched until the card is within 200px of the viewport;
+ * it plays only while at least a quarter of it is visible, and visitors who
+ * prefer reduced motion get the poster alone (the modal stays one click away).
  * The poster is drawn into a <canvas> and the video fades in from opacity 0,
  * so neither ever becomes the page's Largest Contentful Paint element: LCP
  * stays the hero's own content, as before this card existed.
@@ -24,81 +28,9 @@ export function WhatsNew({ updates, variant = 'row' }: { updates: SiteUpdate[]; 
   const reducedMotion = usePrefersReducedMotion();
   const latest = updates[0];
   if (!latest) return null;
+  if (variant === 'hero') return <HeroPlaylist updates={updates} reducedMotion={reducedMotion} />;
   const previous = updates.slice(1);
-  const hasVideo = Boolean(latest.videoMp4Url || latest.videoWebmUrl || latest.loopMp4Url || latest.loopWebmUrl);
-
-  const overlays = (
-    <>
-      {drawerOpen && (
-        <UpdatesDrawer
-          updates={previous}
-          onClose={() => setDrawerOpen(false)}
-          onWatch={(u) => {
-            setDrawerOpen(false);
-            setPlaying(u);
-          }}
-        />
-      )}
-      {playing && <VideoModal update={playing} reducedMotion={reducedMotion} onClose={() => setPlaying(null)} />}
-    </>
-  );
-
-  if (variant === 'hero') {
-    // In the hero's media column, seen on first look: the loop plays right away (muted).
-    return (
-      <section aria-labelledby="whats-new-title" data-testid="whats-new">
-        <div className="theme-light relative overflow-hidden rounded-2xl bg-gray-100 shadow-2xl shadow-blue-950/20 ring-1 ring-black/5">
-          {hasVideo ? (
-            <LoopPlayer update={latest} reducedMotion={reducedMotion} onOpen={() => setPlaying(latest)} eager />
-          ) : latest.posterUrl ? (
-            <div className="relative aspect-video w-full">
-              {/* eslint-disable-next-line @next/next/no-img-element -- storage/static URL in a fixed-ratio box */}
-              <img src={latest.posterUrl} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
-            </div>
-          ) : null}
-          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 py-1 pl-1 pr-3 shadow-sm ring-1 ring-black/5 backdrop-blur-sm">
-            <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">New</span>
-            {latest.publishedAt && (
-              <time dateTime={latest.publishedAt} className="text-xs font-medium text-gray-700">
-                {formatUpdateDate(latest.publishedAt)}
-              </time>
-            )}
-          </div>
-        </div>
-        <div className="mt-4 flex flex-col gap-3">
-          <div className="min-w-0">
-            <h2 id="whats-new-title" className="text-lg sm:text-xl font-bold tracking-tight text-gray-900">
-              {latest.title}
-            </h2>
-            {latest.summary && <p className="mt-1 text-sm leading-relaxed text-gray-600">{latest.summary}</p>}
-          </div>
-          <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
-            {latest.ctaLabel && latest.ctaHref && <CtaLink href={latest.ctaHref}>{latest.ctaLabel}</CtaLink>}
-            {hasVideo && (
-              <button
-                type="button"
-                onClick={() => setPlaying(latest)}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-800 hover:text-black underline-offset-4 hover:underline"
-              >
-                <PlayIcon className="h-4 w-4" /> Watch the video
-              </button>
-            )}
-            {previous.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(true)}
-                className="text-sm font-medium text-gray-500 hover:text-gray-900 underline-offset-4 hover:underline"
-                aria-haspopup="dialog"
-              >
-                Previous updates
-              </button>
-            )}
-          </div>
-        </div>
-        {overlays}
-      </section>
-    );
-  }
+  const hasVideo = hasAnyVideo(latest);
 
   return (
     <section
@@ -155,7 +87,227 @@ export function WhatsNew({ updates, variant = 'row' }: { updates: SiteUpdate[]; 
         </div>
       </div>
 
-      {overlays}
+      <Overlays
+        previous={previous}
+        drawerOpen={drawerOpen}
+        playing={playing}
+        reducedMotion={reducedMotion}
+        onCloseDrawer={() => setDrawerOpen(false)}
+        onWatch={setPlaying}
+        onCloseVideo={() => setPlaying(null)}
+      />
+    </section>
+  );
+}
+
+const hasAnyVideo = (u: SiteUpdate) => Boolean(u.videoMp4Url || u.videoWebmUrl || u.loopMp4Url || u.loopWebmUrl);
+
+/** The "Previous updates" drawer and the modal player, when open. */
+function Overlays({
+  previous,
+  drawerOpen,
+  playing,
+  reducedMotion,
+  onCloseDrawer,
+  onWatch,
+  onCloseVideo,
+}: {
+  previous: SiteUpdate[];
+  drawerOpen: boolean;
+  playing: SiteUpdate | null;
+  reducedMotion: boolean;
+  onCloseDrawer: () => void;
+  onWatch: (u: SiteUpdate) => void;
+  onCloseVideo: () => void;
+}) {
+  return (
+    <>
+      {drawerOpen && (
+        <UpdatesDrawer
+          updates={previous}
+          onClose={onCloseDrawer}
+          onWatch={(u) => {
+            onCloseDrawer();
+            onWatch(u);
+          }}
+        />
+      )}
+      {playing && <VideoModal update={playing} reducedMotion={reducedMotion} onClose={onCloseVideo} />}
+    </>
+  );
+}
+
+/**
+ * The hero's media column: the live announcements as a playlist, newest
+ * first. The current one's video plays once (muted, inline, as the loop did);
+ * when it ends, an overlay offers the next (older) one — on the last, back to
+ * the latest or replay. ‹ › and "1 / 2" switch at any time; nothing advances
+ * on its own. Nothing of a later announcement is fetched until the visitor
+ * asks for it, except its poster once the current video has ended. The NEW
+ * badge marks the newest only; the text below follows the current one.
+ */
+function HeroPlaylist({ updates, reducedMotion }: { updates: SiteUpdate[]; reducedMotion: boolean }) {
+  const playlist = useMemo(() => newestFirst(updates), [updates]);
+  const [index, setIndex] = useState(0);
+  const [ended, setEnded] = useState(false);
+  // Bumped to play the same announcement again (remounts its player).
+  const [run, setRun] = useState(0);
+  const [playing, setPlaying] = useState<SiteUpdate | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const count = playlist.length;
+  const at = Math.min(index, count - 1);
+  const current = playlist[at];
+  const next = at + 1 < count ? playlist[at + 1] : null;
+  const isLast = next === null;
+  const hasVideo = hasAnyVideo(current);
+  // Older than the one showing.
+  const previous = playlist.slice(at + 1);
+
+  const go = (i: number) => {
+    setIndex(i);
+    setEnded(false);
+  };
+  const replay = () => {
+    setEnded(false);
+    setRun((r) => r + 1);
+  };
+
+  const arrow =
+    'flex h-11 w-11 sm:h-9 sm:w-9 items-center justify-center rounded-full text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:opacity-35 disabled:hover:bg-transparent';
+  const controls =
+    count > 1 ? (
+      <div className="flex items-center rounded-full bg-black/50 ring-1 ring-white/20 backdrop-blur-sm" role="group" aria-label="Announcement videos">
+        <button type="button" onClick={() => go(at - 1)} disabled={at === 0} className={arrow} aria-label={at > 0 ? `Previous video: ${playlist[at - 1].title}` : 'Previous video'}>
+          <ChevronIcon className="h-4 w-4 rotate-180" />
+        </button>
+        <span className="min-w-[2.75rem] text-center text-xs font-semibold tabular-nums text-white" aria-hidden="true">
+          {at + 1} / {count}
+        </span>
+        <button type="button" onClick={() => next && go(at + 1)} disabled={isLast} className={arrow} aria-label={next ? `Next video: ${next.title}` : 'Next video'}>
+          <ChevronIcon className="h-4 w-4" />
+        </button>
+      </div>
+    ) : null;
+
+  const big =
+    'inline-flex h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black';
+
+  return (
+    <section aria-labelledby="whats-new-title" data-testid="whats-new">
+      <div className="theme-light relative overflow-hidden rounded-2xl bg-gray-100 shadow-2xl shadow-blue-950/20 ring-1 ring-black/5">
+        {hasVideo ? (
+          <LoopPlayer
+            key={`${current.id}:${run}`}
+            update={current}
+            reducedMotion={reducedMotion}
+            onOpen={() => setPlaying(current)}
+            eager
+            loop={false}
+            onEnded={() => setEnded(true)}
+            controls={controls}
+          />
+        ) : current.posterUrl || controls ? (
+          <div className="relative aspect-video w-full">
+            {current.posterUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- storage/static URL in a fixed-ratio box
+              <img src={current.posterUrl} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+            )}
+            {controls && <div className="absolute bottom-3 right-3 z-20">{controls}</div>}
+          </div>
+        ) : null}
+
+        {ended && (
+          // The end card: what's next (its poster is fetched only now), or back to the start.
+          // Clear of the date chip at the top and the controls at the bottom, down to phone width.
+          <div
+            className={`absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 px-4 pb-14 pt-10 text-center text-white sm:gap-3 sm:pb-12 sm:pt-3 ${next?.posterUrl ? 'bg-gray-950' : 'bg-black/75'}`}
+            data-testid="whats-new-end"
+          >
+            {next?.posterUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- storage/static URL, decorative backdrop
+              <img src={next.posterUrl} alt="" decoding="async" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-35" />
+            )}
+            {next ? (
+              <>
+                <p className="hidden text-[11px] font-semibold uppercase tracking-wider text-white/75 sm:block">Up next</p>
+                <p className="line-clamp-1 max-w-md text-sm font-semibold sm:line-clamp-2 sm:text-lg">{next.title}</p>
+                <button type="button" onClick={() => go(at + 1)} className={`${big} bg-white text-gray-900 hover:bg-gray-100`} aria-label={`Next video: ${next.title}`}>
+                  Next video <ChevronIcon className="h-4 w-4" />
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-semibold sm:text-lg">That&rsquo;s all for now</p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {count > 1 && (
+                    <button type="button" onClick={() => go(0)} className={`${big} bg-white text-gray-900 hover:bg-gray-100`} aria-label={`Back to the latest: ${playlist[0].title}`}>
+                      Back to the latest
+                    </button>
+                  )}
+                  <button type="button" onClick={replay} className={`${big} bg-white/15 text-white ring-1 ring-white/40 hover:bg-white/25`} aria-label={`Replay: ${current.title}`}>
+                    Replay
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        <div
+          className={`pointer-events-none absolute left-3 top-3 z-20 flex items-center gap-2 rounded-full bg-white/90 py-1 pr-3 shadow-sm ring-1 ring-black/5 backdrop-blur-sm ${at === 0 ? 'pl-1' : 'pl-3'}`}
+        >
+          {at === 0 && <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">New</span>}
+          {current.publishedAt && (
+            <time dateTime={current.publishedAt} className="text-xs font-medium text-gray-700">
+              {formatUpdateDate(current.publishedAt)}
+            </time>
+          )}
+        </div>
+      </div>
+      {count > 1 && (
+        <p className="sr-only" aria-live="polite">
+          Video {at + 1} of {count}: {current.title}
+        </p>
+      )}
+      <div className="mt-4 flex flex-col gap-3">
+        <div className="min-w-0">
+          <h2 id="whats-new-title" className="text-lg sm:text-xl font-bold tracking-tight text-gray-900">
+            {current.title}
+          </h2>
+          {current.summary && <p className="mt-1 text-sm leading-relaxed text-gray-600">{current.summary}</p>}
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+          {current.ctaLabel && current.ctaHref && <CtaLink href={current.ctaHref}>{current.ctaLabel}</CtaLink>}
+          {hasVideo && (
+            <button
+              type="button"
+              onClick={() => setPlaying(current)}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-800 hover:text-black underline-offset-4 hover:underline"
+            >
+              <PlayIcon className="h-4 w-4" /> Watch the video
+            </button>
+          )}
+          {previous.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              className="text-sm font-medium text-gray-500 hover:text-gray-900 underline-offset-4 hover:underline"
+              aria-haspopup="dialog"
+            >
+              Previous updates
+            </button>
+          )}
+        </div>
+      </div>
+      <Overlays
+        previous={previous}
+        drawerOpen={drawerOpen}
+        playing={playing}
+        reducedMotion={reducedMotion}
+        onCloseDrawer={() => setDrawerOpen(false)}
+        onWatch={setPlaying}
+        onCloseVideo={() => setPlaying(null)}
+      />
     </section>
   );
 }
@@ -233,12 +385,20 @@ function LoopPlayer({
   reducedMotion,
   onOpen,
   eager = false,
+  loop = true,
+  onEnded,
+  controls,
 }: {
   update: SiteUpdate;
   reducedMotion: boolean;
   onOpen: () => void;
   /** Above the fold (hero): poster and loop load straight away, like the hero film did. */
   eager?: boolean;
+  /** false: play once, then call onEnded (the hero playlist). */
+  loop?: boolean;
+  onEnded?: () => void;
+  /** More buttons, shown beside the pause button. */
+  controls?: ReactNode;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -246,6 +406,7 @@ function LoopPlayer({
   const [visible, setVisible] = useState(false);
   const [started, setStarted] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [done, setDone] = useState(false);
   const { webm, mp4 } = loopSources(update);
   const animate = near && !reducedMotion && Boolean(webm || mp4);
 
@@ -285,10 +446,11 @@ function LoopPlayer({
 
   useEffect(() => {
     const el = video.current;
-    if (!el || !animate) return;
+    // Played to the end (no loop): stay on the last frame; play() would start it over.
+    if (!el || !animate || done) return;
     if (visible && !paused) el.play().catch(() => undefined);
     else el.pause();
-  }, [animate, visible, paused]);
+  }, [animate, visible, paused, done]);
 
   return (
     <div ref={box} className="relative aspect-video w-full overflow-hidden bg-gray-100" data-testid="whats-new-media">
@@ -315,13 +477,17 @@ function LoopPlayer({
             ref={video}
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${started ? 'opacity-100' : 'opacity-0'}`}
             muted
-            loop
+            loop={loop}
             playsInline
             preload="metadata"
             poster={update.posterUrl ?? undefined}
             aria-hidden="true"
             tabIndex={-1}
             onPlaying={() => setStarted(true)}
+            onEnded={() => {
+              setDone(true);
+              onEnded?.();
+            }}
           >
             {webm && <source src={webm} type="video/webm" />}
             {mp4 && <source src={mp4} type="video/mp4" />}
@@ -337,16 +503,21 @@ function LoopPlayer({
           </span>
         </span>
       </button>
-      {animate && (
-        // Moving content that lasts more than 5 s must be pausable (WCAG 2.2.2).
-        <button
-          type="button"
-          onClick={() => setPaused((p) => !p)}
-          className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/50 text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-black/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-          aria-label={paused ? 'Play the preview' : 'Pause the preview'}
-        >
-          {paused ? <PlayIcon className="h-4 w-4" /> : <PauseIcon className="h-4 w-4" />}
-        </button>
+      {(controls || (animate && !done)) && (
+        <div className="absolute bottom-3 right-3 z-20 flex items-center gap-2">
+          {controls}
+          {animate && !done && (
+            // Moving content that lasts more than 5 s must be pausable (WCAG 2.2.2).
+            <button
+              type="button"
+              onClick={() => setPaused((p) => !p)}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/50 text-white ring-1 ring-white/20 backdrop-blur-sm hover:bg-black/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-white sm:h-9 sm:w-9"
+              aria-label={paused ? 'Play the preview' : 'Pause the preview'}
+            >
+              {paused ? <PlayIcon className="h-4 w-4" /> : <PauseIcon className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
@@ -539,6 +710,14 @@ function PauseIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
       <rect x="6" y="5" width="4" height="14" rx="1" />
       <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  );
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m9 5 7 7-7 7" />
     </svg>
   );
 }

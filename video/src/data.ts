@@ -6,7 +6,7 @@
  */
 
 import { staticFile } from 'remotion';
-import type { AnnouncementData, Caption, Manifest, Scene, StrokesFile, UpdateConfig, VariantName } from './types';
+import type { AnnouncementData, Caption, Manifest, Scene, StrokesFile, TransitionConfig, UpdateConfig, VariantName } from './types';
 
 declare const require: {
   context(dir: string, recursive: boolean, re: RegExp): { keys(): string[]; (key: string): unknown };
@@ -47,14 +47,21 @@ export function resolveVariant(config: UpdateConfig, manifest: Manifest, variant
     if (!base) throw new Error(`Variant ${variant} lists unknown scene "${id}"`);
     return { ...base, ...(v?.sceneOverrides?.[id] ?? {}) } as Scene;
   });
-  const transitionFrames = config.transition.type === 'none' ? 0 : Math.round(config.transition.seconds * fps);
+  const framesOf = (t: TransitionConfig) => (t.type === 'none' ? 0 : Math.round(t.seconds * fps));
+  const transitionFrames = framesOf(config.transition);
+  // Each scene's own transition in, else the config's; the first scene has none.
+  const transitions = scenes.map((s, i) => {
+    const t = i === 0 ? { type: 'none' as const, seconds: 0 } : (s.transition ?? config.transition);
+    return { ...t, frames: framesOf(t) };
+  });
   const starts: Record<string, number> = {};
   let at = 0;
-  for (const s of scenes) {
+  scenes.forEach((s, i) => {
+    at -= transitions[i].frames;
     starts[s.id] = at;
-    at += Math.round(s.seconds * fps) - transitionFrames;
-  }
-  const durationInFrames = at + transitionFrames;
+    at += Math.round(s.seconds * fps);
+  });
+  const durationInFrames = at;
 
   const captions: Caption[] = [];
   for (const s of scenes) {
@@ -79,6 +86,7 @@ export function resolveVariant(config: UpdateConfig, manifest: Manifest, variant
     starts,
     durationInFrames,
     transitionFrames,
+    transitions,
   };
 }
 

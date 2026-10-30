@@ -5,7 +5,8 @@ import { DeviceFrame } from '../components/DeviceFrame';
 import { MouseCursor, PencilCursor, Ripple } from '../components/Pointer';
 import { cameraTransform, project, toStage } from '../layout';
 import type { ScreensScene as ScreensSceneConfig } from '../types';
-import { captureUrl, keyedCamera, layoutFor, resolveRect, Screen, ShotImage, shot, type SceneEnv } from './common';
+import { captureUrl, keyedCamera, layoutFor, outputRects, resolveRect, Screen, ShotImage, shot, type SceneEnv } from './common';
+import { Annotations } from '../components/Annotations';
 
 /** Real screenshots in a device frame, with a Ken Burns camera, a cursor and clicks. */
 export function ScreensScene({ scene, env }: { scene: ScreensSceneConfig; env: SceneEnv }) {
@@ -83,6 +84,7 @@ export function ScreensScene({ scene, env }: { scene: ScreensSceneConfig; env: S
         const p = project(cam, W, H, r[0] + r[2] / 2, r[1] + r[3] / 2);
         return <Callout key={i} x={p[0]} y={p[1]} text={c.text} side={c.side} from={c.from} to={c.to} font={env.font} accent={brand.colors.accent} />;
       })}
+      <Annotations items={scene.annotations} rectOf={outputRects(env, layout, cam)} />
     </AbsoluteFill>
   );
 }

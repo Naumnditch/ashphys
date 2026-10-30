@@ -1,4 +1,5 @@
 import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { Annotations } from '../components/Annotations';
 import { Background } from '../components/Background';
 import type { CtaScene as CtaSceneConfig } from '../types';
 import type { SceneEnv } from './common';
@@ -54,6 +55,7 @@ export function CtaScene({ scene, env }: { scene: CtaSceneConfig; env: SceneEnv 
         <div style={{ marginTop: 34 * unit, fontFamily: env.font, fontWeight: 700, fontSize: 40 * unit, color: brand.colors.accent, opacity: c }}>{brand.url}</div>
         {scene.note && <div style={{ marginTop: 18 * unit, fontFamily: env.font, fontWeight: 500, fontSize: 26 * unit, color: brand.colors.muted, opacity: c }}>{scene.note}</div>}
       </AbsoluteFill>
+      <Annotations items={scene.annotations} rectOf={() => null} />
     </AbsoluteFill>
   );
 }

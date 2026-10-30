@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Img, spring, staticFile } from 'remotion';
-import { frameLayout, rectToStage, type Camera, type FrameLayout } from '../layout';
+import { frameLayout, project, rectToStage, type Camera, type FrameLayout } from '../layout';
 import type { AnnouncementData, CameraKey, Rect, Shot, StrokesFile } from '../types';
 
 export interface SceneEnv {
@@ -57,7 +57,9 @@ export function keyedCamera(env: SceneEnv, layout: FrameLayout, keys: CameraKey[
   const H = env.data.height;
   const toCam = (k: CameraKey): Camera => {
     const r = k.focus ? resolveRect(env, layout, k.focus) : null;
-    return r ? { x: r[0] + r[2] / 2, y: r[1] + r[3] / 2, zoom: k.zoom } : { x: W / 2, y: H / 2, zoom: k.zoom };
+    const [sx, sy] = k.shift ?? [0, 0];
+    const c = r ? { x: r[0] + r[2] / 2, y: r[1] + r[3] / 2 } : { x: W / 2, y: H / 2 };
+    return { x: c.x - (sx * W) / k.zoom, y: c.y - (sy * H) / k.zoom, zoom: k.zoom };
   };
   if (!keys || keys.length === 0) return { x: W / 2, y: H / 2, zoom: 1 };
   let cam = toCam(keys[0]);
@@ -71,3 +73,16 @@ export function keyedCamera(env: SceneEnv, layout: FrameLayout, keys: CameraKey[
 }
 
 export const pathOf = (url: string) => `${url.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+
+/** Anchors for annotations: "shot:rect" → its rect in output pixels under the camera. */
+export function outputRects(env: SceneEnv, layout: FrameLayout, cam: Camera) {
+  const W = env.data.width;
+  const H = env.data.height;
+  return (ref: string): Rect | null => {
+    const r = resolveRect(env, layout, ref);
+    if (!r) return null;
+    const [x0, y0] = project(cam, W, H, r[0], r[1]);
+    const [x1, y1] = project(cam, W, H, r[0] + r[2], r[1] + r[3]);
+    return [x0, y0, x1 - x0, y1 - y0];
+  };
+}

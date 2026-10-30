@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ctaComplete, siteUpdateInput, slugify } from '@/lib/siteUpdates/validate';
-import { formatUpdateDate, isLive, siteUpdateStatus } from '@/lib/siteUpdates/types';
+import { formatUpdateDate, isLive, newestFirst, siteUpdateStatus } from '@/lib/siteUpdates/types';
 
 const base = { slug: 'handwritten-worked-solutions', title: 'Handwritten worked solutions' };
 
@@ -65,5 +65,19 @@ describe('site update status', () => {
 
   it('formats dates the same on server and browser (UTC)', () => {
     expect(formatUpdateDate('2026-10-28T23:30:00Z')).toBe('28 Oct 2026');
+  });
+});
+
+describe('newestFirst', () => {
+  it('orders by publish time, newest first, whatever order the rows came in; drafts last; ties keep their order', () => {
+    const rows = [
+      { id: 'hws', publishedAt: '2026-10-28T19:08:50.222Z' },
+      { id: 'draft', publishedAt: null },
+      { id: 'sys', publishedAt: '2026-10-29T21:00:00.000Z' },
+      { id: 'tie-a', publishedAt: '2026-10-01T00:00:00.000Z' },
+      { id: 'tie-b', publishedAt: '2026-10-01T00:00:00.000Z' },
+    ];
+    expect(newestFirst(rows).map((r) => r.id)).toEqual(['sys', 'hws', 'tie-a', 'tie-b', 'draft']);
+    expect(rows[0].id).toBe('hws'); // the input is not reordered
   });
 });

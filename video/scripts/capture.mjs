@@ -4,6 +4,7 @@
  *
  *   CAPTURE_BASE_URL=http://localhost:3100 \
  *   TEST_STUDENT_EMAIL=… TEST_STUDENT_PASSWORD=… TEST_ADMIN_EMAIL=… TEST_ADMIN_PASSWORD=… \
+ *   [TEST_STUDENT2_EMAIL=… TEST_STUDENT2_PASSWORD=…] \
  *   npm run capture -- --update=<slug> [--only=a-question,a-zoompan]
  *
  * Runs updates/<slug>/capture.mjs, which scripts the real UI through this
@@ -49,6 +50,8 @@ const browser = await chromium.launch({
 
 const VIEWPORTS = {
   desktop: { viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2 },
+  // A 16:10 desktop window, for pages whose key controls sit just below a 1080 px fold.
+  'desktop-tall': { viewport: { width: 1920, height: 1200 }, deviceScaleFactor: 2 },
   // iPad Pro 12.9" held landscape.
   tablet: {
     viewport: { width: 1366, height: 1024 },
@@ -80,8 +83,12 @@ async function session(role, form = 'desktop', scale) {
     return s;
   }
   await page.goto(`${baseUrl}/auth/login`, { waitUntil: 'networkidle' });
-  const email = role === 'admin' ? creds.TEST_ADMIN_EMAIL : creds.TEST_STUDENT_EMAIL;
-  const password = role === 'admin' ? creds.TEST_ADMIN_PASSWORD : creds.TEST_STUDENT_PASSWORD;
+  // "reader": a second test student (optional), e.g. one who sees another student's shared work.
+  if (role === 'reader' && !(process.env.TEST_STUDENT2_EMAIL && process.env.TEST_STUDENT2_PASSWORD)) {
+    throw new Error('The "reader" role needs TEST_STUDENT2_EMAIL and TEST_STUDENT2_PASSWORD (seeded by npm run seed).');
+  }
+  const email = { admin: creds.TEST_ADMIN_EMAIL, reader: process.env.TEST_STUDENT2_EMAIL }[role] ?? creds.TEST_STUDENT_EMAIL;
+  const password = { admin: creds.TEST_ADMIN_PASSWORD, reader: process.env.TEST_STUDENT2_PASSWORD }[role] ?? creds.TEST_STUDENT_PASSWORD;
   await page.locator('input[type="email"]').fill(email);
   await page.locator('input[type="password"]').fill(password);
   await Promise.all([
@@ -122,7 +129,9 @@ async function protectPrivacy(page, id) {
 async function rectsOf(page, selectors = {}) {
   const out = {};
   for (const [name, sel] of Object.entries(selectors)) {
-    const box = await page.locator(sel).first().boundingBox().catch(() => null);
+    if (!sel) continue;
+    // Rects that don't apply to this state (e.g. a button the action just replaced) are skipped quickly.
+    const box = await page.locator(sel).first().boundingBox({ timeout: 2000 }).catch(() => null);
     if (box) out[name] = [box.x, box.y, box.width, box.height].map((v) => Math.round(v * 10) / 10);
     else console.warn(`  rect "${name}" (${sel}) not found`);
   }
@@ -190,17 +199,20 @@ const helpers = {
   /**
    * A real interaction recorded frame by frame: `step(i)` drives the page
    * (wheel, drag, click…) and returns the pointer position for the cursor
-   * overlay; a JPEG is taken after every step.
+   * overlay (and `tool: 'pen'` while it writes with the pen, so the video
+   * draws a stylus instead of a mouse); a JPEG is taken after every step.
    */
   async sequence(id, s, frames, step, { fps = 30, rects = {} } = {}) {
     const seqDir = path.join(outDir, id);
     rmSync(seqDir, { recursive: true, force: true });
     mkdirSync(seqDir, { recursive: true });
     const pointer = [];
+    const tools = [];
     const events = [];
     for (let i = 0; i < frames; i++) {
       const r = (await step(i)) ?? {};
       pointer.push(r.pointer ?? null);
+      tools.push(r.tool ?? null);
       if (r.event) events.push({ frame: i, ...r.event });
       if (i === 0) await protectPrivacy(s.page, id);
       await s.page.screenshot({ path: path.join(seqDir, `${String(i).padStart(4, '0')}.jpg`), type: 'jpeg', quality: 92, animations: 'disabled', caret: 'hide' });
@@ -216,6 +228,7 @@ const helpers = {
       path: new URL(s.page.url()).pathname,
       rects: await rectsOf(s.page, rects),
       pointer,
+      ...(tools.some(Boolean) ? { tools } : {}),
       events,
     };
     console.log(`  ✓ ${id} (${frames} frames)`);

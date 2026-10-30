@@ -1,0 +1,601 @@
+{
+  "slug": "share-your-solution",
+  "title": "New: Share Your Solution",
+  "summary": "Work out a practice question in your own workspace and share it. Once your teacher approves it, other students see it next to the teacher's solution, with your name on it.",
+  "cta": {
+    "label": "Try a practice question",
+    "href": "/curriculum?c=a-level"
+  },
+  "fps": 30,
+  "brand": {
+    "logo": "brand/logo.png",
+    "url": "ashphys.org",
+    "font": "Inter",
+    "colors": {
+      "ink": "#111827",
+      "muted": "#4b5563",
+      "page": "#f9fafb",
+      "surface": "#ffffff",
+      "accent": "#2563eb",
+      "accentSoft": "#dbeafe",
+      "highlight": "#fde68a",
+      "grid": "#dfe3ea"
+    }
+  },
+  "showcase": {
+    "B": {
+      "questionIncludes": [
+        "Phobos",
+        "9.38 × 10⁶ m",
+        "2.76 × 10⁴ s",
+        "mass of Mars"
+      ],
+      "answer": "6.412e23"
+    }
+  },
+  "capture": {
+    "question": {
+      "lessonId": "1585a36a-5b5c-5505-abe3-98e37e28c48b",
+      "number": 16
+    }
+  },
+  "transition": {
+    "type": "slide",
+    "seconds": 0.4,
+    "direction": "from-right"
+  },
+  "scenes": [
+    {
+      "id": "hook",
+      "type": "title",
+      "seconds": 3.4,
+      "kicker": "New",
+      "title": "Share your solution",
+      "annotations": [
+        {
+          "kind": "underline",
+          "rect": [
+            0.27,
+            0.6,
+            0.46,
+            0.052
+          ],
+          "from": 0.85,
+          "draw": 0.5,
+          "pad": 4,
+          "color": "red"
+        },
+        {
+          "kind": "note",
+          "text": "students can now publish their working",
+          "at": [
+            0.5,
+            0.71
+          ],
+          "align": "center",
+          "size": 44,
+          "from": 1.2,
+          "draw": 1.3
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.3,
+          "to": 3.2,
+          "text": "New on AshPhys: share your solution"
+        }
+      ]
+    },
+    {
+      "id": "solve",
+      "type": "sequence",
+      "seconds": 5.4,
+      "device": "browser",
+      "capture": "solve",
+      "transition": {
+        "type": "wipe",
+        "seconds": 0.45,
+        "direction": "from-right"
+      },
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1.05
+        },
+        {
+          "at": 0.25,
+          "zoom": 1.55,
+          "focus": "solve:working"
+        },
+        {
+          "at": 2.45,
+          "zoom": 1.7,
+          "focus": "solve:steps"
+        }
+      ],
+      "annotations": [
+        {
+          "kind": "step",
+          "number": "1",
+          "text": "Solve it your way",
+          "from": 0.35,
+          "size": 48
+        },
+        {
+          "kind": "arrow",
+          "anchor": "solve:answer",
+          "start": [
+            0.2,
+            0.2
+          ],
+          "from": 1.6,
+          "color": "red",
+          "to": 2.4
+        },
+        {
+          "kind": "circle",
+          "anchor": "solve:stepsSaved",
+          "from": 4.1,
+          "pad": 12,
+          "color": "red"
+        },
+        {
+          "kind": "note",
+          "text": "saves as you go",
+          "anchor": "solve:stepsSaved",
+          "side": "left",
+          "size": 40,
+          "from": 4.35
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 5.2,
+          "text": "Solve a practice question in your own workspace"
+        }
+      ]
+    },
+    {
+      "id": "share",
+      "type": "sequence",
+      "seconds": 5.4,
+      "device": "browser",
+      "capture": "share",
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1.25,
+          "focus": "share:shareButton"
+        },
+        {
+          "at": 0.6,
+          "zoom": 1.6,
+          "focus": "share:dialog"
+        },
+        {
+          "at": 4.0,
+          "zoom": 1.9,
+          "focus": "share:pendingChip",
+          "shift": [
+            -0.2,
+            0.12
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "kind": "step",
+          "number": "2",
+          "text": "Add your name",
+          "from": 0.35,
+          "size": 48
+        },
+        {
+          "kind": "box",
+          "anchor": "share:nameInput",
+          "from": 1.85,
+          "pad": 8,
+          "to": 3.9
+        },
+        {
+          "kind": "note",
+          "text": "your name, your way",
+          "anchor": "share:nameInput",
+          "side": "right",
+          "size": 36,
+          "from": 2.0,
+          "to": 3.9
+        },
+        {
+          "kind": "tick",
+          "anchor": "share:boxWorked",
+          "from": 2.78,
+          "size": 44,
+          "color": "green",
+          "to": 3.9
+        },
+        {
+          "kind": "tick",
+          "anchor": "share:boxLicence",
+          "from": 3.02,
+          "size": 44,
+          "color": "green",
+          "to": 3.9
+        },
+        {
+          "kind": "tick",
+          "anchor": "share:boxParent",
+          "from": 3.28,
+          "size": 44,
+          "color": "green",
+          "to": 3.9
+        },
+        {
+          "kind": "note",
+          "text": "under 18? a parent says yes",
+          "anchor": "share:checkParent",
+          "side": "right",
+          "size": 34,
+          "from": 3.2,
+          "to": 4.1,
+          "draw": 0.6
+        },
+        {
+          "kind": "circle",
+          "anchor": "share:pendingChip",
+          "from": 4.3,
+          "pad": 10,
+          "color": "red"
+        },
+        {
+          "kind": "note",
+          "text": "sent for review",
+          "anchor": "share:pendingChip",
+          "side": "top",
+          "align": "left",
+          "size": 40,
+          "from": 4.45,
+          "draw": 0.5
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 5.2,
+          "text": "Share it under the name you choose"
+        }
+      ]
+    },
+    {
+      "id": "review",
+      "type": "screens",
+      "seconds": 6.0,
+      "device": "browser",
+      "shots": [
+        {
+          "capture": "review-pending",
+          "at": 0
+        },
+        {
+          "capture": "review-approved",
+          "at": 2.4
+        },
+        {
+          "capture": "review-verified",
+          "at": 3.45
+        }
+      ],
+      "cursor": [
+        {
+          "at": 0.3,
+          "target": "review-pending:studentPane"
+        },
+        {
+          "at": 1.5,
+          "target": "review-pending:approve"
+        },
+        {
+          "at": 1.85,
+          "target": "review-pending:approve",
+          "click": true
+        },
+        {
+          "at": 2.9,
+          "target": "review-pending:verifiedBox"
+        },
+        {
+          "at": 3.25,
+          "target": "review-pending:verifiedBox",
+          "click": true
+        },
+        {
+          "at": 4.3,
+          "target": "review-verified:header"
+        }
+      ],
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1.05
+        },
+        {
+          "at": 0.3,
+          "zoom": 1.75,
+          "focus": "review-pending:panes",
+          "shift": [
+            0.04,
+            0.06
+          ]
+        },
+        {
+          "at": 1.3,
+          "zoom": 1.9,
+          "focus": "review-pending:actions",
+          "shift": [
+            0,
+            0.05
+          ]
+        },
+        {
+          "at": 3.75,
+          "zoom": 2.2,
+          "focus": "review-verified:chip+badge",
+          "shift": [
+            0.05,
+            -0.04
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "kind": "step",
+          "number": "3",
+          "text": "Your teacher checks it",
+          "from": 0.35,
+          "size": 48
+        },
+        {
+          "kind": "tick",
+          "anchor": "review-pending:approve",
+          "from": 1.92,
+          "size": 100,
+          "color": "green",
+          "offset": [
+            10,
+            -8
+          ],
+          "to": 2.45
+        },
+        {
+          "kind": "tick",
+          "anchor": "review-pending:verifiedBox",
+          "from": 3.3,
+          "size": 60,
+          "color": "green",
+          "to": 3.85
+        },
+        {
+          "kind": "circle",
+          "anchor": "review-verified:badge",
+          "from": 4.1,
+          "pad": 8,
+          "color": "red"
+        },
+        {
+          "kind": "note",
+          "text": "checked against the mark scheme",
+          "anchor": "review-verified:badge",
+          "side": "bottom",
+          "align": "left",
+          "size": 40,
+          "from": 4.35
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 5.8,
+          "text": "Your teacher reviews it and approves it"
+        }
+      ]
+    },
+    {
+      "id": "published",
+      "type": "screens",
+      "seconds": 6.0,
+      "device": "browser",
+      "transition": {
+        "type": "wipe",
+        "seconds": 0.45,
+        "direction": "from-right"
+      },
+      "shots": [
+        {
+          "capture": "board",
+          "at": 0
+        }
+      ],
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1.05
+        },
+        {
+          "at": 0.35,
+          "zoom": 1.3,
+          "focus": "board:panel",
+          "shift": [
+            0.02,
+            0.08
+          ]
+        },
+        {
+          "at": 1.9,
+          "zoom": 1.8,
+          "focus": "board:studentHeader+studentSheet",
+          "shift": [
+            0.14,
+            -0.03
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "kind": "step",
+          "number": "4",
+          "text": "Your name, under your solution",
+          "from": 0.35,
+          "size": 48
+        },
+        {
+          "kind": "circle",
+          "anchor": "board:studentTitle",
+          "from": 2.3,
+          "pad": 8,
+          "color": "red"
+        },
+        {
+          "kind": "note",
+          "text": "Sam T.",
+          "anchor": "board:studentSheet",
+          "side": "bottom",
+          "size": 64,
+          "underline": "double",
+          "from": 2.85,
+          "offset": [
+            0,
+            -4
+          ]
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 5.8,
+          "text": "Other students see it next to the teacher's solution, with your name"
+        }
+      ]
+    },
+    {
+      "id": "withdraw",
+      "type": "screens",
+      "seconds": 3.0,
+      "device": "browser",
+      "shots": [
+        {
+          "capture": "withdraw",
+          "at": 0
+        },
+        {
+          "capture": "withdrawn",
+          "at": 1.75
+        }
+      ],
+      "cursor": [
+        {
+          "at": 0.2,
+          "target": "withdraw:statusRow"
+        },
+        {
+          "at": 1.3,
+          "target": "withdraw:withdraw"
+        },
+        {
+          "at": 1.62,
+          "target": "withdraw:withdraw",
+          "click": true
+        }
+      ],
+      "camera": [
+        {
+          "at": 0,
+          "zoom": 1.5,
+          "focus": "withdraw:statusRow",
+          "shift": [
+            0,
+            0.2
+          ]
+        },
+        {
+          "at": 0.15,
+          "zoom": 1.85,
+          "focus": "withdraw:statusRow",
+          "shift": [
+            0.05,
+            0.22
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "kind": "note",
+          "text": "Change your mind?\nWithdraw anytime",
+          "at": [
+            0.16,
+            0.18
+          ],
+          "size": 58,
+          "from": 0.2
+        },
+        {
+          "kind": "arrow",
+          "anchor": "withdraw:withdraw",
+          "start": [
+            0.42,
+            0.53
+          ],
+          "from": 1.05,
+          "color": "red"
+        }
+      ],
+      "captions": [
+        {
+          "from": 0.2,
+          "to": 2.8,
+          "text": "You can withdraw it at any time"
+        }
+      ]
+    },
+    {
+      "id": "cta",
+      "type": "cta",
+      "seconds": 3.2,
+      "transition": {
+        "type": "fade",
+        "seconds": 0.45
+      },
+      "title": "Your work. Your name.",
+      "button": "Try a practice question",
+      "annotations": [
+        {
+          "kind": "underline",
+          "rect": [
+            0.497,
+            0.42,
+            0.21,
+            0.07
+          ],
+          "from": 0.7,
+          "draw": 0.45,
+          "pad": 2,
+          "color": "red"
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "heroLoop": {
+      "width": 1280,
+      "height": 720,
+      "maxBytes": 5000000,
+      "captions": false,
+      "loop": false
+    },
+    "poster": {
+      "variant": "heroLoop",
+      "scene": "published",
+      "at": 4.9
+    }
+  }
+}

@@ -41,6 +41,12 @@ export function isLive(u: Pick<SiteUpdate, 'isActive' | 'publishedAt'>, now: num
   return siteUpdateStatus(u, now) === 'live';
 }
 
+/** Newest first by publish time (drafts last); ties keep the order they came in. */
+export function newestFirst<T extends Pick<SiteUpdate, 'publishedAt'>>(updates: T[]): T[] {
+  const time = (u: T) => (u.publishedAt ? Date.parse(u.publishedAt) : Number.NEGATIVE_INFINITY);
+  return [...updates].sort((a, b) => time(b) - time(a));
+}
+
 /** "28 Oct 2026", in UTC so the server and the browser render the same text. */
 export function formatUpdateDate(iso: string): string {
   return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(iso));

@@ -1,7 +1,8 @@
-import { AbsoluteFill, Freeze, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
-import { linearTiming, TransitionSeries } from '@remotion/transitions';
+import { AbsoluteFill, Easing, Freeze, interpolate, useCurrentFrame, useVideoConfig } from 'remotion';
+import { linearTiming, TransitionSeries, type TransitionPresentation } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
 import { slide } from '@remotion/transitions/slide';
+import { wipe } from '@remotion/transitions/wipe';
 import { Captions } from './components/Captions';
 import { UPDATES } from './data';
 import { fontFamily } from './fonts';
@@ -11,7 +12,7 @@ import { ScreensScene } from './scenes/ScreensScene';
 import { SequenceScene } from './scenes/SequenceScene';
 import { TitleScene } from './scenes/TitleScene';
 import type { SceneEnv } from './scenes/common';
-import type { AnnouncementData, Scene } from './types';
+import type { AnnouncementData, Scene, TransitionConfig } from './types';
 
 export interface AnnouncementProps {
   slug: string;
@@ -35,14 +36,19 @@ function SceneView({ scene, env }: { scene: Scene; env: SceneEnv }) {
   }
 }
 
+// TransitionSeries takes any presentation; widen the three to one type.
+function presentationOf(t: TransitionConfig): TransitionPresentation<Record<string, unknown>> {
+  const direction = t.direction ?? 'from-right';
+  const p = t.type === 'slide' ? slide({ direction }) : t.type === 'wipe' ? wipe({ direction }) : fade();
+  return p as unknown as TransitionPresentation<Record<string, unknown>>;
+}
+
 /** The template: the scene list from the config, joined by transitions, captions on top. */
 export function Announcement({ slug, data }: AnnouncementProps) {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
   if (!data) return null;
   const env: SceneEnv = { data, strokes: UPDATES[slug]?.strokes ?? {}, font: fontFamily };
-  const T = data.transitionFrames;
-  const presentation = data.config.transition.type === 'slide' ? slide({ direction: 'from-right' }) : fade();
 
   // Hero loop: the last half second dissolves into the first frame, so the loop has no seam.
   const loopFrames = Math.round(fps * 0.5);
@@ -57,8 +63,11 @@ export function Announcement({ slug, data }: AnnouncementProps) {
               <SceneView scene={scene} env={env} />
             </TransitionSeries.Sequence>,
           ];
-          if (T > 0 && i < data.scenes.length - 1) {
-            items.push(<TransitionSeries.Transition key={`${scene.id}-t`} presentation={presentation} timing={linearTiming({ durationInFrames: T })} />);
+          const next = data.transitions[i + 1];
+          if (next && next.frames > 0) {
+            items.push(
+              <TransitionSeries.Transition key={`${scene.id}-t`} presentation={presentationOf(next)} timing={linearTiming({ durationInFrames: next.frames, easing: Easing.inOut(Easing.cubic) })} />
+            );
           }
           return items;
         })}

@@ -1,4 +1,5 @@
 import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { Annotations } from '../components/Annotations';
 import { Background } from '../components/Background';
 import type { TitleScene as TitleSceneConfig } from '../types';
 import type { SceneEnv } from './common';
@@ -73,6 +74,7 @@ export function TitleScene({ scene, env }: { scene: TitleSceneConfig; env: Scene
           </div>
         )}
       </AbsoluteFill>
+      <Annotations items={scene.annotations} rectOf={() => null} />
     </AbsoluteFill>
   );
 }

@@ -2,10 +2,11 @@ import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig } from 'remotion';
 import { Background } from '../components/Background';
 import { Callout } from '../components/Callout';
 import { DeviceFrame } from '../components/DeviceFrame';
-import { MouseCursor, PinchIndicator, Ripple } from '../components/Pointer';
+import { MouseCursor, PencilCursor, PinchIndicator, Ripple } from '../components/Pointer';
 import { cameraTransform, project, toStage } from '../layout';
 import type { SequenceScene as SequenceSceneConfig } from '../types';
-import { captureUrl, keyedCamera, layoutFor, resolveRect, Screen, shot, type SceneEnv } from './common';
+import { captureUrl, keyedCamera, layoutFor, outputRects, resolveRect, Screen, shot, type SceneEnv } from './common';
+import { Annotations } from '../components/Annotations';
 
 /** A real interaction recorded frame by frame (zoom, pan, full screen), with the pointer drawn on top. */
 export function SequenceScene({ scene, env }: { scene: SequenceSceneConfig; env: SceneEnv }) {
@@ -51,13 +52,15 @@ export function SequenceScene({ scene, env }: { scene: SequenceSceneConfig; env:
           return <Ripple key={e.frame} x={o[0]} y={o[1]} t={(i - e.frame) / seqFps} color={brand.colors.accent} size={70 * unit} />;
         })}
       {out && pinch && <PinchIndicator x={out[0]} y={out[1]} progress={(i - pinch.frame) / 40} size={50 * unit} opacity={Math.min(1, (40 - (i - pinch.frame)) / 6)} />}
-      {out && !pinch && <MouseCursor x={out[0]} y={out[1]} pressed={pressed} size={30 * unit} />}
+      {out && !pinch && s.tools?.[i] === 'pen' && <PencilCursor x={out[0]} y={out[1]} size={230 * unit} />}
+      {out && !pinch && s.tools?.[i] !== 'pen' && <MouseCursor x={out[0]} y={out[1]} pressed={pressed} size={30 * unit} />}
       {(scene.callouts ?? []).map((c, k) => {
         const r = resolveRect(env, layout, c.anchor);
         if (!r) return null;
         const p = project(cam, W, H, r[0] + r[2] / 2, r[1] + r[3] / 2);
         return <Callout key={k} x={p[0]} y={p[1]} text={c.text} side={c.side} from={c.from} to={c.to} font={env.font} accent={brand.colors.accent} />;
       })}
+      <Annotations items={scene.annotations} rectOf={outputRects(env, layout, cam)} />
     </AbsoluteFill>
   );
 }

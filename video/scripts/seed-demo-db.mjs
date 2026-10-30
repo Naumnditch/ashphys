@@ -2,13 +2,17 @@
 /**
  * Stand up the LOCAL database the capture build runs against:
  *   1. the live schema (video/.cache/demo/schema.sql, from export-demo-data),
- *   2. the site's own idempotent migrations for handwriting and site_updates,
+ *   2. the site's own idempotent migrations for handwriting, site_updates and
+ *      shared solutions (student workspaces + "Share my solution"),
  *   3. the exported demo rows (lessons, questions, handwritten solutions),
- *   4. a TEST student and a TEST admin from environment variables,
- *   5. a clean slate for the test student (no attempts, no solution views).
+ *   4. a TEST student and a TEST admin from environment variables (plus an
+ *      optional second TEST student, "Test Reader", from TEST_STUDENT2_*),
+ *   5. a clean slate for the test students (no attempts, no solution views, no
+ *      workspaces, no shared solutions).
  *
  *   DATABASE_URL=postgresql://…@localhost:5433/ashphys \
  *   TEST_STUDENT_EMAIL=… TEST_STUDENT_PASSWORD=… TEST_ADMIN_EMAIL=… TEST_ADMIN_PASSWORD=… \
+ *   [TEST_STUDENT2_EMAIL=… TEST_STUDENT2_PASSWORD=…] \
  *   npm run seed -- [--student-tier=free|plus|pro] [--reset-only]
  *
  * Refuses to touch anything but localhost unless DEMO_DB_ALLOW_REMOTE=1 (a
@@ -67,7 +71,7 @@ try {
     if (!existsSync(path.join(demo, 'schema.sql'))) throw new Error('Run `npm run export-demo-data -- --update=<slug>` first.');
     const fresh = !(await client.query(`SELECT to_regclass('public.users') IS NOT NULL AS ok`)).rows[0].ok;
     if (fresh) await runStatements(readFileSync(path.join(demo, 'schema.sql'), 'utf8'));
-    for (const m of ['2026-10-28-question-handwriting.sql', '2026-10-28-site-updates.sql']) {
+    for (const m of ['2026-10-28-question-handwriting.sql', '2026-10-28-site-updates.sql', '2026-10-29-shared-solutions.sql']) {
       await client.query(readFileSync(path.join(SITE_DIR, 'database', 'seeds', m), 'utf8'));
     }
 
@@ -112,31 +116,42 @@ try {
   };
   const studentId = await upsertUser(env.TEST_STUDENT_EMAIL, env.TEST_STUDENT_PASSWORD, 'student', 'Test', 'Student');
   const adminId = await upsertUser(env.TEST_ADMIN_EMAIL, env.TEST_ADMIN_PASSWORD, 'admin', 'Demo', 'Teacher');
+  // Optional second student: the one who sees an approved shared solution on the question page.
+  const readerId =
+    process.env.TEST_STUDENT2_EMAIL && process.env.TEST_STUDENT2_PASSWORD
+      ? await upsertUser(process.env.TEST_STUDENT2_EMAIL, process.env.TEST_STUDENT2_PASSWORD, 'student', 'Test', 'Reader')
+      : null;
   await client.query(`UPDATE question_handwriting SET created_by = coalesce(created_by, $1), updated_by = coalesce(updated_by, $1)`, [adminId]);
 
-  // Clean slate for the student: no answers, no views, no sessions left over from a previous capture.
-  for (const sql of [
+  // Clean slate for the students: no answers, no views, no workspaces or shared solutions,
+  // no age answer, no sessions left over from a previous capture.
+  for (const id of [studentId, readerId].filter(Boolean)) for (const sql of [
     `DELETE FROM practice_attempts WHERE student_id = $1`,
     `DELETE FROM practice_sessions WHERE student_id = $1`,
     `DELETE FROM topic_mastery WHERE student_id = $1`,
     `DELETE FROM user_solution_views WHERE user_id = $1`,
     `DELETE FROM solution_access_log WHERE user_id = $1`,
     `DELETE FROM subscriptions WHERE student_id = $1`,
+    `DELETE FROM shared_solutions WHERE user_id = $1`,
+    `DELETE FROM student_workspaces WHERE user_id = $1`,
+    `UPDATE users SET age_band = NULL, age_band_declared_at = NULL WHERE id = $1`,
     `UPDATE sessions SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`,
   ]) {
-    await client.query(sql, [studentId]).catch((e) => {
+    await client.query(sql, [id]).catch((e) => {
       if (!/does not exist/.test(e.message)) throw e;
     });
   }
   await client.query(`UPDATE sessions SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`, [adminId]);
   if (studentTier > 0) {
-    await client.query(
-      `INSERT INTO subscriptions (student_id, plan_id, status, start_date, end_date, tier)
-       SELECT $1, id, 'active', now(), now() + interval '30 days', 'premium' FROM subscription_plans WHERE tier_level = $2 ORDER BY "order" LIMIT 1`,
-      [studentId, studentTier]
-    );
+    for (const id of [studentId, readerId].filter(Boolean)) {
+      await client.query(
+        `INSERT INTO subscriptions (student_id, plan_id, status, start_date, end_date, tier)
+         SELECT $1, id, 'active', now(), now() + interval '30 days', 'premium' FROM subscription_plans WHERE tier_level = $2 ORDER BY "order" LIMIT 1`,
+        [id, studentTier]
+      );
+    }
   }
-  console.log(`Seeded. Test student tier: ${Object.keys(TIERS)[studentTier]}.`);
+  console.log(`Seeded. Test student tier: ${Object.keys(TIERS)[studentTier]}${readerId ? ' (both test students)' : ''}.`);
 } finally {
   await client.end();
 }
