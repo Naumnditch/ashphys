@@ -1,459 +1,461 @@
-"""Original SVG illustrations for the Grade 11 AS Physics examination."""
-import math
+"""Monochrome diagrams in the style of the Grade 12 First Quarter Examination.
 
-INK = "#1b1f24"
-NAVY = "#1d4e89"
-RED = "#b3261e"
-GREEN = "#2e7d32"
-GREY = "#6b7280"
-LIGHT = "#e5e7eb"
-SANS = "Liberation Sans, Arial, sans-serif"
+Every box figure is 480 x 360 (rendered to a 960 x 720 PNG), black line work,
+light-grey fills, serif labels and grey dimension lines.
+"""
+import math
+import os
+
+OUT = os.path.join(os.path.dirname(__file__), "..", "figs", "svg")
+os.makedirs(OUT, exist_ok=True)
+
+K = "#111111"
+G = "#666666"
+FILL = "#e8e8e8"
 SERIF = "Liberation Serif, Times New Roman, serif"
 
-DEFS = f"""
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
- <defs>
-  <marker id="ah-k" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="{INK}"/></marker>
-  <marker id="ah-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="{NAVY}"/></marker>
-  <marker id="ah-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="{RED}"/></marker>
-  <marker id="ah-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 L2.5,5 z" fill="{GREEN}"/></marker>
-  <marker id="ah-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="{INK}"/></marker>
-  <radialGradient id="g-pos" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffb4a8"/><stop offset="0.55" stop-color="#d9412f"/><stop offset="1" stop-color="#8e1c12"/></radialGradient>
-  <radialGradient id="g-neg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#b3d4ff"/><stop offset="0.55" stop-color="#2f6fc4"/><stop offset="1" stop-color="#173f78"/></radialGradient>
-  <radialGradient id="g-ball" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="0.5" stop-color="#9aa4b1"/><stop offset="1" stop-color="#3d4651"/></radialGradient>
-  <linearGradient id="g-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c99a"/><stop offset="1" stop-color="#c79a5f"/></linearGradient>
-  <linearGradient id="g-snow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e2ee"/></linearGradient>
-  <linearGradient id="g-metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f4f6"/><stop offset="1" stop-color="#b8bec7"/></linearGradient>
-  <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="{GREY}" stroke-width="1.2"/></pattern>
- </defs>
-</svg>
-"""
+DEFS = f"""<defs>
+<marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" fill="{K}"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1.5 L10,5 L0,8.5 z" fill="{G}"/></marker>
+<marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0.5 L10,5 L0,9.5 z" fill="{K}"/></marker>
+</defs>"""
 
 
-def svg(w, h, body, cls="fig", style=""):
-    return (f'<svg class="{cls}" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
-            f'style="{style}" xmlns="http://www.w3.org/2000/svg" font-family="{SANS}">{body}</svg>')
+def svg(body, w=480, h=360):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" '
+            f'font-family="{SERIF}"><rect width="{w}" height="{h}" fill="#fff"/>{DEFS}{body}</svg>')
 
 
-def t(x, y, s, size=13, anchor="middle", color=INK, weight="normal", italic=False, family=None, extra=""):
-    fam = family or (SERIF if italic else SANS)
+def t(x, y, s, size=20, anchor="middle", color=K, italic=False, weight="normal", fam=None):
     st = ' font-style="italic"' if italic else ""
-    return (f'<text x="{x}" y="{y}" font-size="{size}" text-anchor="{anchor}" fill="{color}" '
-            f'font-weight="{weight}" font-family="{fam}"{st} {extra}>{s}</text>')
+    f = f' font-family="{fam}"' if fam else ""
+    return f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" text-anchor="{anchor}" fill="{color}" font-weight="{weight}"{st}{f}>{s}</text>'
 
 
-def line(x1, y1, x2, y2, color=INK, w=1.5, dash=None, arrow=None, start_arrow=False, extra=""):
+def ln(x1, y1, x2, y2, c=K, w=2, dash=None, arrow=None, both=False):
     d = f' stroke-dasharray="{dash}"' if dash else ""
     m = ""
     if arrow:
-        m += f' marker-end="url(#ah-{arrow})"'
-        if start_arrow:
-            m += f' marker-start="url(#ah-{arrow})"'
-    return (f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{color}" stroke-width="{w}"'
-            f' stroke-linecap="round"{d}{m} {extra}/>')
+        m = f' marker-end="url(#{arrow})"' + (f' marker-start="url(#{arrow})"' if both else "")
+    return f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{c}" stroke-width="{w}" stroke-linecap="round"{d}{m}/>'
 
 
-def charge(x, y, sign, r=15):
-    g = "g-pos" if sign == "+" else "g-neg"
-    sym = "+" if sign == "+" else "&#8722;"
-    return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="url(#{g})" stroke="#2b2b2b" stroke-width="0.8"/>'
-            + t(x, y + r * 0.42, sym, size=r * 1.35, color="#fff", weight="bold"))
+def charge(x, y, sign, r=20):
+    s = (f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff" stroke="{K}" stroke-width="2.2"/>'
+         + ln(x - r * 0.5, y, x + r * 0.5, y, K, 2.2))
+    if sign == "+":
+        s += ln(x, y - r * 0.5, x, y + r * 0.5, K, 2.2)
+    return s
 
 
-def dim(x1, x2, y, label, size=13, tick=8, color=INK):
-    """Horizontal dimension line with arrows at both ends."""
-    return (line(x1, y - tick, x1, y + tick, color, 1) + line(x2, y - tick, x2, y + tick, color, 1)
-            + line(x1 + 1, y, x2 - 1, y, color, 1.1, arrow="k", start_arrow=True)
-            + f'<rect x="{(x1 + x2) / 2 - len(label) * 3.6 - 4}" y="{y - 9}" width="{len(label) * 7.2 + 8}" height="18" fill="#fff"/>'
-            + t((x1 + x2) / 2, y + 4.5, label, size))
+def hdim(x1, x2, y, label, tick=12, size=20, above=True, italic=False):
+    s = ln(x1, y - tick, x1, y + tick, G, 1.3) + ln(x2, y - tick, x2, y + tick, G, 1.3)
+    s += ln(x1 + 2, y, x2 - 2, y, G, 1.3, arrow="g", both=True)
+    s += t((x1 + x2) / 2, y - 8 if above else y + 24, label, size, italic=italic)
+    return s
 
 
-def vdim(x, y1, y2, label, size=13, tick=8, anchor="end", dx=-8):
-    return (line(x - tick, y1, x + tick, y1, INK, 1) + line(x - tick, y2, x + tick, y2, INK, 1)
-            + line(x, y1 + 1, x, y2 - 1, INK, 1.1, arrow="k", start_arrow=True)
-            + t(x + dx, (y1 + y2) / 2 + 4.5, label, size, anchor=anchor))
+def vdim(x, y1, y2, label, tick=12, size=20, left=True):
+    s = ln(x - tick, y1, x + tick, y1, G, 1.3) + ln(x - tick, y2, x + tick, y2, G, 1.3)
+    s += ln(x, y1 + 2, x, y2 - 2, G, 1.3, arrow="g", both=True)
+    s += t(x - 10 if left else x + 10, (y1 + y2) / 2 + 7, label, size, anchor="end" if left else "start")
+    return s
 
 
-def arc(cx, cy, r, a1, a2, color=INK, w=1.2):
-    """Angle arc, angles in degrees measured anticlockwise from +x (screen y flipped)."""
+def arc(cx, cy, r, a1, a2, c=K, w=1.4):
     x1 = cx + r * math.cos(math.radians(a1)); y1 = cy - r * math.sin(math.radians(a1))
     x2 = cx + r * math.cos(math.radians(a2)); y2 = cy - r * math.sin(math.radians(a2))
-    large = 1 if abs(a2 - a1) > 180 else 0
     sweep = 0 if a2 > a1 else 1
-    return f'<path d="M{x1:.1f},{y1:.1f} A{r},{r} 0 {large},{sweep} {x2:.1f},{y2:.1f}" fill="none" stroke="{color}" stroke-width="{w}"/>'
+    return f'<path d="M{x1:.1f},{y1:.1f} A{r},{r} 0 0,{sweep} {x2:.1f},{y2:.1f}" fill="none" stroke="{c}" stroke-width="{w}"/>'
 
 
-def right_angle(x, y, s=10, dx=1, dy=-1, color=INK):
-    return (f'<path d="M{x + dx * s},{y} L{x + dx * s},{y + dy * s} L{x},{y + dy * s}" fill="none" '
-            f'stroke="{color}" stroke-width="1.1"/>')
+def rangle(x, y, s=12, dx=1, dy=-1):
+    return f'<path d="M{x + dx * s},{y} L{x + dx * s},{y + dy * s} L{x},{y + dy * s}" fill="none" stroke="{K}" stroke-width="1.3"/>'
 
 
-def compass(x, y, size=26):
-    return (line(x, y + size * 0.55, x, y - size * 0.55, INK, 1.6, arrow="s")
-            + line(x - size * 0.45, y, x + size * 0.45, y, INK, 1, )
-            + t(x, y - size * 0.55 - 5, "N", 12, weight="bold")
-            + t(x + size * 0.45 + 9, y + 4, "E", 11, color=GREY)
-            + t(x - size * 0.45 - 9, y + 4, "W", 11, color=GREY)
-            + t(x, y + size * 0.55 + 13, "S", 11, color=GREY))
+def note(s, x=468, y=350):
+    return t(x, y, s, 15, anchor="end", color=G)
 
 
-# ---------------------------------------------------------------- graphs
-def graph(xmax, ymax, xmajor, ymajor, xsub, ysub, pw, ph, xlabel, ylabel,
-          series=(), extra_fn=None, ml=58, mb=46, mt=16, mr=22, xfmt="{:g}", yfmt="{:g}",
-          grid_color="#c7d3e0", major_color="#8aa1bb", paper=True):
-    W = ml + pw + mr
-    H = mt + ph + mb
-    X = lambda v: ml + v / xmax * pw
-    Y = lambda v: mt + ph - v / ymax * ph
-    b = []
-    if paper:
-        b.append(f'<rect x="{ml}" y="{mt}" width="{pw}" height="{ph}" fill="#fbfdff"/>')
-        nx = round(xmax / xmajor * xsub)
-        ny = round(ymax / ymajor * ysub)
-        for i in range(nx + 1):
-            x = ml + i * pw / nx
-            major = i % xsub == 0
-            b.append(line(round(x, 2), mt, round(x, 2), mt + ph, major_color if major else grid_color,
-                          0.9 if major else 0.45))
-        for j in range(ny + 1):
-            y = mt + ph - j * ph / ny
-            major = j % ysub == 0
-            b.append(line(ml, round(y, 2), ml + pw, round(y, 2), major_color if major else grid_color,
-                          0.9 if major else 0.45))
-    # axes
-    b.append(line(ml, mt + ph, ml + pw + 12, mt + ph, INK, 1.6, arrow="k"))
-    b.append(line(ml, mt + ph, ml, mt - 10, INK, 1.6, arrow="k"))
+def north(x, y, L=44):
+    return ln(x, y + L / 2, x, y - L / 2, K, 2, arrow="a") + t(x, y - L / 2 - 8, "N", 20)
+
+
+def graph(xmax, ymax, xmaj, ymaj, xsub, ysub, x0, y0, pw, ph, xlab, ylab, size=18, pts=None,
+          extra=None, xfmt="{:g}", yfmt="{:g}", minor="#dddddd", major="#aaaaaa"):
+    X = lambda v: x0 + v / xmax * pw
+    Y = lambda v: y0 - v / ymax * ph
+    s = ""
+    nx = round(xmax / xmaj * xsub); ny = round(ymax / ymaj * ysub)
+    for i in range(nx + 1):
+        x = x0 + i * pw / nx
+        s += ln(x, y0, x, y0 - ph, major if i % xsub == 0 else minor, 1.1 if i % xsub == 0 else 0.7)
+    for j in range(ny + 1):
+        y = y0 - j * ph / ny
+        s += ln(x0, y, x0 + pw, y, major if j % ysub == 0 else minor, 1.1 if j % ysub == 0 else 0.7)
+    s += ln(x0, y0, x0 + pw + 14, y0, K, 2, arrow="a") + ln(x0, y0, x0, y0 - ph - 14, K, 2, arrow="a")
     v = 0.0
     while v <= xmax + 1e-9:
-        x = X(v)
-        b.append(line(x, mt + ph, x, mt + ph + 5, INK, 1.2))
-        b.append(t(x, mt + ph + 19, xfmt.format(round(v, 6)), 12))
-        v += xmajor
+        s += ln(X(v), y0, X(v), y0 + 6, K, 1.5) + t(X(v), y0 + 6 + size, xfmt.format(round(v, 6)), size)
+        v += xmaj
     v = 0.0
     while v <= ymax + 1e-9:
-        y = Y(v)
-        b.append(line(ml - 5, y, ml, y, INK, 1.2))
-        if v > 0 or True:
-            b.append(t(ml - 9, y + 4, yfmt.format(round(v, 6)), 12, anchor="end"))
-        v += ymajor
-    b.append(t(ml + pw / 2, H - 6, xlabel, 13))
-    b.append(f'<g transform="translate(15,{mt + ph / 2}) rotate(-90)">{t(0, 0, ylabel, 13)}</g>')
-    for s in series:
-        pts = " ".join(f"{X(a):.1f},{Y(c):.1f}" for a, c in s["pts"])
-        b.append(f'<polyline points="{pts}" fill="none" stroke="{s.get("color", NAVY)}" '
-                 f'stroke-width="{s.get("w", 2.4)}" stroke-linejoin="round" stroke-linecap="round"/>')
-    if extra_fn:
-        b.append(extra_fn(X, Y))
-    return svg(W, H, "".join(b))
+        s += ln(x0 - 6, Y(v), x0, Y(v), K, 1.5) + t(x0 - 10, Y(v) + size * 0.35, yfmt.format(round(v, 6)), size, anchor="end")
+        v += ymaj
+    s += t(x0 + pw / 2, y0 + 2 * size + 12, xlab, size)
+    s += f'<g transform="translate({x0 - 3.1 * size:.0f},{y0 - ph / 2:.0f}) rotate(-90)">{t(0, 0, ylab, size)}</g>'
+    if pts:
+        s += '<polyline points="' + " ".join(f"{X(a):.1f},{Y(b):.1f}" for a, b in pts) + f'" fill="none" stroke="{K}" stroke-width="2.6" stroke-linejoin="round"/>'
+    if extra:
+        s += extra(X, Y)
+    return s
 
 
-# ---------------------------------------------------------------- Section A figures
-def fig_track():
-    # stadium shaped 400 m track
-    cx1, cx2, cy = 150, 330, 105
-    def stadium(r, **kw):
-        return (f'<path d="M{cx1},{cy - r} L{cx2},{cy - r} A{r},{r} 0 0 1 {cx2},{cy + r} '
-                f'L{cx1},{cy + r} A{r},{r} 0 0 1 {cx1},{cy - r} z" {kw.get("a", "")}/>')
-    b = [stadium(88, a='fill="#c8553d"'), stadium(60, a='fill="#7fb069"')]
-    for r in (67, 74, 81):
-        b.append(stadium(r, a='fill="none" stroke="#f3e9e2" stroke-width="0.9" stroke-dasharray="1 0"'))
-    b.append(stadium(88, a=f'fill="none" stroke="{INK}" stroke-width="1.4"'))
-    b.append(stadium(60, a=f'fill="none" stroke="{INK}" stroke-width="1.4"'))
-    # start/finish line
-    b.append(f'<rect x="238" y="{cy + 60}" width="6" height="28" fill="#fff" stroke="{INK}" stroke-width="0.6"/>')
-    b.append(t(241, cy + 108, "start / finish", 12))
-    # runner marker
-    b.append(f'<circle cx="252" cy="{cy + 74}" r="6" fill="{NAVY}" stroke="#fff" stroke-width="1.5"/>')
-    # direction arrow inside field
-    b.append(f'<path d="M300,{cy + 38} A120,40 0 0 0 300,{cy - 38}" fill="none" stroke="#fff" stroke-width="2.2" marker-end="url(#ah-k)"/>')
-    b.append(t(240, cy + 5, "one lap = 400 m", 14, color="#fff", weight="bold"))
-    return svg(480, 228, "".join(b))
+def car(x, y, w=80, flip=False):
+    """Side view of a car; (x, y) is the left end at road level."""
+    h = w * 0.28
+    s = (f'<path d="M{x},{y - 10} L{x},{y - h} L{x + w * 0.22},{y - h} L{x + w * 0.34},{y - h - w * 0.2} '
+         f'L{x + w * 0.70},{y - h - w * 0.2} L{x + w * 0.82},{y - h} L{x + w},{y - h + 4} L{x + w},{y - 10} z" '
+         f'fill="{FILL}" stroke="{K}" stroke-width="2"/>')
+    s += f'<path d="M{x + w * 0.38},{y - h - 3} L{x + w * 0.44},{y - h - w * 0.16} L{x + w * 0.66},{y - h - w * 0.16} L{x + w * 0.74},{y - h - 3} z" fill="#fff" stroke="{K}" stroke-width="1.3"/>'
+    for cx in (x + w * 0.22, x + w * 0.78):
+        s += f'<circle cx="{cx:.1f}" cy="{y - 9}" r="{w * 0.1:.1f}" fill="#fff" stroke="{K}" stroke-width="2"/>'
+    return s
 
 
-def fig_walk():
-    y0 = 40
-    b = [line(30, 110, 450, 110, GREY, 1)]
-    for i in range(0, 9):
+FIGS = {}
+
+
+def fig(name):
+    def deco(f):
+        FIGS[name] = f
+        return f
+    return deco
+
+
+# ----------------------------------------------------------------- Section A
+@fig("q02_track")
+def _():
+    cx1, cx2, cy = 165, 315, 165
+    def stadium(r, extra):
+        return (f'<path d="M{cx1},{cy - r} L{cx2},{cy - r} A{r},{r} 0 0 1 {cx2},{cy + r} L{cx1},{cy + r} '
+                f'A{r},{r} 0 0 1 {cx1},{cy - r} z" {extra}/>')
+    b = stadium(118, f'fill="{FILL}" stroke="{K}" stroke-width="2.2"') + stadium(78, f'fill="#fff" stroke="{K}" stroke-width="2.2"')
+    b += stadium(98, f'fill="none" stroke="{G}" stroke-width="1" stroke-dasharray="6 5"')
+    b += ln(240, cy + 78, 240, cy + 118, K, 3)
+    b += t(240, cy + 145, "start / finish", 18)
+    b += ln(290, cy - 98, 200, cy - 98, K, 2.6, arrow="a") + t(245, cy - 128, "direction of running", 16, color=G)
+    b += t(235, cy - 4, "one lap", 20) + t(235, cy + 22, "= 400 m", 20)
+    return svg(b)
+
+
+@fig("q03_walk")
+def _():
+    b = ln(40, 250, 450, 250, K, 1.6)
+    for i in range(9):
         x = 50 + i * 50
-        b.append(line(x, 105, x, 115, GREY, 1))
-        b.append(t(x, 130, f"{i * 100}", 11, color=GREY))
-    b.append(t(470, 133, "m", 11, color=GREY, anchor="start"))
-    b.append(line(50, 60, 250, 60, NAVY, 2.6, arrow="b"))
-    b.append(t(150, 50, "400 m east", 13, color=NAVY))
-    b.append(line(250, 85, 100, 85, RED, 2.6, arrow="r"))
-    b.append(t(175, 101, "300 m west", 13, color=RED))
-    b.append(line(250, 60, 250, 85, GREY, 1, dash="3 3"))
-    b.append(f'<circle cx="50" cy="60" r="5" fill="{INK}"/>')
-    b.append(t(50, 46, "start", 12))
-    b.append(compass(420, 50, 26))
-    return svg(490, 140, "".join(b))
+        b += ln(x, 244, x, 256, K, 1.4) + t(x, 280, f"{i * 100}", 16)
+    b += t(450, 305, "distance from start / m", 16, anchor="end", color=G)
+    b += ln(50, 150, 250, 150, K, 2.6, arrow="a") + t(150, 138, "400 m east", 20)
+    b += ln(250, 200, 100, 200, K, 2.6, arrow="a") + t(175, 228, "300 m west", 20)
+    b += ln(250, 150, 250, 200, G, 1.2, dash="4 4")
+    b += f'<circle cx="50" cy="150" r="6" fill="{K}"/>' + t(50, 128, "start", 18)
+    b += north(420, 110)
+    return svg(b)
 
 
-def fig_st():
-    def extra(X, Y):
-        s = ""
-        s += t(X(1.7), Y(7.6), "P", 14, weight="bold", color=RED)
-        s += t(X(5.5), Y(12) - 9, "Q", 14, weight="bold", color=RED)
-        s += t(X(8.9), Y(7.6), "R", 14, weight="bold", color=RED)
-        return s
-    return graph(10, 14, 2, 2, 2, 2, 330, 210, "time / s", "displacement / m",
-                 series=[{"pts": [(0, 0), (4, 12), (7, 12), (10, 0)]}], extra_fn=extra)
+@fig("q04_st")
+def _():
+    def ex(X, Y):
+        return (t(X(1.4), Y(7.5), "P", 20, weight="bold") + t(X(5.5), Y(12) - 10, "Q", 20, weight="bold")
+                + t(X(9.1), Y(7.5), "R", 20, weight="bold"))
+    return svg(graph(10, 14, 2, 2, 2, 2, 90, 290, 350, 250, "time / s", "displacement / m",
+                     pts=[(0, 0), (4, 12), (7, 12), (10, 0)], extra=ex))
 
 
-def mini(kind, letter):
-    w, h = 150, 112
-    ox, oy = 26, 92
-    b = [line(ox, oy, ox + 112, oy, INK, 1.4, arrow="k"), line(ox, oy, ox, 10, INK, 1.4, arrow="k")]
-    yl = "s" if kind in ("s-line", "s-flat") else "v"
-    b.append(t(ox - 11, 22, yl, 14, italic=True))
-    b.append(t(ox + 112, oy + 16, "t", 14, italic=True))
-    b.append(t(ox - 9, oy + 13, "0", 11))
-    if kind == "s-line":
-        b.append(line(ox, oy, ox + 95, oy - 66, NAVY, 2.4))
-    elif kind == "v-flat":
-        b.append(line(ox, oy - 45, ox + 100, oy - 45, NAVY, 2.4))
-    elif kind == "v-line":
-        b.append(line(ox, oy, ox + 95, oy - 66, NAVY, 2.4))
-    elif kind == "s-flat":
-        b.append(line(ox, oy - 45, ox + 100, oy - 45, NAVY, 2.4))
-    b.append(t(w / 2 + 6, h - 2, letter, 14, weight="bold"))
-    return svg(w, h + 6, "".join(b))
+@fig("q05_car")
+def _():
+    b = ln(20, 250, 460, 250, K, 2)
+    b += car(40, 250, 90) + car(290, 250, 90)
+    b += ln(140, 205, 200, 205, K, 2.4, arrow="a") + t(85, 170, "5.0 m s⁻¹", 20)
+    b += ln(390, 205, 450, 205, K, 2.4, arrow="a") + t(335, 170, "25 m s⁻¹", 20)
+    b += hdim(85, 335, 300, "time taken = 8.0 s", size=20, above=False)
+    return svg(b)
 
 
-def fig_force_vertical():
-    ox, oy = 90, 150
-    L = 120
-    th = 35  # angle from vertical
-    ex = ox + L * math.sin(math.radians(th)); ey = oy - L * math.cos(math.radians(th))
-    b = [line(ox, oy, ox, oy - 135, GREY, 1, dash="5 4"), line(ox, oy, ox + 140, oy, GREY, 1, dash="5 4"),
-         t(ox, oy - 140, "vertical", 11, color=GREY), t(ox + 150, oy + 4, "horizontal", 11, color=GREY, anchor="start"),
-         line(ox, oy, ex, ey, RED, 2.8, arrow="r"),
-         arc(ox, oy, 38, 90, 90 - th), t(ox + 10, oy - 46, "θ", 15, italic=True),
-         t(ex + 6, ey - 4, "F", 16, italic=True, anchor="start", color=RED),
-         f'<circle cx="{ox}" cy="{oy}" r="4" fill="{INK}"/>']
-    return svg(270, 170, "".join(b))
+@fig("q06_graphs")
+def _():
+    b = ""
+    cells = [("A", "s", "line"), ("B", "v", "flat"), ("C", "v", "line"), ("D", "s", "flat")]
+    for i, (L, q, k) in enumerate(cells):
+        ox = 50 + (i % 2) * 230; oy = 150 + (i // 2) * 175
+        b += ln(ox, oy, ox + 160, oy, K, 1.8, arrow="a") + ln(ox, oy, ox, oy - 120, K, 1.8, arrow="a")
+        b += t(ox - 14, oy - 100, q, 22, italic=True) + t(ox + 160, oy + 22, "t", 22, italic=True) + t(ox - 10, oy + 18, "0", 16)
+        if k == "line":
+            b += ln(ox, oy, ox + 135, oy - 95, K, 2.6)
+        else:
+            b += ln(ox, oy - 55, ox + 140, oy - 55, K, 2.6)
+        b += t(ox + 80, oy + 28, L, 22, weight="bold", fam="Liberation Sans, Arial")
+    return svg(b)
 
 
-def fig_perp():
-    ox, oy = 70, 150
-    b = [f'<circle cx="{ox}" cy="{oy}" r="5" fill="{INK}"/>',
-         line(ox, oy, ox + 100, oy, RED, 2.8, arrow="r"), t(ox + 50, oy + 20, "5.0 N", 13, color=RED),
-         line(ox, oy, ox, oy - 128, RED, 2.8, arrow="r"), t(ox - 10, oy - 64, "8.0 N", 13, color=RED, anchor="end"),
-         right_angle(ox, oy, 10, 1, -1), t(ox - 12, oy + 4, "O", 13, anchor="end")]
-    return svg(220, 170, "".join(b))
+@fig("q07_journey")
+def _():
+    b = ln(20, 200, 460, 200, K, 2)
+    for x, lab in ((40, "A"), (240, "B"), (440, "C")):
+        b += ln(x, 188, x, 212, K, 2) + t(x, 240, lab, 22, weight="bold", fam="Liberation Sans, Arial")
+    b += car(45, 198, 70)
+    b += ln(48, 140, 236, 140, K, 2.2, arrow="a", both=True) + t(140, 105, "30 km", 20) + t(140, 128, "in 0.50 h", 18)
+    b += ln(244, 140, 436, 140, K, 2.2, arrow="a", both=True) + t(340, 105, "30 km", 20) + t(340, 128, "in 1.0 h", 18)
+    return svg(b)
 
 
-def fig_velocity_components():
-    ox, oy = 40, 140
-    vx, vy = 12, 9
-    s = 11
-    ex, ey = ox + vx * s, oy - vy * s
-    b = [line(ox, oy, ex, ey, NAVY, 2.8, arrow="b"),
-         t((ox + ex) / 2 - 10, (oy + ey) / 2 - 8, "15 m s⁻¹", 13, color=NAVY, anchor="end"),
-         line(ox, oy, ex, oy, GREY, 1.6, dash="6 4", arrow="k"), t((ox + ex) / 2, oy + 20, "horizontal component = ?", 12),
-         line(ex, oy, ex, ey, GREY, 1.6, dash="6 4", arrow="k"), t(ex + 8, (oy + ey) / 2 + 4, "9.0 m s⁻¹", 13, anchor="start"),
-         right_angle(ex, oy, 9, -1, -1)]
-    return svg(260, 160, "".join(b))
+@fig("q08_force")
+def _():
+    ox, oy, L, th = 170, 300, 210, 35
+    ex, ey = ox + L * math.sin(math.radians(th)), oy - L * math.cos(math.radians(th))
+    b = ln(ox, oy, ox, 50, G, 1.4, dash="7 5") + ln(ox, oy, 430, oy, G, 1.4, dash="7 5")
+    b += t(ox, 40, "vertical", 16, color=G) + t(430, oy + 24, "horizontal", 16, anchor="end", color=G)
+    b += ln(ox, oy, ex, ey, K, 3, arrow="a") + t(ex + 10, ey + 4, "F", 24, italic=True, anchor="start")
+    b += arc(ox, oy, 60, 90, 90 - th) + t(ox + 18, oy - 70, "θ", 22, italic=True)
+    b += f'<circle cx="{ox}" cy="{oy}" r="5" fill="{K}"/>'
+    return svg(b)
 
 
-def fig_two_charges():
-    b = [charge(70, 45, "+", 17), charge(300, 45, "-", 17),
-         t(70, 90, "+2.0 μC", 13), t(300, 90, "−3.0 μC", 13),
-         dim(70, 300, 116, "0.30 m")]
-    return svg(370, 132, "".join(b))
+@fig("q09_perp")
+def _():
+    ox, oy = 150, 280
+    b = f'<circle cx="{ox}" cy="{oy}" r="6" fill="{K}"/>' + t(ox - 14, oy + 22, "O", 20)
+    b += ln(ox, oy, ox + 160, oy, K, 3, arrow="a") + t(ox + 80, oy + 30, "5.0 N", 20)
+    b += ln(ox, oy, ox, oy - 220, K, 3, arrow="a") + t(ox - 14, oy - 110, "8.0 N", 20, anchor="end")
+    b += rangle(ox, oy, 16)
+    return svg(b)
 
 
-def fig_line_zero():
-    y = 62
-    b = [line(78, y, 367, y, GREY, 1, dash="4 4"),
-         charge(60, y, "+", 18), charge(380, y, "+", 13),
-         t(60, 30, "X", 14, weight="bold"), t(380, 30, "Y", 14, weight="bold"),
-         t(34, y + 6, "+9<tspan font-style=\"italic\" font-family=\"Liberation Serif\">q</tspan>", 15, anchor="end"),
-         t(400, y + 6, "+<tspan font-style=\"italic\" font-family=\"Liberation Serif\">q</tspan>", 15, anchor="start"),
-         f'<circle cx="300" cy="{y}" r="6" fill="#fff" stroke="{INK}" stroke-width="1.5"/>',
-         t(300, y - 14, "P", 14, weight="bold"),
-         dim(300, 380, y + 34, "?", size=14),
-         dim(60, 380, y + 70, "4d", size=14).replace(">4d<", "><tspan>4</tspan><tspan font-style=\"italic\" font-family=\"Liberation Serif\">d</tspan><")]
-    return svg(440, 150, "".join(b))
+@fig("q10_components")
+def _():
+    ox, oy, s = 70, 290, 22
+    ex, ey = ox + 12 * s, oy - 9 * s
+    b = ln(ox, oy, ex, ey, K, 3, arrow="a") + t((ox + ex) / 2 - 22, (oy + ey) / 2 - 10, "15 m s⁻¹", 20, anchor="end")
+    b += ln(ox, oy, ex, oy, G, 2, dash="8 5", arrow="g") + t((ox + ex) / 2, oy + 30, "horizontal component = ?", 18)
+    b += ln(ex, oy, ex, ey, G, 2, dash="8 5", arrow="g") + t(ex + 12, (oy + ey) / 2 + 6, "9.0 m s⁻¹", 20, anchor="start")
+    b += rangle(ex, oy, 12, -1, -1)
+    return svg(b)
 
 
-def fig_triangle_equal():
-    cx, cy = 80, 175
-    b = [f'<path d="M{cx},{cy} L{cx},{cy - 140} L{cx + 170},{cy} z" fill="#f6f8fb" stroke="{GREY}" stroke-width="1.2" stroke-dasharray="5 4"/>',
-         right_angle(cx, cy, 13, 1, -1),
-         charge(cx, cy - 140, "+", 15), charge(cx + 170, cy, "+", 15), charge(cx, cy, "+", 12),
-         t(cx - 22, cy - 135, "+<tspan font-style=\"italic\">Q</tspan>", 16, anchor="end", family=SERIF),
-         t(cx + 170, cy + 34, "+<tspan font-style=\"italic\">Q</tspan>", 16, family=SERIF),
-         t(cx - 20, cy + 6, "+<tspan font-style=\"italic\">q</tspan>", 16, anchor="end", family=SERIF),
-         t(cx - 16, cy - 66, "r", 17, italic=True, anchor="end"), t(cx + 85, cy + 24, "r", 17, italic=True)]
-    return svg(290, 215, "".join(b))
+@fig("q11_two_forces")
+def _():
+    ox, oy = 120, 260
+    b = f'<circle cx="{ox}" cy="{oy}" r="6" fill="{K}"/>'
+    b += ln(ox, oy, ox + 110, oy, K, 3, arrow="a") + t(ox + 55, oy + 30, "5.0 N", 20)
+    a = 55
+    ex, ey = ox + 230 * math.cos(math.radians(a)), oy - 230 * math.sin(math.radians(a))
+    b += ln(ox, oy, ex, ey, K, 3, arrow="a") + t(ex + 10, ey + 10, "12 N", 20, anchor="start")
+    b += arc(ox, oy, 55, 0, a) + t(ox + 70, oy - 30, "θ", 22, italic=True, anchor="start")
+    b += t(240, 335, "θ can be changed", 17, color=G)
+    return svg(b)
 
 
-# ---------------------------------------------------------------- Section B figures
-def road(x1, y1, x2, y2, w=16):
-    return (line(x1, y1, x2, y2, "#9aa1a9", w, extra='stroke-linecap="square"')
-            + line(x1, y1, x2, y2, "#ffffff", 1.4, dash="7 6"))
+@fig("q12_charges")
+def _():
+    b = t(40, 40, "before", 17, anchor="start", color=G)
+    b += charge(110, 90, "+", 18) + charge(250, 90, "+", 18)
+    b += t(110, 135, "Q₁", 20, italic=True) + t(250, 135, "Q₂", 20, italic=True)
+    b += hdim(110, 250, 160, "r", above=False, italic=True)
+    b += ln(20, 205, 460, 205, G, 1, dash="5 5")
+    b += t(40, 235, "after", 17, color=G, anchor="start")
+    b += charge(110, 262, "+", 18) + charge(390, 262, "+", 18)
+    b += t(110, 302, "2Q₁", 20, italic=True) + t(390, 302, "Q₂", 20, italic=True)
+    b += hdim(110, 390, 320, "2r", above=False, italic=True)
+    return svg(b)
 
 
-def fig_map():
-    P = (60, 262); Q = (300, 262); R = (300, 46)
-    trees = [(70, 70), (125, 55), (95, 130), (180, 52), (430, 150), (400, 215), (365, 245), (440, 255), (60, 180)]
-    b = [f'<rect x="0" y="0" width="470" height="305" rx="8" fill="#f2f6ee"/>',
-         road(P[0] - 20, P[1], Q[0] + 8, Q[1]), road(Q[0], Q[1] + 8, R[0], R[1] - 20),
-         ''.join(f'<circle cx="{x}" cy="{y}" r="10" fill="#9ccc8a" stroke="#6c9d5b"/>' for x, y in trees),
-         line(P[0] + 4, P[1] - 24, Q[0] - 8, Q[1] - 24, NAVY, 2.8, arrow="b"),
-         t((P[0] + Q[0]) / 2 + 30, P[1] - 34, "600 m, 120 s", 17, color=NAVY, weight="bold"),
-         line(Q[0] + 24, Q[1] - 8, R[0] + 24, R[1] + 8, NAVY, 2.8, arrow="b"),
-         t(Q[0] + 34, (Q[1] + R[1]) / 2 - 2, "800 m,", 17, color=NAVY, weight="bold", anchor="start"),
-         t(Q[0] + 34, (Q[1] + R[1]) / 2 + 18, "200 s", 17, color=NAVY, weight="bold", anchor="start"),
-         line(P[0], P[1], R[0], R[1], RED, 1.6, dash="7 5"),
-         ''.join(f'<circle cx="{x}" cy="{y}" r="7" fill="#fff" stroke="{INK}" stroke-width="2.2"/>' for x, y in (P, Q, R)),
-         t(P[0] - 6, P[1] + 30, "P", 19, weight="bold"), t(Q[0], Q[1] + 33, "Q", 19, weight="bold"),
-         t(R[0] - 18, R[1] + 6, "R", 19, weight="bold", anchor="end"),
-         compass(425, 55, 40).replace('font-size="12"', 'font-size="16"').replace('font-size="11"', 'font-size="14"')]
-    return svg(470, 305, "".join(b))
+@fig("q13_two")
+def _():
+    b = charge(120, 150, "+", 24) + charge(360, 150, "-", 24)
+    b += t(120, 205, "+2.0 μC", 20) + t(360, 205, "−3.0 μC", 20)
+    b += hdim(120, 360, 260, "0.30 m", above=False)
+    return svg(b)
 
 
-def fig_vt():
-    return graph(40, 25, 10, 5, 5, 5, 400, 230, "time / s", "velocity / m s⁻¹",
-                 series=[{"pts": [(0, 0), (10, 20), (30, 20), (35, 0)]}])
+@fig("q14_midpoint")
+def _():
+    y = 170
+    b = ln(80, y, 400, y, G, 1.2, dash="6 5")
+    b += charge(80, y, "+", 24) + charge(400, y, "+", 24) + charge(240, y, "+", 13)
+    b += t(80, y - 40, "X", 20, weight="bold", fam="Liberation Sans, Arial") + t(400, y - 40, "Y", 20, weight="bold", fam="Liberation Sans, Arial")
+    b += t(80, y + 52, "+Q", 21, italic=True) + t(400, y + 52, "+Q", 21, italic=True) + t(240, y - 28, "+q", 21, italic=True)
+    b += t(240, y + 40, "M", 18, weight="bold", fam="Liberation Sans, Arial")
+    b += hdim(80, 240, y + 95, "d", above=False, italic=True) + hdim(240, 400, y + 95, "d", above=False, italic=True)
+    return svg(b)
 
 
-def fig_sledge():
-    gy = 160
-    b = [f'<path d="M0,{gy} L420,{gy} L420,200 L0,200 z" fill="url(#g-snow)"/>',
-         line(0, gy, 420, gy, "#8fa6bd", 1.4)]
-    # sledge
-    x0 = 90
-    b.append(f'<path d="M{x0 - 6},{gy - 4} L{x0 + 130},{gy - 4} q22,0 26,-22" fill="none" stroke="{INK}" stroke-width="3" stroke-linecap="round"/>')
-    for x in (x0 + 18, x0 + 100):
-        b.append(line(x, gy - 4, x, gy - 26, INK, 2.4))
-    b.append(f'<rect x="{x0 - 4}" y="{gy - 38}" width="140" height="13" rx="3" fill="url(#g-wood)" stroke="#8a5a2b" stroke-width="1.2"/>')
-    b.append(f'<rect x="{x0 + 20}" y="{gy - 66}" width="70" height="28" rx="4" fill="#d9e6f2" stroke="{GREY}" stroke-width="1"/>')
-    b.append(t(x0 + 55, gy - 47, "load", 14, color=GREY))
-    # rope
-    ax, ay = x0 + 152, gy - 26
-    L = 160; th = 35
+@fig("q15_triangle")
+def _():
+    cx, cy = 140, 290
+    b = f'<path d="M{cx},{cy} L{cx},{cy - 220} L{cx + 240},{cy} z" fill="none" stroke="{G}" stroke-width="1.4" stroke-dasharray="7 5"/>'
+    b += rangle(cx, cy, 16)
+    b += charge(cx, cy - 220, "+", 20) + charge(cx + 240, cy, "+", 20) + charge(cx, cy, "+", 15)
+    b += t(cx - 30, cy - 213, "+Q", 22, italic=True, anchor="end") + t(cx + 240, cy + 46, "+Q", 22, italic=True)
+    b += t(cx - 26, cy + 8, "+q", 22, italic=True, anchor="end")
+    b += t(cx - 16, cy - 105, "r", 24, italic=True, anchor="end") + t(cx + 120, cy + 32, "r", 24, italic=True)
+    return svg(b)
+
+
+# ----------------------------------------------------------------- Section B
+@fig("q16_map")
+def _():
+    P, Q, R = (70, 300), (320, 300), (320, 60)
+    b = ""
+    for a, c in ((P, Q), (Q, R)):
+        b += ln(*a, *c, "#bdbdbd", 18)
+        b += ln(*a, *c, "#ffffff", 1.6, dash="10 8")
+    b += ln(P[0] + 6, P[1] - 30, Q[0] - 10, Q[1] - 30, K, 2.6, arrow="a") + t(195, 258, "600 m, 120 s", 20)
+    b += ln(Q[0] + 30, Q[1] - 10, R[0] + 30, R[1] + 10, K, 2.6, arrow="a")
+    b += t(Q[0] + 42, 175, "800 m,", 20, anchor="start") + t(Q[0] + 42, 200, "200 s", 20, anchor="start")
+    b += ln(*P, *R, K, 1.6, dash="8 6")
+    for p in (P, Q, R):
+        b += f'<circle cx="{p[0]}" cy="{p[1]}" r="8" fill="#fff" stroke="{K}" stroke-width="2.4"/>'
+    b += t(P[0] - 6, P[1] + 36, "P", 22, weight="bold", fam="Liberation Sans, Arial")
+    b += t(Q[0], Q[1] + 38, "Q", 22, weight="bold", fam="Liberation Sans, Arial")
+    b += t(R[0] - 20, R[1] + 8, "R", 22, weight="bold", fam="Liberation Sans, Arial", anchor="end")
+    b += north(430, 80) + note("not to scale")
+    return svg(b)
+
+
+@fig("q17_lights")
+def _():
+    b = ln(10, 250, 470, 250, K, 2)
+    b += f'<rect x="28" y="70" width="26" height="70" rx="4" fill="{FILL}" stroke="{K}" stroke-width="2"/>' + ln(41, 140, 41, 250, K, 3)
+    for i, f in enumerate(("#fff", "#fff", K)):
+        b += f'<circle cx="41" cy="{84 + i * 21}" r="7" fill="{f}" stroke="{K}" stroke-width="1.5"/>'
+    b += t(41, 55, "lights", 16, color=G)
+    b += car(60, 250, 80)
+    xs = [65, 185, 395, 465]
+    labs = [("speeds up", "6.0 s"), ("constant velocity", "20 s"), ("brakes", "5.0 s")]
+    for (a, c), (l1, l2) in zip(zip(xs, xs[1:]), labs):
+        b += ln(a, 300, c, 300, G, 1.3, arrow="g", both=True) + ln(a, 288, a, 312, G, 1.3) + ln(c, 288, c, 312, G, 1.3)
+        b += t((a + c) / 2, 327, l1, 16) + t((a + c) / 2, 347, l2, 16)
+    b += ln(150, 200, 230, 200, K, 2.4, arrow="a") + t(190, 188, "a = 2.5 m s⁻²", 18).replace(">a =", "><tspan font-style=\"italic\">a</tspan> =")
+    b += note("not to scale", 468, 30)
+    return svg(b)
+
+
+@fig("q18_sledge")
+def _():
+    gy = 270
+    b = f'<rect x="0" y="{gy}" width="480" height="90" fill="#f2f2f2"/>' + ln(0, gy, 480, gy, K, 2)
+    x0 = 50
+    b += f'<path d="M{x0 - 8},{gy - 5} L{x0 + 160},{gy - 5} q26,0 30,-26" fill="none" stroke="{K}" stroke-width="3" stroke-linecap="round"/>'
+    for x in (x0 + 25, x0 + 125):
+        b += ln(x, gy - 5, x, gy - 30, K, 2.4)
+    b += f'<rect x="{x0 - 4}" y="{gy - 46}" width="170" height="16" fill="{FILL}" stroke="{K}" stroke-width="2"/>'
+    b += f'<rect x="{x0 + 30}" y="{gy - 84}" width="90" height="38" fill="#fff" stroke="{K}" stroke-width="1.6"/>' + t(x0 + 75, gy - 58, "load", 17, color=G)
+    ax, ay = x0 + 186, gy - 31
+    L, th = 220, 35
     ex, ey = ax + L * math.cos(math.radians(th)), ay - L * math.sin(math.radians(th))
-    b.append(line(ax, ay, ex - 30 * math.cos(math.radians(th)), ey + 30 * math.sin(math.radians(th)), "#8a5a2b", 2.2))
-    b.append(line(ax, ay, ex, ey, RED, 2.8, arrow="r", extra='opacity="0.95"'))
-    b.append(t(ex - 4, ey - 10, "tension = 50 N", 17, color=RED, anchor="middle", weight="bold"))
-    b.append(line(ax, ay, ax + 110, ay, GREY, 1, dash="5 4"))
-    b.append(arc(ax, ay, 46, 0, th))
-    b.append(t(ax + 58, ay - 12, "35°", 17, anchor="start"))
-    return svg(470, 200, "".join(b)).replace('viewBox="0 0 470 200"', 'viewBox="0 -20 470 220"').replace('height="200"', 'height="220"', 1)
+    b += ln(ax, ay, ex, ey, K, 3, arrow="a") + t(ex - 6, ey - 14, "50 N", 22, anchor="end")
+    b += ln(ax, ay, ax + 150, ay, G, 1.4, dash="7 5")
+    b += arc(ax, ay, 70, 0, th) + t(ax + 82, ay - 16, "35°", 20, anchor="start")
+    b += t(ax + 40, ay - 92, "rope", 17, color=G)
+    return svg(b)
 
 
-def fig_drone():
-    cx, cy = 70, 120
-    b = []
-    sx = 11
-    # velocity components drawn from the drone's centre (behind the drone)
-    b.append(line(cx, cy, cx + 15 * sx + 40, cy, NAVY, 2.8, arrow="b"))
-    b.append(line(cx, cy, cx, cy - 6.0 * sx - 40, NAVY, 2.8, arrow="b"))
-    b.append(t(cx + 150, cy + 24, "15 m s⁻¹", 16, color=NAVY, weight="bold"))
-    b.append(t(cx + 150, cy + 42, "(horizontal)", 13, color=NAVY))
-    b.append(t(cx + 12, cy - 86, "6.0 m s⁻¹", 16, color=NAVY, weight="bold", anchor="start"))
-    b.append(t(cx + 12, cy - 69, "(vertical)", 13, color=NAVY, anchor="start"))
-    for dx in (-44, 44):
-        b.append(line(cx, cy, cx + dx, cy - 8, INK, 3))
-        b.append(line(cx + dx, cy - 8, cx + dx, cy - 13, INK, 2))
-        b.append(f'<ellipse cx="{cx + dx}" cy="{cy - 14}" rx="24" ry="3.5" fill="#cfd6df" stroke="{GREY}" stroke-width="1"/>')
-    b.append(f'<rect x="{cx - 20}" y="{cy - 9}" width="40" height="18" rx="7" fill="#3b4652" stroke="{INK}" stroke-width="1"/>')
-    b.append(f'<circle cx="{cx}" cy="{cy + 12}" r="4.5" fill="#111" stroke="#666"/>')
-    return svg(290, 175, "".join(b))
+@fig("q18_drone")
+def _():
+    cx, cy = 130, 250
+    b = ln(cx, cy, cx + 300, cy, K, 3, arrow="a") + ln(cx, cy, cx, cy - 170, K, 3, arrow="a")
+    b += t(cx + 230, cy + 36, "15 m s⁻¹", 22) + t(cx + 230, cy + 60, "horizontal", 16, color=G)
+    b += t(cx + 16, cy - 150, "6.0 m s⁻¹", 22, anchor="start") + t(cx + 16, cy - 128, "vertical", 16, color=G, anchor="start")
+    for dx in (-60, 60):
+        b += ln(cx, cy, cx + dx, cy - 12, K, 3.5) + ln(cx + dx, cy - 12, cx + dx, cy - 19, K, 2.4)
+        b += f'<ellipse cx="{cx + dx}" cy="{cy - 21}" rx="34" ry="5" fill="{FILL}" stroke="{K}" stroke-width="1.6"/>'
+    b += f'<rect x="{cx - 28}" y="{cy - 12}" width="56" height="26" rx="9" fill="{FILL}" stroke="{K}" stroke-width="2"/>'
+    b += f'<circle cx="{cx}" cy="{cy + 18}" r="6" fill="#fff" stroke="{K}" stroke-width="2"/>'
+    b += t(cx - 40, cy + 60, "drone", 17, color=G)
+    return svg(b)
 
 
-def fig_three_line():
-    A, B, C = 60, 190, 450
-    b = [line(30, 50, 480, 50, GREY, 1, dash="4 4"),
-         charge(A, 50, "+", 17), charge(B, 50, "+", 15), charge(C, 50, "-", 18),
-         t(A, 16, "A", 14, weight="bold"), t(B, 16, "B", 14, weight="bold"), t(C, 16, "C", 14, weight="bold"),
-         t(A, 92, "+3.0 μC", 13), t(B, 92, "+2.0 μC", 13), t(C, 92, "−4.0 μC", 13),
-         dim(A, B, 122, "0.10 m"), dim(B, C, 122, "0.20 m")]
-    return svg(510, 140, "".join(b))
+@fig("q19_line")
+def _():
+    A, B, C, y = 60, 180, 420, 160
+    b = ln(30, y, 450, y, G, 1.2, dash="6 5")
+    b += charge(A, y, "+", 24) + charge(B, y, "+", 22) + charge(C, y, "-", 24)
+    for x, L, q in ((A, "A", "+3.0 μC"), (B, "B", "+2.0 μC"), (C, "C", "−4.0 μC")):
+        b += t(x, y - 40, L, 21, weight="bold", fam="Liberation Sans, Arial") + t(x, y + 52, q, 19)
+    b += hdim(A, B, y + 100, "0.10 m", above=False) + hdim(B, C, y + 100, "0.20 m", above=False)
+    return svg(b)
 
 
-def fig_triangle_numeric():
-    O = (100, 210); X = (100, 50); Y = (313, 210)
-    b = [f'<path d="M{O[0]},{O[1]} L{X[0]},{X[1]} L{Y[0]},{Y[1]} z" fill="#f6f8fb" stroke="{GREY}" stroke-width="1.2" stroke-dasharray="5 4"/>',
-         right_angle(O[0], O[1], 14, 1, -1),
-         charge(X[0], X[1], "+", 16), charge(Y[0], Y[1], "-", 17), charge(O[0], O[1], "+", 13),
-         t(X[0] + 26, X[1] + 6, "X   +3.0 μC", 15, anchor="start"),
-         t(Y[0] + 26, Y[1] + 6, "Y", 15, weight="bold", anchor="start"),
-         t(Y[0] + 26, Y[1] + 24, "−3.0 μC", 15, anchor="start"),
-         t(O[0] - 20, O[1] - 12, "O", 15, weight="bold", anchor="end"),
-         t(O[0] + 22, O[1] - 22, "+2.0 μC", 15, anchor="start"),
-         vdim(52, X[1], O[1], "0.30 m", dx=-8, anchor="end", tick=6, size=14),
-         dim(O[0], Y[0], 282, "0.40 m", size=14)]
-    return svg(400, 298, "".join(b))
+@fig("q19_triangle")
+def _():
+    O, X, Y = (150, 270), (150, 60), (430, 270)
+    b = f'<path d="M{O[0]},{O[1]} L{X[0]},{X[1]} L{Y[0]},{Y[1]} z" fill="none" stroke="{G}" stroke-width="1.4" stroke-dasharray="7 5"/>'
+    b += rangle(*O, 16)
+    b += charge(*X, "+", 22) + charge(*Y, "-", 22) + charge(*O, "+", 18)
+    b += t(X[0] + 32, X[1] + 7, "X   +3.0 μC", 19, anchor="start")
+    b += t(Y[0] - 4, Y[1] - 34, "Y", 20, weight="bold", fam="Liberation Sans, Arial") + t(Y[0] - 10, Y[1] + 48, "−3.0 μC", 19)
+    b += t(O[0] - 28, O[1] - 20, "O", 20, weight="bold", fam="Liberation Sans, Arial", anchor="end")
+    b += t(O[0] + 30, O[1] - 26, "+2.0 μC", 19, anchor="start")
+    b += vdim(70, X[1], O[1], "0.30 m", size=19)
+    b += hdim(O[0], Y[0], 342, "0.40 m", above=True)
+    return svg(b)
 
 
-# ---------------------------------------------------------------- Section C figures
-def fig_ramp():
-    b = []
-    b.append(f'<rect x="10" y="200" width="580" height="14" fill="url(#g-wood)" stroke="#8a5a2b"/>')
-    b.append(f'<rect x="30" y="214" width="14" height="40" fill="#b88a55"/><rect x="556" y="214" width="14" height="40" fill="#b88a55"/>')
-    x1, y1, x2, y2 = 60, 118, 566, 199
-    b.append(f'<rect x="48" y="131" width="50" height="69" fill="#d8c3a5" stroke="#8a5a2b"/>')
-    b.append(t(73, 170, "block", 11, color="#6b4a25"))
-    ang = math.degrees(math.atan2(y2 - y1, x2 - x1))
-    L = math.hypot(x2 - x1, y2 - y1)
-    b.append(f'<g transform="rotate({ang:.3f} {x1} {y1})"><rect x="{x1}" y="{y1}" width="{L:.1f}" height="8" fill="url(#g-metal)" stroke="{GREY}"/></g>')
-    def on(s):
-        return x1 + s * (x2 - x1), y1 + s * (y2 - y1)
-    nx, ny = math.sin(math.radians(ang)), -math.cos(math.radians(ang))
-    r = 12
-    s0, s1 = 0.07, 0.80
-    for s, lab in ((s0, "start line"), (s1, "finish line")):
-        px, py = on(s)
-        b.append(line(px + nx * 26, py + ny * 26, px - nx * 10, py - ny * 10, RED, 2.4))
-        b.append(t(px + nx * 26 - 4, py + ny * 26 - 6, lab, 13, color=RED, weight="bold", anchor="end"))
-    bx, by = on(s0 - 0.025)
-    b.append(f'<circle cx="{bx + nx * r:.1f}" cy="{by + ny * r:.1f}" r="{r}" fill="url(#g-ball)" stroke="#333"/>')
-    (sx, sy), (fx, fy) = on(s0), on(s1)
-    off = 58
-    b.append(line(sx + nx * off, sy + ny * off, fx + nx * off, fy + ny * off, INK, 1.3, arrow="k", start_arrow=True))
-    for px, py in ((sx, sy), (fx, fy)):
-        b.append(line(px + nx * 30, py + ny * 30, px + nx * (off + 6), py + ny * (off + 6), GREY, 0.8, dash="3 3"))
-    mx, my = (sx + fx) / 2 + nx * (off + 14), (sy + fy) / 2 + ny * (off + 14)
-    b.append(t(mx, my, "d", 18, italic=True))
-    b.append(t(300, 240, "bench", 12, color=GREY))
-    cx, cy = 535, 52
-    b.append(f'<circle cx="{cx}" cy="{cy}" r="30" fill="#fff" stroke="{INK}" stroke-width="2.4"/>')
-    b.append(f'<rect x="{cx - 6}" y="{cy - 44}" width="12" height="9" rx="2" fill="{INK}"/>')
-    b.append(f'<rect x="{cx - 26}" y="{cy - 9}" width="52" height="18" rx="3" fill="#dfe8d8" stroke="{GREY}"/>')
-    b.append(t(cx, cy + 5, "0.00 s", 12, family="Liberation Mono, monospace"))
-    b.append(t(cx, cy + 46, "stopwatch", 12, color=GREY))
-    return svg(600, 258, "".join(b))
+# ----------------------------------------------------------------- Section C
+@fig("q20_setup")
+def _():
+    b = ""
+    y = 230
+    b += f'<rect x="20" y="{y}" width="440" height="16" fill="{FILL}" stroke="{K}" stroke-width="2"/>'
+    b += f'<rect x="40" y="{y + 30}" width="400" height="26" fill="#fff" stroke="{K}" stroke-width="1.6"/>'
+    for i in range(0, 41):
+        x = 40 + i * 10
+        h = 12 if i % 10 == 0 else (8 if i % 5 == 0 else 5)
+        b += ln(x, y + 30, x, y + 30 + h, K, 1)
+    for i, lab in ((0, "0"), (10, "0.40"), (20, "0.80"), (30, "1.20")):
+        b += t(40 + i * 10, y + 52, lab, 12)
+    b += t(240, y + 80, "metre rule (distance d / m)", 16, color=G)
+    b += car(40, y, 70)
+    b += ln(115, y - 40, 190, y - 40, K, 2.4, arrow="a") + t(150, y - 52, "constant speed", 16)
+    for x in (40, 200):
+        b += ln(x, y - 12, x, y + 22, K, 1.6, dash="4 3")
+    cx, cy = 380, 95
+    b += f'<circle cx="{cx}" cy="{cy}" r="48" fill="#fff" stroke="{K}" stroke-width="3"/>'
+    b += f'<rect x="{cx - 9}" y="{cy - 66}" width="18" height="14" rx="3" fill="{K}"/>'
+    b += f'<rect x="{cx - 36}" y="{cy - 14}" width="72" height="28" rx="4" fill="{FILL}" stroke="{K}" stroke-width="1.4"/>'
+    b += t(cx, cy + 8, "2.0 s", 20, fam="Liberation Mono, monospace")
+    b += t(cx, cy + 74, "stopwatch", 16, color=G)
+    b += t(40, 40, "toy car", 17, anchor="start", color=G) + ln(70, 48, 75, y - 30, G, 1)
+    return svg(b)
 
 
-PRACT = [  # d, t1, t2, t3
-    (0.20, 0.80, 0.84, 0.82),
-    (0.40, 1.17, 1.13, 1.15),
-    (0.60, 1.40, 1.44, 1.39),
-    (0.80, 1.62, 1.66, 1.61),
-    (1.00, 1.84, 1.80, 1.85),
-]
-
-
-def practical_graph(answers=False):
-    def extra(X, Y):
+def practical_grid(answers=False):
+    def ex(X, Y):
         if not answers:
             return ""
-        s = ""
-        pts = [(0.67, 0.20), (1.32, 0.40), (1.99, 0.60), (2.66, 0.80), (3.35, 1.00)]
-        s += line(X(0), Y(0), X(3.5), Y(3.5 * 0.300), NAVY, 1.8)
+        pts = [(1.0, 0.40), (2.0, 0.80), (3.1, 1.20), (4.0, 1.60), (5.0, 2.00)]
+        s = ln(X(0), Y(0), X(6), Y(2.4), K, 2)
         for a, c in pts:
-            s += line(X(a) - 5, Y(c) - 5, X(a) + 5, Y(c) + 5, RED, 1.8) + line(X(a) - 5, Y(c) + 5, X(a) + 5, Y(c) - 5, RED, 1.8)
-        # gradient triangle 0.50 -> 3.30
-        xa, xb = 0.50, 3.30
-        ya, yb = 0.150, 0.990
-        s += line(X(xa), Y(ya), X(xb), Y(ya), GREEN, 1.6, dash="6 4")
-        s += line(X(xb), Y(ya), X(xb), Y(yb), GREEN, 1.6, dash="6 4")
-        s += t((X(xa) + X(xb)) / 2, Y(ya) + 18, "Δ(t²) = 3.30 − 0.50 = 2.80 s²", 12, color=GREEN)
-        s += t(X(xb) + 8, (Y(ya) + Y(yb)) / 2, "Δd = 0.990 − 0.150", 12, color=GREEN, anchor="start")
-        s += t(X(xb) + 8, (Y(ya) + Y(yb)) / 2 + 16, "= 0.840 m", 12, color=GREEN, anchor="start")
+            s += ln(X(a) - 7, Y(c) - 7, X(a) + 7, Y(c) + 7, K, 2.2) + ln(X(a) - 7, Y(c) + 7, X(a) + 7, Y(c) - 7, K, 2.2)
+        s += ln(X(2.5), Y(0), X(2.5), Y(1.0), G, 1.8, dash="8 6") + ln(X(0), Y(1.0), X(2.5), Y(1.0), G, 1.8, dash="8 6")
+        s += t(X(2.5) + 10, Y(0.5), "t = 2.5 s → d = 1.0 m", 22, anchor="start")
         return s
-    return graph(3.5, 1.2, 0.5, 0.2, 5, 5, 500, 400, "t² / s²", "d / m", extra_fn=extra,
-                 xfmt="{:.1f}", yfmt="{:.1f}", mr=140 if answers else 30)
+    return svg(graph(6, 2.4, 1, 0.4, 5, 5, 120, 640, 780, 580, "t / s", "d / m", size=26, extra=ex,
+                     xfmt="{:g}", yfmt="{:.1f}", minor="#d6d6d6", major="#8c8c8c"), 960, 720)
+
+
+@fig("q20_grid")
+def _():
+    return practical_grid(False)
+
+
+@fig("ms_q20_graph")
+def _():
+    return practical_grid(True)
+
+
+if __name__ == "__main__":
+    for name, f in FIGS.items():
+        open(os.path.join(OUT, name + ".svg"), "w").write(f())
+    print(len(FIGS), "figures")

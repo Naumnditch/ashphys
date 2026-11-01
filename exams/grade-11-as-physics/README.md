@@ -1,21 +1,19 @@
-# Grade 11 AS Level Physics — School Examination (50 marks)
+# Grade 11 AS Physics — First Quarter Examination (50 marks)
 
-- `Grade11_AS_Physics_Exam.pdf`: the question paper (13 pages, A4)
-- `Grade11_AS_Physics_Mark_Scheme.pdf`: the mark scheme, assessment map and model graph (6 pages)
+Word files in the same layout as the Grade 12 First Quarter Examination
+(Cezeri header, Calibri, maroon `8C2332` headings and marks, framed diagrams, ruled working lines).
 
-| Section | Style | Marks |
-|---|---|---|
-| A | Multiple choice (Paper 1), Q1–15 | 15 (30%) |
-| B | Structured (Paper 2), Q16–19 | 25 (50%) |
-| C | Practical skills (Paper 3), Q20 | 10 (20%) |
+- `Grade11_First_Quarter_Exam.docx` / `.pdf`: question paper (14 pages)
+- `Grade11_First_Quarter_Exam_MarkScheme.docx` / `.pdf`: mark scheme (6 pages)
 
-Topics: speed, velocity and acceleration; distance and displacement; resolving and combining vectors;
-Coulomb's law (two charges, three charges in a line, three charges on a right-angled triangle).
+| Section | Style | Questions | Marks |
+|---|---|---|---|
+| A | Multiple choice (Paper 1) | 1–15 | 15 |
+| B | Structured (Paper 2) | 16–19 | 25 |
+| C | Practical skills (Paper 3) | 20 | 10 |
 
-All diagrams are original SVG drawn in `src/figs.py`. To rebuild:
+Rebuild (diagrams are drawn in `src/figs.py`):
 
 ```bash
-cd src && python3 build.py && node render.js
+python3 src/figs.py && node src/rasterize.js && node src/build.js
 ```
-
-PDFs are written to this folder; `build/` holds the intermediate HTML (ignored).
