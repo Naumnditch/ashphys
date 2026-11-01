@@ -17,3 +17,9 @@ Rebuild (diagrams are drawn in `src/figs.py`):
 ```bash
 python3 src/figs.py && node src/rasterize.js && node src/build.js
 ```
+
+## Formula sheet
+
+`formula-sheet/Grade11_Formula_Sheet_BW.pdf`: two-page A4 sheet in the layout of the Grade 12
+formula sheet, covering only the equations used in this exam, with every variable made the subject.
+Rebuild with `cd formula-sheet/src && npm install && node build.js` (needs Playwright).
