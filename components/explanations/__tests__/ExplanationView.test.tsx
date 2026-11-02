@@ -36,9 +36,15 @@ describe('ExplanationView', () => {
     expect(container.textContent).not.toContain('$');
   });
 
-  it('falls back to a plain paragraph for old explanations', () => {
+  it('typesets the equations inside an old plain explanation', () => {
     const { container } = render(<ExplanationView text="KE = ½mv². Common mistake: dropping the half." />);
-    expect(container.querySelector('p')?.textContent).toBe('KE = ½mv². Common mistake: dropping the half.');
+    expect(container.querySelectorAll('.katex')).toHaveLength(1);
+    expect(container.querySelector('p')?.textContent).toContain('. Common mistake: dropping the half.');
+  });
+
+  it('shows prose with no equations unchanged', () => {
+    const { container } = render(<ExplanationView text="Velocity is a vector, so direction matters." />);
+    expect(container.querySelector('p')?.textContent).toBe('Velocity is a vector, so direction matters.');
     expect(container.querySelector('.katex')).toBeNull();
   });
 });

@@ -4,15 +4,40 @@ import { useMemo } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { isStructured, parseExplanation, type Block, type Inline } from '@/lib/explanations/parse';
+import { segmentMath } from '@/lib/explanations/autoLatex';
 
 /**
  * Shows a question's explanation. Structured explanations (### Given …
  * ### Common errors, with LaTeX) are typeset as a numbered worked solution;
- * anything else is shown as the plain paragraph it always was.
+ * anything else is shown as the same paragraph, with its equations converted
+ * to LaTeX and typeset (lib/explanations/autoLatex.ts).
  */
 
 function tex(latex: string, displayMode: boolean): string {
   return katex.renderToString(latex, { displayMode, throwOnError: false, output: 'htmlAndMathml', strict: 'ignore' });
+}
+
+/** Typesets an equation, or returns null when KaTeX cannot parse it (the text is shown instead). */
+function texOrNull(latex: string): string | null {
+  try {
+    return katex.renderToString(latex, { displayMode: false, throwOnError: true, output: 'htmlAndMathml', strict: 'ignore' });
+  } catch {
+    return null;
+  }
+}
+
+/** A plain-text explanation with its equations found and typeset as LaTeX. */
+function AutoMath({ text, className }: { text: string; className: string }) {
+  const segments = useMemo(() => segmentMath(text), [text]);
+  return (
+    <p className={`text-sm leading-relaxed text-gray-700 ${className}`}>
+      {segments.map((s, i) => {
+        if (!s.math) return <span key={i}>{s.text}</span>;
+        const html = texOrNull(s.latex);
+        return html ? <span key={i} dangerouslySetInnerHTML={{ __html: html }} /> : <span key={i}>{s.source}</span>;
+      })}
+    </p>
+  );
 }
 
 function Inlines({ items }: { items: Inline[] }) {
@@ -74,7 +99,7 @@ export function ExplanationView({
   const structured = format ? format === 'structured' : isStructured(text);
   const parsed = useMemo(() => (structured ? parseExplanation(text) : null), [structured, text]);
 
-  if (!parsed) return <p className={`text-sm leading-relaxed text-gray-700 ${className}`}>{text}</p>;
+  if (!parsed) return <AutoMath text={text} className={className} />;
 
   return (
     <div className={`text-sm leading-relaxed text-gray-800 ${className}`} aria-label="Worked solution">

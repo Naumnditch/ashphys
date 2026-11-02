@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-11-02 (**structured worked-solution explanations**: every practice question's explanation can now be rewritten as Given / Unit conversion / Principle / Substitution and calculation / boxed Result / Common errors with LaTeX, via the new admin page `/admin/explanations` — see "Structured question explanations"; the DB columns are applied to production, the 2,384 rewrites themselves have not been run yet). Previously 2026-10-30 (second announcement video **Share Your Solution** (~30 s, real footage + hand-drawn notes) and the hero "What's New" slot is now a **newest-first playlist** with a Next button — see "Share Your Solution video + hero playlist"; its production row is in **unpublished**: press Publish at /admin/updates once this branch is deployed). Previously 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-11-02 (**question explanations now show their equations in LaTeX**, converted automatically in code with no AI or API cost; optional hand-written six-section worked solutions at `/admin/explanations` — see "Question explanations in LaTeX"). Previously 2026-10-30 (second announcement video **Share Your Solution** (~30 s, real footage + hand-drawn notes) and the hero "What's New" slot is now a **newest-first playlist** with a Next button — see "Share Your Solution video + hero playlist"; its production row is in **unpublished**: press Publish at /admin/updates once this branch is deployed). Previously 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -25,77 +25,39 @@ Last updated: 2026-11-02 (**structured worked-solution explanations**: every pra
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
 
-### Structured question explanations (NEW 2026-11-02)
+### Question explanations in LaTeX (NEW 2026-11-02)
 
-**What it is.** Each practice question's explanation can be shown as a short,
-formal worked solution in six numbered sections, with the maths typeset by
-KaTeX:
+**Every explanation's equations are typeset as LaTeX, automatically and for
+free.** `lib/explanations/autoLatex.ts` (`segmentMath`) finds the equations in
+the stored plain-text explanation ("v = 2πr/T = (2π × 50) ÷ 9.0 = 34.9 m/s") and
+converts each to LaTeX (`v = 2\pi r/T = (2\pi \times 50) \div 9.0 = 34.9\ \text{m}/\text{s}`):
+× ÷ − → \times \div -, Greek letters, ² ⁻¹ → ^{}, ₀ ₁ → _{}, √(…) → \sqrt{…},
+sin/cos/tan/ln/lg, ½ → \tfrac12, t½ → t_{1/2}, ° and °C, and SI units after a
+number in \text{} (Ω and µ as symbols). Prose, bare numbers ("24.0, 31.5") and
+sentences like "speed = distance ÷ time" are left alone. It runs in the browser
+when the explanation is shown (`components/explanations/ExplanationView.tsx`);
+nothing in the database changes. Two safety nets: if the pieces do not rebuild
+the original text exactly, the whole explanation is shown unchanged, and an
+equation KaTeX cannot parse is shown as its original text. **No AI and no API
+calls are involved** — the owner asked for no paid processing (2026-11-02), so
+the Claude-API rewrite tool that was first built for this was removed the same
+day (along with the `@anthropic-ai/sdk` dependency).
 
-1. Given — known quantities with symbols and SI values
-2. Unit conversion — each conversion before substitution
-3. Principle — governing equation and its constants
-4. Substitution and calculation — substituted expression and arithmetic steps
-5. Result — `\boxed{...}` answer with units and sensible s.f.
-6. Common errors — one or two likely mistakes
+**Optional hand-written worked solutions.** `/admin/explanations` (sidebar:
+Content → Question explanations) lists every question with its explanation as
+students see it, and lets the admin write a six-section worked solution by hand
+(Given / Unit conversion / Principle / Substitution and calculation / boxed
+Result / Common errors, Markdown + LaTeX, live preview). It is validated
+(`lib/explanations/validate.ts`: six sections in order, under 150 words, no
+"!", valid LaTeX, boxed number within 2 % of `answer_correct`) and replaces the
+original for students once it passes ("Publish anyway" overrides). Stored in
+`problems.explanation_structured*` columns
+(`database/seeds/2026-11-02-structured-explanations.sql`, **applied to
+production**); the original `explanation` column is never overwritten. Twelve
+questions already have one: Q1–Q6 (numeric and MCQ) of 3.7 Circular motion
+(extension), written 2026-11-02.
 
-Under 150 words, no exclamation marks, no filler. The prompt is the owner's
-instruction word for word (`lib/explanations/format.ts`, `STYLE_INSTRUCTION`)
-with the question, final answer (MCQ: the correct option, plus all options)
-and the existing explanation filled in, followed by output-format rules the
-parser relies on (`### Given` … `### Common errors` headings, `- ` lists,
-`$$…$$` display maths on its own line).
-
-**Storage** (`database/seeds/2026-11-02-structured-explanations.sql`,
-**applied to production 2026-11-02**): new nullable columns on `problems` —
-`explanation_structured`, `explanation_structured_status` (`ok` |
-`needs_review`), `explanation_structured_issues text[]`,
-`explanation_structured_source` (`ai` | `manual`), `explanation_structured_at`.
-The original `explanation` column is **never overwritten**: it is the source
-text for every rewrite and what students see until a structured version is
-live. Clearing a structured version (admin "Remove") returns the question to
-the original.
-
-**What students see** (`lib/explanations/display.ts`,
-`explanationForStudents`): the structured text when status = `ok`, otherwise
-the original. `POST /api/practice/[topicId]/submit` now returns
-`explanationFormat: 'structured' | 'plain'` next to `explanation`, and
-`components/explanations/ExplanationView.tsx` renders it (structured: numbered
-sections, KaTeX, display equations scroll inside their own box, Result in a
-bordered card; plain: the same paragraph as before). The shared-solution
-review page uses the same component.
-
-**Rewriting** (`lib/explanations/generate.ts`): Claude API via
-`@anthropic-ai/sdk` (model `claude-opus-5-5`, effort `medium`, server-side
-refusal fallback `fallbacks: 'default'`). Uses the `ANTHROPIC_API_KEY` that is
-already set on Vercel for receipt scanning. Each draft is validated
-(`lib/explanations/validate.ts`): all six sections in order and non-empty,
-under 150 words (each LaTeX expression counts as one word), no `!`, balanced
-`$`, every expression parses in KaTeX, a `\boxed{}` exists, and for numeric
-questions a number in the box is within max(2 %, answer_tolerance) of
-`answer_correct` or an alternate. A failing draft gets one automatic revision
-with the issues listed; if it still fails it is stored as `needs_review`
-(not shown to students). API errors leave the question pending.
-
-**Admin page `/admin/explanations`** (sidebar: Content → Question
-explanations): progress bar (rewritten / live / need review / pending),
-**Rewrite remaining** (works through every pending question 6 at a time,
-4 in parallel per request, until done or "Stop after this batch"; keep the
-tab open), filters (All, Not rewritten, Needs review, Live, Edited by you),
-search, and per question the original next to the worked solution with
-**Regenerate**, **Edit** (Markdown/LaTeX textarea with live preview; a manual
-edit that fails the checks is saved as needs_review, with **Publish anyway**)
-and **Remove**.
-
-**Status on 2026-11-02:** columns applied to production; all 2,384
-explanations are still pending (the rewrite needs the production API key, so
-it has to be started from the admin page after deploy). Rough cost at Opus 5.5
-prices: ~2,400 × (~1.5k input + ~1–2k output incl. thinking) ≈ $60–110.
-
-**New question banks:** seed scripts keep writing the plain `explanation`;
-run "Rewrite remaining" after seeding to convert the new questions.
-
-Tests: `lib/explanations/__tests__/explanations.test.ts`,
-`components/explanations/__tests__/ExplanationView.test.tsx`.
+Tests: `lib/explanations/__tests__/`, `components/explanations/__tests__/`.
 
 ### Student workspace & "Share my solution" (NEW 2026-10-29)
 

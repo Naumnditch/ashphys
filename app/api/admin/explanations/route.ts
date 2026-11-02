@@ -1,8 +1,8 @@
 /**
  * GET /api/admin/explanations?filter=pending|ok|needs_review|manual|all&q=&page=
  *
- * Progress of the structured-explanation rewrite, plus one page of questions
- * with their original and structured explanations. Admin-only.
+ * One page of questions with their original explanation and any hand-written
+ * structured version. Admin-only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,7 +29,6 @@ export async function GET(req: NextRequest) {
       total: list.total,
       page,
       pageSize: PAGE_SIZE,
-      configured: Boolean(process.env.ANTHROPIC_API_KEY),
     });
   } catch (err) {
     if (isSchemaMissing(err)) return fail(SCHEMA_MISSING_MESSAGE, 503);

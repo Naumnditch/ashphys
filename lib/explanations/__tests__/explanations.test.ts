@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildRewritePrompt, SECTION_TITLES } from '../format';
+import { SECTION_TITLES } from '../format';
 import { countWords, isStructured, parseExplanation } from '../parse';
 import { boxedContents, numbersInLatex, validateExplanation } from '../validate';
 import { explanationForStudents } from '../display';
@@ -105,27 +105,6 @@ describe('validateExplanation', () => {
   it('does not check the number for multiple-choice questions', () => {
     const mcq = GOOD.replace('F = 3.37\\ \\text{N}', '\\text{B: the force quadruples}');
     expect(validateExplanation(mcq, { answerType: 'multiple_choice', answerCorrect: null }).ok).toBe(true);
-  });
-});
-
-describe('buildRewritePrompt', () => {
-  it('fills the three placeholders and lists MCQ options', () => {
-    const prompt = buildRewritePrompt({
-      questionText: 'Which is a vector?',
-      finalAnswer: 'Velocity',
-      existingExplanation: 'Velocity has direction.',
-      answerType: 'multiple_choice',
-      options: [
-        { text: 'Speed', correct: false },
-        { text: 'Velocity', correct: true },
-      ],
-    });
-    expect(prompt).toContain('Question: Which is a vector?');
-    expect(prompt).toContain('Final answer: Velocity');
-    expect(prompt).toContain('Existing explanation: Velocity has direction.');
-    expect(prompt).toContain('B. Velocity  [correct]');
-    expect(prompt).toContain('Keep the explanation under 150 words.');
-    expect(prompt).not.toContain('[QUESTION]');
   });
 });
 
