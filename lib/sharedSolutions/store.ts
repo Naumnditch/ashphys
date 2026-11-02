@@ -18,6 +18,7 @@ import { withRlsContext } from '@/lib/db/rls';
 import { renderSnapshots } from '@/lib/handwriting/svg';
 import { isHandwritingSchemaMissing } from '@/lib/handwriting/store';
 import type { HwSnapshot } from '@/lib/handwriting/types';
+import { explanationForStudents } from '@/lib/explanations/display';
 import { CONSENT_VERSION, consentText, defaultDisplayName, needsParentConsent, type AgeBand } from './consent';
 import type { ReviewInput, ShareInput } from './validate';
 import type {
@@ -266,7 +267,7 @@ export async function listForReview(admin: { id: string }, filter: ReviewFilter,
   const userIds = Array.from(new Set(rows.flatMap((r) => [r.user_id, r.reviewed_by].filter(Boolean))));
   const [questions, users, teacher] = await Promise.all([
     query(
-      `SELECT p.id, p.topic_id, p.problem_number, p.question_text, p.question_image_url, p.explanation,
+      `SELECT p.id, p.topic_id, p.problem_number, p.question_text, p.question_image_url, p.explanation, p.explanation_structured, p.explanation_structured_status,
               p.answer_type, p.answer_correct, p.answer_unit, t.topic_name,
               (SELECT o.option_text FROM problem_options o WHERE o.problem_id = p.id AND o.is_correct LIMIT 1) AS correct_option
        FROM problems p JOIN topics t ON t.id = p.topic_id WHERE p.id = ANY($1::uuid[])`,
@@ -320,7 +321,10 @@ export async function listForReview(admin: { id: string }, filter: ReviewFilter,
         text: q.question_text ?? '',
         imageUrl: q.question_image_url ?? null,
         answer,
-        explanation: q.explanation ?? null,
+        ...(() => {
+          const e = explanationForStudents({ explanation: q.explanation ?? null, explanation_structured: q.explanation_structured, explanation_structured_status: q.explanation_structured_status });
+          return { explanation: e.explanation, explanationFormat: e.explanationFormat };
+        })(),
       },
       teacherPages: teacherById.get(r.question_id) ?? [],
     };

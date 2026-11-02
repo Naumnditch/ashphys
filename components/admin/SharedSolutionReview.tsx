@@ -17,6 +17,7 @@ import { SharedStatusChip, VerifiedBadge } from '@/components/workspace/SharedSt
 import type { AdminSharedSolutionDTO, SharedSolutionStatus } from '@/lib/sharedSolutions/types';
 import type { HwSnapshot } from '@/lib/handwriting/types';
 import { MAX_REJECTION_REASON } from '@/lib/sharedSolutions/validate';
+import { ExplanationView } from '@/components/explanations/ExplanationView';
 
 const HandwritingViewer = dynamic(() => import('@/components/handwriting/HandwritingViewer').then((m) => m.HandwritingViewer), {
   ssr: false,
@@ -181,7 +182,7 @@ function ReviewCard({
           {q.explanation && (
             <details className="mt-1 text-sm text-gray-700">
               <summary className="cursor-pointer text-xs font-semibold text-gray-500">Explanation (mark scheme)</summary>
-              <p className="mt-1 leading-relaxed">{q.explanation}</p>
+              <ExplanationView text={q.explanation} format={q.explanationFormat} className="mt-1" />
             </details>
           )}
         </section>

@@ -14,6 +14,7 @@ import { PracticeTopBar, type LessonInfo } from '@/components/practice/PracticeS
 import { HandwrittenSolution, type SolutionState } from '@/components/handwriting/HandwrittenSolution';
 import { Popover } from '@/components/handwriting/controls';
 import { SoundToggle } from '@/components/SoundToggle';
+import { ExplanationView } from '@/components/explanations/ExplanationView';
 import { animateReveal, celebrateCorrect, celebrateMilestone, primeFeedback, shakeIncorrect } from '@/lib/feedback';
 
 // The heaviest piece of the page, loaded only when a canvas is shown: the
@@ -152,6 +153,7 @@ export function PracticeSession({
     isCorrect: boolean;
     correctAnswerLabel: string;
     explanation: string;
+    explanationFormat?: 'structured' | 'plain';
     feedback?: string | null;
   } | null>(null);
 
@@ -286,6 +288,7 @@ export function PracticeSession({
         isCorrect: data.data.isCorrect,
         correctAnswerLabel: data.data.correctAnswerLabel,
         explanation: data.data.explanation,
+        explanationFormat: data.data.explanationFormat,
         feedback: data.data.feedback,
       });
       setMastery(data.data.mastery);
@@ -713,7 +716,7 @@ export function PracticeSession({
                 {result.feedback && !result.isCorrect && (
                   <p className="mb-2 text-sm leading-relaxed text-red-900">{result.feedback}</p>
                 )}
-                {result.explanation && <p className="text-sm leading-relaxed text-gray-700">{result.explanation}</p>}
+                {result.explanation && <ExplanationView text={result.explanation} format={result.explanationFormat} />}
 
                 {!result.isCorrect && (
                   <div className="mt-3 border-t border-red-100 pt-3">

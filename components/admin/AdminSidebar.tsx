@@ -38,6 +38,7 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     items: [
       { href: '/admin/curriculum', label: 'Curriculum', icon: 'curriculum' },
       { href: '/admin/solutions', label: 'Interactive solutions', icon: 'solutions' },
+      { href: '/admin/explanations', label: 'Question explanations', icon: 'explanations' },
       { href: '/admin/lesson-videos', label: 'Lesson videos', icon: 'video' },
       { href: '/admin/past-papers', label: 'Past papers', icon: 'papers' },
       { href: '/admin/booklets', label: 'Booklets', icon: 'booklets' },

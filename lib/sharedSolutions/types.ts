@@ -78,6 +78,7 @@ export interface AdminSharedSolutionDTO {
     imageUrl: string | null;
     answer: string | null;
     explanation: string | null;
+    explanationFormat?: 'structured' | 'plain';
   };
   /** The teacher's handwritten solution pages (empty when there is none). */
   teacherPages: HwSnapshot[];

@@ -177,6 +177,12 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="m8 12.5 2.5 2.5L16 9.5" />
     </>
   ),
+  explanations: (
+    <>
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M15 7.5H9l3 4.5-3 4.5h6" />
+    </>
+  ),
 };
 
 export type AdminIconName = keyof typeof PATHS;

@@ -130,6 +130,12 @@ CREATE TABLE IF NOT EXISTS problems (
   answer_type answer_type DEFAULT 'multiple_choice',
   answer_correct TEXT,
   explanation TEXT,
+  -- Structured worked solution (database/seeds/2026-11-02-structured-explanations.sql)
+  explanation_structured TEXT,
+  explanation_structured_status VARCHAR(20),
+  explanation_structured_issues TEXT[],
+  explanation_structured_source VARCHAR(10),
+  explanation_structured_at TIMESTAMPTZ,
   points INT DEFAULT 1,
   "order" INT,
   created_at TIMESTAMP DEFAULT NOW(),

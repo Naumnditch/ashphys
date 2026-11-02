@@ -18,6 +18,7 @@ import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { query } from '@/lib/db/client';
 import { gradeNumeric, specFromProblem, type GradeReason } from '@/lib/grading/numericAnswer';
 import { openPracticeSession, recordAttempt } from '@/lib/practice/attempts';
+import { explanationForStudents } from '@/lib/explanations/display';
 
 export async function POST(req: NextRequest, { params }: { params: { topicId: string } }) {
   const user = await getCurrentUser();
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest, { params }: { params: { topicId: st
   }
 
   const problemResult = await query(
-    `SELECT id, answer_type, answer_correct, explanation, chapter_id,
+    `SELECT id, answer_type, answer_correct, explanation, explanation_structured, explanation_structured_status, chapter_id,
             answer_unit, answer_unit_required, answer_tolerance, answer_sign_sensitive, answer_alternates
      FROM problems WHERE id = $1 AND topic_id = $2`,
     [problemId, params.topicId]
@@ -130,7 +131,7 @@ export async function POST(req: NextRequest, { params }: { params: { topicId: st
     data: {
       isCorrect,
       correctAnswerLabel,
-      explanation: problem.explanation,
+      ...explanationForStudents(problem),
       feedback,
       grading: {
         method: gradingMethod,
