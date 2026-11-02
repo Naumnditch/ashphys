@@ -39,7 +39,16 @@ describe('ExplanationView', () => {
   it('typesets the equations inside an old plain explanation', () => {
     const { container } = render(<ExplanationView text="KE = ½mv². Common mistake: dropping the half." />);
     expect(container.querySelectorAll('.katex')).toHaveLength(1);
-    expect(container.querySelector('p')?.textContent).toContain('. Common mistake: dropping the half.');
+    expect(container.textContent).toContain('Common mistake: dropping the half.');
+  });
+
+  it('puts each equation and each sentence on its own line', () => {
+    const { container } = render(
+      <ExplanationView text="ω = 2π/T = 2π ÷ 15 = 0.419 rad/s, so F = mrω² = 65 × 4.0 × 0.419² = 45.6 N. (Or v = 2πr/T = 1.68 m/s and F = mv²/r.)" />,
+    );
+    const lines = Array.from(container.firstElementChild!.children).map((c) => c.textContent ?? '');
+    expect(lines.length).toBeGreaterThanOrEqual(5);
+    expect(container.querySelectorAll('div > div .katex').length).toBeGreaterThanOrEqual(4);
   });
 
   it('shows prose with no equations unchanged', () => {

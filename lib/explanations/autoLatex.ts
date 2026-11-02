@@ -284,6 +284,12 @@ function segment(text: string): Segment[] {
         lastT.trail = ')' + lastT.trail;
         bal++;
       }
+      // "mv²/r.)" → the full stop before a prose bracket is prose too.
+      const stop = /[.,;:]+$/.exec(lastT.core);
+      if (stop && lastT.trail.startsWith(')')) {
+        lastT.core = lastT.core.slice(0, -stop[0].length);
+        lastT.trail = stop[0] + lastT.trail;
+      }
       const firstT = inner[0];
       while (bal > 0 && firstT.core.startsWith('(')) {
         firstT.core = firstT.core.slice(1);

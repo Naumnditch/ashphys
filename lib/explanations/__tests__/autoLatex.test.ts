@@ -44,6 +44,10 @@ describe('segmentMath', () => {
     expect(show(SAMPLES[8])).toContain('= (-8.00, 8.00)\\ \\text{m}/\\text{s}]');
   });
 
+  it('keeps a full stop before a closing bracket out of the equation', () => {
+    expect(show('(Or v = 2πr/T = 1.68 m/s and F = mv²/r.)')).toBe('(Or [v = 2\\pi r/T = 1.68\\ \\text{m}/\\text{s}] and [F = mv^{2}/r].)');
+  });
+
   it('leaves plain prose and bare numbers alone', () => {
     const t = 'A column of readings should read 24.0, 31.5, 47.0 — not 24, 31.5, 47. Average speed = total distance ÷ total time.';
     expect(segmentMath(t)).toEqual([{ math: false, text: t }]);

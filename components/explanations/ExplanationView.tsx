@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { isStructured, parseExplanation, type Block, type Inline } from '@/lib/explanations/parse';
-import { segmentMath } from '@/lib/explanations/autoLatex';
+import { segmentMath, type Segment } from '@/lib/explanations/autoLatex';
 
 /**
  * Shows a question's explanation. Structured explanations (### Given …
@@ -26,17 +26,77 @@ function texOrNull(latex: string): string | null {
   }
 }
 
-/** A plain-text explanation with its equations found and typeset as LaTeX. */
-function AutoMath({ text, className }: { text: string; className: string }) {
-  const segments = useMemo(() => segmentMath(text), [text]);
+type Line = { eq: boolean; parts: Segment[] };
+
+/**
+ * Lays a plain explanation out line by line: every equation (anything with an
+ * "=") on its own line, and the prose between split into sentences, one per
+ * line. Leftover punctuation ("." or ", so") joins the line it belongs to.
+ */
+export function toLines(segments: Segment[]): Line[] {
+  const lines: Line[] = [];
+  const addText = (text: string) => {
+    let t = text;
+    // Punctuation straight after an equation stays on the equation's line.
+    const lead = /^[\s.,;:)]+/.exec(t);
+    if (lead && lines.length) {
+      const p = lead[0].trim();
+      if (p) lines[lines.length - 1].parts.push({ math: false, text: p });
+      t = t.slice(lead[0].length);
+    }
+    for (const sentence of t.split(/(?<=[.!?])\s+(?=[A-Z(“"‘])/)) {
+      if (!sentence.trim()) continue;
+      const last = lines[lines.length - 1];
+      // Continue an open prose line (the sentence carried on past inline maths).
+      if (last && !last.eq && !/[.!?:)]\s*$/.test(partsText(last))) last.parts.push({ math: false, text: sentence });
+      else lines.push({ eq: false, parts: [{ math: false, text: sentence.trimStart() }] });
+    }
+  };
+  for (const seg of segments) {
+    if (!seg.math) addText(seg.text);
+    else if (/=|\\approx|\\propto/.test(seg.latex)) lines.push({ eq: true, parts: [seg] });
+    else {
+      const last = lines[lines.length - 1];
+      if (last && !last.eq) last.parts.push(seg);
+      else lines.push({ eq: false, parts: [seg] });
+    }
+  }
+  return lines;
+}
+
+function partsText(l: Line): string {
+  return l.parts.map((p) => (p.math ? p.source : p.text)).join('');
+}
+
+function Parts({ parts }: { parts: Segment[] }) {
   return (
-    <p className={`text-sm leading-relaxed text-gray-700 ${className}`}>
-      {segments.map((s, i) => {
+    <>
+      {parts.map((s, i) => {
         if (!s.math) return <span key={i}>{s.text}</span>;
         const html = texOrNull(s.latex);
         return html ? <span key={i} dangerouslySetInnerHTML={{ __html: html }} /> : <span key={i}>{s.source}</span>;
       })}
-    </p>
+    </>
+  );
+}
+
+/** A plain-text explanation with its equations typeset as LaTeX, one line each. */
+function AutoMath({ text, className }: { text: string; className: string }) {
+  const lines = useMemo(() => toLines(segmentMath(text)), [text]);
+  return (
+    <div className={`space-y-1 text-sm leading-relaxed text-gray-700 ${className}`}>
+      {lines.map((l, i) =>
+        l.eq ? (
+          <div key={i} className="overflow-x-auto overflow-y-hidden py-0.5 pl-3 text-[15px] text-gray-900">
+            <Parts parts={l.parts} />
+          </div>
+        ) : (
+          <p key={i}>
+            <Parts parts={l.parts} />
+          </p>
+        ),
+      )}
+    </div>
   );
 }
 
