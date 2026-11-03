@@ -17,7 +17,8 @@ export interface LessonInfo {
  * chrome, like an app: a minimal top bar and a working area that never
  * scrolls as a page. Only the question column scrolls, and only when a
  * question is unusually long. Page scrolling (and iOS bounce) underneath is
- * locked while it is open.
+ * locked while it is open. While the maths keyboard is up the page is that
+ * much shorter, so nothing is hidden behind it.
  */
 export function PracticeShell({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -33,7 +34,13 @@ export function PracticeShell({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-30 flex h-[100dvh] flex-col overflow-hidden bg-white text-gray-900" style={{ overscrollBehavior: 'none' }}>
+    // --math-kbd-h is the maths on-screen keyboard's height while it is open
+    // (components/math/MathAnswerInput.tsx): the page shrinks by that much so
+    // the keyboard sits below the question instead of on top of it.
+    <div
+      className="fixed inset-x-0 top-0 z-30 flex flex-col overflow-hidden bg-white text-gray-900"
+      style={{ overscrollBehavior: 'none', height: 'calc(100dvh - var(--math-kbd-h, 0px))' }}
+    >
       {children}
     </div>
   );
