@@ -229,7 +229,7 @@ def check_question(qn):
     for seg, val, res, half in st:
         if abs(val - res) > half * 1.0001 + 0.012 * abs(res):
             problems.append(f'step "{seg.strip()}" evaluates to {val:.6g}, the solution prints {res:.6g}')
-    target = qn['value']
+    target = qn['value'] * qn.get('scale', 1.0)
     sig = qn.get('sig', 3)
     half_sig = 0.5 * 10 ** (int(f'{abs(target):e}'.split('e')[1]) - sig + 1) if target else 0
     hit = any(abs(res - target) <= max(half, half_sig) * 1.0001 + 0.006 * abs(target) and abs(val - target) <= 0.025 * abs(target) + 1e-300

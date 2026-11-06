@@ -32,9 +32,16 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 - Answer in a unit the grader cannot convert and whose factor ≠ 1 (µF, kΩ, MeV, eV,
   days, rev min⁻¹, km s⁻¹ …) → the stem must contain that unit text. Never ask in g.
 - Physical plausibility asserts where a variant could be impossible (slack strings etc.).
+- No zero answers (ungradeable). Never print `X° = Y rad` as if equal numbers — write
+  "60°, which is π/3 rad" or put the radian value in a separate clause. Trig in printed
+  steps is in degrees (`cos 57.3°`); convert ωt in radians to degrees before printing.
+- Squaring an sf() standard-form value: wrap it, `({sf(x)})²` — never `{sf(x)}²`.
+- Never leave `... if False else None` draft lines (the strip step only removes single lines).
+- Bash heredocs appending to chapter files must end with an `EOF` line.
 
 ## Applied to production
 | file | lessons | commit | md5 | applied | counts after |
 |---|---|---|---|---|---|
 | ch16 | 16.2–16.7 | 15a82b0 | 00f88542ee9cadbe6493ee60c27d2a36 | 2026-11-06 (pg_net id 4) | 16.2 51, 16.3–16.7 50 each |
 | ch17 | 17.1–17.7 | bdcd5e1 | 1d9760b6fa819299ddf34e3a8e5ed736 | 2026-11-06 (pg_net id 5) | 17.1 51, 17.2 52, 17.3 50, 17.4 50, 17.5 51, 17.6 50, 17.7 50 |
+| ch18a + ch18b | 18.1–18.10 | c1941d6 | d005fec900d1d1a7d62cd472cad96104 / a42635b75165592391a65ef9c85c10ea | 2026-11-06 (pg_net ids 6, 7) | all 50 |

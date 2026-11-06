@@ -100,6 +100,7 @@ UNITS = {
     'km s⁻¹ Mpc⁻¹': 1 / 3.09e19, 's⁻¹': 1, 'min⁻¹': 1 / 60, 'h⁻¹': 1 / 3600, 'day⁻¹': 1 / 86400, 'year⁻¹': 1 / 3.156e7,
     'counts per minute': 1 / 60, 'counts min⁻¹': 1 / 60, 'counts s⁻¹': 1, 'kg s⁻¹': 1, 'm³ s⁻¹': 1, 'Pa s': 1,
     'dB': 1, 'times': 1, 'turns': 1, 'turns m⁻¹': 1, 'cycles': 1, 'oscillations': 1, 'photons s⁻¹': 1,
+    'K s⁻¹': 1, 'K min⁻¹': 1 / 60, 'J kg⁻¹ K⁻¹ ': 1, 'kg m⁻²': 1, 'W m⁻¹ K⁻¹': 1, 'J m⁻³': 1, 'mol m⁻³': 1, 'm⁻³': 1, 'kg m²': 1, 'N m²': 1,
     'N m² kg⁻¹': 1, 'N m² kg⁻²': 1, 'J m kg⁻¹': 1, 'N s² m⁻¹': 1, 'm² s⁻²': 1, 'J s': 1, 'W m⁻² K⁻⁴': 1, 'm K': 1,
     'electrons': 1, 'nuclei': 1, 'H m⁻¹': 1, 'F m⁻¹': 1, 'Wb m⁻²': 1, 'T m': 1, 'N A⁻¹ m⁻¹': 1,
 }
@@ -238,7 +239,23 @@ def _explanation(sol, ms_lines, mk, cm):
     return text
 
 
-def N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq=None, alts=None):
+def _safe(builder):
+    """Run a builder; an assertion becomes a recorded build error (the driver rejects it)."""
+    def wrapped(*a, **k):
+        try:
+            return builder(*a, **k)
+        except AssertionError as err:
+            q = dict(lesson=_STATE['lesson'], d=a[0] if a else 'E', difficulty=DIFF.get(a[0] if a else 'E', 1),
+                     marks=a[1] if len(a) > 1 else 1, kind='numeric' if builder.__name__ == '_N' else 'multiple_choice',
+                     text=str(a[2]) if len(a) > 2 else '', value=1.0, sig=3, shown='', unit=None, sign=False, tol=None,
+                     alts=[], explanation='', sol='', options=['a', 'b', 'c', 'd'], correct_idx=0, answer='a',
+                     build_error=str(err))
+            QUESTIONS.append(q)
+            return q
+    return wrapped
+
+
+def _N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq=None, alts=None):
     """A numeric question.
 
     d    'E' | 'M' | 'H'          mk   marks (E 1–2, M 3–4, H 5–7)
@@ -251,8 +268,15 @@ def N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq=
     """
     assert d in DIFF and mk in MARK_RANGE[d], f'{_STATE["lesson"]}: {d} question cannot be worth {mk}'
     assert ans == ans and abs(ans) < 1e60, 'answer must be a finite number'
-    assert abs(ans) > 1e-12, 'a zero answer cannot be graded (any small value would pass): ask for a non-zero quantity'
-    shown = sf(ans, sig) + (f' {unit}' if unit and unit not in ('%', '°') else (unit or ''))
+    assert abs(ans) > 1e-60, 'a zero answer cannot be graded (any small value would pass): ask for a non-zero quantity'
+    scale = 1.0
+    if unit and unit.startswith('10') and ' ' in unit:
+        # "in units of 10⁻²¹ J": ans is given in SI; store and show the scaled number
+        scale = 10 ** int(unit.split(' ')[0][2:].translate(_UNSUP))
+        ans = ans / scale
+        shown = f'{sf(ans, sig)} × {unit}'
+    else:
+        shown = sf(ans, sig) + (f' {unit}' if unit and unit not in ('%', '°') else (unit or ''))
     final = f'A1: {aq + " = " if aq else ""}{shown}'
     ms_lines = _mark_lines(ms, mk, final)
     if tol is None and ans != 0 and abs(round_sf(ans, 2) - ans) / abs(ans) > 0.018 and sig <= 2:
@@ -260,13 +284,13 @@ def N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq=
     if tol is None and ans != 0 and abs(round_sf(ans, sig) - ans) / abs(ans) > 0.018:
         tol = 0.05
     q = dict(lesson=_STATE['lesson'], d=d, difficulty=DIFF[d], marks=mk, kind='numeric', text=stem.strip(),
-             value=ans, sig=sig, shown=shown, unit=unit, sign=sign, tol=tol, alts=alts or [],
+             value=ans, sig=sig, shown=shown, unit=unit, sign=sign, tol=tol, alts=alts or [], scale=scale,
              explanation=_explanation(sol, ms_lines, mk, cm), sol=sol)
     QUESTIONS.append(q)
     return q
 
 
-def M(d, mk, stem, right, wrong, sol, ms=None, cm=None):
+def _M(d, mk, stem, right, wrong, sol, ms=None, cm=None):
     """A multiple-choice question: `right` is the correct option, `wrong` the three distractors."""
     assert d in DIFF and mk in MARK_RANGE[d], f'{_STATE["lesson"]}: {d} MCQ cannot be worth {mk}'
     assert len(wrong) == 3 and len({right, *wrong}) == 4, 'an MCQ needs 4 different options'
@@ -282,6 +306,10 @@ def M(d, mk, stem, right, wrong, sol, ms=None, cm=None):
              explanation=_explanation(sol, ms_lines, mk, cm), sol=sol)
     QUESTIONS.append(q)
     return q
+
+
+N = _safe(_N)
+M = _safe(_M)
 
 
 def pick(seq, i):

@@ -412,5 +412,113 @@
    "d3": 3
   },
   "file": "ch18b"
+ },
+ "19.1": {
+  "code": "19.1",
+  "title": "Changes of state",
+  "topic": "608a3093-aba0-4a7e-ade8-3b518d43db3b",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch19"
+ },
+ "19.2": {
+  "code": "19.2",
+  "title": "The first law of thermodynamics",
+  "topic": "ac0eb546-c37c-5122-8eaa-89bbcb42a5c1",
+  "before": 8,
+  "new": 43,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 5,
+   "d3": 3
+  },
+  "file": "ch19"
+ },
+ "19.3": {
+  "code": "19.3",
+  "title": "Internal energy",
+  "topic": "57651263-6bbc-5909-9535-85c599a55166",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 3,
+   "d3": 4
+  },
+  "file": "ch19"
+ },
+ "19.4": {
+  "code": "19.4",
+  "title": "Thermal equilibrium",
+  "topic": "57029f9b-b999-54ce-809e-427abcb1c520",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 3,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch19"
+ },
+ "19.5": {
+  "code": "19.5",
+  "title": "Temperature scales",
+  "topic": "44937e02-ca76-55a2-936f-ebfb890a9d89",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 19,
+  "medium": 18,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 4,
+   "d2": 3,
+   "d3": 1
+  },
+  "file": "ch19"
+ },
+ "19.6": {
+  "code": "19.6",
+  "title": "Specific heat capacity and latent heat",
+  "topic": "ea4a2b5f-fc7b-5e52-84b7-b92896426bdd",
+  "before": 8,
+  "new": 45,
+  "after": 53,
+  "easy": 17,
+  "medium": 20,
+  "hard": 16,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 4,
+   "d3": 3
+  },
+  "file": "ch19"
  }
 }

@@ -145,8 +145,18 @@ def stored(x, n=4):
     return f'-{out}' if neg else out
 
 
+def _factor_or_unknown(u):
+    try:
+        f = LIB['unit_factor'](u)
+        return 1 if abs(f - 1) < 1e-12 else f
+    except KeyError:
+        return None   # an unknown unit must be named in the stem
+
+
 def quality(q, lesson_qs, existing):
     """Reasons this question fails a quality check (empty list = passes)."""
+    if q.get('build_error'):
+        return [f"build check failed: {q['build_error']}"]
     why = []
     if not q['text'] or len(q['text']) < 25:
         why.append('stem missing or too short')
@@ -165,9 +175,13 @@ def quality(q, lesson_qs, existing):
         if not ok:
             why.extend(problems)
         u = q['unit']
+        gu = grader_unit(u)
+        graded = abs(q['value']) * (gu[1] if gu else 1.0)
+        if graded < 1e-10:
+            why.append(f"answer {q['value']:.3g} is too small for the grader (absolute epsilon 1e-12): ask in eV, a prefixed unit or 'units of 10ⁿ'")
         if u == 'g':
             why.append('answer asked in grams: the grader reads g as 10⁻³ kg, ask in kg or mg')
-        elif u and grader_unit(u) is None and abs(LIB['unit_factor'](u) - 1) > 1e-12 and u not in q['text']:
+        elif u and grader_unit(u) is None and u not in q['text'] and _factor_or_unknown(u) != 1:
             # the stored number is not SI and the grader cannot convert it, so the stem must name the unit
             why.append(f"answer unit {u!r} is not named in the stem")
     else:
