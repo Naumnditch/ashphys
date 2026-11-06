@@ -520,5 +520,149 @@
    "d3": 3
   },
   "file": "ch19"
+ },
+ "20.1": {
+  "code": "20.1",
+  "title": "Particles of a gas",
+  "topic": "975bd5dc-77a0-497e-8745-a6f0d01bd40a",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch20a"
+ },
+ "20.2": {
+  "code": "20.2",
+  "title": "Explaining pressure",
+  "topic": "abc37ad9-553a-497c-9676-00666272de18",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch20a"
+ },
+ "20.3": {
+  "code": "20.3",
+  "title": "The mole and the Avogadro constant",
+  "topic": "e1c1c48c-6a14-5ab3-b2eb-36b898c80474",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 3,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch20a"
+ },
+ "20.4": {
+  "code": "20.4",
+  "title": "Boyle's law",
+  "topic": "aedaea73-e04d-4a1b-a2c2-8460f1be716e",
+  "before": 0,
+  "new": 50,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch20a"
+ },
+ "20.5": {
+  "code": "20.5",
+  "title": "Changing temperature",
+  "topic": "b9eabbea-06f6-441f-84b6-f328fbc895cb",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch20b"
+ },
+ "20.6": {
+  "code": "20.6",
+  "title": "The ideal gas equation",
+  "topic": "2dd6660f-f63e-5078-8c92-9b2c1782553d",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch20b"
+ },
+ "20.7": {
+  "code": "20.7",
+  "title": "Kinetic theory of gases",
+  "topic": "50c14949-b5ee-5ec0-85da-611fddf81a19",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch20b"
+ },
+ "20.8": {
+  "code": "20.8",
+  "title": "Temperature and molecular kinetic energy",
+  "topic": "c69befdb-0bb1-4d84-a2b1-56487e6070d7",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch20b"
  }
 }

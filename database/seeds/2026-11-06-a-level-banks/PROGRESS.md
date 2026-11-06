@@ -38,6 +38,10 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 - Squaring an sf() standard-form value: wrap it, `({sf(x)})²` — never `{sf(x)}²`.
 - Never leave `... if False else None` draft lines (the strip step only removes single lines).
 - Bash heredocs appending to chapter files must end with an `EOF` line.
+- Answers below ~1e-10 in SI fail the grader's absolute epsilon (1e-12): ask "in units of 10⁻²¹ J"
+  (unit '10⁻²¹ J', pass the SI value — N() scales it) or in eV / a grader prefix.
+- Builder assertion failures (mark totals etc.) now appear as REJECTED lines, not crashes.
+- Mark totals: listed lines must sum to marks−1 (final A1 appended) or to marks exactly.
 
 ## Applied to production
 | file | lessons | commit | md5 | applied | counts after |
@@ -45,3 +49,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch16 | 16.2–16.7 | 15a82b0 | 00f88542ee9cadbe6493ee60c27d2a36 | 2026-11-06 (pg_net id 4) | 16.2 51, 16.3–16.7 50 each |
 | ch17 | 17.1–17.7 | bdcd5e1 | 1d9760b6fa819299ddf34e3a8e5ed736 | 2026-11-06 (pg_net id 5) | 17.1 51, 17.2 52, 17.3 50, 17.4 50, 17.5 51, 17.6 50, 17.7 50 |
 | ch18a + ch18b | 18.1–18.10 | c1941d6 | d005fec900d1d1a7d62cd472cad96104 / a42635b75165592391a65ef9c85c10ea | 2026-11-06 (pg_net ids 6, 7) | all 50 |
+| ch19 | 19.1–19.6 | fd8f04a (SQL same as ea02146) | 32aac7ce9869c99a06323696959ba9ea | 2026-11-06 (pg_net id 8) | 19.1 50, 19.2 51, 19.3 50, 19.4 50, 19.5 50, 19.6 53 |
