@@ -82,7 +82,7 @@ function tuples(sql: string, table: string): Cell[][] {
 for (const file of FILES) {
   const sql = readFileSync(path.join(DIR, file), 'utf8');
   const key = JSON.parse(readFileSync(path.join(DIR, file.replace(/\.sql$/, '.key.json')), 'utf8')) as {
-    id: string; shown: string; sign: boolean; value: number;
+    id: string; shown: string; stated: string; sign: boolean; value: number;
   }[];
   const problems = tuples(sql, 'problems');
   const options = tuples(sql, 'problem_options');
@@ -116,7 +116,7 @@ for (const file of FILES) {
           answer_alternates: (p[17] as string[] | null) ?? null,
         });
         expect(spec, `${k.id} answer ${p[12]}`).not.toBeNull();
-        const stated = k.shown.replace(/−/g, '-').replace(/ × 10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (_, e) => 'e' + [...e].map((c: string) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c) === 0 ? '-' : String('⁻⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c) - 1)).join(''));
+        const stated = k.stated.replace(/−/g, '-').replace(/ × 10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/, (_, e) => 'e' + [...e].map((c: string) => '⁻⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c) === 0 ? '-' : String('⁻⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c) - 1)).join(''));
         const number = stated.split(' ')[0];
         expect(gradeNumeric(String(p[12]), spec!).correct, `${k.id} stored ${p[12]}`).toBe(true);
         expect(gradeNumeric(number, spec!).correct, `${k.id} stated "${number}" vs ${p[12]}`).toBe(true);

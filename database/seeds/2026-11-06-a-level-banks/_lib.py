@@ -284,7 +284,7 @@ def _N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq
     if tol is None and ans != 0 and abs(round_sf(ans, sig) - ans) / abs(ans) > 0.018:
         tol = 0.05
     q = dict(lesson=_STATE['lesson'], d=d, difficulty=DIFF[d], marks=mk, kind='numeric', text=stem.strip(),
-             value=ans, sig=sig, shown=shown, unit=unit, sign=sign, tol=tol, alts=alts or [], scale=scale,
+             value=ans, sig=sig, shown=shown, stated=sf(ans, sig), unit=unit, sign=sign, tol=tol, alts=alts or [], scale=scale,
              explanation=_explanation(sol, ms_lines, mk, cm), sol=sol)
     QUESTIONS.append(q)
     return q

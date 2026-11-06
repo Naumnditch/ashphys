@@ -280,7 +280,7 @@ def build(name, rejected, report):
     with open(os.path.join(HERE, 'sql', f'{name}.sql'), 'w', encoding='utf-8') as fh:
         fh.write('\n'.join(out) + '\n')
     # answer key as the mark scheme states it (stated s.f.), for the vitest grader check
-    key_rows = [dict(id=q['id'], lesson=q['lesson'], shown=q['shown'], sig=q['sig'], value=q['value'], sign=bool(q.get('sign')))
+    key_rows = [dict(id=q['id'], lesson=q['lesson'], shown=q['shown'], stated=q.get('stated', q['shown']), sig=q['sig'], value=q['value'], sign=bool(q.get('sign')))
                 for lqs in by_lesson.values() for q in lqs if q['kind'] == 'numeric' and 'id' in q
                 and not any(r['text'] == q['text'] and r['lesson'] == q['lesson'] for r in rejected)]
     with open(os.path.join(HERE, 'sql', f'{name}.key.json'), 'w', encoding='utf-8') as fh:
