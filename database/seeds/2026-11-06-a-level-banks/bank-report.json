@@ -664,5 +664,77 @@
    "d3": 3
   },
   "file": "ch20b"
+ },
+ "21.1": {
+  "code": "21.1",
+  "title": "Attraction and repulsion",
+  "topic": "49460917-aba1-4426-8cf1-21b78854f490",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 1,
+   "d3": 4
+  },
+  "file": "ch21"
+ },
+ "21.2": {
+  "code": "21.2",
+  "title": "Electric fields and field lines",
+  "topic": "7ef293ce-52e7-56ce-9b56-5d610fce5bd5",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 2,
+   "d2": 5,
+   "d3": 1
+  },
+  "file": "ch21"
+ },
+ "21.3": {
+  "code": "21.3",
+  "title": "Uniform electric fields",
+  "topic": "ea6e0ded-f55f-54ce-803b-1143224c470a",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 2,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch21"
+ },
+ "21.4": {
+  "code": "21.4",
+  "title": "Force on a charge",
+  "topic": "d1772ef2-4c08-4e93-86a4-2802dcbf78cc",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 4,
+   "d3": 1
+  },
+  "file": "ch21"
  }
 }

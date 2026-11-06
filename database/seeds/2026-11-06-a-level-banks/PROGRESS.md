@@ -42,6 +42,10 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
   (unit '10⁻²¹ J', pass the SI value — N() scales it) or in eV / a grader prefix.
 - Builder assertion failures (mark totals etc.) now appear as REJECTED lines, not crashes.
 - Mark totals: listed lines must sum to marks−1 (final A1 appended) or to marks exactly.
+- Run the DO block in its own execute_sql call: a failing statement later in the same batch
+  rolls the whole batch back. problems.topic_id is a uuid — count by joining a VALUES list of
+  (topic uuid, code) from lessons.json, not with LIKE.
+- Existing rows also use difficulty_level 4 and 5; they are counted as hard (≥ 3).
 
 ## Applied to production
 | file | lessons | commit | md5 | applied | counts after |
@@ -50,3 +54,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch17 | 17.1–17.7 | bdcd5e1 | 1d9760b6fa819299ddf34e3a8e5ed736 | 2026-11-06 (pg_net id 5) | 17.1 51, 17.2 52, 17.3 50, 17.4 50, 17.5 51, 17.6 50, 17.7 50 |
 | ch18a + ch18b | 18.1–18.10 | c1941d6 | d005fec900d1d1a7d62cd472cad96104 / a42635b75165592391a65ef9c85c10ea | 2026-11-06 (pg_net ids 6, 7) | all 50 |
 | ch19 | 19.1–19.6 | fd8f04a (SQL same as ea02146) | 32aac7ce9869c99a06323696959ba9ea | 2026-11-06 (pg_net id 8) | 19.1 50, 19.2 51, 19.3 50, 19.4 50, 19.5 50, 19.6 53 |
+| ch20a + ch20b | 20.1–20.8 | 955c2cc | daa4c97e03824f41b4cba2926e363b95 / df2425c119612789b2ccea09976756b1 | 2026-11-06 (pg_net ids 9, 10) | all 50 (20.4 18/19/13, others 17/20/13) |
