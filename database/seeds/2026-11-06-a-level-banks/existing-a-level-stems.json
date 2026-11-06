@@ -1,0 +1,6418 @@
+[
+{
+"code": "16.1",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "An object moves round a circle at a constant speed. In which direction does its acceleration point?"
+},
+{
+"code": "16.1",
+"n": 2,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Which force provides the centripetal force in each case? (1) A mass whirled round in a circle on the end of a string. (2) A car rounding a corner on a flat road. (3) The Moon orbiting the Earth."
+},
+{
+"code": "16.1",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "“Centripetal” means centre-seeking and “centrifugal” means centre-fleeing. In an inertial frame of reference (one in which Newton’s laws hold), which statement about a “centrifugal force” on an object moving in a circle is correct?"
+},
+{
+"code": "16.1",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Riding in the back seat of a car that turns a corner, you slide across the seat as if pushed outwards, away from the centre of the turn. Which is the correct explanation?"
+},
+{
+"code": "16.1",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.50 kg mass on a frictionless table is tied to a string that passes through a hole in the centre of the table to a hanging mass. The 0.50 kg mass moves round a circle of radius 0.20 m at 2.3 m/s. Calculate the centripetal force on it."
+},
+{
+"code": "16.1",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The 0.50 kg mass circles at 2.3 m/s on a radius of 0.20 m, held in its circle by a string that runs through the hole in the frictionless table to a hanging mass M, which stays at rest. Calculate M. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 7,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A car travelling at 14 m/s goes round an unbanked (flat) bend of radius 96 m. Calculate its centripetal acceleration."
+},
+{
+"code": "16.1",
+"n": 8,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The car goes round the flat bend of radius 96 m at 14 m/s, with sideways friction from the road providing all of the centripetal force. The friction force can be at most μ × (normal contact force), where μ is the coefficient of friction. Calculate the minimum value of μ that lets the car round the bend. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 9,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A mass on a string moves in a vertical circle. T is the tension in the string and mg is the weight of the mass. Which expressions give the resultant (centripetal) force on the mass at the top and at the bottom of the circle?"
+},
+{
+"code": "16.1",
+"n": 10,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 1.7 kg object is swung on the end of a 0.60 m string in a vertical circle, taking 1.1 s for each revolution. Treating its speed as constant, calculate the tension in the string at the top of the circle. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 11,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The same 1.7 kg object on a 0.60 m string goes round its vertical circle once every 1.1 s. Treating its speed as constant, calculate the tension in the string at the bottom of the circle. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 12,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A mass on a string is swung in a vertical circle with only just enough speed to keep it moving in the circle. What is the tension in the string when the mass is at the top?"
+},
+{
+"code": "16.1",
+"n": 13,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object is swung in a vertical circle of radius 0.75 m. Calculate the minimum speed it must have at the top of the circle to stay in circular motion. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 14,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A car travels at a constant speed round a frictionless banked bend, as shown. Which forces act on the car?"
+},
+{
+"code": "16.1",
+"n": 15,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "On a frictionless banked bend, what provides the centripetal force on the car?"
+},
+{
+"code": "16.1",
+"n": 16,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A bend of radius 475 m is to be banked so that a car can go round it at 22 m/s without needing any friction. Calculate the angle θ at which the road must be banked. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 17,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.25 kg toy plane on a string flies round a horizontal circle of radius 0.80 m. The string makes an angle of 28° with the vertical. Calculate the period of the plane’s motion. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 18,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Alice rides in a car on a theme-park ride. The car travels round a circular track that is banked, as shown, and friction is negligible. Which two forces act on the car?"
+},
+{
+"code": "16.1",
+"n": 19,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The mass of Alice’s car and its passengers is 9.60 × 10² kg, and the frictionless track is banked at 20° to the horizontal. Calculate the size of the centripetal force on the car. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 20,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A 0.250 kg ball on the end of a cord 1.20 m long is swung in a vertical circle. At the position shown its speed is 4.00 m/s. Calculate the centripetal force on the ball at this instant."
+},
+{
+"code": "16.1",
+"n": 21,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does a ball swung on a cord in a vertical circle move fastest at the bottom of the circle?"
+},
+{
+"code": "16.1",
+"n": 22,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "The ball is swung in a vertical circle with the cord taut all the way round. How does the tension in the cord at the bottom of the circle compare with the tension at the top?"
+},
+{
+"code": "16.1",
+"n": 23,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Compare the centripetal (resultant) force on the ball at the top and at the bottom of its vertical circle."
+},
+{
+"code": "16.1",
+"n": 24,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The 0.250 kg ball is swung in a vertical circle on a cord 1.20 m long. Calculate the minimum speed it must have at the top of the circle for the cord to stay taut. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 25,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "The ball has its minimum speed of 3.43 m/s at the top of the circle (cord 1.20 m). Using conservation of energy, calculate the angle θ from the top of the circle — measured at the centre, from the upward vertical — at which the ball’s speed has risen to 4.00 m/s. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 26,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 1.80 kg bob on a cord 1.55 m long swings as a conical pendulum, moving round a horizontal circle of radius 0.290 m. Calculate the angle θ between the cord and the vertical."
+},
+{
+"code": "16.1",
+"n": 27,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The 1.80 kg bob of a conical pendulum moves round a horizontal circle of radius 0.290 m on a cord 1.55 m long. Calculate the tension in the cord. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 28,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the speed the 1.80 kg bob must have to move round its horizontal circle of radius 0.290 m on the 1.55 m cord. Take g = 9.81 m/s²."
+},
+{
+"code": "16.1",
+"n": 29,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "The London Eye is a giant wheel with 32 passenger capsules evenly spaced round its rim. Each capsule has a mass of 1.0 × 10⁴ kg, is 68 m from the centre of the wheel and moves at a constant 0.26 m/s. Calculate the centripetal force that keeps a capsule moving in its vertical circle."
+},
+{
+"code": "16.1",
+"n": 30,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A passenger stands on the floor of a capsule at the position shown, on the side of the turning wheel. Which forces act on her, and how do they give her centripetal force?"
+},
+{
+"code": "16.1",
+"n": 31,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Jon spins Ana round a horizontal circle on the ice by holding her arm, as shown. In which direction does the tension force from Jon’s arm act on Ana at the instant shown?"
+},
+{
+"code": "16.1",
+"n": 32,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Ana (mass 55 kg) moves round a horizontal circle of radius 0.95 m, and the tension force in Jon’s arm is 5.00 × 10² N. Calculate Ana’s speed, giving your answer to an appropriate number of significant figures."
+},
+{
+"code": "16.1",
+"n": 33,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Jan swings a 10 kg iron ball on a steel wire round a horizontal circle, shown from above. In which direction is the ball’s acceleration at the instant shown?"
+},
+{
+"code": "16.1",
+"n": 34,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "In which direction does the steel wire pull on Jan?"
+},
+{
+"code": "16.1",
+"n": 35,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The iron ball moves round its horizontal circle at a constant speed. Why is a horizontal force needed on the ball?"
+},
+{
+"code": "16.1",
+"n": 36,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The 10 kg iron ball goes round a horizontal circle of radius 2.0 m, taking 1.5 s for each rotation. Calculate the centripetal force on the ball."
+},
+{
+"code": "16.1",
+"n": 37,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "After a few rotations the ball moves round a circle of the same radius, but with a shorter period. What happens to the horizontal force that the wire exerts on Jan?"
+},
+{
+"code": "16.1",
+"n": 38,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An 18 kg suitcase rides on a horizontal circular conveyor belt of radius 7.0 m. The unbalanced (resultant) force on it is 5.5 N. Calculate the time the belt takes to complete one rotation."
+},
+{
+"code": "16.1",
+"n": 39,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Jason (mass 65 kg) stands on a merry-go-round, 4.0 m from its centre. The merry-go-round takes 15 s to make a complete turn. Calculate the centripetal force needed to keep him moving in his circle."
+},
+{
+"code": "16.1",
+"n": 40,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Janet’s ball moves round a horizontal circle of radius 0.75 m, taking 0.84 s to go round her head once. Calculate the acceleration of the ball."
+},
+{
+"code": "16.1",
+"n": 41,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which force makes Janet’s ball accelerate as it goes round its circle, and how does it change the ball’s velocity?"
+},
+{
+"code": "16.1",
+"n": 42,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The referee’s 40.0 g whistle moves round a horizontal circle of radius 0.500 m, taking 1.40 s for each rotation. Calculate the horizontal force that the string exerts on the whistle."
+},
+{
+"code": "16.1",
+"n": 43,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Considering the horizontal forces on the whistle, why does it keep moving round its circle at a constant speed?"
+},
+{
+"code": "16.1",
+"n": 44,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The speed of the 40.0 g whistle is reduced to 1.0 m/s, still on a circle of radius 0.500 m. Calculate the new horizontal force needed to keep it moving in the circle."
+},
+{
+"code": "16.1",
+"n": 45,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "At 1.0 m/s the whistle needs a horizontal force of only 0.080 N, while its weight is about 0.39 N. What is the likely result of reducing its speed?"
+},
+{
+"code": "16.1",
+"n": 46,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.50 kg ball on a 0.80 m string moves in a horizontal circle on a frictionless table. It completes 3.0 revolutions in 2.0 s. Calculate the tension in the string."
+},
+{
+"code": "16.1",
+"n": 47,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 1200 kg car takes a flat circular bend of radius 50 m. On a dry road the tyres can provide a maximum friction force of 7200 N. On a wet road this maximum falls by 40%. Calculate the maximum safe speed on the wet road."
+},
+{
+"code": "16.1",
+"n": 48,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Two coins sit on a turntable rotating at 45 revolutions per minute. Coin A is 0.10 m from the centre and coin B is 0.20 m from the centre. Calculate the centripetal acceleration of coin B."
+},
+{
+"code": "16.1",
+"n": 49,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.50 kg ball is swung in a vertical circle of radius 1.2 m. Assume its speed is 6.0 m/s at both the top and the bottom. Calculate the tension in the string at the top of the circle. Take g = 9.8 N/kg."
+},
+{
+"code": "16.1",
+"n": 50,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.20 kg bob hangs on a 1.0 m string. It moves in a horizontal circle with the string making 30° with the vertical. Calculate the time for one revolution. Take g = 9.8 N/kg."
+},
+{
+"code": "16.1",
+"n": 51,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.30 kg mass is whirled on the end of a 0.60 m string in a horizontal circle on a frictionless table. The string breaks if the tension exceeds 40 N. Calculate the maximum speed the mass can have without the string breaking."
+},
+{
+"code": "16.1",
+"n": 52,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The maximum friction force between a car’s tyres and a dry flat road is 0.85 times the car’s weight. Calculate the maximum speed at which the car can take a flat bend of radius 40 m. Take g = 9.8 N/kg."
+},
+{
+"code": "16.1",
+"n": 53,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A conical pendulum has a bob on a 0.75 m string. The string makes an angle of 40° with the vertical as the bob moves in a horizontal circle. Calculate the speed of the bob. Take g = 9.8 N/kg."
+},
+{
+"code": "16.1",
+"n": 54,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A ball is swung on a string in a vertical circle of radius 0.90 m. Calculate the minimum speed it must have at the bottom of the circle for the string to stay taut all the way round. (Its speed changes as it rises: use conservation of energy.) Take g = 9.8 N/kg."
+},
+{
+"code": "16.1",
+"n": 55,
+"d": 5,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.25 kg ball is swung on a string in a vertical circle of radius 0.90 m. Its speed at the bottom of the circle is 7.0 m/s. Calculate the tension in the string at the top of the circle. Take g = 9.8 N/kg."
+},
+{
+"code": "16.2",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "A mass on a string is whirled round a horizontal circle at a constant speed. In which direction is the mass moving at any instant?"
+},
+{
+"code": "16.2",
+"n": 2,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "An object moves round a circle of radius r at a constant speed, taking a time T (the period) for each revolution. Which expression gives its speed?"
+},
+{
+"code": "16.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An aircraft flies round a complete horizontal circle of radius 3622 m in 2.10 minutes, at a constant speed. Calculate its speed."
+},
+{
+"code": "16.2",
+"n": 4,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A referee swings her 40.0 g whistle round a horizontal circle of radius 0.500 m above her head at a constant speed, taking 1.40 s for each rotation. Calculate the speed of the whistle."
+},
+{
+"code": "16.2",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Jason stands near the edge of a merry-go-round that turns clockwise at a constant speed, as shown. What is the direction of his velocity at the instant shown?"
+},
+{
+"code": "16.2",
+"n": 6,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "A suitcase rides on a horizontal circular conveyor belt of radius 7.0 m that turns clockwise at a constant speed. At the instant shown the suitcase is at the right-hand side of the circle. In which direction is it moving?"
+},
+{
+"code": "16.2",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "The suitcase on the circular belt moves at a constant speed. Why is its motion described as accelerated?"
+},
+{
+"code": "16.2",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Janet swings a ball on a string round a horizontal circle above her head at a constant speed. Which statement explains why the ball is accelerating?"
+},
+{
+"code": "16.2",
+"n": 9,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Jon spins Ana round a horizontal circle on the ice, holding her by the arm. While she is still moving in the circle he lets go. Ignoring friction from the ice, how does Ana move immediately afterwards?"
+},
+{
+"code": "16.3",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An object moves in a circle of radius 4.0 m at a constant speed of 8.0 m s⁻¹. Calculate its centripetal acceleration."
+},
+{
+"code": "16.3",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An object travelling at 6.0 m s⁻¹ moves a quarter of the way round a circle. Calculate the magnitude of its change in velocity."
+},
+{
+"code": "16.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A car rounds a bend of radius 25 m at a steady 10 m s⁻¹. Calculate its centripetal acceleration."
+},
+{
+"code": "16.3",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is an object moving in a circle at constant speed accelerating?"
+},
+{
+"code": "16.3",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "In what direction does the velocity of an object in circular motion point at any instant?"
+},
+{
+"code": "16.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "In what direction does the acceleration of an object in uniform circular motion point?"
+},
+{
+"code": "16.4",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object completes one revolution in 4.0 s. Calculate its angular speed."
+},
+{
+"code": "16.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object moves in a circle of radius 0.80 m with an angular speed of 2.5 rad s⁻¹. Calculate its linear speed."
+},
+{
+"code": "16.4",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A wheel rotates at 300 revolutions per minute. Calculate its angular speed in rad s⁻¹."
+},
+{
+"code": "16.4",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object has an angular speed of 10 rad s⁻¹. Calculate its period."
+},
+{
+"code": "16.4",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object has an angular speed of 12.57 rad s⁻¹. Calculate its frequency of rotation."
+},
+{
+"code": "16.4",
+"n": 6,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is the SI unit of angular speed?"
+},
+{
+"code": "16.4",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Two coins sit on a turntable rotating at 45 revolutions per minute. Coin A is 0.10 m from the centre and coin B is 0.20 m from the centre. Calculate the ratio (speed of coin B) ÷ (speed of coin A)."
+},
+{
+"code": "16.4",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Two coins sit on a turntable rotating at 45 revolutions per minute. Coin A is 0.10 m from the centre and coin B is 0.20 m from the centre. Calculate the centripetal acceleration of coin B."
+},
+{
+"code": "16.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A car of mass 1200 kg rounds a bend of radius 50 m at 15 m s⁻¹. Calculate the centripetal force needed."
+},
+{
+"code": "16.5",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.50 kg mass moves in a circle of radius 1.2 m with angular speed 4.0 rad s⁻¹. Calculate the centripetal force."
+},
+{
+"code": "16.5",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 1000 kg car rounds a bend of radius 40 m. The maximum frictional force available is 3000 N. Calculate the maximum speed before it skids."
+},
+{
+"code": "16.5",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What provides the centripetal force for a car rounding a level bend?"
+},
+{
+"code": "16.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Is the centripetal force an extra force acting on a body in circular motion?"
+},
+{
+"code": "16.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A whirling ball on a string is released when the string snaps. What path does it follow immediately afterwards?"
+},
+{
+"code": "16.5",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.50 kg ball is swung in a vertical circle of radius 1.2 m on a string. Assume its speed is 6.0 m s⁻¹ at both the top and the bottom. Take g = 9.8 N kg⁻¹. Calculate the tension in the string at the top of the circle."
+},
+{
+"code": "16.5",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.50 kg ball is swung in a vertical circle of radius 1.2 m on a string. Assume its speed is 6.0 m s⁻¹ at both the top and the bottom. Take g = 9.8 N kg⁻¹. Calculate the tension in the string at the bottom of the circle."
+},
+{
+"code": "16.5",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.50 kg ball is swung in a vertical circle of radius 1.2 m on a string. Take g = 9.8 N kg⁻¹. Calculate the minimum speed at the top of the circle for the string to stay taut."
+},
+{
+"code": "16.6",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object moves at 20 m s⁻¹ in a circle of radius 100 m. Calculate its centripetal acceleration."
+},
+{
+"code": "16.6",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An object rotates with angular speed 3.0 rad s⁻¹ at a radius of 2.0 m. Calculate its centripetal acceleration."
+},
+{
+"code": "16.6",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.20 kg ball moves in a circle of radius 0.50 m at 5.0 m s⁻¹. Calculate the centripetal force."
+},
+{
+"code": "16.6",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits at 7800 m s⁻¹ at a radius of 6.8 × 10⁶ m. Calculate its centripetal acceleration."
+},
+{
+"code": "16.6",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A car passes over a humpback bridge of radius 5.0 m. Calculate the speed at which it just loses contact with the road. Take g = 9.81 m s⁻²."
+},
+{
+"code": "16.6",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which expressions both correctly give the centripetal acceleration?"
+},
+{
+"code": "16.6",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.50 kg ball on a 0.80 m string moves in a horizontal circle on a frictionless table. It completes 3.0 revolutions in 2.0 s. Calculate its speed."
+},
+{
+"code": "16.6",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.50 kg ball on a 0.80 m string moves in a horizontal circle on a frictionless table. It completes 3.0 revolutions in 2.0 s. Calculate the tension in the string."
+},
+{
+"code": "16.7",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A track is banked so that a car of any mass can round a bend of radius 80 m at 20 m s⁻¹ with no reliance on friction. Calculate the banking angle. Take g = 9.81 m s⁻²."
+},
+{
+"code": "16.7",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.50 kg ball on a string of length 1.0 m swings in a vertical circle and passes the lowest point at 4.0 m s⁻¹. Calculate the tension in the string there. Take g = 9.81 m s⁻²."
+},
+{
+"code": "16.7",
+"n": 3,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What supplies the centripetal force keeping a satellite in orbit?"
+},
+{
+"code": "16.7",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What supplies the centripetal force on an electron held in orbit around a nucleus in the simple planetary model?"
+},
+{
+"code": "16.7",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A mass on a string is whirled in a horizontal circle, so the string traces out a cone. What supplies the centripetal force?"
+},
+{
+"code": "16.7",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is centrifugal force described as a fictitious force?"
+},
+{
+"code": "16.7",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 1200 kg car takes a flat circular bend of radius 50 m. The maximum friction force the tyres can provide is 7200 N. Calculate the maximum safe speed."
+},
+{
+"code": "16.7",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 1200 kg car takes a flat circular bend of radius 50 m. On a dry road the maximum friction force is 7200 N. On a wet road the maximum friction force falls by 40%. Calculate the new maximum safe speed."
+},
+{
+"code": "16.7",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.20 kg bob hangs on a 1.0 m string and moves in a horizontal circle (a conical pendulum) with the string at 30° to the vertical. Take g = 9.8 N kg⁻¹. Calculate the tension in the string."
+},
+{
+"code": "16.7",
+"n": 10,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.20 kg bob hangs on a 1.0 m string and moves in a horizontal circle (a conical pendulum) with the string at 30° to the vertical. Take g = 9.8 N kg⁻¹. Calculate the speed of the bob."
+},
+{
+"code": "16.7",
+"n": 11,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A 0.20 kg bob hangs on a 1.0 m string and moves in a horizontal circle (a conical pendulum) with the string at 30° to the vertical. Take g = 9.8 N kg⁻¹. Calculate the time taken for one complete revolution."
+},
+{
+"code": "17.1",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is a gravitational field?"
+},
+{
+"code": "17.1",
+"n": 2,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Gravitational field strength g at a point is defined as…"
+},
+{
+"code": "17.1",
+"n": 3,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Is gravitational field strength a scalar or a vector quantity?"
+},
+{
+"code": "17.1",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The diagram shows field lines around a planet. What does the spacing of the field lines show?"
+},
+{
+"code": "17.1",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "An astronaut travels from the Earth to the Moon. Which statement is correct?"
+},
+{
+"code": "17.2",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "A campfire seems to give out a “heat field”: it feels stronger as you move closer, and stronger again if the fire is made bigger. In what similar way does the gravitational field strength around a planet behave?"
+},
+{
+"code": "17.2",
+"n": 2,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Near the Earth’s surface we use g = 9.81 N/kg. Why can’t this value be used to find the gravitational force on a satellite in a high orbit?"
+},
+{
+"code": "17.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The Moon has a mass of 7.35 × 10²² kg and a radius of 1.74 × 10⁶ m. Calculate the gravitational field strength at its surface. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The space shuttle and telescope orbit the Earth at a radius of 7.00 × 10⁶ m. Calculate the gravitational field strength (the acceleration due to gravity) at this height, giving your answer to an appropriate number of significant figures. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.2",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the gravitational field strength due to the Earth at any point in the orbit of the ISS, 6.788 × 10⁶ m from the Earth’s centre. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.97 × 10²⁴ kg."
+},
+{
+"code": "17.2",
+"n": 6,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Planet X has mass 4.0 × 10²⁴ kg and radius 5.0 × 10⁶ m. Take G = 6.67 × 10⁻¹¹ N m² kg⁻². Calculate the gravitational field strength at the surface of the planet."
+},
+{
+"code": "17.2",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Planet X has mass 4.0 × 10²⁴ kg and radius 5.0 × 10⁶ m. Take G = 6.67 × 10⁻¹¹ N m² kg⁻². Calculate the gravitational field strength at a height of 5.0 × 10⁶ m above the surface."
+},
+{
+"code": "17.2",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Planet X has mass 4.0 × 10²⁴ kg and radius 5.0 × 10⁶ m. Take G = 6.67 × 10⁻¹¹ N m² kg⁻². Calculate the weight of a 70 kg astronaut at a height of 5.0 × 10⁶ m above the surface."
+},
+{
+"code": "17.2",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "The distance between the centres of the Earth and the Moon is 3.84 × 10⁸ m. The mass of the Earth is 81 times the mass of the Moon. A spacecraft on the line between them experiences zero resultant gravitational force. Calculate its distance from the centre of the Earth."
+},
+{
+"code": "17.3",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the gravitational potential energy of a 100 kg mass at the Earth surface. Take G = 6.67 × 10⁻¹¹ N m² kg⁻², M = 5.97 × 10²⁴ kg and r = 6.4 × 10⁶ m."
+},
+{
+"code": "17.3",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the escape velocity from the Earth surface. Take G = 6.67 × 10⁻¹¹ N m² kg⁻², M = 5.97 × 10²⁴ kg and r = 6.4 × 10⁶ m."
+},
+{
+"code": "17.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A mass has a gravitational potential energy of −6.22 × 10⁹ J at a distance r from the Earth centre. Calculate its potential energy at 2r."
+},
+{
+"code": "17.3",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the gain in gravitational potential energy when a 1200 kg satellite is raised 100 m near the Earth surface. Take g = 9.81 m s⁻²."
+},
+{
+"code": "17.3",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is gravitational potential energy always negative?"
+},
+{
+"code": "17.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What happens to the gravitational potential energy of a satellite as it moves further from the Earth?"
+},
+{
+"code": "17.4",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "In the expression Eₚ = −GMm/r for the gravitational potential energy of two masses, where is the zero of potential energy?"
+},
+{
+"code": "17.4",
+"n": 2,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is the gravitational potential energy of a mass near a planet always negative?"
+},
+{
+"code": "17.4",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which graph shows how the gravitational potential energy Eₚ of a mass varies with its distance r from the centre of a planet of radius R, for r ≥ R?"
+},
+{
+"code": "17.4",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 2500 kg satellite is in orbit 3.60 × 10⁷ m above the Earth’s surface. Calculate its gravitational potential energy due to the Earth, including the sign. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the Earth’s mass as 5.98 × 10²⁴ kg and its radius as 6.38 × 10⁶ m."
+},
+{
+"code": "17.4",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "The same 2500 kg satellite orbits 4.238 × 10⁷ m from the Earth’s centre. Calculate its total energy (kinetic plus gravitational potential), including the sign. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "For a satellite in a circular orbit, how is its kinetic energy Eₖ related to its gravitational potential energy Eₚ?"
+},
+{
+"code": "17.4",
+"n": 7,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "How much work must be done to move a 4500 kg satellite from an orbital radius of 1.8 × 10⁷ m out to an orbital radius of 4.2 × 10⁷ m? Consider only the change in its gravitational potential energy (ignore any change in kinetic energy). Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.4",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 250 kg capsule of waste is released from rest at an altitude of 3.50 × 10⁵ m above the Earth’s surface. Ignoring air resistance, calculate the speed at which it would hit the Earth. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the Earth’s mass as 5.98 × 10²⁴ kg and its radius as 6.38 × 10⁶ m."
+},
+{
+"code": "17.4",
+"n": 9,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An asteroid of mass 2.35 × 10¹⁶ kg starts from rest a very long way from the Earth (take its initial kinetic and potential energy as zero) and falls to the Earth. Calculate the energy released on impact — the kinetic energy it has when it reaches the Earth’s surface. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the Earth’s mass as 5.98 × 10²⁴ kg and its radius as 6.38 × 10⁶ m."
+},
+{
+"code": "17.4",
+"n": 10,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "To escape completely from the Earth’s gravitational field, an object launched from the surface must be given enough kinetic energy to…"
+},
+{
+"code": "17.4",
+"n": 11,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "At what speed would you need to throw a 1.0 kg rock upwards from the Earth’s surface for it to escape completely from the Earth’s gravitational field? Ignore air resistance and the Earth’s rotation. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the Earth’s mass as 5.98 × 10²⁴ kg and its radius as 6.38 × 10⁶ m."
+},
+{
+"code": "17.4",
+"n": 12,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Does the mass of the rock affect the speed it needs to escape from the Earth?"
+},
+{
+"code": "17.4",
+"n": 13,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 1450 kg satellite moves from an orbit 980 km above the Earth’s surface to a lower orbit 480 km above the surface. Calculate the change in its gravitational potential energy, including the sign. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the Earth’s mass as 5.97 × 10²⁴ kg and its radius as 6.38 × 10⁶ m."
+},
+{
+"code": "17.5",
+"n": 1,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "According to Newton’s law of gravitation, the gravitational force between two point masses is…"
+},
+{
+"code": "17.5",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Two students, each of mass 75 kg, stand with their centres of mass 0.95 m apart. Treating them as point masses, calculate the gravitational force between them. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite weighs 9000 N on the Earth’s surface. What would the gravitational force on it be if its mass were tripled and it were moved to twice its distance from the Earth’s centre?"
+},
+{
+"code": "17.5",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The Moon is pulled towards the Earth by gravity. Why doesn’t it fall down onto the Earth?"
+},
+{
+"code": "17.5",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 4500 kg satellite orbits the Earth at an orbital radius of 8.50 × 10⁷ m. Calculate its orbital speed. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits the Earth at a radius of 2.20 × 10⁷ m. Calculate its orbital period. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Two identical satellites orbit the Earth. Satellite A’s orbital radius is twice satellite B’s. Which satellite travels faster?"
+},
+{
+"code": "17.5",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Two identical satellites are in circular orbits of the same radius: A orbits the Sun and B orbits the Earth. Which satellite travels faster?"
+},
+{
+"code": "17.5",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A geostationary satellite stays above the same point on the equator: it orbits once in the time the Earth takes to spin once, 24 hours. Calculate the radius of its orbit. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.98 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 10,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A geostationary satellite orbits at a radius of 4.22 × 10⁷ m, going round once every 24 hours. Calculate its orbital speed."
+},
+{
+"code": "17.5",
+"n": 11,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A spaceship goes into a circular orbit around a planet, at a height of 351 km above the planet’s surface, with a period of 5.46 × 10³ s. The planet’s radius is 5220 km. Calculate the mass of the planet. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 12,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "A 300 kg television satellite is in a geostationary orbit round the Earth. Name the force that keeps it in its circular orbit, and state the direction in which this force acts."
+},
+{
+"code": "17.5",
+"n": 13,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The 300 kg television satellite orbits at a radius of 4.22 × 10⁷ m from the centre of the Earth. Calculate the gravitational force on it. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.97 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 14,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the orbital speed of the television satellite, which orbits at a radius of 4.22 × 10⁷ m. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.97 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 15,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "The space shuttle Discovery, with the Hubble space telescope attached to it by a cable, is in a circular orbit of radius 7.00 × 10⁶ m. Which force keeps the shuttle and telescope in their orbit, and in which direction does it act?"
+},
+{
+"code": "17.5",
+"n": 16,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Phobos, one of the moons of Mars, orbits Mars at a mean radius of 9.38 × 10⁶ m with a period of 2.76 × 10⁴ s. Calculate the mass of Mars. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 17,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A planet of mass m moves in a circular orbit of radius r and period T round a star of mass M. Equating the gravitational force on the planet to the centripetal force it needs gives which relationship?"
+},
+{
+"code": "17.5",
+"n": 18,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "By equating the gravitational force on a planet to the centripetal force it needs, find an expression for its orbital speed v in a circular orbit of radius r round a star of mass M."
+},
+{
+"code": "17.5",
+"n": 19,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "F_E is the gravitational force exerted on the Earth by the Moon, and F_m is the gravitational force exerted on the Moon by the Earth. Which statement is correct?"
+},
+{
+"code": "17.5",
+"n": 20,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The Earth has a mass of 5.97 × 10²⁴ kg and the Moon a mass of 7.35 × 10²² kg. Their centres are 3.84 × 10⁸ m apart. Calculate the gravitational force between the Earth and the Moon. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 21,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "The International Space Station (ISS), of mass 4.20 × 10⁵ kg, orbits the Earth at a height of 408 km above the Earth’s surface. Taking the radius of the Earth as 6.38 × 10⁶ m, calculate the distance between the centre of the Earth and the ISS."
+},
+{
+"code": "17.5",
+"n": 22,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The ISS (mass 4.20 × 10⁵ kg) orbits 6.788 × 10⁶ m from the centre of the Earth. Calculate the gravitational force between the Earth and the ISS. Use G = 6.67 × 10⁻¹¹ N m² kg⁻² and take the mass of the Earth as 5.97 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 23,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Planet X has mass 4.0 × 10²⁴ kg and radius 5.0 × 10⁶ m. Calculate the weight of a 70 kg astronaut at a height of 5.0 × 10⁶ m above the surface of Planet X. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 24,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits Earth in a circle at an altitude of 600 km. Calculate its orbital period, in minutes. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²; Earth’s mass = 5.97 × 10²⁴ kg and Earth’s radius = 6.37 × 10⁶ m."
+},
+{
+"code": "17.5",
+"n": 25,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A geostationary satellite has a period of 24 h. Calculate its altitude above Earth’s surface, in metres. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²; Earth’s mass = 5.97 × 10²⁴ kg and Earth’s radius = 6.37 × 10⁶ m."
+},
+{
+"code": "17.5",
+"n": 26,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Satellites A and B orbit the same planet. B’s orbital radius is 4 times A’s. If A’s orbital period is 2.0 h, calculate B’s orbital period, in hours."
+},
+{
+"code": "17.5",
+"n": 27,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "The Earth–Moon distance is 3.84 × 10⁸ m, and Earth’s mass is 81 times the Moon’s. At what distance from Earth does a spacecraft on the line between them feel zero net gravitational force? Give your answer in metres."
+},
+{
+"code": "17.5",
+"n": 28,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "At what height above Earth’s surface is the gravitational field strength 4.9 N/kg? Give your answer in metres. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²; Earth’s mass = 5.97 × 10²⁴ kg and Earth’s radius = 6.37 × 10⁶ m."
+},
+{
+"code": "17.5",
+"n": 29,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The Moon orbits Earth in an almost circular orbit of radius 3.84 × 10⁸ m. Calculate the Moon’s orbital period, in days. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²; Earth’s mass = 5.97 × 10²⁴ kg."
+},
+{
+"code": "17.5",
+"n": 30,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A moon orbits a planet in a circle of radius 4.22 × 10⁸ m with a period of 1.77 days. Calculate the mass of the planet. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.5",
+"n": 31,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits Earth once every 90 minutes in a circular orbit. Calculate its altitude above Earth’s surface, in metres. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²; Earth’s mass = 5.97 × 10²⁴ kg and Earth’s radius = 6.37 × 10⁶ m."
+},
+{
+"code": "17.5",
+"n": 32,
+"d": 5,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits just above the surface of a planet of uniform density 5500 kg/m³, so its orbital radius is the planet’s radius R. Show that the period does not depend on the size of the planet, and calculate it, in seconds. Use G = 6.67 × 10⁻¹¹ N m² kg⁻²."
+},
+{
+"code": "17.6",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits at a radius of 7.0 × 10⁶ m. Calculate its period. Take GM = 3.98 × 10¹⁴ N m² kg⁻¹ for the Earth."
+},
+{
+"code": "17.6",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A satellite orbits at a radius of 7.0 × 10⁶ m with a period of 5832 s. Calculate its orbital speed."
+},
+{
+"code": "17.6",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The orbital radius of a satellite is doubled. Calculate the factor by which its period increases."
+},
+{
+"code": "17.6",
+"n": 4,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the period of a geostationary satellite in seconds."
+},
+{
+"code": "17.6",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does Kepler third law state for circular orbits?"
+},
+{
+"code": "17.6",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Does the period of a satellite depend on its mass?"
+},
+{
+"code": "17.6",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Satellites A and B orbit the same planet in circular orbits. The orbital radius of B is 4 times the orbital radius of A. Calculate the ratio (orbital speed of B) ÷ (orbital speed of A)."
+},
+{
+"code": "17.6",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Satellites A and B orbit the same planet in circular orbits. The orbital radius of B is 4 times the orbital radius of A. Calculate the ratio (orbital period of B) ÷ (orbital period of A)."
+},
+{
+"code": "17.6",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Satellites A and B orbit the same planet in circular orbits. The orbital radius of B is 4 times the orbital radius of A. The orbital period of A is 2.0 hours. Calculate the orbital period of B in hours."
+},
+{
+"code": "17.6",
+"n": 10,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "Satellites A and B, of equal mass, orbit the same planet in circular orbits. The orbital radius of B is 4 times the orbital radius of A. Calculate the ratio (gravitational force on B) ÷ (gravitational force on A)."
+},
+{
+"code": "17.7",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A geostationary satellite orbits at a radius of 4.22 × 10⁷ m. Taking the Earth radius as 6.4 × 10⁶ m, calculate its height above the surface."
+},
+{
+"code": "17.7",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the orbital speed of a geostationary satellite at radius 4.22 × 10⁷ m with a period of 86 400 s."
+},
+{
+"code": "17.7",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the gravitational field strength at a geostationary orbit radius of 4.22 × 10⁷ m. Take GM = 3.98 × 10¹⁴ N m² kg⁻¹."
+},
+{
+"code": "17.7",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What conditions must a geostationary orbit satisfy?"
+},
+{
+"code": "17.7",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are polar orbits used for Earth-observation satellites?"
+},
+{
+"code": "17.7",
+"n": 6,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why do astronauts on the International Space Station appear weightless, even though gravity there is nearly 90% of its surface value?"
+},
+{
+"code": "17.7",
+"n": 7,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A satellite orbits the Earth in a circle at an altitude of 600 km. Take G = 6.67 × 10⁻¹¹ N m² kg⁻², Earth mass = 5.97 × 10²⁴ kg and Earth radius = 6.37 × 10⁶ m. Calculate its orbital speed."
+},
+{
+"code": "17.7",
+"n": 8,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A satellite orbits the Earth in a circle at an altitude of 600 km. Take G = 6.67 × 10⁻¹¹ N m² kg⁻², Earth mass = 5.97 × 10²⁴ kg and Earth radius = 6.37 × 10⁶ m. Calculate its orbital period in minutes."
+},
+{
+"code": "17.7",
+"n": 9,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A geostationary satellite orbits the Earth with a period of 24 hours (86 400 s). Take G = 6.67 × 10⁻¹¹ N m² kg⁻² and Earth mass = 5.97 × 10²⁴ kg. Calculate the orbital radius."
+},
+{
+"code": "17.7",
+"n": 10,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A geostationary satellite orbits the Earth with a period of 24 hours (86 400 s). Take G = 6.67 × 10⁻¹¹ N m² kg⁻², Earth mass = 5.97 × 10²⁴ kg and Earth radius = 6.37 × 10⁶ m. Calculate its height above the Earth's surface."
+},
+{
+"code": "17.7",
+"n": 11,
+"d": 4,
+"ty": "numeric",
+"pts": 4,
+"qt": "A geostationary satellite orbits the Earth with a period of 24 hours (86 400 s). Take G = 6.67 × 10⁻¹¹ N m² kg⁻² and Earth mass = 5.97 × 10²⁴ kg. Calculate its orbital speed."
+},
+{
+"code": "18.1",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.20 kg mass hangs from a spring of spring constant 50 N m⁻¹. Calculate the natural frequency of oscillation."
+},
+{
+"code": "18.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A system has a natural frequency of 2.52 Hz. State the driving frequency that would produce resonance."
+},
+{
+"code": "18.1",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A mass of 0.80 kg on a spring oscillates freely with a period of 0.90 s. Calculate the spring constant."
+},
+{
+"code": "18.1",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is a free oscillation?"
+},
+{
+"code": "18.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is a forced oscillation?"
+},
+{
+"code": "18.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What determines the natural frequency of a mass-spring system?"
+},
+{
+"code": "18.10",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A mass of 0.50 kg hangs from a spring of spring constant 200 N m⁻¹. Calculate the natural frequency of the oscillation."
+},
+{
+"code": "18.10",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the natural frequency of a simple pendulum of length 0.40 m. Take g = 9.81 m s⁻²."
+},
+{
+"code": "18.10",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A pendulum of length 0.25 m is driven by an external force. Calculate the driving frequency that produces the largest amplitude. Take g = 9.81 m s⁻²."
+},
+{
+"code": "18.10",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is resonance?"
+},
+{
+"code": "18.10",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does increasing the damping of a driven oscillator change its resonance curve?"
+},
+{
+"code": "18.10",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is meant by critical damping?"
+},
+{
+"code": "18.10",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A lightly damped oscillator is left to oscillate freely. What happens to its amplitude and its period?"
+},
+{
+"code": "18.10",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which of these is an example of resonance being deliberately put to use rather than avoided?"
+},
+{
+"code": "18.2",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A pendulum completes 20 oscillations in 15.0 s. Calculate its period."
+},
+{
+"code": "18.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has a period of 0.75 s. Calculate its frequency."
+},
+{
+"code": "18.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A trace shows an oscillation with a peak-to-peak displacement of 6.0 cm. Calculate the amplitude."
+},
+{
+"code": "18.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A mass completes 50 oscillations in 42.5 s. Calculate its period."
+},
+{
+"code": "18.2",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is the time for many oscillations measured rather than the time for one?"
+},
+{
+"code": "18.2",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A position sensor connected to a data logger records an oscillating mass. What does the resulting displacement–time trace look like for simple harmonic motion?"
+},
+{
+"code": "18.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has a period of 0.50 s. Calculate its angular frequency."
+},
+{
+"code": "18.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has an angular frequency of 20 rad s⁻¹. Calculate its frequency in hertz."
+},
+{
+"code": "18.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two oscillators of the same frequency are a quarter of a period out of step. Calculate their phase difference in radians."
+},
+{
+"code": "18.3",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An object in simple harmonic motion has x = A cos ωt with A = 0.050 m and ω = 10 rad s⁻¹. Calculate its displacement at t = 0.10 s."
+},
+{
+"code": "18.3",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is the amplitude of an oscillation?"
+},
+{
+"code": "18.3",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Two identical pendulums swing so that one is at its rightmost point when the other is at its leftmost. What is their phase difference?"
+},
+{
+"code": "18.4",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A mass on a spring oscillates with simple harmonic motion of period 0.50 s and amplitude 3.0 cm. Calculate its maximum acceleration."
+},
+{
+"code": "18.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "For the same oscillator (period 0.50 s, amplitude 3.0 cm), calculate the maximum speed of the mass."
+},
+{
+"code": "18.4",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "For the same oscillator (period 0.50 s, amplitude 3.0 cm), calculate the speed of the mass when it is 1.5 cm from the equilibrium position."
+},
+{
+"code": "18.4",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The acceleration of an oscillating body is given by a = −64x, in SI units. Calculate its frequency."
+},
+{
+"code": "18.4",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Where in its motion is the acceleration of a body in simple harmonic motion greatest?"
+},
+{
+"code": "18.5",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An oscillation has amplitude 4.0 cm and period 2.0 s. Calculate the maximum speed."
+},
+{
+"code": "18.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An oscillation has amplitude 4.0 cm and period 2.0 s. Calculate the maximum acceleration."
+},
+{
+"code": "18.5",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An oscillation has ω = 5.0 rad s⁻¹ and amplitude 0.030 m. Calculate the speed when the displacement is 0.018 m."
+},
+{
+"code": "18.5",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does the velocity–time graph of simple harmonic motion relate to the displacement–time graph?"
+},
+{
+"code": "18.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does the acceleration–time graph relate to the displacement–time graph in simple harmonic motion?"
+},
+{
+"code": "18.5",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does the gradient of a displacement–time graph give for an oscillating object?"
+},
+{
+"code": "18.6",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has a frequency of 50 Hz. Calculate its angular frequency."
+},
+{
+"code": "18.6",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has an angular frequency of 628 rad s⁻¹. Calculate its frequency."
+},
+{
+"code": "18.6",
+"n": 3,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "An oscillation has a frequency of 250 Hz. Calculate its period."
+},
+{
+"code": "18.6",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the angular frequency of a simple pendulum of length 1.0 m. Take g = 9.81 m s⁻²."
+},
+{
+"code": "18.6",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.50 kg mass oscillates on a spring of spring constant 200 N m⁻¹. Calculate the frequency."
+},
+{
+"code": "18.6",
+"n": 6,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "How is angular frequency related to frequency?"
+},
+{
+"code": "18.7",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An object in simple harmonic motion has ω = 8.0 rad s⁻¹. Calculate the magnitude of its acceleration when the displacement is 0.030 m."
+},
+{
+"code": "18.7",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An oscillation has ω = 8.0 rad s⁻¹ and amplitude 0.050 m. Calculate the speed when the displacement is 0.030 m."
+},
+{
+"code": "18.7",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscillation has ω = 8.0 rad s⁻¹ and amplitude 0.050 m. Calculate the maximum speed."
+},
+{
+"code": "18.7",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An object obeys x = A sin ωt with A = 0.020 m and ω = 15 rad s⁻¹. Calculate its displacement at t = 0.050 s."
+},
+{
+"code": "18.7",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the defining equation of simple harmonic motion?"
+},
+{
+"code": "18.7",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the significance of the minus sign in a = −ω²x?"
+},
+{
+"code": "18.8",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A mass of 0.20 kg oscillates with simple harmonic motion of angular frequency 10 rad s⁻¹ and amplitude 0.050 m. Calculate the total energy of the oscillation."
+},
+{
+"code": "18.8",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A body oscillates in simple harmonic motion with angular frequency 10 rad s⁻¹ and amplitude 0.050 m. Calculate its maximum speed."
+},
+{
+"code": "18.8",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 0.20 kg mass oscillates with ω = 10 rad s⁻¹ and amplitude 0.050 m. Calculate its kinetic energy when its displacement is 0.025 m."
+},
+{
+"code": "18.8",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.20 kg mass oscillates with ω = 10 rad s⁻¹ and amplitude 0.050 m. Calculate its potential energy at maximum displacement."
+},
+{
+"code": "18.8",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A mass of 0.50 kg on a spring oscillates with amplitude 0.080 m and period 0.40 s. Calculate the total energy of the oscillation."
+},
+{
+"code": "18.8",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The amplitude of a simple harmonic oscillation is doubled while the frequency is unchanged. What happens to the total energy?"
+},
+{
+"code": "18.8",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Where in a simple harmonic oscillation is the kinetic energy greatest?"
+},
+{
+"code": "18.8",
+"n": 8,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An oscillator has frequency f. At what frequency does its kinetic energy vary?"
+},
+{
+"code": "18.9",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A damped oscillation has its amplitude halved every 4 complete cycles. Starting at 8.0 cm, calculate the amplitude after 12 cycles."
+},
+{
+"code": "18.9",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The amplitude of a damped oscillation halves. Calculate the fraction of the original energy that remains."
+},
+{
+"code": "18.9",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A lightly damped pendulum has a period of 2.00 s when undamped. What is its period when lightly damped?"
+},
+{
+"code": "18.9",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is the effect of damping on an oscillating system?"
+},
+{
+"code": "18.9",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does an overdamped system differ from a critically damped one?"
+},
+{
+"code": "18.9",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which is an example of damping being used deliberately?"
+},
+{
+"code": "19.1",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy needed to melt 0.30 kg of ice at 0 °C. Take the specific latent heat of fusion as 3.34 × 10⁵ J kg⁻¹."
+},
+{
+"code": "19.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy needed to boil away 0.10 kg of water at 100 °C. Take the specific latent heat of vaporisation as 2.26 × 10⁶ J kg⁻¹."
+},
+{
+"code": "19.1",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the total energy needed to turn 0.20 kg of ice at 0 °C into water at 20 °C. Take L_f = 3.34 × 10⁵ J kg⁻¹ and c = 4200 J kg⁻¹ K⁻¹."
+},
+{
+"code": "19.1",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What happens to the arrangement of molecules when a solid melts?"
+},
+{
+"code": "19.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does the temperature stay constant while a pure substance changes state?"
+},
+{
+"code": "19.1",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the specific latent heat of vaporisation much larger than that of fusion for the same substance?"
+},
+{
+"code": "19.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas absorbs 600 J of thermal energy and expands, doing 250 J of work on its surroundings. Calculate the change in its internal energy."
+},
+{
+"code": "19.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas is compressed adiabatically and 500 J of work is done on it. Calculate the change in its internal energy."
+},
+{
+"code": "19.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas at a constant pressure of 1.0 × 10⁵ Pa expands by 2.0 × 10⁻³ m³. Calculate the work done by the gas."
+},
+{
+"code": "19.2",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A gas is compressed at a constant pressure of 1.5 × 10⁵ Pa from 0.030 m³ to 0.020 m³. Calculate the work done on the gas."
+},
+{
+"code": "19.2",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An ideal gas expands isothermally and does 400 J of work on its surroundings. Calculate the thermal energy it must absorb."
+},
+{
+"code": "19.2",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "In the equation ΔU = q + w, what does a positive value of w represent?"
+},
+{
+"code": "19.2",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An ideal gas expands adiabatically. What happens to its temperature?"
+},
+{
+"code": "19.2",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What underlying physical principle does the first law of thermodynamics express?"
+},
+{
+"code": "19.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas absorbs 500 J of thermal energy and 200 J of work is done on it. Calculate the increase in its internal energy."
+},
+{
+"code": "19.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A gas absorbs 800 J of thermal energy while doing 300 J of work on its surroundings. Calculate the change in its internal energy."
+},
+{
+"code": "19.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the internal energy of 2.0 mol of a monatomic ideal gas at 300 K. Take R = 8.31 J mol⁻¹ K⁻¹ and use U = (3/2)nRT."
+},
+{
+"code": "19.3",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "2.0 mol of a monatomic ideal gas is heated from 300 K to 400 K. Calculate the increase in its internal energy. Take R = 8.31 J mol⁻¹ K⁻¹."
+},
+{
+"code": "19.3",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is meant by the internal energy of a system?"
+},
+{
+"code": "19.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does the internal energy of an ideal gas depend only on its temperature?"
+},
+{
+"code": "19.3",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "When ice at 0 °C melts to water at 0 °C, what happens to its internal energy?"
+},
+{
+"code": "19.3",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A gas is taken from state A to state B by two completely different routes. What is true of the change in internal energy?"
+},
+{
+"code": "19.4",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Two objects are at 350 K and 290 K. Calculate the temperature difference between them in kelvin."
+},
+{
+"code": "19.4",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An aluminium block of mass 0.50 kg at 90 °C is placed in 0.40 kg of water at 20 °C in an insulated container. Calculate the final temperature. Take c for aluminium as 900 J kg⁻¹ K⁻¹ and for water as 4200 J kg⁻¹ K⁻¹."
+},
+{
+"code": "19.4",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A block loses 450 J of energy to a second block with which it is in contact, in an insulated system. Calculate the energy gained by the second block."
+},
+{
+"code": "19.4",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What does it mean for two objects to be in thermal equilibrium?"
+},
+{
+"code": "19.4",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Two objects at different temperatures are placed in contact. In which direction is there a net flow of energy?"
+},
+{
+"code": "19.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What microscopic quantity does the temperature of a gas indicate?"
+},
+{
+"code": "19.4",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Object A is in thermal equilibrium with object B, and B is in thermal equilibrium with object C. What follows about A and C?"
+},
+{
+"code": "19.4",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A small cup of boiling water is placed in a large cold room. Why does energy flow from the water to the room, even though the room contains far more internal energy in total?"
+},
+{
+"code": "19.5",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Convert 27 °C to a temperature in kelvin."
+},
+{
+"code": "19.5",
+"n": 2,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Convert 400 K to a temperature in degrees Celsius."
+},
+{
+"code": "19.5",
+"n": 3,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Convert −40 °C to a temperature in kelvin."
+},
+{
+"code": "19.5",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The temperature of a sample rises by 25 °C. Express this change in kelvin."
+},
+{
+"code": "19.5",
+"n": 5,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Convert 100 °C to a temperature in kelvin."
+},
+{
+"code": "19.5",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the physical significance of absolute zero?"
+},
+{
+"code": "19.5",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is a thermometric property?"
+},
+{
+"code": "19.5",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the thermodynamic (kelvin) scale regarded as superior to a scale based on the expansion of a particular liquid?"
+},
+{
+"code": "19.6",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy needed to raise the temperature of 2.0 kg of water from 20 °C to 80 °C. Take c = 4200 J kg⁻¹ K⁻¹."
+},
+{
+"code": "19.6",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy needed to melt 0.50 kg of ice at 0 °C. Take the specific latent heat of fusion of ice as 3.34 × 10⁵ J kg⁻¹."
+},
+{
+"code": "19.6",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy needed to boil away 0.20 kg of water already at 100 °C. Take the specific latent heat of vaporisation as 2.26 × 10⁶ J kg⁻¹."
+},
+{
+"code": "19.6",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A block of metal of mass 0.80 kg absorbs 12 000 J and its temperature rises by 30 K. Calculate the specific heat capacity of the metal."
+},
+{
+"code": "19.6",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 2.0 kW kettle heats 1.5 kg of water from 20 °C to 100 °C. Assuming no energy is wasted, calculate the time taken. Take c = 4200 J kg⁻¹ K⁻¹."
+},
+{
+"code": "19.6",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "0.30 kg of water at 80 °C is mixed with 0.20 kg of water at 20 °C in an insulated container. Calculate the final temperature."
+},
+{
+"code": "19.6",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is meant by the specific heat capacity of a substance?"
+},
+{
+"code": "19.6",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does the temperature stay constant while a pure substance melts, even though energy is still being supplied?"
+},
+{
+"code": "20.1",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the number of molecules in 2.0 mol of a gas. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.1",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Nitrogen has a molar mass of 0.028 kg mol⁻¹. Calculate the mass of one nitrogen molecule. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.1",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "One mole of gas occupies 0.0224 m³ at standard temperature and pressure. Calculate the average volume available to each molecule. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.1",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which assumption is made about the molecules of an ideal gas?"
+},
+{
+"code": "20.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What observation provides direct evidence for the random motion of gas molecules?"
+},
+{
+"code": "20.1",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are collisions between gas molecules and the container walls assumed to be perfectly elastic?"
+},
+{
+"code": "20.2",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A force of 200 N acts uniformly over an area of 0.050 m². Calculate the pressure."
+},
+{
+"code": "20.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas at a pressure of 1.0 × 10⁵ Pa acts on a wall of area 0.020 m². Calculate the force on the wall."
+},
+{
+"code": "20.2",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A container of volume 0.050 m³ holds gas of total mass 1.2 kg with a mean square speed of 2.5 × 10⁵ m² s⁻². Calculate the pressure."
+},
+{
+"code": "20.2",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does the kinetic model explain gas pressure?"
+},
+{
+"code": "20.2",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "The number of molecules per unit volume in a gas is doubled at constant temperature. What happens to the pressure?"
+},
+{
+"code": "20.2",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does the pressure of a gas rise when it is heated at constant volume?"
+},
+{
+"code": "20.3",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the number of molecules in 2.0 mol of a gas. Take the Avogadro constant as 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.3",
+"n": 2,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A sample contains 3.01 × 10²³ molecules. Calculate the number of moles present. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.3",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Oxygen gas has a molar mass of 32 g mol⁻¹. Calculate the number of moles in 64 g of oxygen."
+},
+{
+"code": "20.3",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Helium has a molar mass of 4.0 g mol⁻¹. Calculate the number of atoms in 8.0 g of helium. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.3",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Water has a molar mass of 18 g mol⁻¹. Calculate the mass of one water molecule in kg. Take N_A = 6.02 × 10²³ mol⁻¹."
+},
+{
+"code": "20.3",
+"n": 6,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the mass of 0.25 mol of carbon dioxide, which has a molar mass of 44 g mol⁻¹."
+},
+{
+"code": "20.3",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is one mole of a substance defined as containing?"
+},
+{
+"code": "20.3",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "One mole of helium and one mole of carbon dioxide are compared. Which quantity is the same for both?"
+},
+{
+"code": "20.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas occupies 0.40 m³ at 300 K. Calculate its volume at 450 K, at constant pressure."
+},
+{
+"code": "20.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A fixed volume of gas at 1.0 × 10⁵ Pa and 273 K is heated to 373 K. Calculate the new pressure."
+},
+{
+"code": "20.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A gas occupies 0.25 m³ at 290 K. Calculate the temperature at which it occupies 0.35 m³, at constant pressure."
+},
+{
+"code": "20.5",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A sealed container of gas at 2.0 × 10⁵ Pa is heated from 27 °C to 127 °C. Calculate the new pressure."
+},
+{
+"code": "20.5",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why must temperatures be converted to kelvin in gas law calculations?"
+},
+{
+"code": "20.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A graph of gas pressure against Celsius temperature at constant volume is extrapolated backwards to zero pressure. What temperature does it reach?"
+},
+{
+"code": "20.6",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the pressure of 2.0 mol of an ideal gas occupying 0.050 m³ at 300 K. Take R = 8.31 J mol⁻¹ K⁻¹."
+},
+{
+"code": "20.6",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas at 1.0 × 10⁵ Pa occupies 0.020 m³. It is compressed at constant temperature to 0.0050 m³. Calculate the new pressure."
+},
+{
+"code": "20.6",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A gas occupies 0.30 m³ at 300 K. It is heated at constant pressure to 400 K. Calculate its new volume."
+},
+{
+"code": "20.6",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A fixed mass of gas at 2.0 × 10⁵ Pa occupies 0.010 m³ at 300 K. Calculate its volume when the pressure is 1.0 × 10⁵ Pa and the temperature is 400 K."
+},
+{
+"code": "20.6",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the number of moles in a gas of volume 0.024 m³ at a pressure of 1.0 × 10⁵ Pa and a temperature of 293 K. Take R = 8.31 J mol⁻¹ K⁻¹."
+},
+{
+"code": "20.6",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the temperature of 0.80 mol of an ideal gas at 2.5 × 10⁵ Pa occupying 8.0 × 10⁻³ m³. Take R = 8.31 J mol⁻¹ K⁻¹."
+},
+{
+"code": "20.6",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which assumption is made about the molecules of an ideal gas?"
+},
+{
+"code": "20.6",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why must the temperature in pV = nRT always be in kelvin rather than degrees Celsius?"
+},
+{
+"code": "20.7",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the mean translational kinetic energy of a gas molecule at 300 K. Take the Boltzmann constant as 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.7",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The temperature of a gas is raised from 300 K to 600 K. Calculate the new mean translational kinetic energy of a molecule. Take k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.7",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the root-mean-square speed of a nitrogen molecule at 300 K. The mass of a nitrogen molecule is 4.65 × 10⁻²⁶ kg and k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.7",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A container of volume 0.020 m³ holds 2.0 × 10²⁵ molecules, each of mass 5.3 × 10⁻²⁶ kg, with a mean square speed of 2.4 × 10⁵ m² s⁻². Calculate the pressure of the gas."
+},
+{
+"code": "20.7",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The absolute temperature of a gas is increased from 300 K to 1200 K. Calculate the factor by which the root-mean-square speed of its molecules increases."
+},
+{
+"code": "20.7",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does the kinetic model explain the pressure a gas exerts on the walls of its container?"
+},
+{
+"code": "20.7",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Two different gases are at the same temperature. What must be equal for their molecules?"
+},
+{
+"code": "20.7",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are the collisions of gas molecules with the container walls assumed to be perfectly elastic in the kinetic model?"
+},
+{
+"code": "20.8",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the mean translational kinetic energy of a gas molecule at 300 K. Take k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.8",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the mean translational kinetic energy of a molecule at 500 K. Take k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.8",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A molecule has a mean translational kinetic energy of 8.0 × 10⁻²¹ J. Calculate the temperature of the gas. Take k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.8",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the root-mean-square speed of an oxygen molecule of mass 5.31 × 10⁻²⁶ kg at 300 K. Take k = 1.38 × 10⁻²³ J K⁻¹."
+},
+{
+"code": "20.8",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does the absolute temperature of a gas measure at the molecular level?"
+},
+{
+"code": "20.8",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Helium and oxygen are held at the same temperature. Which statement is correct?"
+},
+{
+"code": "21.1",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the force between charges of +2.0 μC and −3.0 μC separated by 0.20 m. Take 1/(4πε₀) = 8.99 × 10⁹ N m² C⁻²."
+},
+{
+"code": "21.1",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the number of electrons that must be added to a body to give it a charge of −1.0 μC. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "21.1",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two identical charged spheres carrying +4.0 μC each are 0.30 m apart. Calculate the force between them. Take 1/(4πε₀) = 8.99 × 10⁹ N m² C⁻²."
+},
+{
+"code": "21.1",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What happens when two objects carrying like charges are brought close together?"
+},
+{
+"code": "21.1",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A charged rod is brought near an uncharged metal sphere on an insulating stand, without touching it. What happens?"
+},
+{
+"code": "21.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A plastic rod rubbed with a cloth becomes negatively charged. What has happened to the cloth?"
+},
+{
+"code": "21.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A charge of 2.0 × 10⁻⁶ C experiences a force of 3.0 × 10⁻³ N in an electric field. Calculate the electric field strength."
+},
+{
+"code": "21.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the force on a charge of 4.0 × 10⁻⁶ C placed in a uniform electric field of strength 5000 V m⁻¹."
+},
+{
+"code": "21.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the magnitude of the force on an electron placed in a uniform field of strength 200 V m⁻¹. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "21.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A charge of 1.0 × 10⁻⁹ C experiences a force of 2.0 × 10⁻⁵ N at a point in a field. Calculate the field strength at that point."
+},
+{
+"code": "21.2",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What does the direction of an electric field line indicate?"
+},
+{
+"code": "21.2",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why can two electric field lines never cross?"
+},
+{
+"code": "21.2",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the electric field strength inside the hollow cavity of a charged conductor in equilibrium?"
+},
+{
+"code": "21.2",
+"n": 8,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What does the field line pattern around an isolated negative point charge look like?"
+},
+{
+"code": "21.3",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Two parallel plates 0.020 m apart have a potential difference of 600 V between them. Calculate the electric field strength between them."
+},
+{
+"code": "21.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A uniform field of strength 5.0 × 10⁴ V m⁻¹ exists between plates 3.0 mm apart. Calculate the potential difference between the plates."
+},
+{
+"code": "21.3",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the plate separation needed to produce a field of 2.0 × 10⁵ V m⁻¹ from a potential difference of 500 V."
+},
+{
+"code": "21.3",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the work done in moving a charge of 2.0 × 10⁻⁶ C from one plate to the other, when the potential difference between the plates is 600 V."
+},
+{
+"code": "21.3",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron is in a uniform field of strength 3.0 × 10⁴ V m⁻¹. Calculate the magnitude of the force on it. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "21.3",
+"n": 6,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron experiences a force of 4.8 × 10⁻¹⁵ N in a uniform field. Calculate its acceleration. Take the electron mass as 9.11 × 10⁻³¹ kg."
+},
+{
+"code": "21.3",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is the field like in the region between two large, closely spaced, oppositely charged parallel plates?"
+},
+{
+"code": "21.3",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An electron enters a uniform electric field at right angles to the field direction. What path does it follow while in the field?"
+},
+{
+"code": "21.4",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the force on a charge of 5.0 μC placed in a field of strength 2000 V m⁻¹."
+},
+{
+"code": "21.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A charge of 3.0 μC experiences a force of 0.024 N. Calculate the electric field strength at that point."
+},
+{
+"code": "21.4",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the magnitude of the force on an electron in a field of strength 1.5 × 10⁴ V m⁻¹. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "21.4",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the acceleration of a proton of mass 1.67 × 10⁻²⁷ kg in a field of 5000 V m⁻¹. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "21.4",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the work done in moving a charge of 4.0 μC through a potential difference of 250 V."
+},
+{
+"code": "21.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "In which direction does the force act on a negative charge placed in an electric field?"
+},
+{
+"code": "23.1",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A capacitor stores a charge of 6.0 × 10⁻⁴ C when the potential difference across it is 12 V. Calculate its capacitance."
+},
+{
+"code": "23.1",
+"n": 2,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the charge stored on a 22 μF capacitor when the potential difference across it is 9.0 V."
+},
+{
+"code": "23.1",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 100 μF capacitor carries a charge of 3.3 × 10⁻⁴ C. Calculate the potential difference across it."
+},
+{
+"code": "23.1",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Capacitors of 10 μF and 20 μF are connected in parallel. Calculate their combined capacitance."
+},
+{
+"code": "23.1",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Capacitors of 10 μF and 20 μF are connected in series. Calculate their combined capacitance."
+},
+{
+"code": "23.1",
+"n": 6,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Three 6.0 μF capacitors are connected in series. Calculate their combined capacitance."
+},
+{
+"code": "23.1",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is meant by the capacitance of a capacitor?"
+},
+{
+"code": "23.1",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does inserting a dielectric between the plates of a parallel-plate capacitor increase its capacitance?"
+},
+{
+"code": "23.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy stored in a 100 μF capacitor charged to 12 V."
+},
+{
+"code": "23.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A capacitor stores a charge of 2.0 × 10⁻³ C at a potential difference of 50 V. Calculate the energy stored."
+},
+{
+"code": "23.2",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy stored in a 50 μF capacitor carrying a charge of 4.0 × 10⁻⁴ C."
+},
+{
+"code": "23.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy stored in a 470 μF capacitor charged to 15 V."
+},
+{
+"code": "23.2",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 50 μF capacitor is charged to 10 V and then to 20 V. Calculate the energy stored at 20 V."
+},
+{
+"code": "23.2",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A capacitor storing 0.010 J is discharged completely in 2.0 ms. Calculate the mean power delivered."
+},
+{
+"code": "23.2",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the energy stored in a capacitor ½QV rather than QV?"
+},
+{
+"code": "23.2",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does the area under a graph of charge against potential difference for a capacitor represent?"
+},
+{
+"code": "23.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Capacitors of 4.7 μF, 10 μF and 22 μF are connected in parallel. Calculate the total capacitance."
+},
+{
+"code": "23.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 4.7 μF capacitor is part of a parallel combination across a 12 V supply. Calculate the charge stored on it."
+},
+{
+"code": "23.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A parallel combination of total capacitance 36.7 μF is connected across 12 V. Calculate the total charge stored."
+},
+{
+"code": "23.3",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Two capacitors in parallel give a total of 50 μF. One is 18 μF. Calculate the other."
+},
+{
+"code": "23.3",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why do capacitances add when capacitors are connected in parallel?"
+},
+{
+"code": "23.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the same for every capacitor in a parallel combination?"
+},
+{
+"code": "23.4",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Capacitors of 6.0 μF and 3.0 μF are connected in series. Calculate the total capacitance."
+},
+{
+"code": "23.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Three 12 μF capacitors are connected in series. Calculate the total capacitance."
+},
+{
+"code": "23.4",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Capacitors of 4.0 μF and 12 μF are connected in series. Calculate the total capacitance."
+},
+{
+"code": "23.4",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A series combination of total capacitance 2.0 μF is connected across 9.0 V. Calculate the charge on each capacitor."
+},
+{
+"code": "23.4",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 6.0 μF capacitor in a series combination carries a charge of 1.8 × 10⁻⁵ C. Calculate the potential difference across it."
+},
+{
+"code": "23.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the total capacitance of capacitors in series less than the smallest of them?"
+},
+{
+"code": "23.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Resistors of 4.0 Ω and 12 Ω are connected in parallel. Calculate the total resistance."
+},
+{
+"code": "23.5",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Capacitors of 4.0 μF and 12 μF are connected in parallel. Calculate the total capacitance."
+},
+{
+"code": "23.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two 10 μF capacitors are connected in series. Calculate the total capacitance."
+},
+{
+"code": "23.5",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How do the combination rules for capacitors compare with those for resistors?"
+},
+{
+"code": "23.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is common to all components connected in series, whether resistors or capacitors?"
+},
+{
+"code": "23.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the essential physical difference between a resistor and a capacitor in a circuit?"
+},
+{
+"code": "23.6",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two 3.0 μF capacitors in parallel are connected in series with a 2.0 μF capacitor. Calculate the total capacitance."
+},
+{
+"code": "23.6",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two 2.0 μF capacitors in series are connected in parallel with a 4.0 μF capacitor. Calculate the total capacitance."
+},
+{
+"code": "23.6",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two 6.0 μF capacitors in parallel are connected in series with another 6.0 μF capacitor. Calculate the total capacitance."
+},
+{
+"code": "23.6",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A network of total capacitance 1.5 μF is connected across a 12 V supply. Calculate the total charge drawn."
+},
+{
+"code": "23.6",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy stored in a 1.5 μF network charged to 12 V."
+},
+{
+"code": "23.6",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the correct strategy for reducing a mixed capacitor network?"
+},
+{
+"code": "23.7",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Calculate the time constant of a 470 µF capacitor discharging through a 22 kΩ resistor."
+},
+{
+"code": "23.7",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 100 µF capacitor is charged to 12 V and then discharged through a 50 kΩ resistor. Calculate the p.d. across it 8.0 s later."
+},
+{
+"code": "23.7",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 220 µF capacitor discharges through a 10 kΩ resistor. Calculate the time for its charge to fall to half its initial value."
+},
+{
+"code": "23.7",
+"n": 4,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A capacitor charged to 9.0 V starts to discharge through a 4.7 kΩ resistor. Calculate the initial discharge current, in mA."
+},
+{
+"code": "23.7",
+"n": 5,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "After one time constant, approximately what fraction of its initial charge remains on a discharging capacitor?"
+},
+{
+"code": "24.1",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A solenoid produces a uniform field of flux density 0.020 T along its axis. A straight wire of length 0.10 m carrying 3.0 A is placed inside, at right angles to the axis. Calculate the force on the wire."
+},
+{
+"code": "24.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The field inside a solenoid has flux density 0.015 T and its cross-sectional area is 8.0 × 10⁻⁴ m². Calculate the magnetic flux through the solenoid."
+},
+{
+"code": "24.1",
+"n": 3,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is the shape of the magnetic field pattern around a long straight current-carrying wire?"
+},
+{
+"code": "24.1",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "How is the direction of the magnetic field around a straight current-carrying wire found?"
+},
+{
+"code": "24.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the magnetic field like inside a long current-carrying solenoid?"
+},
+{
+"code": "24.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which change would increase the flux density inside a solenoid?"
+},
+{
+"code": "24.1",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Two long parallel wires carry currents in the same direction. What force acts between them?"
+},
+{
+"code": "24.1",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Two long parallel wires carry equal currents in opposite directions. What happens to the force between them if both currents are doubled?"
+},
+{
+"code": "24.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A straight wire of length 0.25 m carries a current of 4.0 A at right angles to a magnetic field of flux density 0.30 T. Calculate the force on the wire."
+},
+{
+"code": "24.2",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A wire of length 0.25 m carries 4.0 A in a field of 0.30 T, with the wire at 30° to the field direction. Calculate the force on it."
+},
+{
+"code": "24.2",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A wire of length 0.40 m carrying 2.0 A perpendicular to a field experiences a force of 0.50 N. Calculate the flux density."
+},
+{
+"code": "24.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A wire of length 0.80 m in a field of 0.15 T experiences a force of 0.12 N when placed at right angles to the field. Calculate the current in it."
+},
+{
+"code": "24.2",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the length of wire needed for a current of 3.0 A in a field of 0.50 T to experience a force of 0.60 N, with the wire perpendicular to the field."
+},
+{
+"code": "24.2",
+"n": 6,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A wire carrying a current of 5.0 A is placed parallel to a magnetic field of flux density 0.40 T. Calculate the force on the wire."
+},
+{
+"code": "24.2",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Which rule gives the direction of the force on a current-carrying conductor in a magnetic field?"
+},
+{
+"code": "24.2",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Both the current in a wire and the direction of the magnetic field are reversed. What happens to the force on the wire?"
+},
+{
+"code": "24.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A uniform magnetic field of flux density 0.20 T passes perpendicularly through a coil of area 0.015 m². Calculate the magnetic flux through the coil."
+},
+{
+"code": "24.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A field of flux density 0.50 T passes through a coil of area 0.020 m², with the normal to the coil at 60° to the field. Calculate the magnetic flux through the coil."
+},
+{
+"code": "24.3",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A coil of 200 turns has a magnetic flux of 3.0 × 10⁻³ Wb passing through it. Calculate the flux linkage."
+},
+{
+"code": "24.3",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A magnetic flux of 8.0 × 10⁻⁴ Wb passes perpendicularly through an area of 4.0 × 10⁻³ m². Calculate the flux density."
+},
+{
+"code": "24.3",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A coil of 50 turns and area 2.5 × 10⁻³ m² lies with its plane perpendicular to a field of 0.40 T. Calculate the flux linkage."
+},
+{
+"code": "24.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is meant by a magnetic flux density of 1 tesla?"
+},
+{
+"code": "24.3",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A flat coil is turned so that its plane lies parallel to a uniform magnetic field. What is the flux through the coil?"
+},
+{
+"code": "24.3",
+"n": 8,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What describes the magnetic field pattern outside a bar magnet?"
+},
+{
+"code": "24.4",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A current balance shows a force of 0.036 N on a 0.060 m length of wire carrying 3.0 A perpendicular to a field. Calculate the flux density."
+},
+{
+"code": "24.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.10 m wire carrying 5.0 A perpendicular to a field experiences a force of 0.15 N. Calculate the flux density."
+},
+{
+"code": "24.4",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Switching on a current of 4.0 A through a 0.050 m wire changes a balance reading by 2.0 g. Calculate the flux density. Take g = 9.81 m s⁻²."
+},
+{
+"code": "24.4",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the force on a 0.080 m wire carrying 2.0 A perpendicular to a field of flux density 0.25 T."
+},
+{
+"code": "24.4",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does a current balance measure, and how?"
+},
+{
+"code": "24.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why must the wire be perpendicular to the field in a current balance?"
+},
+{
+"code": "24.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.20 m wire carries 3.0 A perpendicular to a field of 0.40 T. Calculate the force on it."
+},
+{
+"code": "24.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The same 0.20 m wire carrying 3.0 A is placed at 45° to a 0.40 T field. Calculate the force."
+},
+{
+"code": "24.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A wire carries 6.0 A perpendicular to a field of 0.30 T. Calculate the force per unit length on the wire."
+},
+{
+"code": "24.5",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Which rule gives the direction of the force on a current-carrying wire in a magnetic field?"
+},
+{
+"code": "24.5",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The current in a wire lying in a magnetic field is reversed. What happens to the force on it?"
+},
+{
+"code": "24.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the combined field pattern around a current-carrying wire in a uniform field called a catapult field?"
+},
+{
+"code": "24.6",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two parallel wires attract with a force of 2.0 mN. Calculate the force if both currents are doubled."
+},
+{
+"code": "24.6",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two parallel wires experience a force of 4.0 mN. Calculate the force when their separation is doubled, currents unchanged."
+},
+{
+"code": "24.6",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Two long parallel wires carry currents in the same direction. What force acts between them?"
+},
+{
+"code": "24.6",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Two long parallel wires carry currents in opposite directions. What force acts between them?"
+},
+{
+"code": "24.6",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why was the force between parallel currents historically used to define the ampere?"
+},
+{
+"code": "24.6",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A coil of many turns carries a large current in the same sense around every turn. What happens to the turns?"
+},
+{
+"code": "24.7",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 0.20 m wire carrying 3.0 A perpendicular to a field experiences a force of 0.24 N. Calculate the flux density, and confirm the unit is N A⁻¹ m⁻¹."
+},
+{
+"code": "24.7",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A field of 0.25 T passes perpendicularly through an area of 0.020 m². Calculate the flux, and note that the weber equals a tesla metre squared."
+},
+{
+"code": "24.7",
+"n": 3,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What are the SI base units of magnetic flux density?"
+},
+{
+"code": "24.7",
+"n": 4,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What are the SI base units of magnetic flux?"
+},
+{
+"code": "24.7",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Which relationship between the volt and the weber is correct?"
+},
+{
+"code": "24.7",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which of these is an equivalent unit for the tesla?"
+},
+{
+"code": "24.8",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "In crossed fields, an electric field of 2.0 × 10⁴ V m⁻¹ balances a magnetic field of 0.050 T. Calculate the speed of the charge that passes through undeflected."
+},
+{
+"code": "24.8",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the ratio of the electric force to the gravitational force on an electron in a field of 100 V m⁻¹. Take e = 1.60 × 10⁻¹⁹ C, m = 9.11 × 10⁻³¹ kg and g = 9.81 m s⁻²."
+},
+{
+"code": "24.8",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which field exerts a force on a stationary charged particle?"
+},
+{
+"code": "24.8",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Which of the three fields exerts a force that does no work on a moving charge?"
+},
+{
+"code": "24.8",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does the direction of the force relate to the field direction in each case?"
+},
+{
+"code": "24.8",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Which property does a particle need in order to feel each of the three fields?"
+},
+{
+"code": "25.1",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An electron moves at 2.0 × 10⁶ m s⁻¹ at right angles to a magnetic field of 0.40 T. Calculate the force on it. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A proton travels at 5.0 × 10⁵ m s⁻¹ perpendicular to a field of 0.80 T. Calculate the magnetic force on it. Take the proton charge as 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.1",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron moving at 2.0 × 10⁶ m s⁻¹ enters a field of 0.40 T at right angles. Calculate the radius of its circular path. Take the electron mass as 9.11 × 10⁻³¹ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.1",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "In a velocity selector, crossed electric and magnetic fields of 3.0 × 10⁵ V m⁻¹ and 0.25 T act on a charged particle. Calculate the speed at which it passes through undeflected."
+},
+{
+"code": "25.1",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A charged particle moves parallel to a uniform magnetic field. Calculate the magnetic force on it."
+},
+{
+"code": "25.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What path does a charged particle follow when it enters a uniform magnetic field at right angles to the field?"
+},
+{
+"code": "25.1",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does the magnetic force on a moving charge do no work on it?"
+},
+{
+"code": "25.1",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An electron and a proton enter the same magnetic field at the same speed and at right angles to it. How do their circular paths compare?"
+},
+{
+"code": "25.2",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron travelling at 3.0 × 10⁶ m s⁻¹ enters a 0.20 T field at right angles. Calculate the radius of its circular path. Take m = 9.11 × 10⁻³¹ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.2",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the period of an electron circling in a 0.20 T field. Take m = 9.11 × 10⁻³¹ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.2",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A proton travelling at 3.0 × 10⁶ m s⁻¹ enters a 0.20 T field at right angles. Calculate the radius of its path. Take m = 1.67 × 10⁻²⁷ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.2",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the flux density needed to bend an electron of speed 3.0 × 10⁶ m s⁻¹ into a circle of radius 0.10 m. Take m = 9.11 × 10⁻³¹ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.2",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does a charged particle entering a uniform magnetic field at right angles follow a circular path?"
+},
+{
+"code": "25.2",
+"n": 6,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A faster particle of the same type enters the same magnetic field. How do its radius and period compare?"
+},
+{
+"code": "25.3",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "In a velocity selector the electric field is 1.2 × 10⁵ V m⁻¹ and the magnetic flux density is 0.30 T. Calculate the selected speed."
+},
+{
+"code": "25.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the electric field needed to balance a magnetic field of 0.25 T for particles travelling at 2.0 × 10⁶ m s⁻¹."
+},
+{
+"code": "25.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A velocity selector uses an electric field of 3.0 × 10⁴ V m⁻¹ to select particles of speed 1.5 × 10⁶ m s⁻¹. Calculate the magnetic flux density required."
+},
+{
+"code": "25.3",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How are the fields arranged in a velocity selector?"
+},
+{
+"code": "25.3",
+"n": 5,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Does the speed selected by a velocity selector depend on the charge or mass of the particle?"
+},
+{
+"code": "25.3",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A particle travels faster than the selected speed through a velocity selector. What happens to it?"
+},
+{
+"code": "25.4",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A Hall probe has thickness 1.0 × 10⁻⁴ m and carries 2.0 A in a 0.50 T field. Calculate the Hall voltage, taking n = 8.5 × 10²⁸ m⁻³ and q = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.4",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A Hall probe gives 7.35 × 10⁻⁷ V in a 0.50 T field. Calculate the Hall voltage when the flux density is doubled, everything else unchanged."
+},
+{
+"code": "25.4",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A Hall probe of thickness 5.0 × 10⁻⁵ m carries 3.0 mA in a 0.40 T field and gives a Hall voltage of 2.5 mV. Calculate the number density of charge carriers. Take q = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.4",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does a Hall voltage appear across a current-carrying slab placed in a magnetic field?"
+},
+{
+"code": "25.4",
+"n": 5,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are Hall probes made from semiconductors rather than metals?"
+},
+{
+"code": "25.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is a Hall probe used for?"
+},
+{
+"code": "25.5",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Electrons of speed 2.0 × 10⁷ m s⁻¹ follow a circle of radius 0.076 m in a field of 1.5 × 10⁻³ T. Calculate the specific charge e/m."
+},
+{
+"code": "25.5",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Electrons are accelerated from rest through 2000 V. Calculate their final speed, taking e/m = 1.76 × 10¹¹ C kg⁻¹."
+},
+{
+"code": "25.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the mass of an electron from e/m = 1.76 × 10¹¹ C kg⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "25.5",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What did Thomson experiment with cathode rays establish?"
+},
+{
+"code": "25.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why could Thomson experiment determine only the ratio e/m and not e or m separately?"
+},
+{
+"code": "25.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What did Millikan oil-drop experiment establish?"
+},
+{
+"code": "26.1",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A rod of length 0.30 m moves at 2.0 m s⁻¹ perpendicular to a field of 0.40 T. Calculate the emf induced across it."
+},
+{
+"code": "26.1",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A coil of 50 turns experiences a flux change of 1.2 × 10⁻³ Wb in 0.020 s. Calculate the induced emf."
+},
+{
+"code": "26.1",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A rod of length 0.50 m moving perpendicular to a 0.25 T field induces an emf of 0.50 V. Calculate its speed."
+},
+{
+"code": "26.1",
+"n": 4,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "A magnet is held stationary inside a coil. What emf is induced?"
+},
+{
+"code": "26.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which change would increase the emf induced when a magnet is pushed into a coil?"
+},
+{
+"code": "26.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What happens to the induced emf if a magnet is withdrawn from a coil instead of inserted, at the same speed?"
+},
+{
+"code": "26.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A field of 0.25 T passes perpendicularly through a coil of area 0.040 m². Calculate the magnetic flux."
+},
+{
+"code": "26.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A coil of 200 turns encloses a flux of 0.010 Wb. Calculate the flux linkage."
+},
+{
+"code": "26.2",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The flux linkage of a coil falls from 2.0 Wb to 0.50 Wb in 0.10 s. Calculate the average induced emf."
+},
+{
+"code": "26.2",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A rod of length 0.25 m moves at 3.0 m s⁻¹ for 2.0 s across a field of 0.20 T. Calculate the total change in flux it sweeps through."
+},
+{
+"code": "26.2",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How can electromagnetic induction be explained at the level of individual charges in a moving conductor?"
+},
+{
+"code": "26.2",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does rotating a coil steadily in a uniform magnetic field induce an alternating emf?"
+},
+{
+"code": "26.3",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A coil of 100 turns experiences a change in flux of 2.0 × 10⁻³ Wb in 0.050 s. Calculate the magnitude of the average induced emf."
+},
+{
+"code": "26.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A rod of length 0.25 m moves at 4.0 m s⁻¹ perpendicular to a field of flux density 0.30 T. Calculate the emf induced across its ends."
+},
+{
+"code": "26.3",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A metal rod of length 0.80 m moves at 6.0 m s⁻¹ at right angles to a magnetic field of 0.50 T. Calculate the induced emf."
+},
+{
+"code": "26.3",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An emf of 1.5 V is induced in a coil while the flux through each turn changes at 0.010 Wb s⁻¹. Calculate the number of turns in the coil."
+},
+{
+"code": "26.3",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A coil produces an induced emf of 0.80 V. Calculate the rate of change of flux linkage."
+},
+{
+"code": "26.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A bar magnet is pushed north pole first into a coil connected to a closed circuit. What happens?"
+},
+{
+"code": "26.3",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does Faraday’s law of electromagnetic induction state?"
+},
+{
+"code": "26.3",
+"n": 8,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why must the induced current oppose the change that produces it, as Lenz’s law says?"
+},
+{
+"code": "26.4",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A magnet is pushed into a coil against an opposing force of 0.15 N through a distance of 0.20 m. Calculate the electrical energy generated."
+},
+{
+"code": "26.4",
+"n": 2,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What does Lenz law state?"
+},
+{
+"code": "26.4",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The north pole of a magnet is pushed towards a coil. What is the polarity of the coil face nearest the magnet?"
+},
+{
+"code": "26.4",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why must the induced effects oppose the change that produces them?"
+},
+{
+"code": "26.4",
+"n": 5,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does a strong magnet fall unusually slowly down a vertical copper tube?"
+},
+{
+"code": "26.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does electromagnetic braking on a train work?"
+},
+{
+"code": "26.5",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A transformer has 500 turns on the primary and 100 on the secondary, with 230 V applied. Calculate the secondary voltage."
+},
+{
+"code": "26.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An ideal transformer draws 0.20 A at 230 V and delivers 46 V. Calculate the secondary current."
+},
+{
+"code": "26.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A step-up transformer has 200 primary turns and 5000 secondary turns, with 12 V applied. Calculate the secondary voltage."
+},
+{
+"code": "26.5",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does a transformer work only with alternating current?"
+},
+{
+"code": "26.5",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does a simple a.c. generator produce an emf?"
+},
+{
+"code": "26.5",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does a metal detector locate buried metal?"
+},
+{
+"code": "27.1",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating voltage has a peak value of 325 V. Calculate its root-mean-square value."
+},
+{
+"code": "27.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating current has a peak value of 5.0 A. Calculate its root-mean-square value."
+},
+{
+"code": "27.1",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "The root-mean-square voltage of a supply is 230 V. Calculate its peak voltage."
+},
+{
+"code": "27.1",
+"n": 4,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "An alternating supply has a period of 0.020 s. Calculate its frequency."
+},
+{
+"code": "27.1",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating supply of rms voltage 230 V drives an rms current of 3.0 A through a resistive load. Calculate the mean power dissipated."
+},
+{
+"code": "27.1",
+"n": 6,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An alternating voltage of rms value 12 V is applied across a 6.0 Ω resistor. Calculate the mean power dissipated."
+},
+{
+"code": "27.1",
+"n": 7,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A resistive load dissipates a mean power of 690 W from an alternating supply. Calculate the peak power."
+},
+{
+"code": "27.1",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does the root-mean-square value of an alternating current represent?"
+},
+{
+"code": "27.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating voltage has a peak value of 12 V. Calculate its root-mean-square value."
+},
+{
+"code": "27.2",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating voltage has an rms value of 6.0 V. Calculate its peak value."
+},
+{
+"code": "27.2",
+"n": 3,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "An alternating supply has a frequency of 60 Hz. Calculate its period."
+},
+{
+"code": "27.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An oscilloscope trace shows a peak-to-peak voltage of 340 V. Calculate the peak voltage."
+},
+{
+"code": "27.2",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An alternating voltage is V = 10 sin(2πft) with f = 50 Hz. Calculate the instantaneous voltage at t = 2.5 ms."
+},
+{
+"code": "27.2",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does an oscilloscope display show for a sinusoidal alternating supply?"
+},
+{
+"code": "27.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An alternating supply of rms voltage 230 V drives an rms current of 5.0 A through a resistive load. Calculate the mean power."
+},
+{
+"code": "27.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An rms voltage of 12 V is applied across an 8.0 Ω resistor. Calculate the mean power dissipated."
+},
+{
+"code": "27.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A resistive load dissipates a mean power of 1150 W from a sinusoidal supply. Calculate the peak power."
+},
+{
+"code": "27.3",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An appliance is rated at 2300 W on a 230 V rms supply. Calculate the rms current it draws."
+},
+{
+"code": "27.3",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 1150 W appliance runs for 30 minutes. Calculate the energy transferred."
+},
+{
+"code": "27.3",
+"n": 6,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the mean power of a sinusoidal supply across a resistor exactly half the peak power?"
+},
+{
+"code": "27.4",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 50 Hz alternating supply is passed through a full-wave rectifier. Calculate the frequency of the rectified output."
+},
+{
+"code": "27.4",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A 50 Hz alternating supply is passed through a single diode to give half-wave rectification. Calculate the frequency of the output pulses."
+},
+{
+"code": "27.4",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A smoothing capacitor of 470 μF is used with a load resistance of 1.0 kΩ. Calculate the time constant of the circuit."
+},
+{
+"code": "27.4",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How many diodes are needed for a full-wave bridge rectifier?"
+},
+{
+"code": "27.4",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the purpose of a capacitor connected across the output of a rectifier?"
+},
+{
+"code": "27.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "A larger smoothing capacitor is fitted in a rectifier circuit, with the load unchanged. What happens to the output?"
+},
+{
+"code": "27.4",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What property of a diode makes rectification possible?"
+},
+{
+"code": "27.4",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is full-wave rectification easier to smooth than half-wave rectification?"
+},
+{
+"code": "28.1",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy of a photon of wavelength 500 nm. Take h = 6.63 × 10⁻³⁴ J s and c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.1",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the de Broglie wavelength of an electron travelling at 5.0 × 10⁶ m s⁻¹. Take h = 6.63 × 10⁻³⁴ J s and m = 9.11 × 10⁻³¹ kg."
+},
+{
+"code": "28.1",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the momentum of a photon of wavelength 400 nm. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.1",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which phenomenon can only be explained by treating light as a wave?"
+},
+{
+"code": "28.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is meant by wave–particle duality?"
+},
+{
+"code": "28.1",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "When is the wave model of light the appropriate one to use?"
+},
+{
+"code": "28.10",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the de Broglie wavelength of an electron travelling at 1.0 × 10⁷ m s⁻¹. Take h = 6.63 × 10⁻³⁴ J s and the electron mass as 9.11 × 10⁻³¹ kg."
+},
+{
+"code": "28.10",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the de Broglie wavelength of a person of mass 60 kg walking at 2.0 m s⁻¹. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.10",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A particle has a de Broglie wavelength of 2.0 × 10⁻¹⁰ m. Calculate its momentum. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.10",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the speed of an electron whose de Broglie wavelength is 1.0 × 10⁻¹⁰ m. Take h = 6.63 × 10⁻³⁴ J s and the electron mass as 9.11 × 10⁻³¹ kg."
+},
+{
+"code": "28.10",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron is accelerated from rest through a potential difference of 100 V. Calculate its de Broglie wavelength. Take h = 6.63 × 10⁻³⁴ J s, m = 9.11 × 10⁻³¹ kg and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.10",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which observation provides evidence that electrons behave as waves?"
+},
+{
+"code": "28.10",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which observation provides evidence that light behaves as a stream of particles?"
+},
+{
+"code": "28.10",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the wave nature of a moving tennis ball never observed?"
+},
+{
+"code": "28.11",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy of a photon of wavelength 600 nm. Take h = 6.63 × 10⁻³⁴ J s and c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.11",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A 100 W lamp emits light of wavelength 600 nm, whose photons carry 3.315 × 10⁻¹⁹ J each. Calculate the number of photons emitted per second."
+},
+{
+"code": "28.11",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A dark-adapted eye can register about 100 photons of wavelength 600 nm. Calculate the total energy this represents."
+},
+{
+"code": "28.11",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is the photon nature of light not obvious in everyday experience?"
+},
+{
+"code": "28.11",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "In the photon model, what does the intensity of a monochromatic beam correspond to?"
+},
+{
+"code": "28.11",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What can be said about the emission of individual photons from a light source?"
+},
+{
+"code": "28.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy of a photon of frequency 5.0 × 10¹⁴ Hz. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.2",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy of a photon of wavelength 500 nm. Take h = 6.63 × 10⁻³⁴ J s and c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.2",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A photon has an energy of 3.978 × 10⁻¹⁹ J. Express this energy in electronvolts. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.2",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the momentum of a photon of wavelength 500 nm. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.2",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A laser of power 1.0 mW emits photons each of energy 3.978 × 10⁻¹⁹ J. Calculate the number of photons emitted per second."
+},
+{
+"code": "28.2",
+"n": 6,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A photon has an energy of 4.0 × 10⁻¹⁹ J. Calculate its frequency. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.2",
+"n": 7,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What is a photon?"
+},
+{
+"code": "28.2",
+"n": 8,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The intensity of a monochromatic light beam is doubled while its colour is unchanged. What happens to the energy of each photon?"
+},
+{
+"code": "28.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy of a photon of blue light of wavelength 450 nm, in electronvolts. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m/s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A metal has a work function of 2.3 eV. Calculate its threshold frequency. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m/s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.3",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Ultraviolet light of wavelength 250 nm falls on a metal with work function 4.5 eV. Calculate the maximum kinetic energy of the emitted electrons, in eV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m/s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.3",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Light of frequency 7.5 × 10¹⁴ Hz falls on a surface with work function 2.0 eV. Calculate the stopping potential. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m/s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.3",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "The intensity of light shining on a metal is doubled, keeping its frequency the same and above the threshold. What changes?"
+},
+{
+"code": "28.4",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A metal has a work function of 2.3 eV. Calculate its threshold frequency. Take h = 6.63 × 10⁻³⁴ J s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.4",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A metal has a threshold frequency of 5.55 × 10¹⁴ Hz. Calculate its threshold wavelength. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.4",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Light of frequency 6.0 × 10¹⁴ Hz falls on a metal of work function 3.68 × 10⁻¹⁹ J. Calculate the maximum kinetic energy of the emitted electrons. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.4",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A metal has a threshold wavelength of 400 nm. Calculate its work function in eV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.4",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is meant by the threshold frequency of a metal?"
+},
+{
+"code": "28.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does increasing the intensity of light below the threshold frequency still produce no photoelectrons?"
+},
+{
+"code": "28.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the momentum of a photon of wavelength 600 nm. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A photon has an energy of 3.0 × 10⁻¹⁹ J. Calculate its momentum. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A photon has a momentum of 2.0 × 10⁻²⁷ kg m s⁻¹. Calculate its wavelength. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.5",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the momentum of an X-ray photon of wavelength 1.0 × 10⁻¹¹ m. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How can a photon carry momentum when it has no mass?"
+},
+{
+"code": "28.5",
+"n": 6,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What does Compton scattering demonstrate?"
+},
+{
+"code": "28.6",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An electron in a hydrogen atom falls from the −3.4 eV level to the −13.6 eV ground state. Calculate the energy of the emitted photon in eV."
+},
+{
+"code": "28.6",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An electron falls from the −0.85 eV level to the −3.4 eV level. Calculate the energy of the emitted photon in eV."
+},
+{
+"code": "28.6",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the wavelength of a photon of energy 10.2 eV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.6",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the frequency of a photon of energy 2.55 eV. Take h = 6.63 × 10⁻³⁴ J s and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.6",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The ground state of hydrogen is at −13.6 eV. Calculate the ionisation energy of hydrogen in joules. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.6",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why does an atomic emission spectrum consist of discrete lines rather than a continuous band?"
+},
+{
+"code": "28.6",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does an absorption spectrum arise?"
+},
+{
+"code": "28.6",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are atomic energy levels quoted as negative values?"
+},
+{
+"code": "28.7",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An electron falls from the −1.5 eV level to the −13.6 eV ground state of hydrogen. Calculate the photon energy in eV."
+},
+{
+"code": "28.7",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the wavelength of a photon of energy 12.1 eV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.7",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A hydrogen line has a wavelength of 486 nm. Calculate the corresponding energy difference in eV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.7",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does each element produce its own unique line spectrum?"
+},
+{
+"code": "28.7",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How do the dark lines of an absorption spectrum compare with the bright lines a gas emits?"
+},
+{
+"code": "28.7",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why can an atom not emit a photon of any arbitrary energy?"
+},
+{
+"code": "28.8",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy of a photon of frequency 4.0 × 10¹⁴ Hz. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.8",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Express a photon energy of 2.65 × 10⁻¹⁹ J in electronvolts. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.8",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy of an X-ray photon of wavelength 1.0 × 10⁻¹⁰ m. Take h = 6.63 × 10⁻³⁴ J s and c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "28.8",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Express an X-ray photon energy of 1.99 × 10⁻¹⁵ J in keV. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "28.8",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A laser delivers 1.0 J of energy in photons of 2.65 × 10⁻¹⁹ J each. Calculate the number of photons."
+},
+{
+"code": "28.8",
+"n": 6,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "Which photon carries the most energy?"
+},
+{
+"code": "28.9",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A photon has a wavelength of 500 nm. Calculate its momentum. Take h = 6.63 × 10⁻³⁴ J s."
+},
+{
+"code": "28.9",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Light of wavelength 500 nm has photons of energy 3.98 × 10⁻¹⁹ J. Calculate how many photons a 1.0 mW beam delivers each second."
+},
+{
+"code": "28.9",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which model is needed to explain the photoelectric effect?"
+},
+{
+"code": "28.9",
+"n": 4,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Photons are sent through a double slit one at a time, and each is recorded as a single dot on a detector. What builds up over many hours?"
+},
+{
+"code": "28.9",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Can light behave as a wave and as a particle in the same experiment at the same moment?"
+},
+{
+"code": "28.9",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which phenomenon requires the wave model of light?"
+},
+{
+"code": "29.1",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "Radium-226, proton number 88, emits an alpha particle. Calculate the nucleon number of the daughter."
+},
+{
+"code": "29.1",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Iodine-131, proton number 53, undergoes beta-minus decay. Calculate the proton number of the daughter."
+},
+{
+"code": "29.1",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "In the fusion reaction of deuterium-2 with tritium-3 producing helium-4, calculate the nucleon number of the other particle released."
+},
+{
+"code": "29.1",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Uranium-235 absorbs a neutron and splits into barium-141 and krypton-92. Calculate the number of neutrons released."
+},
+{
+"code": "29.1",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A nucleus of nucleon number 234 and proton number 90 emits a beta-minus particle. Calculate the proton number of the daughter."
+},
+{
+"code": "29.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which quantities must balance on both sides of a nuclear equation?"
+},
+{
+"code": "29.2",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the energy equivalent of 1.0 kg of mass. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "29.2",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A reaction involves a mass defect of 3.0 × 10⁻²⁹ kg. Calculate the energy released. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "29.2",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the energy equivalent of one atomic mass unit in MeV. Take 1 u = 1.66 × 10⁻²⁷ kg, c = 3.00 × 10⁸ m s⁻¹ and 1 MeV = 1.60 × 10⁻¹³ J."
+},
+{
+"code": "29.2",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A reaction has a mass defect of 0.0186 u. Calculate the energy released in MeV, taking 1 u as equivalent to 931.5 MeV."
+},
+{
+"code": "29.2",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A reaction releases 1.0 × 10¹⁴ J. Calculate the corresponding loss of mass. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "29.2",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does mass–energy equivalence mean?"
+},
+{
+"code": "29.3",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A decay has a mass defect of 0.0053 u. Calculate the energy released in MeV, taking 1 u as equivalent to 931.5 MeV."
+},
+{
+"code": "29.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Express a decay energy of 4.94 MeV in joules. Take 1 MeV = 1.60 × 10⁻¹³ J."
+},
+{
+"code": "29.3",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An alpha decay releases 5.5 MeV, shared between an alpha particle of nucleon number 4 and a daughter of nucleon number 218. Calculate the kinetic energy of the alpha particle."
+},
+{
+"code": "29.3",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A source undergoes 1.0 × 10²⁰ decays, each releasing 5.0 MeV. Calculate the total energy released in joules. Take 1 MeV = 1.60 × 10⁻¹³ J."
+},
+{
+"code": "29.3",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Where does the energy released in radioactive decay come from?"
+},
+{
+"code": "29.3",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does a given alpha emitter always produce alpha particles of essentially the same energy?"
+},
+{
+"code": "29.4",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A nuclear reaction involves a mass defect of 1.0 × 10⁻²⁸ kg. Calculate the energy released. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "29.4",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A nucleus has a mass defect of 0.030 u. Calculate its binding energy in MeV, taking 1 u to be equivalent to 931.5 MeV."
+},
+{
+"code": "29.4",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An iron-56 nucleus has a total binding energy of 492 MeV. Calculate its binding energy per nucleon."
+},
+{
+"code": "29.4",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A helium-4 nucleus has a mass of 4.00151 u. A proton has a mass of 1.00728 u and a neutron 1.00867 u. Calculate the mass defect in u."
+},
+{
+"code": "29.4",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Using a mass defect of 0.03039 u for helium-4, calculate its binding energy per nucleon in MeV. Take 1 u as equivalent to 931.5 MeV."
+},
+{
+"code": "29.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is meant by the mass defect of a nucleus?"
+},
+{
+"code": "29.4",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why do both the fusion of very light nuclei and the fission of very heavy nuclei release energy?"
+},
+{
+"code": "29.4",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Which nucleus is the most stable?"
+},
+{
+"code": "29.5",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A sample contains 5.0 × 10¹⁸ undecayed nuclei with a decay constant of 1.0 × 10⁻³ s⁻¹. Calculate its activity."
+},
+{
+"code": "29.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A source has an activity of 2.0 × 10⁶ Bq and a decay constant of 4.0 × 10⁻⁴ s⁻¹. Calculate the number of undecayed nuclei."
+},
+{
+"code": "29.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A sample of 8.0 × 10¹² nuclei has a decay constant of 2.5 × 10⁻⁵ s⁻¹. Calculate its activity."
+},
+{
+"code": "29.5",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does it mean to say that radioactive decay is random and spontaneous?"
+},
+{
+"code": "29.5",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Repeated one-minute counts from a steady source give 512, 495, 530, 501 and 486. Why do the readings differ?"
+},
+{
+"code": "29.5",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "A radioactive source is heated strongly and placed under high pressure. What happens to its activity?"
+},
+{
+"code": "29.6",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An isotope has a half-life of 5.0 s. Calculate its decay constant."
+},
+{
+"code": "29.6",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An isotope has a decay constant of 0.0250 s⁻¹. Calculate its half-life."
+},
+{
+"code": "29.6",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A sample starts with 1.0 × 10²⁰ nuclei and has a decay constant of 0.139 s⁻¹. Calculate the number remaining after 10 s."
+},
+{
+"code": "29.6",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A source has an activity of 800 Bq. Calculate its activity after three half-lives."
+},
+{
+"code": "29.6",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the fraction of a sample remaining after four half-lives."
+},
+{
+"code": "29.6",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is radioactive decay described by an exponential law?"
+},
+{
+"code": "29.7",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A decay curve shows the activity falling from 400 Bq to 200 Bq in 12 s. Calculate the half-life."
+},
+{
+"code": "29.7",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An isotope has a half-life of 12 s. Calculate its decay constant."
+},
+{
+"code": "29.7",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A graph of ln(activity) against time is a straight line of gradient −0.050 s⁻¹. Calculate the decay constant."
+},
+{
+"code": "29.7",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An isotope has a half-life of 20 s. Calculate the time for its activity to fall from 600 Bq to 75 Bq."
+},
+{
+"code": "29.7",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the fraction of nuclei remaining after five half-lives."
+},
+{
+"code": "29.7",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is ln(activity) plotted against time rather than activity itself?"
+},
+{
+"code": "29.8",
+"n": 1,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "An isotope has a half-life of 1.2 × 10⁴ s. Calculate its decay constant."
+},
+{
+"code": "29.8",
+"n": 2,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "A sample contains 4.0 × 10¹⁸ undecayed nuclei of an isotope with decay constant 2.0 × 10⁻⁶ s⁻¹. Calculate its activity."
+},
+{
+"code": "29.8",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "What fraction of the original nuclei in a sample remains undecayed after 3.5 half-lives? Give your answer as a decimal."
+},
+{
+"code": "29.8",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A sample has an activity of 800 Bq. Its half-life is 6.0 hours. Calculate its activity 15 hours later."
+},
+{
+"code": "29.8",
+"n": 5,
+"d": 1,
+"ty": "numeric",
+"pts": 1,
+"qt": "The activity of a sample falls from 1200 Bq to 150 Bq. The half-life is 8.0 days. How many days does this take?"
+},
+{
+"code": "30.1",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An X-ray tube operates at 80 kV. Calculate the maximum energy of an X-ray photon produced, in joules. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "30.1",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the minimum wavelength of X-rays produced by a tube operating at 80 kV. Take h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹ and e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "30.1",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A beam of X-rays passes through 30 mm of tissue with a linear attenuation coefficient of 50 m⁻¹. Calculate the fraction of the original intensity that emerges, as a decimal."
+},
+{
+"code": "30.1",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A material has a linear attenuation coefficient of 0.10 mm⁻¹ for a particular X-ray beam. Calculate its half-value thickness."
+},
+{
+"code": "30.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How are X-rays produced in an X-ray tube?"
+},
+{
+"code": "30.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is a contrast medium such as barium or iodine given to a patient before some X-ray examinations?"
+},
+{
+"code": "30.1",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the main advantage of a CT scan over a conventional X-ray image?"
+},
+{
+"code": "30.1",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An X-ray beam is passed through an aluminium filter before reaching the patient. What is the purpose of this?"
+},
+{
+"code": "30.2",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An X-ray beam passes through 40 mm of tissue with a linear attenuation coefficient of 25 m⁻¹. Calculate the fraction of the intensity transmitted."
+},
+{
+"code": "30.2",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A material has a linear attenuation coefficient of 0.20 mm⁻¹. Calculate its half-value thickness."
+},
+{
+"code": "30.2",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A material has a half-value thickness of 5.0 mm. Calculate its linear attenuation coefficient."
+},
+{
+"code": "30.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Calculate the fraction of an X-ray beam transmitted through three half-value thicknesses."
+},
+{
+"code": "30.2",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A beam passes through 4.0 cm of material with μ = 0.50 cm⁻¹. Calculate the fraction transmitted."
+},
+{
+"code": "30.2",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What does the linear attenuation coefficient of a material depend on?"
+},
+{
+"code": "30.3",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Using intensifying screens cuts the required exposure by a factor of 20. Calculate the new dose if the unaided dose would have been 2.0 mGy."
+},
+{
+"code": "30.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An anti-scatter grid absorbs 70% of scattered radiation while transmitting 90% of the direct beam. Calculate the fraction of scattered radiation reaching the detector."
+},
+{
+"code": "30.3",
+"n": 3,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the purpose of a collimator in an X-ray machine?"
+},
+{
+"code": "30.3",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What do intensifying screens do in X-ray imaging?"
+},
+{
+"code": "30.3",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the difference between contrast and sharpness in an X-ray image?"
+},
+{
+"code": "30.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is a contrast medium such as barium used for imaging the digestive tract?"
+},
+{
+"code": "30.4",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A CT image is built from a 512 × 512 grid across 100 slices. Calculate the total number of voxels."
+},
+{
+"code": "30.4",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A CT scan delivers 1.5 mGy per slice and 40 slices are taken. Calculate the total dose."
+},
+{
+"code": "30.4",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does a CT scanner build up its image?"
+},
+{
+"code": "30.4",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why must projections be taken from many different angles in a CT scan?"
+},
+{
+"code": "30.4",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the principal advantage of CT over a conventional radiograph?"
+},
+{
+"code": "30.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the main disadvantage of CT scanning?"
+},
+{
+"code": "30.5",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Ultrasound of frequency 2.0 MHz travels through soft tissue at 1500 m s⁻¹. Calculate its wavelength."
+},
+{
+"code": "30.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An ultrasound pulse returns from a boundary 60 μs after it is emitted. Taking the speed in tissue as 1500 m s⁻¹, calculate the depth of the boundary."
+},
+{
+"code": "30.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Blood has a density of 1060 kg m⁻³ and the speed of ultrasound in it is 1540 m s⁻¹. Calculate its specific acoustic impedance."
+},
+{
+"code": "30.5",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Ultrasound of intensity I₀ enters tissue with a linear attenuation coefficient of 100 m⁻¹. Calculate the fraction of the intensity remaining after 20 mm, as a decimal."
+},
+{
+"code": "30.5",
+"n": 5,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Ultrasound passes from tissue of acoustic impedance 1.63 × 10⁶ kg m⁻² s⁻¹ into air of impedance 430 kg m⁻² s⁻¹. Calculate the intensity reflection coefficient, as a decimal."
+},
+{
+"code": "30.5",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why is a coupling gel applied between the ultrasound transducer and the patient’s skin?"
+},
+{
+"code": "30.5",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How does a piezoelectric crystal act as both the source and the detector of ultrasound?"
+},
+{
+"code": "30.5",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the essential difference between an A-scan and a B-scan?"
+},
+{
+"code": "30.6",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "An ultrasound pulse returns 0.080 s after transmission through water at 1500 m s⁻¹. Calculate the depth of the reflecting surface."
+},
+{
+"code": "30.6",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Calculate the time for an echo to return from a depth of 200 m in water, taking the speed as 1500 m s⁻¹."
+},
+{
+"code": "30.6",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Ultrasound of frequency 50 kHz travels at 1500 m s⁻¹. Calculate its wavelength."
+},
+{
+"code": "30.6",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "For ultrasound of wavelength 0.030 m, estimate the smallest separation of two objects that can be distinguished, taking it as half a wavelength."
+},
+{
+"code": "30.6",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does a higher ultrasound frequency give better resolution?"
+},
+{
+"code": "30.6",
+"n": 6,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is a lower ultrasound frequency chosen for imaging deep structures?"
+},
+{
+"code": "30.7",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Muscle has a density of 1075 kg m⁻³ and the speed of ultrasound in it is 1590 m s⁻¹. Calculate its specific acoustic impedance."
+},
+{
+"code": "30.7",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Ultrasound passes from muscle (Z = 1.71 × 10⁶) into fat (Z = 1.38 × 10⁶ kg m⁻² s⁻¹). Calculate the intensity reflection coefficient."
+},
+{
+"code": "30.7",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An echo returns 45 μs after the pulse is transmitted, with the speed in tissue 1540 m s⁻¹. Calculate the depth of the boundary."
+},
+{
+"code": "30.7",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "What is the essential difference between an A-scan and a B-scan?"
+},
+{
+"code": "30.7",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why must a coupling gel be used between the transducer and the skin?"
+},
+{
+"code": "30.7",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the main advantage of ultrasound over X-ray imaging in obstetrics?"
+},
+{
+"code": "30.8",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An electron and a positron annihilate at rest. Calculate the energy of each of the two photons produced, in joules. Take the electron mass as 9.11 × 10⁻³¹ kg and c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "30.8",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Express the energy of an annihilation photon, 8.199 × 10⁻¹⁴ J, in MeV. Take e = 1.60 × 10⁻¹⁹ C."
+},
+{
+"code": "30.8",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "An annihilation occurs 60 mm from the centre of a detector ring, along the line joining two opposite detectors. Calculate the difference in arrival times of the two photons. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "30.8",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "Two annihilation photons arrive at opposite detectors with a time difference of 2.0 × 10⁻¹⁰ s. Calculate the distance of the annihilation event from the centre of the ring. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "30.8",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why are the two photons from an electron–positron annihilation emitted in almost exactly opposite directions?"
+},
+{
+"code": "30.8",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the role of the tracer in a PET scan?"
+},
+{
+"code": "30.8",
+"n": 7,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why must a PET tracer have a relatively short half-life?"
+},
+{
+"code": "30.8",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How does a PET scanner determine where in the body an annihilation took place?"
+},
+{
+"code": "31.1",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "The Sun has a luminosity of 3.8 × 10²⁶ W and is 1.5 × 10¹¹ m from the Earth. Calculate the radiant flux intensity at the Earth."
+},
+{
+"code": "31.1",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of luminosity 2.8 × 10²⁸ W is 4.0 × 10¹⁷ m away. Calculate the radiant flux intensity received from it."
+},
+{
+"code": "31.1",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A standard candle of luminosity 4.0 × 10²⁸ W gives a radiant flux intensity of 2.0 × 10⁻⁹ W m⁻² at Earth. Calculate its distance."
+},
+{
+"code": "31.1",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of luminosity 2.5 × 10³⁰ W lies 2.0 × 10¹⁹ m away. Calculate the radiant flux intensity received."
+},
+{
+"code": "31.1",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A star gives a radiant flux intensity of 800 W m⁻² at a certain distance. Calculate the flux intensity at twice that distance."
+},
+{
+"code": "31.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is a standard candle?"
+},
+{
+"code": "31.1",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the difference between the luminosity of a star and the radiant flux intensity received from it?"
+},
+{
+"code": "31.1",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why does the radiant flux intensity from a star fall off as the inverse square of the distance?"
+},
+{
+"code": "31.2",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of luminosity 6.0 × 10²⁶ W is 3.0 × 10¹⁷ m away. Calculate the radiant flux intensity received."
+},
+{
+"code": "31.2",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star 5.0 × 10¹⁷ m away gives a radiant flux intensity of 3.0 × 10⁻⁹ W m⁻². Calculate its luminosity."
+},
+{
+"code": "31.2",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of luminosity 1.0 × 10²⁹ W gives a flux intensity of 4.0 × 10⁻⁹ W m⁻² at Earth. Calculate its distance."
+},
+{
+"code": "31.2",
+"n": 4,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A star gives a flux intensity of 90 W m⁻² at a certain distance. Calculate the flux intensity at three times that distance."
+},
+{
+"code": "31.2",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What is the difference between the luminosity of a star and the radiant flux intensity received from it?"
+},
+{
+"code": "31.2",
+"n": 6,
+"d": 1,
+"ty": "multiple_choice",
+"pts": 1,
+"qt": "What are the SI units of radiant flux intensity?"
+},
+{
+"code": "31.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A star emits most strongly at a wavelength of 500 nm. Calculate its surface temperature. Take Wien’s displacement constant as 2.9 × 10⁻³ m K."
+},
+{
+"code": "31.3",
+"n": 2,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A star has a surface temperature of 10 000 K. Calculate the wavelength at which it emits most strongly. Take Wien’s displacement constant as 2.9 × 10⁻³ m K."
+},
+{
+"code": "31.3",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of radius 7.0 × 10⁸ m has a surface temperature of 5800 K. Calculate its luminosity. Take σ = 5.67 × 10⁻⁸ W m⁻² K⁻⁴."
+},
+{
+"code": "31.3",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star of luminosity 3.8 × 10²⁶ W has a surface temperature of 5800 K. Calculate its radius. Take σ = 5.67 × 10⁻⁸ W m⁻² K⁻⁴."
+},
+{
+"code": "31.3",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A star has a luminosity of 2.0 × 10²⁶ W. Calculate the luminosity of a star of the same radius but twice the surface temperature."
+},
+{
+"code": "31.3",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does Wien’s displacement law state?"
+},
+{
+"code": "31.3",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "According to the Stefan–Boltzmann law, how does a star’s luminosity depend on its radius and surface temperature?"
+},
+{
+"code": "31.3",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Two stars have the same luminosity, but one has a much cooler surface temperature. What follows about the cooler star?"
+},
+{
+"code": "31.4",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A spectral line of laboratory wavelength 500 nm is observed from a galaxy at 502 nm. Calculate the galaxy’s speed of recession. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "31.4",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A galaxy recedes at 1.2 × 10⁶ m s⁻¹. Calculate its distance, taking the Hubble constant as 2.3 × 10⁻¹⁸ s⁻¹."
+},
+{
+"code": "31.4",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A galaxy is 1.0 × 10²⁴ m away. Calculate its speed of recession, taking H₀ = 2.3 × 10⁻¹⁸ s⁻¹."
+},
+{
+"code": "31.4",
+"n": 4,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A line of laboratory wavelength 600 nm comes from a galaxy receding at 3.0 × 10⁶ m s⁻¹. Calculate the change in wavelength observed. Take c = 3.00 × 10⁸ m s⁻¹."
+},
+{
+"code": "31.4",
+"n": 5,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Estimate the age of the Universe in seconds, taking the Hubble constant as 2.3 × 10⁻¹⁸ s⁻¹."
+},
+{
+"code": "31.4",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does the observed redshift of distant galaxies indicate?"
+},
+{
+"code": "31.4",
+"n": 7,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What does Hubble’s law state?"
+},
+{
+"code": "31.4",
+"n": 8,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Besides the redshift of distant galaxies, which observation is regarded as strong evidence for the Big Bang?"
+},
+{
+"code": "P2.1",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A relationship is thought to be y = kxⁿ. A graph of lg y against lg x gives a straight line of gradient 1.5. State the value of n."
+},
+{
+"code": "P2.1",
+"n": 2,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A log–log graph of y against x has an intercept of 0.60 on the lg y axis. Calculate the constant k in y = kxⁿ."
+},
+{
+"code": "P2.1",
+"n": 3,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What should a good experimental plan identify at the outset?"
+},
+{
+"code": "P2.1",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How would you test experimentally whether two quantities are related by a power law y = kxⁿ, with n unknown?"
+},
+{
+"code": "P2.1",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Why must control variables be kept constant throughout an experiment?"
+},
+{
+"code": "P2.1",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "Which safety precaution is appropriate when planning an experiment with a heavy falling mass?"
+},
+{
+"code": "P2.2",
+"n": 1,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A wire diameter of 0.35 mm is measured with a micrometer of resolution 0.01 mm. Calculate the percentage uncertainty."
+},
+{
+"code": "P2.2",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "Readings are to be taken from 20 cm to 100 cm at equal intervals, with 9 readings in total. Calculate the interval."
+},
+{
+"code": "P2.2",
+"n": 3,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "State the minimum number of readings normally expected to establish a trend and draw a reliable graph."
+},
+{
+"code": "P2.2",
+"n": 4,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "How should the apparatus for measuring a quantity be chosen?"
+},
+{
+"code": "P2.2",
+"n": 5,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What makes a written method good enough for someone else to follow?"
+},
+{
+"code": "P2.2",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why should readings be spread across the full available range of the independent variable?"
+},
+{
+"code": "P2.3",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A best-fit line passes through (1.0, 2.5) and (5.0, 14.5). Calculate its gradient."
+},
+{
+"code": "P2.3",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A line of gradient 3.0 passes through (1.0, 2.5). Calculate its intercept on the y-axis."
+},
+{
+"code": "P2.3",
+"n": 3,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A relationship T = k√L is tested by plotting T² against L, giving a gradient of 4.0. Calculate k."
+},
+{
+"code": "P2.3",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "A graph of 1/v against 1/u for a lens has an intercept of 0.20 cm⁻¹ on the 1/v axis. Calculate the focal length."
+},
+{
+"code": "P2.3",
+"n": 5,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How do you decide what to plot when testing a relationship?"
+},
+{
+"code": "P2.3",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "Why is a constant found from the gradient of a best-fit line rather than from one pair of readings?"
+},
+{
+"code": "P2.4",
+"n": 1,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "Two quantities with percentage uncertainties of 3% and 2% are multiplied. Calculate the percentage uncertainty in the product."
+},
+{
+"code": "P2.4",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A radius is measured with a 4% uncertainty. Calculate the percentage uncertainty in a volume proportional to r³."
+},
+{
+"code": "P2.4",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A quantity x has a percentage uncertainty of 6%. Calculate the percentage uncertainty in √x."
+},
+{
+"code": "P2.4",
+"n": 4,
+"d": 4,
+"ty": "numeric",
+"pts": 3,
+"qt": "The best-fit line has gradient 3.0, the steepest acceptable line 3.2 and the shallowest 2.8. Calculate the uncertainty in the gradient."
+},
+{
+"code": "P2.4",
+"n": 5,
+"d": 2,
+"ty": "numeric",
+"pts": 2,
+"qt": "A result of 4.8 has a percentage uncertainty of 5%. Calculate the absolute uncertainty."
+},
+{
+"code": "P2.4",
+"n": 6,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How is the uncertainty in a gradient found from a graph?"
+},
+{
+"code": "P2.5",
+"n": 1,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An experiment gives g = 9.5 ± 0.4 m s⁻². Calculate the upper limit of this result."
+},
+{
+"code": "P2.5",
+"n": 2,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "An experiment gives g = 9.5 m s⁻² against an accepted value of 9.81 m s⁻². Calculate the percentage difference."
+},
+{
+"code": "P2.5",
+"n": 3,
+"d": 3,
+"ty": "numeric",
+"pts": 3,
+"qt": "A result is 2.45 ± 0.15 and the accepted value is 2.70. Calculate the upper limit of the experimental result."
+},
+{
+"code": "P2.5",
+"n": 4,
+"d": 3,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "How do you judge whether an experimental result agrees with an accepted value?"
+},
+{
+"code": "P2.5",
+"n": 5,
+"d": 4,
+"ty": "multiple_choice",
+"pts": 3,
+"qt": "An experiment produces a result that disagrees with the accepted value by well more than its stated uncertainty. What is the best response?"
+},
+{
+"code": "P2.5",
+"n": 6,
+"d": 2,
+"ty": "multiple_choice",
+"pts": 2,
+"qt": "What distinguishes a limitation from an improvement in an evaluation?"
+}
+]

@@ -1,0 +1,13 @@
+{
+ "taken_at": "2026-11-06, before any write",
+ "query": "per (lesson, curriculum): count, md5 of id||question_text||answer_correct||explanation||difficulty_level||points||updated_at ordered by id, md5 of option id||text||is_correct",
+ "rows": [
+  {"code":"22.1","curriculum_id":"a-level","n":6,"h":"b58f78d7e69c6b1fe44a6c18964143a4","oh":"56e58bf3fb5d246a75be262e3ab82b95"},
+  {"code":"22.2","curriculum_id":"a-level","n":98,"h":"4c870a8d120b7a6273c8e5f1cfed9239","oh":"e80fb6accda161b7dc4443a2ae20067a"},
+  {"code":"22.2","curriculum_id":"ib","n":98,"h":"60062176799e460e373d1ac51b9c4089","oh":"c75bc73f563a99578516a2e95df0c2d3"},
+  {"code":"22.2","curriculum_id":"igcse","n":99,"h":"f1335884b6d14dd93136b3cab54acc14","oh":"b499c12670aece248c10dbf6a3b4e491"},
+  {"code":"22.3","curriculum_id":"a-level","n":8,"h":"3f3da0817cf02c1dec6b7caad33545fd","oh":"b5a55e8780c7ec655b3ea6ae16c33634"},
+  {"code":"22.4","curriculum_id":"a-level","n":5,"h":"c9fa2112ce05e5023f27dd766234b7df","oh":"60dc6e867efd13d565565a821c905a6a"},
+  {"code":"22.5","curriculum_id":"a-level","n":6,"h":"0b28421b378d8850f360a6754a0d02ca","oh":"82e9b85eea4e8ade253211e2ad805eac"}
+ ]
+}

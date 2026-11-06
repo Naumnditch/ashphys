@@ -1,0 +1,110 @@
+{
+ "16.2": {
+  "code": "16.2",
+  "title": "Radians and angular speed",
+  "topic": "0245e29c-acd6-5c5f-b1b3-bf9431a0fa6b",
+  "before": 9,
+  "new": 42,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 9,
+   "d1": 6,
+   "d2": 3,
+   "d3": 0
+  },
+  "file": "ch16"
+ },
+ "16.3": {
+  "code": "16.3",
+  "title": "Steady speed, changing velocity",
+  "topic": "2cb349de-a9e0-4b56-84d7-768b4df0ca9e",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch16"
+ },
+ "16.4": {
+  "code": "16.4",
+  "title": "Angular speed",
+  "topic": "744a91d7-6b75-4fd2-b3c7-17689e965446",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 21,
+  "hard": 12,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 4,
+   "d3": 3
+  },
+  "file": "ch16"
+ },
+ "16.5": {
+  "code": "16.5",
+  "title": "Centripetal forces",
+  "topic": "9b374880-4182-4886-b234-d78a4ea3ad26",
+  "before": 9,
+  "new": 41,
+  "after": 50,
+  "easy": 17,
+  "medium": 19,
+  "hard": 14,
+  "before_split": {
+   "n": 9,
+   "d1": 0,
+   "d2": 3,
+   "d3": 6
+  },
+  "file": "ch16"
+ },
+ "16.6": {
+  "code": "16.6",
+  "title": "Calculating acceleration and force",
+  "topic": "396985e8-749f-49c7-8368-5612a2941d72",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch16"
+ },
+ "16.7": {
+  "code": "16.7",
+  "title": "The origins of centripetal forces",
+  "topic": "685c0bf9-07df-4a2a-bfb1-3c4b387bc137",
+  "before": 11,
+  "new": 39,
+  "after": 50,
+  "easy": 14,
+  "medium": 21,
+  "hard": 15,
+  "before_split": {
+   "n": 11,
+   "d1": 1,
+   "d2": 1,
+   "d3": 9
+  },
+  "file": "ch16"
+ }
+}
