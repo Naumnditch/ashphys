@@ -158,33 +158,54 @@ def read_result(s):
     return sign * float(mant) * 10 ** ex, half
 
 
+def _seg_value(seg):
+    """Value of a numbers-only segment (or of its numeric clause tail), else None."""
+    seg = seg.strip().rstrip(',')
+    if not seg or not re.search(r'\d', seg):
+        return None, seg
+    val = evaluate(seg)
+    if val is not None:
+        return val, seg
+    for start in range(1, len(seg)):
+        if seg[start - 1] in ' :(' and seg[start] not in ' )':
+            before = seg[:start].rstrip()
+            if before and before[-1] in '×÷/*+−-^(√':
+                continue
+            cand = seg[start:]
+            if re.search(r'\d', cand):
+                val = evaluate(cand)
+                if val is not None:
+                    return val, cand
+    return None, seg
+
+
+_OPERATOR_NEXT = re.compile(r'^\s*(?:[×÷/*^+(√⁰¹²³⁴⁵⁶⁷⁸⁹⁻]|[−-]\s*\d)')
+
+
 def steps(text):
-    """[(expr_text, value, result, half)] for every numeric '= expr = result' step in text."""
+    """[(expr_text, value, result, half)] for every numeric '= expr = result' step in text.
+
+    When the text after an expression is itself an expression ("= 4.5 × √(0.50³) = 1.59")
+    the two expressions are compared with each other (half = 0, rounding drift allowed).
+    """
     parts = text.split('=')
     out = []
     for i in range(1, len(parts) - 1):
-        seg = parts[i].strip().rstrip(',')
-        if not seg or not re.search(r'\d', seg):
-            continue
-        # allow a trailing approximation sign or a leading 'so' etc.? no: numbers only
-        val = evaluate(seg)
+        val, seg = _seg_value(parts[i])
         if val is None:
-            # the numeric tail of a clause: "In units of g: 7.81 ÷ 9.81"
-            for start in range(1, len(seg)):
-                if seg[start - 1] in ' :(' and seg[start] not in ' )':
-                    before = seg[:start].rstrip()
-                    if before and before[-1] in '×÷/*+−-^(√':
-                        continue   # the tail is only part of a longer product
-                    cand = seg[start:]
-                    if re.search(r'\d', cand):
-                        val = evaluate(cand)
-                        if val is not None:
-                            seg = cand
-                            break
-            if val is None:
-                continue
-        res = read_result(parts[i + 1].replace('≈', ''))
+            continue
+        nxt = parts[i + 1].replace('≈', '')
+        res = read_result(nxt)
         if res is None:
+            continue
+        m = _RESULT.match(re.sub(r'^(\s*[−-]?\d{1,3})((?: \d{3})+)(?!\d)', lambda mm: mm.group(1) + mm.group(2).replace(' ', ''), nxt))
+        rest = nxt[m.end():] if m else ''
+        if _OPERATOR_NEXT.match(rest):
+            # the next part is an expression, not a stated result
+            nval, nseg = _seg_value(nxt)
+            if nval is None:
+                continue
+            out.append((seg, val, nval, 0.0))
             continue
         out.append((seg, val, res[0], res[1]))
     return out

@@ -100,6 +100,7 @@ UNITS = {
     'km s⁻¹ Mpc⁻¹': 1 / 3.09e19, 's⁻¹': 1, 'min⁻¹': 1 / 60, 'h⁻¹': 1 / 3600, 'day⁻¹': 1 / 86400, 'year⁻¹': 1 / 3.156e7,
     'counts per minute': 1 / 60, 'counts min⁻¹': 1 / 60, 'counts s⁻¹': 1, 'kg s⁻¹': 1, 'm³ s⁻¹': 1, 'Pa s': 1,
     'dB': 1, 'times': 1, 'turns': 1, 'turns m⁻¹': 1, 'cycles': 1, 'oscillations': 1, 'photons s⁻¹': 1,
+    'N m² kg⁻¹': 1, 'N m² kg⁻²': 1, 'J m kg⁻¹': 1, 'N s² m⁻¹': 1, 'm² s⁻²': 1, 'J s': 1, 'W m⁻² K⁻⁴': 1, 'm K': 1,
     'electrons': 1, 'nuclei': 1, 'H m⁻¹': 1, 'F m⁻¹': 1, 'Wb m⁻²': 1, 'T m': 1, 'N A⁻¹ m⁻¹': 1,
 }
 PREFIXABLE = {'m', 's', 'g', 'N', 'J', 'W', 'V', 'A', 'C', 'Ω', 'F', 'T', 'Hz', 'Pa', 'Wb', 'H', 'Bq', 'eV', 'N m⁻¹', 'V m⁻¹'}

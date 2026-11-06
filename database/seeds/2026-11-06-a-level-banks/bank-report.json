@@ -106,5 +106,131 @@
    "d3": 9
   },
   "file": "ch16"
+ },
+ "17.1": {
+  "code": "17.1",
+  "title": "Gravitational fields and field lines",
+  "topic": "748a497a-deae-518a-a929-236d0930052b",
+  "before": 5,
+  "new": 46,
+  "after": 51,
+  "easy": 18,
+  "medium": 21,
+  "hard": 12,
+  "before_split": {
+   "n": 5,
+   "d1": 4,
+   "d2": 1,
+   "d3": 0
+  },
+  "file": "ch17"
+ },
+ "17.2": {
+  "code": "17.2",
+  "title": "Field strength of a point mass",
+  "topic": "f779851e-a0d7-547b-b5a0-d558fa4769be",
+  "before": 9,
+  "new": 43,
+  "after": 52,
+  "easy": 18,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 9,
+   "d1": 1,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch17"
+ },
+ "17.3": {
+  "code": "17.3",
+  "title": "Energy in a gravitational field",
+  "topic": "3dbf9699-434d-4abd-93a9-3d272b99c33d",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 20,
+  "hard": 12,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch17"
+ },
+ "17.4": {
+  "code": "17.4",
+  "title": "Gravitational potential",
+  "topic": "d22251cb-cf0a-5cdb-a0a6-bea9552467ec",
+  "before": 13,
+  "new": 37,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 13,
+   "d1": 1,
+   "d2": 4,
+   "d3": 8
+  },
+  "file": "ch17"
+ },
+ "17.5": {
+  "code": "17.5",
+  "title": "Orbiting under gravity",
+  "topic": "1585a36a-5b5c-5505-abe3-98e37e28c48b",
+  "before": 32,
+  "new": 19,
+  "after": 51,
+  "easy": 14,
+  "medium": 19,
+  "hard": 18,
+  "before_split": {
+   "n": 32,
+   "d1": 4,
+   "d2": 10,
+   "d3": 18
+  },
+  "file": "ch17"
+ },
+ "17.6": {
+  "code": "17.6",
+  "title": "The orbital period",
+  "topic": "bfae2a74-7c35-44c1-b9b0-f286554f329b",
+  "before": 10,
+  "new": 40,
+  "after": 50,
+  "easy": 17,
+  "medium": 19,
+  "hard": 14,
+  "before_split": {
+   "n": 10,
+   "d1": 1,
+   "d2": 2,
+   "d3": 7
+  },
+  "file": "ch17"
+ },
+ "17.7": {
+  "code": "17.7",
+  "title": "Orbiting the Earth",
+  "topic": "663cb445-bbf3-4c10-b9c6-b9a0f8be4bbe",
+  "before": 11,
+  "new": 39,
+  "after": 50,
+  "easy": 17,
+  "medium": 19,
+  "hard": 14,
+  "before_split": {
+   "n": 11,
+   "d1": 0,
+   "d2": 1,
+   "d3": 10
+  },
+  "file": "ch17"
  }
 }
