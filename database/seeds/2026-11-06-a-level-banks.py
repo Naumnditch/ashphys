@@ -275,7 +275,7 @@ def build(name, rejected, report):
 
 
 def main():
-    names = sys.argv[1:] or sorted(f[:-3] for f in os.listdir(HERE) if re.match(r'^(ch\d\d|p1|p2|maths)\.py$', f))
+    names = sys.argv[1:] or sorted(f[:-3] for f in os.listdir(HERE) if re.match(r'^(ch\d\d[a-z]?|p1|p2|maths)\.py$', f))
     rej_path = os.path.join(HERE, 'rejected.json')
     rep_path = os.path.join(HERE, 'bank-report.json')
     rejected_all = json.load(open(rej_path)) if os.path.exists(rej_path) else []

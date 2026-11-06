@@ -232,5 +232,185 @@
    "d3": 10
   },
   "file": "ch17"
+ },
+ "18.1": {
+  "code": "18.1",
+  "title": "Free and forced oscillations",
+  "topic": "85916e10-6d16-4317-bbcd-22eb741ac6db",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch18a"
+ },
+ "18.10": {
+  "code": "18.10",
+  "title": "Damped and forced oscillations, resonance",
+  "topic": "c3990679-5498-5443-9eb0-7f7a69c8b3cf",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 2,
+   "d3": 5
+  },
+  "file": "ch18b"
+ },
+ "18.2": {
+  "code": "18.2",
+  "title": "Observing oscillations",
+  "topic": "a3159ca9-af9c-407a-9d2b-1f70f0f4bf7b",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 5,
+   "d3": 0
+  },
+  "file": "ch18a"
+ },
+ "18.3": {
+  "code": "18.3",
+  "title": "Describing oscillations",
+  "topic": "4e983cb3-2f8d-40bb-bc3f-1575fb3c3a35",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch18a"
+ },
+ "18.4": {
+  "code": "18.4",
+  "title": "Simple harmonic motion",
+  "topic": "bdf389d3-533a-55ee-8bbf-e1744095737f",
+  "before": 5,
+  "new": 45,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 5,
+   "d1": 1,
+   "d2": 3,
+   "d3": 1
+  },
+  "file": "ch18a"
+ },
+ "18.5": {
+  "code": "18.5",
+  "title": "Representing s.h.m. graphically",
+  "topic": "cecb7488-b8aa-4ae3-af2a-d77c04d03414",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch18a"
+ },
+ "18.6": {
+  "code": "18.6",
+  "title": "Frequency and angular frequency",
+  "topic": "229f2746-5b87-4ef8-b289-1403198687fc",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 2,
+   "d2": 2,
+   "d3": 2
+  },
+  "file": "ch18b"
+ },
+ "18.7": {
+  "code": "18.7",
+  "title": "Equations of s.h.m.",
+  "topic": "636093e8-e743-4275-b678-97f3624e39a0",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 20,
+  "hard": 12,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch18b"
+ },
+ "18.8": {
+  "code": "18.8",
+  "title": "Energy in simple harmonic motion",
+  "topic": "326ce4be-3b28-5d8b-baaf-576fbafaa066",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 18,
+  "medium": 20,
+  "hard": 12,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 3,
+   "d3": 4
+  },
+  "file": "ch18b"
+ },
+ "18.9": {
+  "code": "18.9",
+  "title": "Damped oscillations",
+  "topic": "ed31e8cc-8ef4-4b9c-87e0-94fbc7c4ddf0",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch18b"
  }
 }

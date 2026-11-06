@@ -11,7 +11,7 @@ import re
 
 _SUPMAP = {'⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-'}
 _SUPRUN = re.compile('[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+')
-_RESULT = re.compile(r'^\s*(−|-)?(\d+(?:\.\d+)?)(?:\s*×\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+))?')
+_RESULT = re.compile(r'^\s*(−|-|\+)?(\d+(?:\.\d+)?)(?:\s*×\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+))?')
 
 
 _STDFORM = re.compile(r'(\d+(?:\.\d+)?)\s*×\s*10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)')
@@ -26,7 +26,7 @@ def _norm(s):
     s = s.replace('−', '-').replace('×', '*').replace('÷', '/').replace('·', '*').replace('π', ' pi ')
     s = s.replace('√', ' sqrt ')
     s = _SUPRUN.sub(lambda m: '^(' + ''.join(_SUPMAP[c] for c in m.group(0)) + ')', s)
-    s = s.replace('e^', ' exp ')
+    s = s.replace('e^', ' exp ').replace('°', ' ')
     return s
 
 
@@ -147,7 +147,7 @@ def read_result(s):
     m = _RESULT.match(s)
     if not m:
         return None
-    sign = -1 if m.group(1) else 1
+    sign = -1 if m.group(1) in ('−', '-') else 1
     mant = m.group(2)
     ex = int(''.join(_SUPMAP[c] for c in m.group(3))) if m.group(3) else 0
     if '.' in mant:
@@ -169,14 +169,21 @@ def _seg_value(seg):
     for start in range(1, len(seg)):
         if seg[start - 1] in ' :(' and seg[start] not in ' )':
             before = seg[:start].rstrip()
-            if before and before[-1] in '×÷/*+−-^(√':
-                continue
+            if before and (before[-1] in '×÷/*+−-^(√⁰¹²³⁴⁵⁶⁷⁸⁹' or re.search(r'(sin|cos|tan|ln|lg|log|exp)$', before)):
+                continue   # only part of a longer product, or a function's argument
+            last = before.split()[-1] if before.split() else ''
+            if (re.fullmatch(r'[0-9.]*[A-Za-zα-ωΑ-Ω][A-Za-zα-ωΑ-Ω₀-₉ₐ-ₜ]{0,2}', last)
+                    and last.lower() not in _WORDS):
+                continue   # an algebraic symbol multiplies the tail, e.g. 2v sin 30°
             cand = seg[start:]
             if re.search(r'\d', cand):
                 val = evaluate(cand)
                 if val is not None:
                     return val, cand
     return None, seg
+
+
+_WORDS = {'so', 'is', 'of', 'to', 'by', 'be', 'at', 'in', 'on', 'or', 'as', 'it', 'we', 'and', 'the', 'are', 'its', 'now', 'per', 'for', 'gives', 'with', 'then', 'than', 'thus', 'hence', 'giving', 'takes'}
 
 
 _OPERATOR_NEXT = re.compile(r'^\s*(?:[×÷/*^+(√⁰¹²³⁴⁵⁶⁷⁸⁹⁻]|[−-]\s*\d)')
@@ -190,7 +197,7 @@ def steps(text):
     """
     parts = text.split('=')
     out = []
-    for i in range(1, len(parts) - 1):
+    for i in range(0, len(parts) - 1):
         val, seg = _seg_value(parts[i])
         if val is None:
             continue
@@ -205,8 +212,12 @@ def steps(text):
             nval, nseg = _seg_value(nxt)
             if nval is None:
                 continue
+            if '°' in seg and abs(math.radians(val) - nval) <= 0.012 * abs(nval) + 1e-12:
+                continue   # 15° = 15 × π ÷ 180 is a unit conversion
             out.append((seg, val, nval, 0.0))
             continue
+        if '°' in seg and abs(math.radians(val) - res[0]) <= res[1] * 1.0001 + 0.012 * abs(res[0]):
+            continue       # 17° = 0.297 rad is a unit conversion
         out.append((seg, val, res[0], res[1]))
     return out
 

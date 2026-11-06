@@ -37,3 +37,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | file | lessons | commit | md5 | applied | counts after |
 |---|---|---|---|---|---|
 | ch16 | 16.2–16.7 | 15a82b0 | 00f88542ee9cadbe6493ee60c27d2a36 | 2026-11-06 (pg_net id 4) | 16.2 51, 16.3–16.7 50 each |
+| ch17 | 17.1–17.7 | bdcd5e1 | 1d9760b6fa819299ddf34e3a8e5ed736 | 2026-11-06 (pg_net id 5) | 17.1 51, 17.2 52, 17.3 50, 17.4 50, 17.5 51, 17.6 50, 17.7 50 |

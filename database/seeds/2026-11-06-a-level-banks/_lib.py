@@ -251,6 +251,7 @@ def N(d, mk, stem, ans, unit, sol, ms, sig=3, sign=False, tol=None, cm=None, aq=
     """
     assert d in DIFF and mk in MARK_RANGE[d], f'{_STATE["lesson"]}: {d} question cannot be worth {mk}'
     assert ans == ans and abs(ans) < 1e60, 'answer must be a finite number'
+    assert abs(ans) > 1e-12, 'a zero answer cannot be graded (any small value would pass): ask for a non-zero quantity'
     shown = sf(ans, sig) + (f' {unit}' if unit and unit not in ('%', '°') else (unit or ''))
     final = f'A1: {aq + " = " if aq else ""}{shown}'
     ms_lines = _mark_lines(ms, mk, final)
