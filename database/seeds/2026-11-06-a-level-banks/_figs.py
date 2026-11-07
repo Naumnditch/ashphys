@@ -185,7 +185,7 @@ def numbers_after(stem, label):
     i = stem.index(label)
     tail = stem[i + len(label):]
     tail = tail.split('=', 1)[1]
-    m = re.match(r'\s*([−\-]?\d[\d.]*(?:\s*,\s*[−\-]?\d[\d.]*)*)', tail)
+    m = re.match(r'\s*([−\-]?\d+(?:\.\d+)?(?:\s*,\s*[−\-]?\d+(?:\.\d+)?)*)', tail)
     if not m:
         raise ValueError(f'no numbers after {label!r}')
     return [float(x.strip().replace('−', '-')) for x in m.group(1).split(',')]
@@ -341,7 +341,7 @@ def table_rows_from_stem(stem, labels):
     for lab in labels:
         i = stem.index(lab)
         tail = stem[i + len(lab):].split('=', 1)[1]
-        m = re.match(r'\s*([−\-]?\d[\d.]*(?:\s*,\s*[−\-]?\d[\d.]*)*)', tail)
+        m = re.match(r'\s*([−\-]?\d+(?:\.\d+)?(?:\s*,\s*[−\-]?\d+(?:\.\d+)?)*)', tail)
         raw.append([x.strip() for x in m.group(1).split(',')])
     return cols, [list(r) for r in zip(*raw)]
 
@@ -896,3 +896,445 @@ def rc_for_trough(V0, Vmin, f, full=True):
         else:
             hi = mid
     return math.sqrt(lo * hi)
+
+
+# ═════════════════════════ composition ═════════════════════════
+
+def _body(fig):
+    s = fig.svg
+    return s[s.index('</desc>') + 7:s.rindex('</svg>')]
+
+
+def _vb(fig):
+    m = re.search(r'viewBox="0 0 ([\d.]+) ([\d.]+)"', fig.svg)
+    return float(m.group(1)), float(m.group(2))
+
+
+def stack(figs, title, desc, gap=4):
+    """Stack figures vertically (e.g. a data table above its graph), centred on the widest."""
+    W = max(_vb(f)[0] for f in figs)
+    c = Canvas(W, 0)
+    y = 0
+    for f in figs:
+        w, h = _vb(f)
+        c.els.append(f'<g transform="translate({r1((W - w) / 2)},{r1(y)})">{_body(f)}</g>')
+        c.values += f.values
+        y += h + gap
+    c.h = y - gap
+    return c.done(title, desc)
+
+
+def table_plot(headers, rows, title, desc, plot_kw):
+    """A data table with its graph below. plot_kw: arguments for plot() (same numbers as the table)."""
+    t = table(headers, rows, title, desc)
+    p = plot(title=title, desc=desc, **plot_kw)
+    return stack([t, p], title, desc)
+
+
+def blocks(items, title, desc, w=440, box_h=46, arrows=True):
+    """A left-to-right chain of labelled boxes; item = text or list of lines (first line bold)."""
+    n = len(items)
+    gapx = 22
+    bw = (w - 20 - gapx * (n - 1)) / n
+    lines_max = max(len(i) if isinstance(i, (list, tuple)) else 1 for i in items)
+    bh = max(box_h, 18 * lines_max + 14)
+    c = Canvas(w, bh + 20)
+    x = 10
+    for k, it in enumerate(items):
+        ls = list(it) if isinstance(it, (list, tuple)) else [it]
+        c.rect(x, 10, bw, bh, INK, 'axis', fill=FILLC, rx=6)
+        y0 = 10 + bh / 2 - 9 * (len(ls) - 1)
+        for j, t in enumerate(ls):
+            c.text(x + bw / 2, y0 + 18 * j, t, FST, weight=600 if j == 0 and len(ls) > 1 else None)
+        if arrows and k < n - 1:
+            c.arrow(x + bw + 3, 10 + bh / 2, x + bw + gapx - 3, 10 + bh / 2, INK, 'axis', head=7)
+        x += bw + gapx
+    return c.done(title, desc)
+
+
+# ═════════════════════════ electromagnetic induction ═════════════════════════
+
+def field_symbols(c, x, y, w, h, into=True, step=30, color=None, skip=()):
+    """× (into the page) or • (out of the page) symbols filling a box; skip: boxes (x, y, w, h) kept clear."""
+    color = color or MUT
+    nx, ny = max(1, int(w // step)), max(1, int(h // step))
+    for i in range(nx):
+        for j in range(ny):
+            px, py = x + (i + 0.5) * w / nx, y + (j + 0.5) * h / ny
+            if any(sx - 6 <= px <= sx + sw + 6 and sy - 6 <= py <= sy + sh + 6 for sx, sy, sw, sh in skip):
+                continue
+            if into:
+                c.line(px - 4, py - 4, px + 4, py + 4, color, 'axis')
+                c.line(px - 4, py + 4, px + 4, py - 4, color, 'axis')
+            else:
+                c.circle(px, py, 4.5, color, 'thin')
+                c.dot(px, py, 1.6, color)
+
+
+def field_legend(c, x, y, text, into=True, value=None):
+    if into:
+        c.line(x - 4, y - 4, x + 4, y + 4, MUT, 'axis')
+        c.line(x - 4, y + 4, x + 4, y - 4, MUT, 'axis')
+    else:
+        c.circle(x, y, 4.5, MUT, 'thin')
+        c.dot(x, y, 1.6, MUT)
+    c.text(x + 12, y, text, FST, anchor='start', value=value)
+
+
+def compass(c, x, y, size=16):
+    c.arrow(x, y + size, x, y - size, MUT, 'axis', head=7)
+    c.text(x, y - size - 9, 'N', FST, weight=600, value=False)
+
+
+def rails(title, desc, L_label=None, v_label='v', B_label=None, R_label=None, into=True, rails=True,
+          force_label=None, north=False, current=None, w=420, h=250):
+    """Top view: a rod sliding on two rails (joined by a resistor) through a uniform field."""
+    c = Canvas(w, h)
+    y1, y2 = 70, 180
+    xr0, xr1 = 84, 340
+    rod = 240
+    if rails:
+        c.line(xr0, y1, xr1, y1, INK, 'main')
+        c.line(xr0, y2, xr1, y2, INK, 'main')
+        if R_label is not None:
+            vcomp(c, 'R', xr0, y1, y2, R_label or None, side=-1)
+        else:
+            c.line(xr0, y1, xr0, y2, INK, 'main')
+    field_symbols(c, 104, y1 + 6 if rails else 40, 226, (y2 - y1 - 12) if rails else 170, into)
+    c.line(rod, y1 - 16, rod, y2 + 16, ACC2, 'bold')
+    c.arrow(rod + 6, y1 - 26, rod + 70, y1 - 26, ACC2, 'main')
+    c.text(rod + 76, y1 - 26, v_label, FST, anchor='start', color=ACC2)
+    if force_label:
+        c.arrow(rod - 6, y2 + 26, rod - 66, y2 + 26, ACC, 'main')
+        c.text(rod - 72, y2 + 26, force_label, FST, anchor='end', color=ACC)
+    if L_label:
+        c.dim(xr1 + 16, y1, xr1 + 16, y2, L_label, side=1)
+    if B_label:
+        field_legend(c, 24, h - 16, B_label, into)
+    if north:
+        compass(c, 28, 40)
+    return c.done(title, desc)
+
+
+def rod_angle(title, desc, theta_deg, theta_label, v_label='v', B_label='B', w=340, h=230):
+    """Side view: field lines across the page, a rod end-on (perpendicular to the page) moving at θ to them."""
+    c = Canvas(w, h)
+    for k in range(5):
+        y = 30 + k * 40
+        c.arrow(20, y, w - 20, y, ACC, 'thin', head=7)
+    c.text(w - 22, 16, B_label, FST, anchor='end', color=ACC)
+    ox, oy = (110, 150) if theta_deg >= 0 else (170, 70)
+    c.circle(ox, oy, 9, INK, 'main', fill=FILLC)
+    c.dot(ox, oy, 2.4)
+    a = math.radians(theta_deg)
+    L = 130
+    c.arrow(ox + 11 * math.cos(a), oy - 11 * math.sin(a), ox + L * math.cos(a), oy - L * math.sin(a), ACC2, 'bold')
+    c.text(ox + (L + 12) * math.cos(a), oy - (L + 12) * math.sin(a) - (14 if abs(math.sin(a)) < 0.3 else 0), v_label, FST,
+           anchor='start' if math.cos(a) > 0.3 else 'middle', color=ACC2)
+    if theta_label:
+        c.line(ox, oy, ox + 90, oy, MUT, 'thin', dash='4 3')
+        r = 50
+        c.path(f'M{r1(ox + r)},{r1(oy)} A{r},{r} 0 0,0 {r1(ox + r * math.cos(a))},{r1(oy - r * math.sin(a))}', MUT, 'axis')
+        c.text(ox + (r + 14) * math.cos(a / 2), oy - (r + 14) * math.sin(a / 2), theta_label, FST, anchor='start')
+    c.text(ox - 16, oy - 18, 'rod (end-on)', FST, anchor='end', value=False)
+    return c.done(title, desc)
+
+
+def coil_turns(c, cx, cy, length, radius, n, axis='h', color=INK):
+    """A coil seen from the side: n turns as ellipses, back halves muted, front halves solid."""
+    for i in range(n):
+        u = -length / 2 + length * (i + 0.5) / n
+        if axis == 'h':
+            x, y = cx + u, cy
+            c.path(f'M{r1(x)},{r1(y - radius)} A6,{r1(radius)} 0 0,0 {r1(x)},{r1(y + radius)}', MUT, 'thin')
+            c.path(f'M{r1(x)},{r1(y - radius)} A6,{r1(radius)} 0 0,1 {r1(x)},{r1(y + radius)}', color, 'main')
+        else:
+            x, y = cx, cy + u
+            c.path(f'M{r1(x - radius)},{r1(y)} A{r1(radius)},6 0 0,1 {r1(x + radius)},{r1(y)}', MUT, 'thin')
+            c.path(f'M{r1(x - radius)},{r1(y)} A{r1(radius)},6 0 0,0 {r1(x + radius)},{r1(y)}', color, 'main')
+
+
+def bar_magnet(c, x, y, w, h, near='N', vertical=False):
+    """Bar magnet; `near` is the pole at the right end (horizontal) or the bottom end (vertical)."""
+    far = 'S' if near == 'N' else 'N'
+    if not vertical:
+        c.rect(x, y, w / 2, h, INK, 'main')
+        c.rect(x + w / 2, y, w / 2, h, INK, 'main', fill=FILLC)
+        c.text(x + w / 4, y + h / 2, far, FS, weight=700, value=False)
+        c.text(x + 3 * w / 4, y + h / 2, near, FS, weight=700, value=False)
+    else:
+        c.rect(x, y, w, h / 2, INK, 'main')
+        c.rect(x, y + h / 2, w, h / 2, INK, 'main', fill=FILLC)
+        c.text(x + w / 2, y + h / 4, far, FS, weight=700, value=False)
+        c.text(x + w / 2, y + 3 * h / 4, near, FS, weight=700, value=False)
+
+
+def meter_below(c, x1, x2, y_top, y_m, kind='G', label=None):
+    """Leads from (x1, y_top) and (x2, y_top) down to a meter (G, V, A, R, lamp or a data logger box)."""
+    xm = (x1 + x2) / 2
+    c.line(x1, y_top, x1, y_m, INK, 'main')
+    c.line(x2, y_top, x2, y_m, INK, 'main')
+    if kind == 'logger':
+        c.line(x1, y_m, xm - 46, y_m, INK, 'main')
+        c.line(xm + 46, y_m, x2, y_m, INK, 'main')
+        c.rect(xm - 46, y_m - 14, 92, 28, INK, 'main', rx=4)
+        c.text(xm, y_m, 'data logger', FST, value=False)
+    else:
+        Series(El(kind, label)).draw(c, x1, y_m, x2 - x1, below=True)
+
+
+def magnet_coil(title, desc, near='N', motion='towards', meter='G', motion_label=None, dist_label=None, w=420, h=230):
+    """A bar magnet beside a coil connected to a meter. motion: 'towards', 'away' or None."""
+    c = Canvas(w, h)
+    my = 95
+    bar_magnet(c, 24, my - 18, 120, 36, near)
+    coil_turns(c, 285, my, 120, 34, 7)
+    x1, x2 = 225, 345
+    c.line(x1, my, x1, my + 34, INK, 'main')
+    c.line(x2, my, x2, my + 34, INK, 'main')
+    if meter:
+        meter_below(c, x1, x2, my + 34, h - 40, meter)
+    else:   # open circuit: two loose ends
+        for x in (x1, x2):
+            c.line(x, my + 34, x, my + 70, INK, 'main')
+            c.circle(x, my + 74, 3.5, INK, 'axis', fill='none')
+        c.text((x1 + x2) / 2, my + 96, 'ends not connected', FST, value=False)
+    if motion:
+        ax0, ax1 = (40, 128) if motion == 'towards' else (128, 40)
+        c.arrow(ax0, my - 40, ax1, my - 40, ACC2, 'main')
+        if motion_label:
+            c.text(84, my - 56, motion_label, FST, color=ACC2)
+    if dist_label:
+        c.dim(150, my - 52, 270, my - 52, dist_label, side=1, off=12)
+    return c.done(title, desc)
+
+
+def falling_magnet(title, desc, container='coil', near='N', drop_label=None, meter='G', v_label='v', w=320, h=320):
+    """A magnet falling (north pole first by default) towards a coil or down a copper tube."""
+    c = Canvas(w, h)
+    cx = 140
+    if container == 'tube':
+        c.rect(cx - 30, 30, 60, h - 50, INK, 'main', fill=FILLC)
+        c.rect(cx - 22, 30, 44, h - 50, INK, 'thin', fill='none')
+        bar_magnet(c, cx - 12, 110, 24, 64, near, vertical=True)
+        c.arrow(cx + 50, 120, cx + 50, 190, ACC2, 'main')
+        c.text(cx + 58, 155, v_label, FST, anchor='start', color=ACC2)
+        c.text(cx + 40, 40, 'copper tube', FST, anchor='start', value=False)
+    else:
+        bar_magnet(c, cx - 12, 24, 24, 64, near, vertical=True)
+        c.arrow(cx + 30, 40, cx + 30, 100, ACC2, 'main')
+        c.text(cx + 38, 70, v_label, FST, anchor='start', color=ACC2)
+        top = 190
+        coil_turns(c, cx, top + 40, 80, 42, 6, axis='v')
+        if drop_label:
+            c.dim(cx - 64, 88, cx - 64, top, drop_label, side=-1)
+        c.line(cx + 42, top + 4, cx + 110, top + 4, INK, 'main')
+        c.line(cx + 42, top + 76, cx + 110, top + 76, INK, 'main')
+        vcomp(c, meter if meter in ('G', 'V', 'A', 'R') else 'G', cx + 110, top + 4, top + 76, None)
+    return c.done(title, desc)
+
+
+def two_coils(title, desc, left=None, right=None, np_label=None, ns_label=None, switch=None, ring=False, w=450, h=250,
+              np_value=None, ns_value=None):
+    """Two coils on an iron core (a transformer, or Faraday's ring). left/right: dict(kind, label) for the
+    primary supply (ac, cell) and the secondary load (G, V, lamp, R); switch: None, 'open' or 'closed'."""
+    c = Canvas(w, h)
+    ox0, ox1, oy0, oy1 = 150, 300, 40, 200
+    t = 30
+    rx = 22 if ring else 6
+    d = (f'M{ox0},{oy0 + rx} a{rx},{rx} 0 0,1 {rx},{-rx} h{ox1 - ox0 - 2 * rx} a{rx},{rx} 0 0,1 {rx},{rx} '
+         f'v{oy1 - oy0 - 2 * rx} a{rx},{rx} 0 0,1 {-rx},{rx} h{-(ox1 - ox0 - 2 * rx)} a{rx},{rx} 0 0,1 {-rx},{-rx} Z '
+         f'M{ox0 + t},{oy0 + t} h{ox1 - ox0 - 2 * t} v{oy1 - oy0 - 2 * t} h{-(ox1 - ox0 - 2 * t)} Z')
+    c.path(d, MUT, 'axis', fill=FILLC + ';fill-rule:evenodd')
+    for side, spec in ((0, left), (1, right)):
+        xl = ox0 if side == 0 else ox1 - t
+        n = 7
+        ys = [oy0 + 50 + i * 10 for i in range(n)]
+        for y in ys:
+            c.line(xl - 4, y, xl + t + 4, y + 6, INK if side == 0 else ACC, 'main')
+        xe = xl - 4 if side == 0 else xl + t + 4
+        xs = 100 if side == 0 else 370
+        col = INK
+        if side == 0 and switch:
+            c.line(xe, ys[0], 137, ys[0], col, 'main')
+            c.line(113, ys[0], xs, ys[0], col, 'main')
+        else:
+            c.line(xe, ys[0], xs, ys[0], col, 'main')
+        c.line(xe, ys[-1] + 6, xs, ys[-1] + 6, col, 'main')
+        if spec:
+            kind = spec['kind']
+            vcomp(c, kind if kind in ('ac', 'cell', 'R', 'lamp', 'V', 'A', 'G') else 'R', xs, ys[0], ys[-1] + 6,
+                  spec.get('label'), side=-1 if side == 0 else 1, value=spec.get('value'))
+        else:
+            c.line(xs, ys[0], xs, ys[-1] + 6, col, 'main')
+    if np_label:
+        c.text(ox0 + t / 2, oy1 + 22, np_label, FST, value=np_value)
+    if ns_label:
+        c.text(ox1 - t / 2, oy1 + 22, ns_label, FST, value=ns_value)
+    if switch:
+        sx, sy = 125, oy0 + 50
+        c.dot(sx - 12, sy, 2.6)
+        c.dot(sx + 12, sy, 2.6)
+        if switch == 'closed':
+            c.line(sx - 12, sy, sx + 12, sy, INK, 'main')
+        else:
+            c.line(sx - 12, sy, sx + 10, sy - 11, INK, 'main')
+    return c.done(title, desc)
+
+
+def coil_angle(title, desc, theta_deg, theta_label=None, B_label=None, coil_label=None, w=340, h=230, normal=True,
+               rotation=False, poles=False):
+    """Side view: uniform field across the page and a flat coil (edge-on, as a line) whose normal makes θ with the field."""
+    c = Canvas(w, h)
+    x0, x1 = (64, w - 64) if poles else (16, w - 16)
+    if poles:
+        c.rect(14, 30, 44, h - 60, INK, 'main', fill=FILLC)
+        c.rect(w - 58, 30, 44, h - 60, INK, 'main', fill=FILLC)
+        c.text(36, h / 2, 'N', FS, weight=700, value=False)
+        c.text(w - 36, h / 2, 'S', FS, weight=700, value=False)
+    lines_y = [40 + k * (h - 80) / 4 for k in range(5)]
+    for y in lines_y:
+        c.arrow(x0, y, x1, y, ACC, 'thin', head=7)
+    gaps = [(p + q) / 2 for p, q in zip(lines_y, lines_y[1:])]
+    gap_y = lambda y: min(gaps, key=lambda g: abs(g - y))  # noqa: E731  labels sit between field lines
+    cx, cy = w / 2, h / 2
+    a = math.radians(theta_deg)
+    pa = a + math.pi / 2
+    L = 64
+    c.line(cx - L * math.cos(pa), cy + L * math.sin(pa), cx + L * math.cos(pa), cy - L * math.sin(pa), INK, 'bold')
+    for sgn in (1, -1):
+        c.circle(cx + sgn * L * math.cos(pa), cy - sgn * L * math.sin(pa), 5, INK, 'main', fill=FILLC)
+    c.dot(cx, cy, 2.6)
+    if normal:
+        c.arrow(cx, cy, cx + 80 * math.cos(a), cy - 80 * math.sin(a), ACC2, 'main', dash='5 3')
+        tx, ty = cx + 80 * math.cos(a), cy - 80 * math.sin(a)
+        right = tx + 10 + text_w('normal', FST) < x1
+        c.text(tx + 10 if right else tx - 10, gap_y(ty), 'normal', FST, color=ACC2, anchor='start' if right else 'end', value=False)
+    if theta_label and theta_deg:
+        r = 34
+        c.path(f'M{r1(cx + r)},{r1(cy)} A{r},{r} 0 0,0 {r1(cx + r * math.cos(a))},{r1(cy - r * math.sin(a))}', MUT, 'axis')
+        c.text(cx + (r + 8) * math.cos(a / 2), gap_y(cy - (r + 10) * math.sin(a / 2)), theta_label, FST, anchor='start')
+    if rotation:
+        c.path(f'M{r1(cx - 30)},{r1(cy + 22)} A36,36 0 0,0 {r1(cx + 30)},{r1(cy + 22)}', MUT, 'axis')
+        c.arrowhead(cx + 30, cy + 22, -0.75, MUT, 7)
+    if B_label:
+        c.text(x1, 22, B_label, FST, anchor='end', color=ACC)
+    if coil_label:
+        c.text(cx, h - 10, coil_label, FST)
+    return c.done(title, desc)
+
+
+def loop_region(title, desc, inside=0.4, motion='in', side_label=None, v_label='v', B_label=None, into=True,
+                vertical=False, turns_label=None, w=420, h=260):
+    """Top view of a square coil entering ('in') or leaving ('out') a region of uniform field on the right
+    (vertical=True: the field region is below and the loop falls into it)."""
+    c = Canvas(w, h)
+    s = 110
+    if not vertical:
+        bx = 220
+        ry0, ry1 = 50, h - 50
+        c.rect(bx, ry0, w - bx - 14, ry1 - ry0, MUT, 'thin', dash='5 4', fill=FILLC)
+        field_symbols(c, bx, ry0, w - bx - 14, ry1 - ry0, into)
+        x = bx - s * (1 - inside)
+        y = (ry0 + ry1 - s) / 2
+        c.rect(x, y, s, s, ACC2, 'bold')
+        dx = 1 if motion == 'in' else -1
+        ax = x - 10 if dx > 0 else x + s + 10
+        if dx > 0:
+            c.arrow(x - 70, y + s / 2, x - 8, y + s / 2, ACC2, 'main')
+            c.text(x - 74, y + s / 2, v_label, FST, anchor='end', color=ACC2)
+        else:
+            c.arrow(x - 8, y + s / 2, x - 70, y + s / 2, ACC2, 'main')
+            c.text(x - 74, y + s / 2, v_label, FST, anchor='end', color=ACC2)
+        if side_label:
+            c.dim(x, ry1 + 10, x + s, ry1 + 10, side_label, side=-1, off=14)
+        if B_label:
+            field_legend(c, w - 150, 30, B_label, into)
+        if turns_label:
+            c.text(x + s / 2, 30, turns_label, FST, color=ACC2)
+    else:
+        by, bb = 150, h - 34
+        c.rect(30, by, w - 60, bb - by, MUT, 'thin', dash='5 4', fill=FILLC)
+        field_symbols(c, 30, by, w - 60, bb - by, into)
+        lw_, lh = 120, 100
+        x, y = 150, by + 30 - lh
+        c.rect(x, y, lw_, lh, ACC2, 'bold')
+        c.arrow(x + lw_ + 26, y + 10, x + lw_ + 26, y + 70, ACC2, 'main')
+        c.text(x + lw_ + 34, y + 40, v_label, FST, anchor='start', color=ACC2)
+        if side_label:
+            c.dim(x, y - 14, x + lw_, y - 14, side_label, side=1, off=12)
+        if B_label:
+            field_legend(c, 36, h - 14, B_label, into)
+    return c.done(title, desc)
+
+
+def solenoid_coil(title, desc, sol_label=None, coil_label=None, inside=False, current_label=None, w=420, h=200):
+    c = Canvas(w, h)
+    cy = 90
+    coil_turns(c, w / 2, cy, 300, 40, 16)
+    c.line(w / 2 - 150, cy - 40, 40, cy - 40, INK, 'main')
+    c.line(w / 2 + 150, cy + 40, w - 40, cy + 40, INK, 'main')
+    if inside:
+        coil_turns(c, w / 2, cy, 34, 18, 4, color=ACC2)
+    else:
+        coil_turns(c, w / 2, cy, 40, 50, 4, color=ACC2)
+    if current_label:
+        c.text(40, cy - 54, current_label, FST, anchor='start')
+    if sol_label:
+        c.text(w / 2, h - 34, sol_label, FST)
+    if coil_label:
+        c.text(w / 2, h - 14, coil_label, FST, color=ACC2)
+    return c.done(title, desc)
+
+
+def jumping_ring(title, desc, cut=False, supply='ac', switch='open', w=320, h=280):
+    c = Canvas(w, h)
+    cx = 120
+    c.rect(cx - 16, 30, 32, h - 50, MUT, 'axis', fill=FILLC)
+    coil_turns(c, cx, h - 70, 80, 34, 7, axis='v')
+    ry = 90
+    if cut:
+        c.path(f'M{r1(cx - 30)},{ry} A30,8 0 0,0 {r1(cx + 24)},{ry + 5}', ACC2, 'bold')
+        c.path(f'M{r1(cx - 30)},{ry} A30,8 0 0,1 {r1(cx + 30)},{ry}', ACC2, 'axis')
+        c.path(f'M{r1(cx + 30)},{ry} A30,8 0 0,1 {r1(cx + 28)},{ry + 2}', ACC2, 'axis')
+    else:
+        c.path(f'M{r1(cx - 30)},{ry} A30,8 0 0,0 {r1(cx + 30)},{ry}', ACC2, 'bold')
+        c.path(f'M{r1(cx - 30)},{ry} A30,8 0 0,1 {r1(cx + 30)},{ry}', ACC2, 'axis')
+    c.text(cx + 40, ry - 8, 'aluminium ring' + (' (cut)' if cut else ''), FST, anchor='start', color=ACC2, value=False)
+    c.text(cx + 24, 44, 'iron core', FST, anchor='start', value=False)
+    y1, y2 = h - 108, h - 32
+    sx = 205
+    if switch:
+        c.line(cx + 34, y1, sx - 14, y1, INK, 'main')
+        c.line(sx + 14, y1, 250, y1, INK, 'main')
+        c.dot(sx - 14, y1, 2.6)
+        c.dot(sx + 14, y1, 2.6)
+        if switch == 'closed':
+            c.line(sx - 14, y1, sx + 14, y1, INK, 'main')
+        else:
+            c.line(sx - 14, y1, sx + 12, y1 - 12, INK, 'main')
+    else:
+        c.line(cx + 34, y1, 250, y1, INK, 'main')
+    c.line(cx + 34, y2, 250, y2, INK, 'main')
+    vcomp(c, supply, 250, y1, y2, None)
+    return c.done(title, desc)
+
+
+def shrinking_loop(title, desc, r_label=None, rate_label=None, B_label=None, into=True, w=340, h=260):
+    """A circular loop face-on to a uniform field (into the page) whose radius is shrinking."""
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, h / 2 - 10, 80
+    field_symbols(c, 20, 14, w - 40, h - 64, into, skip=[(cx - 4, cy - 30, R + 10, 30)])
+    c.circle(cx, cy, R, ACC2, 'bold')
+    c.dot(cx, cy, 2.6)
+    c.line(cx, cy, cx + R, cy, INK, 'thin')
+    if r_label:
+        c.text(cx + R / 2, cy - 12, r_label, FST)
+    for ang in (45, 135, 225, 315):
+        a = math.radians(ang)
+        c.arrow(cx + (R + 26) * math.cos(a), cy - (R + 26) * math.sin(a), cx + (R + 6) * math.cos(a), cy - (R + 6) * math.sin(a), ACC2, 'main', head=7)
+    if rate_label:
+        c.text(cx, h - 30, rate_label, FST, color=ACC2)
+    if B_label:
+        field_legend(c, 24, h - 12, B_label, into)
+    return c.done(title, desc)
