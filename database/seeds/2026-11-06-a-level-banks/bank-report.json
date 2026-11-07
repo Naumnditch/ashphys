@@ -1328,5 +1328,119 @@
   },
   "file": "ch27",
   "figures": 18
+ },
+ "28.1": {
+  "code": "28.1",
+  "title": "Modelling with particles and waves",
+  "topic": "ddd29c21-5c10-43b3-8daf-432cc4c86b34",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch28a",
+  "figures": 0
+ },
+ "28.2": {
+  "code": "28.2",
+  "title": "Photons: energy and momentum",
+  "topic": "6403e30c-f596-5ad5-a997-b63837482348",
+  "before": 8,
+  "new": 43,
+  "after": 51,
+  "easy": 19,
+  "medium": 20,
+  "hard": 12,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 3,
+   "d3": 4
+  },
+  "file": "ch28a",
+  "figures": 0
+ },
+ "28.3": {
+  "code": "28.3",
+  "title": "The photoelectric effect",
+  "topic": "7b93970a-92bd-55df-bca6-9d3907e1c231",
+  "before": 5,
+  "new": 45,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 5,
+   "d1": 0,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch28a",
+  "figures": 6
+ },
+ "28.4": {
+  "code": "28.4",
+  "title": "Threshold frequency and wavelength",
+  "topic": "41988582-a22a-4110-ad60-63bc462aa69a",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch28a",
+  "figures": 4
+ },
+ "28.5": {
+  "code": "28.5",
+  "title": "Photons have momentum too",
+  "topic": "3523abc9-75b0-40b2-9f61-48537e083932",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch28a",
+  "figures": 1
+ },
+ "28.6": {
+  "code": "28.6",
+  "title": "Energy levels and line spectra",
+  "topic": "9aa7e25f-8f21-5c29-8c21-0ab595acb86b",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch28a",
+  "figures": 18
  }
 }

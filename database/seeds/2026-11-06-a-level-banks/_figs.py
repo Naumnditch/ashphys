@@ -495,12 +495,16 @@ def energy_levels(levels, title, desc, transitions=(), w=400, h=300, unit='eV'):
     """levels: (name, label, value). transitions: (i_from, i_to, label or None, is_value)."""
     vals = [v for _, _, v in levels]
     lo, hi = min(vals), max(vals)
-    top, bot = 26, h - 22
+    top, bot = 44, h - 22
     ys = [bot - (v - lo) / ((hi - lo) or 1) * (bot - top) for v in vals]
     order = sorted(range(len(ys)), key=lambda i: -ys[i])  # bottom (lowest energy) first
     for a, b in zip(order, order[1:]):  # keep at least 20 px between neighbouring levels
         if ys[a] - ys[b] < 20:
             ys[b] = ys[a] - 20
+    if min(ys) < top:                  # crowded: grow the canvas downwards rather than clip the top
+        shift = top - min(ys)
+        ys = [y + shift for y in ys]
+        h += shift
     c = Canvas(w, h)
     x1, x2 = 110, w - 110
     for (name, lab, v), y in zip(levels, ys):
@@ -2972,4 +2976,64 @@ def ring_station(title, desc, r_label, w=340, h=350):
     c.dot(cx, cy, 2.6)
     c.dim(cx, cy, cx + R2, cy, r_label, side=1)
     rot_arrow(c, cx, cy, R2 + 10, 100, 150)
+    return c.done(title, desc)
+
+
+# ═════════════════════════ quantum physics ═════════════════════════
+
+def photocell(title, desc, meter='µA', reverse=False, light_label=None, supply_label=None, w=380, h=250):
+    """A vacuum photocell (curved cathode, rod anode) lit from above, in series with a meter and a cell.
+    reverse=True connects the cell so the anode is negative (for stopping-potential measurements)."""
+    c = Canvas(w, h)
+    cx, cy, r = 175, 104, 56
+    c.circle(cx, cy, r, INK, 'axis')
+    c.path(f'M150,{cy - 30} A40,40 0 0,0 150,{cy + 30}', INK, 'bold')
+    xl = 150 - (40 - math.sqrt(40 ** 2 - 30 ** 2))
+    c.line(205, cy - 12, 205, cy + 12, INK, 'bold')
+    c.text(128, 34, 'cathode', FST, anchor='end', value=False)
+    c.text(205, cy + 28, 'anode', FST, value=False)
+    for (x0, y0), (x1, y1) in (((205, 14), (153, cy - 24)), ((222, 24), (155, cy - 10)), ((239, 34), (157, cy + 4))):
+        c.arrow(x0, y0, x1, y1, ACC2, 'thin', head=7)
+    if light_label:
+        c.text(246, 16, light_label, FST, anchor='start', color=ACC2)
+    xL, xR, yb = 50, 310, h - 26
+    c.line(xl, cy, xL, cy, INK, 'main')
+    c.line(205, cy, xR, cy, INK, 'main')
+    vcomp(c, 'A', xR, cy, yb, meter, value=False)
+    ycell = (cy + yb) / 2
+    c.line(xL, cy, xL, ycell - 5, INK, 'main')
+    c.line(xL, ycell + 5, xL, yb, INK, 'main')
+    long_y, short_y = (ycell - 5, ycell + 5) if reverse else (ycell + 5, ycell - 5)
+    c.line(xL - 13, long_y, xL + 13, long_y, INK, 'main')
+    c.line(xL - 7, short_y, xL + 7, short_y, INK, 'bold')
+    if supply_label:
+        c.text(xL + 20, ycell, supply_label, FST, anchor='start', value=False)
+    c.line(xL, yb, xR, yb, INK, 'main')
+    return c.done(title, desc)
+
+
+def mirror_rays(title, desc, angle, angle_label, w=360, h=230):
+    """A light beam reflecting from a plane mirror at `angle` to the normal, with the normal dashed."""
+    c = Canvas(w, h)
+    x0, y0 = w / 2, h - 50
+    c.line(x0 - 140, y0, x0 + 140, y0, INK, 'bold')
+    for x in range(int(x0 - 136), int(x0 + 140), 12):
+        c.line(x, y0 + 2, x - 8, y0 + 10, INK, 'thin')
+    c.line(x0, y0, x0, 24, MUT, 'thin', dash='5 4')
+    c.text(x0, 14, 'normal', FST, color=MUT, value=False)
+    a = math.radians(angle)
+    L = 150
+    p_in = (x0 - L * math.sin(a), y0 - L * math.cos(a))
+    p_out = (x0 + L * math.sin(a), y0 - L * math.cos(a))
+    c.arrow(*p_in, x0 - 0.45 * L * math.sin(a), y0 - 0.45 * L * math.cos(a), ACC2, 'main')
+    c.line(x0 - 0.45 * L * math.sin(a), y0 - 0.45 * L * math.cos(a), x0, y0, ACC2, 'main')
+    c.arrow(x0, y0, *p_out, ACC2, 'main')
+    for s in (-1, 1):
+        q0 = (x0, y0 - 46)
+        q1 = (x0 + s * 46 * math.sin(a), y0 - 46 * math.cos(a))
+        c.path(f'M{r1(q0[0])},{r1(q0[1])} A46,46 0 0,{1 if s > 0 else 0} {r1(q1[0])},{r1(q1[1])}', INK, 'thin')
+        m = (x0 + s * 62 * math.sin(a / 2), y0 - 62 * math.cos(a / 2))
+        c.text(*m, angle_label, FST)
+    c.text(p_in[0] - 6, p_in[1] - 10, 'incident beam', FST, anchor='middle', color=ACC2, value=False)
+    c.text(p_out[0] + 6, p_out[1] - 10, 'reflected beam', FST, anchor='middle', color=ACC2, value=False)
     return c.done(title, desc)
