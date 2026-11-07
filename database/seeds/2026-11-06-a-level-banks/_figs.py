@@ -525,7 +525,7 @@ def energy_levels(levels, title, desc, transitions=(), w=400, h=300, unit='eV'):
 # ═════════════════════════ fields ═════════════════════════
 
 def plates(title, desc, top='+', bottom=MINUS, labels=(), gap_label=None, n_lines=7, w=400, h=220, beam=None,
-           field_dir='down', length_label=None):
+           field_dir='down', length_label=None, particles=(), arrows=True):
     """Parallel horizontal plates with a uniform field. beam: dict(path='straight'|'up'|'down', label, v_label)."""
     c = Canvas(w, h)
     x0, x1 = 90, w - 90
@@ -534,7 +534,7 @@ def plates(title, desc, top='+', bottom=MINUS, labels=(), gap_label=None, n_line
     c.rect(x0, yb, x1 - x0, 8, INK, 'thin', fill=FILLC)
     c.text(x0 - 12, yt - 4, top, FS, anchor='end', weight=600)
     c.text(x0 - 12, yb + 4, bottom, FS, anchor='end', weight=600)
-    for i in range(n_lines):
+    for i in range(n_lines if arrows else 0):
         x = x0 + 20 + (x1 - x0 - 40) * i / (n_lines - 1)
         if field_dir == 'down':
             c.arrow(x, yt + 6, x, yb - 6, ACC, 'thin', head=7)
@@ -546,12 +546,20 @@ def plates(title, desc, top='+', bottom=MINUS, labels=(), gap_label=None, n_line
         c.dim(x0, yb + 26, x1, yb + 26, length_label, side=-1, off=12)
     for x, y, t, anchor, isv in labels:
         c.text(x, y, t, FS, anchor=anchor, value=isv)
+    for fx, fy, sign, lab in particles:   # fx, fy as fractions across / up the gap
+        px, py = x0 + fx * (x1 - x0), yb - fy * (yb - yt)
+        c.circle(px, py, 8, ACC2, 'main', fill=FILLC)
+        c.text(px, py + 0.5, sign, FST, weight=700, color=ACC2, value=False)
+        if lab:
+            c.text(px + 12, py - 12, lab, FST, anchor='start', color=ACC2)
     if beam:
         ym = (yt + yb) / 2
         c.arrow(20, ym, x0 - 4, ym, ACC2, 'main')
         if beam.get('label'):
             c.text(22, ym - 14, beam['label'], FST, anchor='start', value=beam.get('is_value', False))
-        if beam['path'] == 'straight':
+        if beam['path'] == 'none':
+            pass
+        elif beam['path'] == 'straight':
             c.line(x0, ym, x1 + 40, ym, ACC2, 'main', dash='6 4')
         else:
             s = -1 if beam['path'] == 'up' else 1
@@ -1044,6 +1052,8 @@ def rod_angle(title, desc, theta_deg, theta_label, v_label='v', B_label='B', w=3
         c.arrow(20, y, w - 20, y, ACC, 'thin', head=7)
     c.text(w - 22, 14, B_label, FST, anchor='end', color=ACC)
     ox, oy = (110, 150) if theta_deg >= 0 else (170, 70)
+    if math.cos(math.radians(theta_deg)) < -0.3:
+        ox = w - 110
     c.circle(ox, oy, 9, INK, 'main', fill=FILLC)
     c.dot(ox, oy, 2.4)
     a = math.radians(theta_deg)
@@ -1946,4 +1956,81 @@ def network(net, title, desc, margin=40):
     c.w = w + 2 * margin + 30
     c.els.insert(0, '')
     c.h = y + down + 24
+    return c.done(title, desc)
+
+
+# ═════════════════════════ electric charge and fields ═════════════════════════
+
+def spheres_stands(title, desc, spheres, touching=(), rod=None, earth=None, w=420, h=230):
+    """Metal spheres on insulating stands. spheres: (name, charge label); touching: indices drawn in contact;
+    rod: (sign text, index the rod is held near); earth: index of a sphere joined to earth."""
+    c = Canvas(w, h)
+    n = len(spheres)
+    R = 28
+    xs, x = [], 70
+    for i in range(n):
+        xs.append(x)
+        x += 2 * R if (i in touching and i + 1 in touching) else 2 * R + 46
+    shift = (w - (xs[-1] + 70)) / 2
+    xs = [v + shift for v in xs]
+    cy = 120
+    for (name, lab), x in zip(spheres, xs):
+        c.circle(x, cy, R, INK, 'main', fill=FILLC)
+        c.line(x, cy + R, x, h - 40, MUT, 'bold')
+        c.line(x - 22, h - 40, x + 22, h - 40, INK, 'main')
+        if name:
+            c.text(x, cy - R - 14, name, FS, weight=600, value=False)
+        if lab:
+            c.text(x, h - 22, lab, FST)
+    if rod:
+        sign, i = rod
+        rx = xs[i] - R - 64
+        c.rect(rx - 8, cy - 70, 16, 120, ACC2, 'main', fill=FILLC, rx=4)
+        for k in range(4):
+            c.text(rx, cy - 54 + k * 28, sign, FST, weight=700, color=ACC2, value=False)
+    if earth is not None:
+        x = xs[earth]
+        c.line(x + R * 0.7, cy + R * 0.7, x + 50, cy + 60, INK, 'main')
+        for k, hw in enumerate((14, 9, 4)):
+            c.line(x + 50 - hw, cy + 60 + k * 5, x + 50 + hw, cy + 60 + k * 5, INK, 'axis')
+    return c.done(title, desc)
+
+
+def electroscope(title, desc, leaf_raised=True, rod=None, w=300, h=280):
+    c = Canvas(w, h)
+    cx = 150
+    c.rect(cx - 30, 20, 60, 10, INK, 'main', fill=FILLC, rx=3)
+    c.line(cx, 30, cx, 170, INK, 'bold')
+    c.rect(cx - 80, 90, 160, 150, MUT, 'thin', rx=10)
+    c.line(cx - 2, 160, cx - 2, 200, INK, 'main')
+    ang = math.radians(35 if leaf_raised else 5)
+    c.line(cx + 2, 160, cx + 2 + 44 * math.sin(ang), 160 + 44 * math.cos(ang), ACC2, 'bold')
+    c.text(cx + 40, 205, 'gold leaf', FST, anchor='start', color=ACC2, value=False)
+    c.text(cx - 40, 25, 'cap', FST, anchor='end', value=False)
+    if rod:
+        c.rect(cx + 44, 4, 96, 14, ACC2, 'main', fill=FILLC, rx=4)
+        for k in range(4):
+            c.text(cx + 58 + k * 23, 11, rod, FST, weight=700, color=ACC2, value=False)
+    return c.done(title, desc)
+
+
+def point_charges(title, desc, charges, points=(), dims=(), w=420, h=200, pad=70):
+    """Point charges (x, y, sign, label) and marked points (x, y, label) in data units, scaled to fit."""
+    xs = [q[0] for q in charges] + [p[0] for p in points]
+    ys = [q[1] for q in charges] + [p[1] for p in points]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    sp = min((w - 2 * pad) / ((x1 - x0) or 1), (h - 2 * pad) / ((y1 - y0) or 1))
+    X = lambda v: w / 2 + (v - (x0 + x1) / 2) * sp  # noqa: E731
+    Y = lambda v: h / 2 - (v - (y0 + y1) / 2) * sp  # noqa: E731
+    c = Canvas(w, h)
+    for d in dims:
+        c.dim(X(d[0]), Y(d[1]), X(d[2]), Y(d[3]), d[4], side=d[5])
+    for x, y, sign, lab in charges:
+        c.circle(X(x), Y(y), 13, ACC2 if sign == '+' else ACC, 'main', fill=FILLC)
+        c.text(X(x), Y(y) + 0.5, sign, FS, weight=700, color=ACC2 if sign == '+' else ACC, value=False)
+        if lab:
+            c.text(X(x), Y(y) - 26, lab, FST)
+    for x, y, lab in points:
+        c.dot(X(x), Y(y), 3.6)
+        c.text(X(x), Y(y) - 14, lab, FST, weight=600)
     return c.done(title, desc)
