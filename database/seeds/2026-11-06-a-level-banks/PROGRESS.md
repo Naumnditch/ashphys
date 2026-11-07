@@ -92,6 +92,7 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch31 | 31.1–31.4 (with 37 figures) | d92b08d | 63e481761914132c72145660b41e442b | 2026-11-07 (pg_net id 45) | 31.1 50, 31.2 50, 31.3 51, 31.4 51 |
 | p2 | P2.1–P2.5 (with 43 figures) | dd53096 | 9a9cd66b8c5802a74daab0cf3abb18a2 | 2026-11-07 (pg_net id 46) | P2.1 50, P2.2 51, P2.3 51, P2.4 51, P2.5 52 |
 | ch01a | 1.1–1.4 (with 47 figures) | ca8b4b0 | b11ffdb4df8fec4d314438a32bbad967 | 2026-11-07 (pg_net id 47) | 1.1 52, 1.2 51, 1.3 51, 1.4 51 |
+| ch01b | 1.5–1.8 (with 76 figures) | 784a929 | d9c68920c5bda78b0046f7a9e00f23ed | 2026-11-07 (pg_net id 48) | all 51 |
 
 ## Figures applied (full chapter SQL re-applied: same rows, figure_svg / figure_alt added)
 | file | commit | md5 | pg_net | figures per lesson |

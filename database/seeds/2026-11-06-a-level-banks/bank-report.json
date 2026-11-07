@@ -702,6 +702,101 @@
   "file": "ch19",
   "figures": 4
  },
+ "2.1": {
+  "code": "2.1",
+  "title": "The meaning of acceleration",
+  "topic": "8ba3439e-0247-4a40-8f47-a5945e5c2968",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 21,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02a",
+  "figures": 5
+ },
+ "2.2": {
+  "code": "2.2",
+  "title": "Calculating acceleration",
+  "topic": "91cb1c54-423a-4525-a723-99c1e9e9bf6b",
+  "before": 0,
+  "new": 52,
+  "after": 52,
+  "easy": 20,
+  "medium": 22,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02a",
+  "figures": 4
+ },
+ "2.3": {
+  "code": "2.3",
+  "title": "Units of acceleration",
+  "topic": "cfa4c849-4465-4806-9a6e-29163a3db134",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 21,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02a",
+  "figures": 0
+ },
+ "2.4": {
+  "code": "2.4",
+  "title": "Deducing acceleration",
+  "topic": "5e4207c2-e358-4374-b5ab-92bbcb2b87e7",
+  "before": 0,
+  "new": 52,
+  "after": 52,
+  "easy": 21,
+  "medium": 22,
+  "hard": 9,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02a",
+  "figures": 27
+ },
+ "2.5": {
+  "code": "2.5",
+  "title": "Deducing displacement",
+  "topic": "c47dfb2d-b9eb-482e-b89f-aecbc8e799cc",
+  "before": 0,
+  "new": 53,
+  "after": 53,
+  "easy": 20,
+  "medium": 23,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02a",
+  "figures": 29
+ },
  "20.1": {
   "code": "20.1",
   "title": "Particles of a gas",
