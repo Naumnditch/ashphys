@@ -180,6 +180,18 @@ def fmt(v, step=None):
     return s.replace('-', MINUS)
 
 
+def tick_labels(vals):
+    """Tick labels with the fewest decimals that show every tick exactly (3.5 stays 3.5, not 4)."""
+    d = 0
+    while d < 4 and any(abs(round(v, d) - v) > 1e-9 for v in vals):
+        d += 1
+    out = []
+    for v in vals:
+        t = f'{v:.{d}f}'
+        out.append('0' if abs(v) < 1e-12 else t.replace('-', MINUS))
+    return out
+
+
 def numbers_after(stem, label):
     """The comma-separated numbers that follow `label =` in a stem, e.g. 't/s ='."""
     i = stem.index(label)
@@ -210,13 +222,13 @@ def plot(xlabel, ylabel, series, title, desc, xr=None, yr=None, w=400, h=290, no
     else:
         xtv, xs_step = ticks(*xr, nx) if xticks is None else (xticks, (xticks[1] - xticks[0]) if len(xticks) > 1 else 1)
         xr = (min(xr[0], xtv[0]), max(xr[1], xtv[-1]))
-        xlabs = [fmt(v, xs_step) for v in xtv]
+        xlabs = tick_labels(xtv) if xticks is not None else [fmt(v, xs_step) for v in xtv]
     if ytl is not None:
         ytv, ylabs = [v for v, _ in ytl], [t for _, t in ytl]
     else:
         ytv, ys_step = ticks(*yr, ny) if yticks is None else (yticks, (yticks[1] - yticks[0]) if len(yticks) > 1 else 1)
         yr = (min(yr[0], ytv[0]), max(yr[1], ytv[-1]))
-        ylabs = [fmt(v, ys_step) for v in ytv]
+        ylabs = tick_labels(ytv) if yticks is not None else [fmt(v, ys_step) for v in ytv]
     left = max([text_w(s, FST) for s in ylabs] + [8]) + 16
     top, bottom, right = 34, 48, 18
     c = Canvas(w, h)
@@ -279,6 +291,9 @@ def plot(xlabel, ylabel, series, title, desc, xr=None, yr=None, w=400, h=290, no
         elif kind == 'dots':
             for px, py in pts:
                 c.dot(px, py, 3.4, col)
+        elif kind == 'area':   # shaded region between the curve and the x axis
+            base = Y(max(yr[0], 0))
+            c.poly(pts + [(pts[-1][0], base), (pts[0][0], base)], 'none', 'thin', fill=FILLC, closed=True)
     for x, y, t, anchor, dx, dy, isv in notes:
         c.text(X(x) + dx, Y(y) + dy, t, FST, anchor=anchor, value=isv)
     for x1, y1, x2, y2, t, side, isv in dims:   # dimension arrows in data units
@@ -1871,4 +1886,64 @@ def dip_figure(title, desc, dip_deg, total_label=None, h_label=None, dip_label=N
     c.path(f'M{r1(ox + r)},{r1(oy)} A{r},{r} 0 0,1 {r1(ox + r * math.cos(a))},{r1(oy + r * math.sin(a))}', MUT, 'axis')
     if dip_label:
         c.text(ox + (r + 14) * math.cos(a / 2), oy + (r + 14) * math.sin(a / 2), dip_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+# ═════════════════════════ capacitors ═════════════════════════
+
+def cap_plates(title, desc, area_label=None, gap_label=None, dielectric=None, supply=None, top_label=None,
+               bottom_label=None, charges=False, arrow_note=None, w=420, h=240):
+    """A parallel-plate capacitor seen side-on: horizontal plates, optional dielectric slab, optional supply."""
+    c = Canvas(w, h)
+    x0, x1, yt, yb = 100, 300, 60, 150
+    if dielectric is not None:
+        c.rect(x0, yt + 3, x1 - x0, yb - yt - 6, MUT, 'thin', fill=FILLC)
+        if dielectric:
+            c.text((x0 + x1) / 2, (yt + yb) / 2, dielectric, FST)
+    c.line(x0, yt, x1, yt, INK, 'bold')
+    c.line(x0, yb, x1, yb, INK, 'bold')
+    if charges:
+        for k in range(6):
+            x = x0 + 18 + k * (x1 - x0 - 36) / 5
+            c.text(x, yt - 10, '+', FST, weight=700, color=ACC2, value=False)
+            c.text(x, yb + 11, MINUS, FST, weight=700, color=ACC, value=False)
+    if top_label:
+        c.text((x0 + x1) / 2, yt - 26, top_label, FST)
+    if bottom_label:
+        c.text((x0 + x1) / 2, yb + 28, bottom_label, FST)
+    if gap_label:
+        c.dim(x0 - 22, yt, x0 - 22, yb, gap_label, side=-1)
+    if area_label:
+        c.text(x1, yt - 16 if not charges else yt - 30, area_label, FST, anchor='end')
+    if supply:
+        c.line(x1, yt, 370, yt, INK, 'main')
+        c.line(x1, yb, 370, yb, INK, 'main')
+        vcomp(c, 'cell', 370, yt, yb, supply, side=-1)
+    if arrow_note:
+        c.text(w / 2, h - 14, arrow_note, FST)
+    return c.done(title, desc)
+
+
+def share_circuit(title, desc, c1_label, c2_label, switch='open', meter=False, w=420):
+    """A charged capacitor joined to a second capacitor through a switch (charge sharing)."""
+    top = Series(El('C', c1_label), El('switch', closed=(switch == 'closed')))
+    bottom = Par(El('V'), El('C', c2_label)) if meter else El('C', c2_label)
+    return loop(top, bottom if isinstance(bottom, Par) else Series(bottom), title, desc)
+
+
+def network(net, title, desc, margin=40):
+    """A component network between two terminals A and B (no supply)."""
+    if not isinstance(net, (Series, Par)):
+        net = Series(net)
+    w, up, down = net.size()
+    c = Canvas(w + 2 * margin, 0)
+    y = 20 + up
+    net.draw(c, margin, y, w)
+    for x, lab in ((margin - 22, 'A'), (margin + w + 22, 'B')):
+        c.line(x, y, margin if lab == 'A' else margin + w, y, INK, 'main')
+        c.circle(x, y, 4, INK, 'axis', fill='none')
+        c.text(x + (-10 if lab == 'A' else 10), y - 12, lab, FST, weight=600, value=False)
+    c.w = w + 2 * margin + 30
+    c.els.insert(0, '')
+    c.h = y + down + 24
     return c.done(title, desc)
