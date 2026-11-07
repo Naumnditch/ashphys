@@ -2561,3 +2561,415 @@ def equipotentials(title, desc, values, labels, w=440, h=340):
         c.dot(px, ly, 2.4, MUT)
         c.text(lx, ly + 5, labels[i], FST, anchor='start')
     return c.done(title, desc)
+
+
+# ═════════════════════════ circular motion ═════════════════════════
+
+def _pt(cx, cy, r, deg):
+    a = math.radians(deg)
+    return cx + r * math.cos(a), cy - r * math.sin(a)
+
+
+def rot_arrow(c, cx, cy, r, a0, a1, color=None, lw='axis', ry=None):
+    """Curved arrow on a circle (or ellipse with ry) from angle a0 to a1 (degrees, anticlockwise if a1 > a0)."""
+    color = color or MUT
+    ry = ry or r
+    p0 = (cx + r * math.cos(math.radians(a0)), cy - ry * math.sin(math.radians(a0)))
+    p1 = (cx + r * math.cos(math.radians(a1)), cy - ry * math.sin(math.radians(a1)))
+    ccw = a1 > a0
+    c.path(f'M{r1(p0[0])},{r1(p0[1])} A{r1(r)},{r1(ry)} 0 0,{0 if ccw else 1} {r1(p1[0])},{r1(p1[1])}', color, lw)
+    a = math.radians(a1)
+    tx, ty = (-r * math.sin(a), -ry * math.cos(a)) if ccw else (r * math.sin(a), ry * math.cos(a))
+    c.arrowhead(p1[0], p1[1], math.atan2(ty, tx), color, 8)
+
+
+def latitude(title, desc, points, arc=False, axis_radius=None, w=380, h=350):
+    """Cross-section of the Earth through the axis: points at latitudes (deg, label), north positive;
+    arc=True highlights the surface arc between the first two; axis_radius labels the distance of the
+    first point from the axis."""
+    c = Canvas(w, h)
+    cx, cy, R = 150, h / 2, 136
+    c.circle(cx, cy, R, INK, 'main', fill=FILLC)
+    c.line(cx, cy - R - 16, cx, cy + R + 16, MUT, 'thin', dash='5 4')
+    c.text(cx, cy - R - 26, 'N', FST, weight=600, value=False)
+    c.text(cx, cy + R + 26, 'S', FST, weight=600, value=False)
+    c.line(cx - R, cy, cx + R, cy, MUT, 'thin', dash='5 4')
+    c.text(cx - R / 2, cy + 12, 'Equator', FST, color=MUT, value=False)
+    c.dot(cx, cy, 2.6)
+    if arc and len(points) >= 2:
+        (a1, _), (a2, _) = points[0], points[1]
+        p1, p2 = _pt(cx, cy, R, a1), _pt(cx, cy, R, a2)
+        c.path(f'M{r1(p1[0])},{r1(p1[1])} A{R},{R} 0 0,{0 if a2 > a1 else 1} {r1(p2[0])},{r1(p2[1])}', ACC2, 'bold')
+    for k, (lat, lab) in enumerate(points):
+        px, py = _pt(cx, cy, R, lat)
+        c.line(cx, cy, px, py, INK, 'thin')
+        c.dot(px, py, 3.8, ACC2)
+        c.text(px + 12, py - (12 if lat >= 0 else -12) * (0.4 if abs(lat) < 20 else 1), lab, FST, anchor='start', color=ACC2)
+    if axis_radius:
+        lat = points[0][0]
+        px, py = _pt(cx, cy, R, lat)
+        c.line(cx, py, px, py, ACC, 'main')
+        c.text(cx + 4, py + 12, axis_radius, FST, anchor='start', color=ACC)
+    return c.done(title, desc)
+
+
+def belt_drive(title, desc, ra, rb, la, lb, chain=False, w=420, h=250):
+    """Two pulleys (radii ra, rb in any unit, drawn to scale) joined by a belt or chain; la/lb are
+    (name, radius text) pairs written under each."""
+    c = Canvas(w, h)
+    sc = 70 / max(ra, rb)
+    a, b = max(ra * sc, 10), max(rb * sc, 10)
+    y = 100
+    x1, x2 = 50 + a, w - 50 - b
+    d = x2 - x1
+    phi = math.asin((a - b) / d)
+    s, co = math.sin(phi), math.cos(phi)
+    P1, P2 = (x1 + a * s, y - a * co), (x2 + b * s, y - b * co)
+    Q1, Q2 = (x1 + a * s, y + a * co), (x2 + b * s, y + b * co)
+    c.circle(x1, y, a, INK, 'main', fill=FILLC)
+    c.circle(x2, y, b, INK, 'main', fill=FILLC)
+    c.dot(x1, y, 2.8)
+    c.dot(x2, y, 2.4)
+    dash = '3 3' if chain else None
+    c.line(*P1, *P2, ACC2, 'main', dash=dash)
+    c.line(*Q1, *Q2, ACC2, 'main', dash=dash)
+    c.path(f'M{r1(P1[0])},{r1(P1[1])} A{r1(a)},{r1(a)} 0 {1 if a > b else 0},0 {r1(Q1[0])},{r1(Q1[1])}', ACC2, 'main', dash=dash)
+    c.path(f'M{r1(P2[0])},{r1(P2[1])} A{r1(b)},{r1(b)} 0 {1 if b > a else 0},1 {r1(Q2[0])},{r1(Q2[1])}', ACC2, 'main', dash=dash)
+    for x, r, (name, rad) in ((x1, a, la), (x2, b, lb)):
+        c.text(x, y + max(a, b) + 26, name, FST, value=False)
+        c.text(x, y + max(a, b) + 44, rad, FST)
+    return c.done(title, desc)
+
+
+def circle_turn(title, desc, angles, v_label=None, ccw=True, angle_label=None, north=False, labels=(), axes=False,
+                R_label=None, centre_label=None, w=360, h=300, cx=None):
+    """Top view of uniform circular motion: positions at the given angles (degrees from the +x direction)
+    with tangential velocity arrows, an optional angle mark at the centre between the first two positions.
+    labels: (text, dx, dy, anchor) per position, offsets from the point."""
+    c = Canvas(w, h)
+    cx = cx if cx is not None else w / 2
+    cy, R = h / 2 + 6, 100
+    if axes:
+        c.arrow(cx - R - 24, cy, cx + R + 30, cy, INK, 'axis', head=7)
+        c.arrow(cx, cy + R + 24, cx, cy - R - 30, INK, 'axis', head=7)
+        c.text(cx + R + 40, cy, 'x', FS, italic=True, value=False)
+        c.text(cx - 12, cy - R - 30, 'y', FS, italic=True, value=False)
+    c.circle(cx, cy, R, MUT, 'axis', dash='5 4')
+    c.dot(cx, cy, 3)
+    if centre_label:
+        c.text(cx - 8, cy + 14, centre_label, FST, anchor='end')
+    for k, a in enumerate(angles):
+        px, py = _pt(cx, cy, R, a)
+        if not axes or a % 90:
+            c.line(cx, cy, px, py, MUT, 'thin')
+        r_ = math.radians(a)
+        tx, ty = (-math.sin(r_), -math.cos(r_)) if ccw else (math.sin(r_), math.cos(r_))
+        L = 56
+        c.arrow(px, py, px + L * tx, py + L * ty, ACC, 'main')
+        close = len(angles) > 1 and abs(angles[1] - angles[0]) < 50
+        if v_label and not (close and k == 0):
+            ex, ey = px + (L + 12) * tx, py + (L + 12) * ty
+            anchor = 'start' if tx > 0.3 else ('end' if tx < -0.3 else 'middle')
+            c.text(ex, ey, v_label, FST, anchor=anchor, color=ACC)
+        c.circle(px, py, 6, ACC2, 'main', fill=FILLC)
+        if k < len(labels) and labels[k]:
+            t, dx, dy, anchor = labels[k]
+            c.text(px + dx, py + dy, t, FST, anchor=anchor, color=ACC2)
+    if angle_label and len(angles) >= 2:
+        a0, a1 = angles[0], angles[1]
+        p0, p1 = _pt(cx, cy, 30, a0), _pt(cx, cy, 30, a1)
+        c.path(f'M{r1(p0[0])},{r1(p0[1])} A30,30 0 0,{0 if a1 > a0 else 1} {r1(p1[0])},{r1(p1[1])}', INK, 'thin')
+        mx, my = _pt(cx, cy, 46, (a0 + a1) / 2)
+        c.text(mx, my, angle_label, FST)
+    if R_label:
+        px, py = _pt(cx, cy, R, angles[0])
+        r_ = math.radians(angles[0])
+        c.text((cx + px) / 2 - 14 * math.sin(r_), (cy + py) / 2 - 14 * math.cos(r_), R_label, FST)
+    if north:
+        compass(c, w - 28, 50)
+    return c.done(title, desc)
+
+
+def vertical_circle(title, desc, r_label=None, at='bottom', v_label=None, obj='ball', string=True, track=False,
+                    hand=None, w=320, h=320):
+    """Side view of motion in a vertical circle: a ball or bucket on a string, a car inside a loop track
+    or an aircraft on a circular path; the object at the bottom or top with its velocity arrow."""
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, h / 2, 100
+    if track:
+        c.circle(cx, cy, R + 4, INK, 'bold')
+    else:
+        c.circle(cx, cy, R, MUT, 'axis', dash='5 4')
+    oy = cy + R if at == 'bottom' else cy - R
+    if track:
+        oy = cy + R - 9 if at == 'bottom' else cy - R + 9
+    if string:
+        c.line(cx, cy, cx, oy, INK, 'main')
+        c.circle(cx, cy, 5, INK, 'main', fill=FILLC)
+        if hand:
+            c.text(cx - 10, cy, hand, FST, anchor='end', value=False)
+    else:
+        c.line(cx, cy, cx, oy, MUT, 'thin', dash='4 3')
+        c.dot(cx, cy, 3)
+    if r_label:
+        c.text(cx + 8, (cy + oy) / 2, r_label, FST, anchor='start')
+    if obj == 'ball':
+        c.circle(cx, oy, 11, ACC2, 'main', fill=FILLC)
+    elif obj == 'bucket':
+        top = oy - 14
+        c.poly([(cx - 14, top), (cx + 14, top), (cx + 10, oy + 14), (cx - 10, oy + 14)], ACC2, 'main', fill=FILLC, closed=True)
+    elif obj == 'car':
+        hh = 14
+        y0 = oy - hh / 2
+        c.rect(cx - 22, y0, 44, hh, ACC2, 'main', fill=FILLC, rx=3)
+    elif obj == 'plane':
+        c.poly([(cx - 26, oy - 3), (cx + 22, oy - 3), (cx + 30, oy), (cx + 22, oy + 3), (cx - 26, oy + 3)], ACC2, 'main', fill=FILLC, closed=True)
+        c.poly([(cx - 4, oy), (cx - 14, oy + 16), (cx - 6, oy + 16), (cx + 8, oy)], ACC2, 'thin', fill=FILLC, closed=True)
+    d = 1 if at == 'bottom' else -1
+    if track:
+        ay = oy - d * 24
+        c.arrow(cx - d * 20, ay, cx + d * 36, ay, ACC, 'main')
+        if v_label:
+            c.text(cx + d * 44, ay, v_label, FST, anchor='start' if d > 0 else 'end', color=ACC)
+    else:
+        x0 = cx + d * 36
+        c.arrow(x0, oy, x0 + d * 56, oy, ACC, 'main')
+        if v_label:
+            c.text(x0 + d * 28, oy + (20 if at == 'bottom' else -20), v_label, FST, color=ACC)
+    return c.done(title, desc)
+
+
+def swing(title, desc, L_label=None, v_label=None, release=None, bob='seat', w=None, h=300):
+    """A swing (or pendulum) at its lowest point; release=(L, h, h_label) also draws the start position,
+    at the angle where it is h above the lowest point, with the height marked."""
+    w = w or (430 if release else 340)
+    c = Canvas(w, h)
+    px, py = 150, 34
+    ceiling(c, px - 70, px + 70, py)
+    L = 200
+    if release:
+        Ld, hd, hl = release
+        th = math.acos(1 - hd / Ld)
+        bx, by = px + L * math.sin(th), py + L * math.cos(th)
+        c.line(px, py, bx, by, MUT, 'thin', dash='5 4')
+        c.circle(bx, by, 10, MUT, 'thin', fill='none', dash='3 2')
+        c.path(f'M{r1(bx)},{r1(by)} A{L},{L} 0 0,1 {r1(px)},{r1(py + L)}', MUT, 'thin', dash='3 3')
+        xd = bx + 32
+        c.line(bx + 14, by, xd + 6, by, MUT, 'thin', dash='3 3')
+        c.line(px + 14, py + L, xd + 6, py + L, MUT, 'thin', dash='3 3')
+        c.dim(xd, by, xd, py + L, hl, side=1)
+    c.line(px, py, px, py + L, INK, 'main')
+    if bob == 'seat':
+        c.rect(px - 22, py + L - 3, 44, 7, ACC2, 'main', fill=FILLC, rx=2)
+        c.line(px - 18, py + L - 3, px, py, INK, 'thin')
+        c.line(px + 18, py + L - 3, px, py, INK, 'thin')
+    else:
+        c.circle(px, py + L, 10, ACC2, 'main', fill=FILLC)
+    if L_label:
+        c.text(px - 26, py + L * 0.45, L_label, FST, anchor='end')
+    if v_label:
+        c.arrow(px - 30, py + L + 26, px + 30, py + L + 26, ACC, 'main')
+        c.text(px + 40, py + L + 26, v_label, FST, anchor='start', color=ACC)
+    return c.done(title, desc)
+
+
+def road_profile(title, desc, kind='hump', r_label=None, v_label=None, w=420, h=250):
+    """Side view of a road over a hump (or through a dip, or a hump then a dip) made of circular arcs, with
+    the arc centre and radius marked and a car at the top of the hump (or bottom of the dip)."""
+    c = Canvas(w, h)
+
+    def car(x, y_road, up=True):
+        c.rect(x - 26, y_road - 26, 52, 18, ACC2, 'main', fill=FILLC, rx=4)
+        c.circle(x - 15, y_road - 6, 5.5, ACC2, 'main', fill=FILLC)
+        c.circle(x + 15, y_road - 6, 5.5, ACC2, 'main', fill=FILLC)
+
+    th = math.radians(36)
+    if kind in ('hump', 'dip'):
+        R = 150
+        cx = w / 2
+        if kind == 'hump':
+            top = 70
+            cy = top + R
+            p0, p1 = (cx - R * math.sin(th), cy - R * math.cos(th)), (cx + R * math.sin(th), cy - R * math.cos(th))
+            c.path(f'M{r1(p0[0])},{r1(p0[1])} A{R},{R} 0 0,1 {r1(p1[0])},{r1(p1[1])}', INK, 'bold')
+            car(cx, top)
+            c.line(cx, top, cx, cy, MUT, 'thin', dash='4 3')
+            c.dot(cx, cy, 3)
+            c.text(cx + 8, cy - 10, 'centre', FST, anchor='start', color=MUT, value=False)
+            if r_label:
+                c.text(cx + 8, (top + cy) / 2 + 10, r_label, FST, anchor='start')
+            vy = top - 44
+        else:
+            bot = h - 40
+            cy = bot - R
+            p0, p1 = (cx - R * math.sin(th), cy + R * math.cos(th)), (cx + R * math.sin(th), cy + R * math.cos(th))
+            c.path(f'M{r1(p0[0])},{r1(p0[1])} A{R},{R} 0 0,0 {r1(p1[0])},{r1(p1[1])}', INK, 'bold')
+            car(cx, bot)
+            c.line(cx, bot - 28, cx, max(cy, 14), MUT, 'thin', dash='4 3')
+            if cy > 10:
+                c.dot(cx, cy, 3)
+            if r_label:
+                c.text(cx + 8, (bot - 28 + max(cy, 14)) / 2, r_label, FST, anchor='start')
+            vy = bot - 44
+        if v_label:
+            c.arrow(cx + 40, vy, cx + 96, vy, ACC, 'main')
+            c.text(cx + 104, vy, v_label, FST, anchor='start', color=ACC)
+        return c.done(title, desc)
+    # hump then dip, joined by a straight piece tangent to both
+    R = 105
+    hx, top = 110, 66
+    s, co = math.sin(th), math.cos(th)
+    dx = 300
+    gap = dx - 2 * R * s
+    bot = top + 2 * R * (1 - co) + gap * math.tan(th)
+    dxc = hx + dx
+    hc, dc = (hx, top + R), (dxc, bot - R)
+    a0 = (hx - R * s, top + R * (1 - co))
+    a1 = (hx + R * s, top + R * (1 - co))
+    b0 = (dxc - R * s, bot - R * (1 - co))
+    b1 = (dxc + R * s, bot - R * (1 - co))
+    c.path(f'M{r1(a0[0])},{r1(a0[1])} A{R},{R} 0 0,1 {r1(a1[0])},{r1(a1[1])} L{r1(b0[0])},{r1(b0[1])} A{R},{R} 0 0,0 {r1(b1[0])},{r1(b1[1])}', INK, 'bold')
+    car(hx, top)
+    c.line(hx, top, *hc, MUT, 'thin', dash='4 3')
+    c.dot(*hc, 3)
+    c.line(dxc, bot, *dc, MUT, 'thin', dash='4 3')
+    c.dot(*dc, 3)
+    if r_label:
+        c.text(hx + 8, (top + hc[1]) / 2 + 8, r_label, FST, anchor='start')
+        c.text(dxc - 8, (bot + dc[1]) / 2, r_label, FST, anchor='end')
+    c.text(hx, top + R + 16, 'hump centre', FST, color=MUT, value=False)
+    c.text(dxc, dc[1] - 14, 'dip centre', FST, color=MUT, value=False)
+    if v_label:
+        c.arrow(hx + 36, top - 44, hx + 92, top - 44, ACC, 'main')
+        c.text(hx + 100, top - 44, v_label, FST, anchor='start', color=ACC)
+    return c.done(title, desc)
+
+
+def banked_track(title, desc, angle, angle_label, r_label=None, w=400, h=250):
+    """Cross-section of a banked bend: the surface rises at `angle` (degrees) towards the outside of the
+    bend; a vehicle sits on it; the centre of the bend is to the left."""
+    c = Canvas(w, h)
+    x0, y0 = 50, h - 36
+    th = math.radians(angle)
+    L = min(310, 150 / math.sin(th))
+    ex, ey = x0 + L * math.cos(th), y0 - L * math.sin(th)
+    c.poly([(x0, y0), (ex, ey), (ex, y0)], INK, 'main', fill=FILLC, closed=True)
+    c.line(x0 - 20, y0, ex + 20, y0, MUT, 'thin')
+    ra = 44 if angle >= 20 else 80
+    a0, a1 = _pt(x0, y0, ra, 0), _pt(x0, y0, ra, angle)
+    c.path(f'M{r1(a0[0])},{r1(a0[1])} A{ra},{ra} 0 0,0 {r1(a1[0])},{r1(a1[1])}', INK, 'thin')
+    if angle >= 20:
+        lx, ly = _pt(x0, y0, 60, angle / 2)
+        c.text(lx, ly, angle_label, FST)
+    else:
+        lx, ly = _pt(x0, y0, 100, angle / 2)
+        c.text(lx, ly, angle_label, FST, anchor='start')
+    u = (math.cos(th), -math.sin(th))
+    n = (-math.sin(th), -math.cos(th))
+    sB = 0.6 * L
+    B = (x0 + sB * u[0], y0 + sB * u[1])
+    P = lambda a, b: (B[0] + a * u[0] + b * n[0], B[1] + a * u[1] + b * n[1])  # noqa: E731
+    c.poly([P(-34, 8), P(34, 8), P(34, 30), P(-34, 30)], ACC2, 'main', fill=FILLC, closed=True)
+    for a in (-21, 21):
+        q = P(a, 5)
+        c.circle(q[0], q[1], 5, ACC2, 'main', fill=FILLC)
+    ya = 34
+    c.arrow(min(ex, w - 40) - 20, ya, 60, ya, MUT, 'axis', head=8)
+    c.text(64, ya - 14, 'towards centre of bend', FST, anchor='start', color=MUT, value=False)
+    if r_label:
+        c.text(64, ya + 16, r_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def conical(title, desc, L_label, angle, angle_label, r_label='r', w=330, h=290):
+    """Conical pendulum: string of length L at `angle` to the vertical, bob moving in a horizontal circle."""
+    c = Canvas(w, h)
+    px, py = 130, 34
+    ceiling(c, px - 60, px + 60, py)
+    L = 190
+    th = math.radians(angle)
+    bx, by = px + L * math.sin(th), py + L * math.cos(th)
+    rx = L * math.sin(th)
+    ry = 0.2 * rx
+    c.path(f'M{r1(px - rx)},{r1(by)} A{r1(rx)},{r1(ry)} 0 1,0 {r1(px + rx)},{r1(by)} A{r1(rx)},{r1(ry)} 0 1,0 {r1(px - rx)},{r1(by)}', MUT, 'thin', dash='5 4')
+    c.line(px, py, px, by + ry + 14, MUT, 'thin', dash='4 3')
+    c.line(px, py, bx, by, INK, 'main')
+    c.line(px, by, bx, by, ACC, 'thin', dash='3 3')
+    c.text((px + bx) / 2, by - 11, r_label, FST, italic=True, color=ACC, value=False)
+    c.circle(bx, by, 10, ACC2, 'main', fill=FILLC)
+    p0 = (px, py + 44)
+    p1 = (px + 44 * math.sin(th), py + 44 * math.cos(th))
+    c.path(f'M{r1(p0[0])},{r1(p0[1])} A44,44 0 0,0 {r1(p1[0])},{r1(p1[1])}', INK, 'thin')
+    c.text(px + 72 * math.sin(th / 2), py + 72 * math.cos(th / 2), angle_label, FST)
+    mx, my = (px + bx) / 2, (py + by) / 2
+    c.text(mx + 12 * math.cos(th), my - 12 * math.sin(th), L_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def turntable(title, desc, radii, labels, spring=False, w=340, h=280):
+    """Top view: a turntable (or, with spring=True, a mass whirled on a spring round a peg on a smooth table)
+    with objects at the given radii; the first is drawn solid, any others dashed."""
+    c = Canvas(w, h)
+    cx, cy, R = 150, h / 2, 110
+    sc = 0.78 * R / max(radii)
+    if spring:
+        c.circle(cx, cy, radii[0] * sc, MUT, 'thin', dash='5 4')
+        c.circle(cx, cy, 5, INK, 'main', fill=MUT)
+        c.text(cx - 10, cy - 12, 'peg', FST, anchor='end', value=False)
+        zigzag(c, cx + 5, cy, cx + radii[0] * sc - 10, cy, n=9, amp=6)
+    else:
+        c.circle(cx, cy, R, INK, 'main', fill=FILLC)
+        c.dot(cx, cy, 3)
+    rot_arrow(c, cx, cy, (radii[0] * sc if spring else R) + 14, 25, 70)
+    for k, (r, lab) in enumerate(zip(radii, labels)):
+        x = cx + r * sc
+        if spring:
+            c.circle(x, cy, 10, ACC2, 'main', fill=FILLC)
+        else:
+            c.rect(x - 8, cy - 8, 16, 16, ACC2, 'main' if k == 0 else 'thin', fill=FILLC if k == 0 else 'none', dash=None if k == 0 else '3 2')
+        yd = cy + 26 + 26 * k if not spring else cy + 26
+        c.line(x, cy + 10, x, yd + 4, MUT, 'thin', dash='2 2')
+        c.dim(cx, yd, x, yd, lab, side=-1)
+    return c.done(title, desc)
+
+
+def rotor(title, desc, r_label, w=340, h=300):
+    """Side view of a rotor ride: a vertical cylinder spinning about its axis, a rider pressed against the wall."""
+    c = Canvas(w, h)
+    cx, top, bot, rx, ry = 160, 54, 240, 110, 18
+    c.path(f'M{cx - rx},{top} A{rx},{ry} 0 1,0 {cx + rx},{top} A{rx},{ry} 0 1,0 {cx - rx},{top}', INK, 'main')
+    c.line(cx - rx, top, cx - rx, bot, INK, 'main')
+    c.line(cx + rx, top, cx + rx, bot, INK, 'main')
+    c.path(f'M{cx - rx},{bot} A{rx},{ry} 0 0,0 {cx + rx},{bot}', INK, 'main')
+    c.path(f'M{cx - rx},{bot} A{rx},{ry} 0 0,1 {cx + rx},{bot}', MUT, 'thin', dash='4 3')
+    c.line(cx, top - 30, cx, bot + 30, MUT, 'thin', dash='6 4')
+    rot_arrow(c, cx, top, rx - 20, 200, 330, ry=ry - 6)
+    x = cx + rx - 12
+    c.circle(x, 112, 9, ACC2, 'main', fill=FILLC)
+    c.rect(x - 9, 124, 18, 62, ACC2, 'main', fill=FILLC, rx=6)
+    c.text(x - 18, 150, 'rider', FST, anchor='end', color=ACC2, value=False)
+    c.dim(cx, 214, cx + rx, 214, r_label, side=1)
+    c.text(cx, bot + 40, 'floor drops away', FST, color=MUT, value=False)
+    return c.done(title, desc)
+
+
+def ring_station(title, desc, r_label, w=340, h=350):
+    """A rotating ring space station (hub, spokes, ring) with an astronaut standing on the outer wall."""
+    c = Canvas(w, h)
+    cx, cy = w / 2, 164
+    R1, R2 = 118, 142
+    c.circle(cx, cy, R2, INK, 'main', fill=FILLC)
+    c.circle(cx, cy, R1, INK, 'main', fill='none')
+    c.circle(cx, cy, 16, INK, 'main', fill='none')
+    for a in (45, 135, 225, 315):
+        p0, p1 = _pt(cx, cy, 16, a), _pt(cx, cy, R1, a)
+        c.line(*p0, *p1, INK, 'axis')
+    fx, fy = cx, cy + R2
+    c.line(fx, fy - 2, fx, fy - 12, ACC2, 'main')
+    c.line(fx, fy - 12, fx, fy - 20, ACC2, 'main')
+    c.circle(fx, fy - 24, 3.5, ACC2, 'main', fill=FILLC)
+    c.text(fx + 8, fy + 14, 'astronaut', FST, anchor='start', color=ACC2, value=False)
+    c.dot(cx, cy, 2.6)
+    c.dim(cx, cy, cx + R2, cy, r_label, side=1)
+    rot_arrow(c, cx, cy, R2 + 10, 100, 150)
+    return c.done(title, desc)
