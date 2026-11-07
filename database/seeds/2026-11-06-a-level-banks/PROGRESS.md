@@ -94,3 +94,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch23a + ch23b (+ ch26a regenerated) | 06131d2 | 1ae1ee0e620b1ce7ab8553dd73b124f2 / eb6d7667afe447b9fef1b8d615f1f5ea / 6670ea28daff2099e841e56a191bf9ee | 28, 29, 30 | 23.1 14, 23.2 8, 23.3 15, 23.4 20, 23.5 17, 23.6 24, 23.7 15 |
 | ch21 | a24e638 | b3ade365149cec9987a721ce4c0bc979 | 31 | 21.1 10, 21.2 11, 21.3 15, 21.4 16 |
 | ch20a + ch20b | e241015 | a5481c11651c4226dfc7a734d6fdfcaf / f256e8cd9eeeb90045c858d85a9d28cd | 32, 33 | 20.1 1, 20.2 4, 20.3 0, 20.4 17, 20.5 6, 20.6 4, 20.7 1, 20.8 2 |
+| ch19 | 4217091 | eeb648fb8cc3d03b671ab5dbab336a22 | 34 | 19.1 2, 19.2 12, 19.3 0, 19.4 0, 19.5 8, 19.6 4 |

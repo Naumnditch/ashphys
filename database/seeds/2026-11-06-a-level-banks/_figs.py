@@ -2268,3 +2268,193 @@ def electrical_heating(title, desc, block_label=None, power_label=None):
         b.text(bx + bw / 2, by + bh - 20, block_label, FST)
     circ = circuit(Series(Par(El('R', 'heater', value=False), El('V')), El('A')), El('cell', power_label), 'x', 'x', w_min=220)
     return hstack([b.done('x', 'x'), circ], title, desc)
+
+
+# ═════════════════════════ oscillations ═════════════════════════
+
+def zigzag(c, x1, y1, x2, y2, n=10, amp=8, color=INK, lw='axis'):
+    """A spring drawn as a zigzag between two points (straight leads at each end)."""
+    L = math.hypot(x2 - x1, y2 - y1)
+    ux, uy = (x2 - x1) / L, (y2 - y1) / L
+    px, py = -uy, ux
+    lead = min(10, L * 0.1)
+    pts = [(x1, y1), (x1 + ux * lead, y1 + uy * lead)]
+    for i in range(1, 2 * n):
+        t = lead + (L - 2 * lead) * i / (2 * n)
+        s = amp if i % 2 else -amp
+        pts.append((x1 + ux * t + px * s, y1 + uy * t + py * s))
+    pts += [(x2 - ux * lead, y2 - uy * lead), (x2, y2)]
+    c.poly(pts, color, lw)
+
+
+def ceiling(c, x0, x1, y):
+    c.line(x0, y, x1, y, INK, 'axis')
+    for x in range(int(x0) + 6, int(x1), 12):
+        c.line(x, y, x - 8, y - 8, INK, 'thin')
+
+
+def spring_v(title, desc, mass_label=None, ext_label=None, pull_label=None, k_label=None, double=False, vibrator=False,
+             w=320, h=300):
+    """Mass hanging on a vertical spring (or two springs side by side); optional extension and pull-down dims."""
+    c = Canvas(w, h)
+    cx, top = 130, 40
+    if vibrator:
+        c.rect(cx - 40, 10, 80, 26, INK, 'main', fill=FILLC, rx=4)
+        c.text(cx, 23, 'vibrator', FST, value=False)
+        c.arrow(cx + 56, 30, cx + 56, 6, ACC2, 'thin', head=6, both=True)
+        top = 36
+    else:
+        ceiling(c, cx - 60, cx + 60, top)
+    ybot = top + 130
+    xs = [cx - 18, cx + 18] if double else [cx]
+    for x in xs:
+        zigzag(c, x, top, x, ybot, n=8, amp=9)
+    c.rect(cx - 30, ybot, 60, 40, INK, 'main', fill=FILLC)
+    if mass_label:
+        c.text(cx, ybot + 20, mass_label, FST)
+    if k_label:
+        c.text(cx + 22 + (18 if double else 0), top + 65, k_label, FST, anchor='start')
+    if ext_label:
+        c.line(cx + 40, top + 100, cx + 80, top + 100, MUT, 'thin', dash='3 3')
+        c.text(cx + 84, top + 100, 'unstretched end', FST, anchor='start', value=False)
+        c.dim(cx + 60, top + 100, cx + 60, ybot, ext_label, side=1)
+    if pull_label:
+        c.dim(cx - 50, ybot + 40, cx - 50, ybot + 80, pull_label, side=-1)
+        c.rect(cx - 30, ybot + 40, 60, 40, MUT, 'thin', dash='4 3')
+        c.text(cx, ybot + 92, 'pulled down', FST, value=False)
+    return c.done(title, desc)
+
+
+def spring_h(title, desc, mass_label=None, k_labels=(None, None), x_label=None, glider=False, single=False, w=420, h=200):
+    """A trolley or glider on a horizontal track held between two springs fixed to walls (or one spring)."""
+    c = Canvas(w, h)
+    y = 100
+    c.rect(20, y - 50, 10, 80, INK, 'thin', fill=MUT)
+    if not single:
+        c.rect(w - 30, y - 50, 10, 80, INK, 'thin', fill=MUT)
+    c.line(20, y + 30, w - 20, y + 30, INK, 'axis')
+    bx0, bx1 = w / 2 - 40, w / 2 + 40
+    c.rect(bx0, y - 20, 80, 40, INK, 'main', fill=FILLC, rx=4)
+    if not glider:
+        c.circle(bx0 + 18, y + 24, 6, INK, 'main')
+        c.circle(bx1 - 18, y + 24, 6, INK, 'main')
+    zigzag(c, 30, y, bx0, y, n=8, amp=8)
+    if not single:
+        zigzag(c, bx1, y, w - 30, y, n=8, amp=8)
+    if mass_label:
+        c.text(w / 2, y, mass_label, FST)
+    if k_labels[0]:
+        c.text((30 + bx0) / 2, y - 22, k_labels[0], FST)
+    if k_labels[1] and not single:
+        c.text((bx1 + w - 30) / 2, y - 22, k_labels[1], FST)
+    if x_label:
+        c.dim(w / 2, y + 52, w / 2 + 60, y + 52, x_label, side=-1, off=12)
+        c.line(w / 2, y + 36, w / 2, y + 60, MUT, 'thin', dash='3 3')
+    return c.done(title, desc)
+
+
+def pendulum(title, desc, L_label=None, disp_label=None, bob_label=None, gate=False, angle=12, w=320, h=300):
+    c = Canvas(w, h)
+    px, py = 150, 40
+    ceiling(c, px - 50, px + 50, py)
+    L = 200
+    a = math.radians(angle)
+    bx, by = px + L * math.sin(a), py + L * math.cos(a)
+    c.line(px, py, px, py + L + 10, MUT, 'thin', dash='4 3')
+    c.line(px, py, bx, by, INK, 'axis')
+    c.circle(bx, by, 11, INK, 'main', fill=FILLC)
+    c.circle(px, py + L, 11, MUT, 'thin', dash='3 3')
+    if L_label:
+        c.text(px - 8, py + L / 2, L_label, FST, anchor='end')
+    if bob_label:
+        c.text(bx + 16, by - (22 if gate else 0), bob_label, FST, anchor='start')
+    if disp_label:
+        c.dim(px, py + L + 26, bx, py + L + 26, disp_label, side=-1, off=12)
+    if gate:
+        c.rect(px - 40, py + L - 8, 16, 16, INK, 'main', fill=FILLC)
+        c.rect(px + 24, py + L - 8, 16, 16, INK, 'main', fill=FILLC)
+        c.line(px - 24, py + L, px + 24, py + L, ACC2, 'thin', dash='3 2')
+        c.text(px + 46, py + L, 'light gate', FST, anchor='start', value=False)
+    return c.done(title, desc)
+
+
+def test_tube(title, desc, area_label=None, mass_label=None, w=300, h=280):
+    c = Canvas(w, h)
+    c.rect(30, 130, w - 60, 130, ACC, 'thin', fill=FILLC)
+    c.line(30, 130, w - 30, 130, ACC, 'main')
+    cx = w / 2
+    c.path(f'M{cx - 18},{60} V{210} A18,18 0 0,0 {cx + 18},{210} V{60}', INK, 'main')
+    c.rect(cx - 14, 196, 28, 18, MUT, 'thin', fill=MUT)
+    c.arrow(cx + 40, 80, cx + 40, 116, ACC2, 'thin', head=6, both=True)
+    c.text(cx + 48, 98, 'bobs', FST, anchor='start', color=ACC2, value=False)
+    if area_label:
+        c.text(cx, 44, area_label, FST)
+    if mass_label:
+        c.text(cx, 26, mass_label, FST)
+    return c.done(title, desc)
+
+
+def u_tube(title, desc, L_label=None, w=360, h=280):
+    c = Canvas(w, h)
+    xl, xr, yb = 100, 200, 180
+    c.path(f'M{xl - 14},{40} V{yb} A{(xr - xl) / 2 + 14},{(xr - xl) / 2 + 14} 0 0,0 {xr + 14},{yb} V{40}', INK, 'main')
+    c.path(f'M{xl + 14},{40} V{yb} A{(xr - xl) / 2 - 14},{(xr - xl) / 2 - 14} 0 0,0 {xr - 14},{yb} V{40}', INK, 'main')
+    c.rect(xl - 12, 90, 24, yb - 90, 'none', 'thin', fill=FILLC)
+    c.rect(xr - 12, 130, 24, yb - 130, 'none', 'thin', fill=FILLC)
+    c.line(xl - 30, 110, xr + 40, 110, MUT, 'thin', dash='3 3')
+    c.text(xr + 44, 110, 'equilibrium level', FST, anchor='start', value=False)
+    if L_label:
+        c.text((xl + xr) / 2, h - 12, L_label, FST)
+    return c.done(title, desc)
+
+
+def curved_track(title, desc, R_label=None, mass_label=None, w=340, h=240):
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, -60, 250
+    a0 = math.radians(52)
+    c.path(f'M{r1(cx - R * math.sin(a0))},{r1(cy + R * math.cos(a0))} A{R},{R} 0 0,0 {r1(cx + R * math.sin(a0))},{r1(cy + R * math.cos(a0))}', INK, 'bold')
+    a = math.radians(12)
+    bx, by = cx + (R - 12) * math.sin(a), cy + (R - 12) * math.cos(a)
+    c.circle(bx, by, 11, ACC2, 'main', fill=FILLC)
+    if R_label:
+        c.text(cx, h - 12, R_label, FST)
+    if mass_label:
+        c.text(bx + 18, by - 14, mass_label, FST, anchor='start', color=ACC2)
+    return c.done(title, desc)
+
+
+def platform_coin(title, desc, f_label=None, w=300, h=240):
+    c = Canvas(w, h)
+    c.rect(70, 110, 160, 14, INK, 'main', fill=FILLC)
+    c.rect(130, 100, 40, 10, ACC2, 'main', fill=FILLC)
+    c.text(185, 92, 'coin', FST, anchor='start', color=ACC2, value=False)
+    c.rect(130, 124, 40, 70, INK, 'main', fill=MUT)
+    c.text(150, 210, 'vibrator', FST, value=False)
+    c.arrow(250, 90, 250, 140, ACC2, 'thin', head=6, both=True)
+    if f_label:
+        c.text(258, 115, f_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def shm_graph(f, t_end, xlabel, ylabel, title, desc, yr, xticks, yticks, n=400, hlines=(), vlines=(), notes=(), extra=(), dims=()):
+    xs, ys = wave_xy(f, 0, t_end, n)
+    return plot(xlabel, ylabel, [dict(x=xs, y=ys)] + list(extra), title, desc, xr=(0, t_end), yr=yr, xticks=xticks, yticks=yticks,
+                hlines=hlines, vlines=vlines, notes=notes, dims=dims)
+
+
+def barton(title, desc, n=5, w=420, h=250):
+    """Barton's pendulums: a heavy driver (left) and light pendulums of different lengths on one string;
+    the middle light pendulum has the driver's length."""
+    c = Canvas(w, h)
+    c.line(20, 30, w - 20, 30, INK, 'axis')
+    lengths = [80 + 24 * i for i in range(n)]
+    xs = [150 + i * (w - 190) / (n - 1) for i in range(n)]
+    for x, L in zip(xs, lengths):
+        c.line(x, 30, x, 30 + L, INK, 'thin')
+        c.circle(x, 30 + L + 6, 6, INK, 'thin', fill=FILLC)
+    xd, Ld = 60, lengths[n // 2]
+    c.line(xd, 30, xd, 30 + Ld, INK, 'axis')
+    c.circle(xd, 30 + Ld + 12, 13, ACC2, 'main', fill=FILLC)
+    c.text(xd, 30 + Ld + 40, 'heavy driver', FST, color=ACC2, value=False)
+    c.text((xs[0] + xs[-1]) / 2, h - 12, 'light pendulums of different lengths', FST, value=False)
+    return c.done(title, desc)
