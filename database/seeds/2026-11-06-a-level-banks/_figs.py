@@ -2231,3 +2231,40 @@ def brownian(title, desc, n=40, seed=7, w=300, h=240):
     for px, py in pts[::4]:
         c.dot(px, py, 2.2, ACC2)
     return c.done(title, desc)
+
+
+# ═════════════════════════ thermal physics ═════════════════════════
+
+def hstack(figs, title, desc, gap=10):
+    """Place figures side by side, vertically centred."""
+    H = max(_vb(f)[1] for f in figs)
+    c = Canvas(0, H)
+    x = 0
+    for f in figs:
+        w, h = _vb(f)
+        c.els.append(f'<g transform="translate({r1(x)},{r1((H - h) / 2)})">{_body(f)}</g>')
+        c.values += f.values
+        x += w + gap
+    c.w = x - gap
+    return c.done(title, desc)
+
+
+def electrical_heating(title, desc, block_label=None, power_label=None):
+    """Electrical method for specific heat capacity: an insulated block with a heater and a thermometer, and the
+    heater circuit (ammeter in series, voltmeter across the heater)."""
+    b = Canvas(220, 250)
+    bx, by, bw, bh = 30, 70, 160, 140
+    b.rect(bx - 10, by - 10, bw + 20, bh + 20, MUT, 'thin', dash='4 3')
+    b.rect(bx, by, bw, bh, INK, 'main', fill=FILLC)
+    b.text(bx + bw / 2, by + bh + 26, 'insulation', FST, value=False)
+    hx = bx + 50
+    b.rect(hx - 8, by - 30, 16, 110, INK, 'main', fill=MUT)
+    b.text(hx, by - 42, 'heater', FST, value=False)
+    tx = bx + 115
+    b.rect(tx - 4, by - 50, 8, 120, INK, 'thin', rx=4)
+    b.circle(tx, by + 72, 7, INK, 'thin', fill=ACC2)
+    b.text(tx, by - 60, 'thermometer', FST, value=False)
+    if block_label:
+        b.text(bx + bw / 2, by + bh - 20, block_label, FST)
+    circ = circuit(Series(Par(El('R', 'heater', value=False), El('V')), El('A')), El('cell', power_label), 'x', 'x', w_min=220)
+    return hstack([b.done('x', 'x'), circ], title, desc)
