@@ -3188,3 +3188,62 @@ def spectrum_lines(title, desc, lines, lo, hi, ticks, absorption=False, w=440, h
         c.text(X(v), y1 + 28, lab, FST, value=False)
     c.text((x0 + x1) / 2, h - 10, 'wavelength / nm', FST, value=False)
     return c.done(title, desc)
+
+
+# ═════════════════════════ nuclear physics ═════════════════════════
+
+def nz_chart(title, desc, points, nr, zr, nticks, zticks, arrows=(), w=400, h=300):
+    """Proton number Z against neutron number N with labelled nuclides: points = (N, Z, label)."""
+    series = [dict(x=[p[0]], y=[p[1]], kind='points') for p in points]
+    notes = [(p[0], p[1], p[2], 'start', 8, -10, False) for p in points]
+    extra = [dict(x=[a[0], a[2]], y=[a[1], a[3]], color=MUT, dash='4 3') for a in arrows]
+    return plot('neutron number N', 'proton number Z', series + extra, title, desc, xr=nr, yr=zr, xticks=nticks, yticks=zticks,
+                notes=notes, w=w, h=h)
+
+
+def decay_recoil(title, desc, left='daughter', right='α-particle', v_left=None, v_right=None, parent='parent at rest', w=420, h=200):
+    """Before/after sketch of a decay at rest: a parent nucleus, then the daughter and the emitted particle
+    moving apart along a line with velocity arrows."""
+    c = Canvas(w, h)
+    c.text(w / 2, 18, 'before', FST, color=MUT, value=False)
+    c.circle(w / 2, 50, 18, INK, 'main', fill=FILLC)
+    c.text(w / 2 + 28, 50, parent, FST, anchor='start', value=False)
+    c.line(20, 86, w - 20, 86, GRID, 'thin', dash='4 3')
+    c.text(w / 2, 104, 'after', FST, color=MUT, value=False)
+    yd = 146
+    c.circle(w / 2 - 40, yd, 16, INK, 'main', fill=FILLC)
+    c.circle(w / 2 + 40, yd, 7, ACC2, 'main', fill=FILLC)
+    c.arrow(w / 2 - 62, yd, w / 2 - 102, yd, INK, 'main')
+    c.arrow(w / 2 + 52, yd, w / 2 + 132, yd, ACC2, 'main')
+    c.text(w / 2 - 40, yd + 30, left, FST, value=False)
+    c.text(w / 2 + 40, yd + 30, right, FST, color=ACC2, value=False)
+    if v_left:
+        c.text(w / 2 - 82, yd - 14, v_left, FST, anchor='middle')
+    if v_right:
+        c.text(w / 2 + 92, yd - 14, v_right, FST, anchor='middle', color=ACC2)
+    return c.done(title, desc)
+
+
+def _be_per_nucleon(A):
+    """Binding energy per nucleon (MeV) from the semi-empirical mass formula along the line of stability."""
+    Z = A / (1.98 + 0.0155 * A ** (2 / 3))
+    av, as_, ac, aa = 15.75, 17.8, 0.711, 23.7
+    B = av * A - as_ * A ** (2 / 3) - ac * Z * (Z - 1) / A ** (1 / 3) - aa * (A - 2 * Z) ** 2 / A
+    return B / A
+
+
+def be_curve(title, desc, marks=(), w=420, h=300, light=True):
+    """Binding energy per nucleon against nucleon number: a smooth curve from the semi-empirical formula
+    (A ≥ 12) joined to measured values for the lightest nuclei; marks = (A, BE/A, label, is_value)."""
+    known = [(2, 1.11), (3, 2.57), (4, 7.07), (6, 5.33), (7, 5.61), (9, 6.46), (12, 7.68)]
+    xs = [a for a, _ in known] if light else []
+    ys = [b for _, b in known] if light else []
+    xs += list(range(14, 241, 2))
+    ys += [_be_per_nucleon(a) for a in range(14, 241, 2)]
+    series = [dict(x=xs, y=ys)]
+    notes = []
+    for A, b, lab, isv in marks:
+        series.append(dict(x=[A], y=[b], kind='points', color=ACC2))
+        notes.append((A, b, lab, 'start' if A < 200 else 'end', 6 if A < 200 else -6, 16, isv))
+    return plot('nucleon number A', 'BE per nucleon / MeV', series, title, desc, xr=(0, 250), yr=(0, 10),
+                xticks=[0, 50, 100, 150, 200, 250], yticks=[0, 2, 4, 6, 8, 10], notes=notes, w=w, h=h)

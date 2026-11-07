@@ -1537,5 +1537,81 @@
   },
   "file": "ch28b",
   "figures": 8
+ },
+ "29.1": {
+  "code": "29.1",
+  "title": "Balanced equations",
+  "topic": "20eb2251-a133-4766-96d3-065fb00dfd07",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch29a",
+  "figures": 3
+ },
+ "29.2": {
+  "code": "29.2",
+  "title": "Mass and energy",
+  "topic": "aa310305-acdb-4a66-9833-4fdfca276c71",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch29a",
+  "figures": 0
+ },
+ "29.3": {
+  "code": "29.3",
+  "title": "Energy released in radioactive decay",
+  "topic": "7dea064c-452c-45f6-955f-b7e078a6e859",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch29a",
+  "figures": 4
+ },
+ "29.4": {
+  "code": "29.4",
+  "title": "Mass defect and binding energy",
+  "topic": "c7d1948a-561e-56c0-8776-090012819a77",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 3,
+   "d3": 5
+  },
+  "file": "ch29a",
+  "figures": 5
  }
 }
