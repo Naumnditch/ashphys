@@ -736,5 +736,131 @@
    "d3": 1
   },
   "file": "ch21"
+ },
+ "23.1": {
+  "code": "23.1",
+  "title": "Capacitors and capacitance",
+  "topic": "98bbfcc1-1e3c-5d99-be0d-e19121542f69",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 3,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch23a"
+ },
+ "23.2": {
+  "code": "23.2",
+  "title": "Energy stored in a capacitor",
+  "topic": "1f2d9fae-c676-5618-9e77-df3b1c100686",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch23a"
+ },
+ "23.3": {
+  "code": "23.3",
+  "title": "Capacitors in parallel",
+  "topic": "1da133f6-6b3d-48ce-9d65-eff20177efd9",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 4,
+   "d3": 2
+  },
+  "file": "ch23a"
+ },
+ "23.4": {
+  "code": "23.4",
+  "title": "Capacitors in series",
+  "topic": "418cd812-3eed-413c-87d7-8695a008d131",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch23a"
+ },
+ "23.5": {
+  "code": "23.5",
+  "title": "Comparing capacitors and resistors",
+  "topic": "37b002d3-71bb-4659-b130-a879ad127cf8",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch23b"
+ },
+ "23.6": {
+  "code": "23.6",
+  "title": "Capacitor networks",
+  "topic": "c4c09cba-9d0a-4033-abe7-0b8c56bb7ef4",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 0,
+   "d3": 6
+  },
+  "file": "ch23b"
+ },
+ "23.7": {
+  "code": "23.7",
+  "title": "Discharging a capacitor",
+  "topic": "0c42a207-4bd1-5379-b11d-d983544be962",
+  "before": 5,
+  "new": 45,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 5,
+   "d1": 3,
+   "d2": 1,
+   "d3": 1
+  },
+  "file": "ch23b"
  }
 }
