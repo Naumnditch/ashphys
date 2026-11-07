@@ -11,6 +11,7 @@ import { getUserTier } from '@/lib/subscriptions/getUserTier';
 import { query } from '@/lib/db/client';
 import { CURRICULUM_IDS, topicInCurriculum, tryParseCurriculum } from '@/lib/curricula';
 import { loadQuestionBank } from '@/lib/practice/questions';
+import { questionFigure } from '@/lib/practice/figure';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,6 +63,7 @@ export async function GET(req: NextRequest) {
         number: p.problem_number ?? i + 1,
         questionText: p.question_text,
         imageUrl: p.question_image_url,
+        ...questionFigure(p.figure_svg, p.figure_alt),
         answerType: p.answer_type,
         difficultyLevel: p.difficulty_level,
         topicCode: p.topic_code,

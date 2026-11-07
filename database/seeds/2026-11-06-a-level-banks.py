@@ -20,6 +20,12 @@ Layout (directory 2026-11-06-a-level-banks/):
   _lib.py                 Q() quantities, sf()/stored(), N()/M() builders
   _verify.py              independent re-evaluation of printed working
   chNN.py, p1.py, p2.py, maths.py   the questions (EDIT THESE)
+  _figs.py                SVG figure generators (house style, theme variables)
+  figs/<file>.py          figures for that content file: F('<stem substring>',
+                          lambda s: <generator>(…)) — each must match exactly one
+                          stem; values printed on a figure must appear in it
+  figs/existing.py        figures for questions that were already in the banks
+                          (keyed by id) → sql/figures-existing.sql
   sql/<file>.sql          GENERATED, one per content file (never hand-edit)
   rejected.json           GENERATED: questions dropped by a quality check, and why
   bank-report.json        GENERATED: per-lesson before/after/split
@@ -201,8 +207,100 @@ def quality(q, lesson_qs, existing):
     return why
 
 
+FIG_FORBIDDEN = [
+    r'<\s*(script|foreignObject|image|img|iframe|object|embed|style|use|a|link|meta|animate\w*|set)\b',
+    r'\son[a-z]+\s*=', r'(?:xlink:)?href\s*=', r'javascript:', r'url\s*\(', r'@import', r'<!ENTITY|<!DOCTYPE',
+]
+_FNUM = re.compile(r'(?<![\w.])[−-]?(\d+(?:\.\d+)?(?:\s*×\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)?)')
+
+
+def fig_numbers(t):
+    return {re.sub(r'\s+', '', m) for m in _FNUM.findall(t.replace('\u2009', ' '))}
+
+
+def fig_namespace():
+    ns = {}
+    for f in ('_lib.py', '_figs.py'):
+        path = os.path.join(HERE, f)
+        exec(compile(open(path, encoding='utf-8').read(), path, 'exec'), ns)
+    return ns
+
+
+def load_figs(path):
+    """[(match, make)] from a figure spec file (F(match, make) calls)."""
+    if not os.path.exists(path):
+        return []
+    ns = fig_namespace()
+    specs = []
+    ns['F'] = lambda match, make: specs.append((match, make))
+    exec(compile(open(path, encoding='utf-8').read(), path, 'exec'), ns)
+    return specs
+
+
+def fig_quality(fig, stem):
+    """Reasons a figure fails (empty = passes). Mirrors lib/practice/figure.ts plus house rules."""
+    why = []
+    svg, alt = fig.svg, fig.alt
+    if not svg.startswith('<svg ') or not svg.endswith('</svg>'):
+        why.append('not a single <svg> element')
+    if len(svg.encode('utf-8')) > 61440:
+        why.append(f'figure is {len(svg.encode("utf-8"))} bytes (> 60 KB)')
+    for pat in FIG_FORBIDDEN:
+        if re.search(pat, svg, re.I):
+            why.append(f'forbidden markup /{pat}/')
+    if len(re.findall(r'<svg[\s>]', svg)) != 1:
+        why.append('more than one <svg> root')
+    root = svg[:svg.index('>') + 1]
+    if ' width=' in root or ' height=' in root or 'viewBox=' not in root:
+        why.append('root must have a viewBox and no fixed width/height')
+    if '<title' not in svg or '<desc' not in svg:
+        why.append('missing <title> or <desc>')
+    if not alt or len(alt.strip()) < 20:
+        why.append('figure_alt missing or shorter than 20 characters')
+    if re.search(r'\\u[0-9a-fA-F]{4}', svg + alt):
+        why.append('literal \\u escape in figure')
+    have = fig_numbers(stem)
+    for label in fig.values:
+        miss = fig_numbers(label) - have
+        if miss:
+            why.append(f'figure value {label!r} not in the stem ({", ".join(sorted(miss))})')
+    return why
+
+
+def attach_figures(specs, qs, where):
+    """Attach each spec's figure to the one question whose stem contains its match string."""
+    errors = []
+    for match, make in specs:
+        hits = [q for q in qs if match in q['text']]
+        if len(hits) != 1:
+            errors.append(f'{where}: figure spec {match!r} matches {len(hits)} questions')
+            continue
+        q = hits[0]
+        if 'figure' in q:
+            errors.append(f'{where}: two figures for {match!r}')
+            continue
+        try:
+            q['figure'] = make(q['text']) if callable(make) else make
+        except Exception as e:  # a generator assertion is a spec error, not a silent skip
+            errors.append(f'{where}: figure for {match!r} failed: {type(e).__name__}: {e}')
+    return errors
+
+
+FIG_ERRORS = []
+
+
+def dump_figures(name, items):
+    out = os.environ.get('FIGOUT')
+    if not out:
+        return
+    os.makedirs(out, exist_ok=True)
+    with open(os.path.join(out, f'{name}.json'), 'w', encoding='utf-8') as fh:
+        json.dump(items, fh, ensure_ascii=False)
+
+
 def build(name, rejected, report):
     qs = load(name)
+    FIG_ERRORS.extend(attach_figures(load_figs(os.path.join(HERE, 'figs', f'{name}.py')), qs, name))
     by_lesson = collections.OrderedDict()
     for q in qs:
         assert q['lesson'] in LESSONS, f'{name}: unknown lesson key {q["lesson"]}'
@@ -223,11 +321,12 @@ def build(name, rejected, report):
     )
     cols = ('id, chapter_id, topic_id, curriculum_id, topic_code, syllabus_cite, problem_number, "order", question_text, '
             'question_image_url, difficulty_level, answer_type, answer_correct, answer_unit, answer_unit_required, '
-            'answer_tolerance, answer_sign_sensitive, answer_alternates, explanation, points')
+            'answer_tolerance, answer_sign_sensitive, answer_alternates, explanation, points, figure_svg, figure_alt')
     upd = ', '.join(f'{c} = EXCLUDED.{c}' for c in [
         'chapter_id', 'topic_id', 'curriculum_id', 'topic_code', 'syllabus_cite', 'problem_number', '"order"',
         'question_text', 'question_image_url', 'difficulty_level', 'answer_type', 'answer_correct', 'answer_unit',
-        'answer_unit_required', 'answer_tolerance', 'answer_sign_sensitive', 'answer_alternates', 'explanation', 'points'])
+        'answer_unit_required', 'answer_tolerance', 'answer_sign_sensitive', 'answer_alternates', 'explanation', 'points',
+        'figure_svg', 'figure_alt'])
     for key, lqs in by_lesson.items():
         L = LESSONS[key]
         for i, q in enumerate(lqs, 1):
@@ -240,13 +339,19 @@ def build(name, rejected, report):
                 rejected.append(dict(lesson=key, file=name, text=q['text'], reasons=why))
             else:
                 kept.append(q)
+        for q in kept:
+            if 'figure' in q:
+                fwhy = fig_quality(q['figure'], q['text'])
+                if fwhy:
+                    rejected.append(dict(lesson=key, file=name, kind='figure', text=q['text'], reasons=fwhy))
+                    del q['figure']
         kept.sort(key=lambda q: (q['difficulty'], q['seq']))
         split = collections.Counter(q['difficulty'] for q in kept)
         before = dict(n=L['n'], d1=L['d1'], d2=L['d2'], d3=L['d3'])
         after_n = L['n'] + len(kept)
         report[key] = dict(code=L['code'], title=L['title'], topic=L['topic'], before=L['n'], new=len(kept),
                            after=after_n, easy=L['d1'] + split[1], medium=L['d2'] + split[2], hard=L['d3'] + split[3],
-                           before_split=before, file=name)
+                           before_split=before, file=name, figures=sum('figure' in q for q in kept))
         prow, orow = [], []
         for rank, q in enumerate(kept, 1):
             number = L['maxn'] + rank
@@ -261,7 +366,7 @@ def build(name, rejected, report):
                 f"({lit(q['id'])}, {lit(L['chapter_id'])}, {lit(L['topic'])}, 'a-level', {lit(L['code'])}, {lit(L['cite'])}, "
                 f"{number}, {number}, {lit(q['text'])}, NULL, {q['difficulty']}, '{atype}'::answer_type, {lit(correct)}, "
                 f"{lit(unit)}, false, {lit(q.get('tol'))}, {lit(bool(q.get('sign')))}, {alts_sql}, {lit(q['explanation'])}, "
-                f"{q['marks']})"
+                f"{q['marks']}, {lit(q['figure'].svg if 'figure' in q else None)}, {lit(q['figure'].alt if 'figure' in q else None)})"
             )
             if atype == 'multiple_choice':
                 for oi, text in enumerate(q['options']):
@@ -276,6 +381,8 @@ def build(name, rejected, report):
                        ',\n'.join(orow) + '\nON CONFLICT (id) DO UPDATE SET problem_id = EXCLUDED.problem_id, '
                        'option_text = EXCLUDED.option_text, option_letter = EXCLUDED.option_letter, '
                        'is_correct = EXCLUDED.is_correct, "order" = EXCLUDED."order";')
+    dump_figures(name, [dict(key=f"{q['lesson']} #{q['seq']} d{q['difficulty']}", stem=q['text'], svg=q['figure'].svg, alt=q['figure'].alt)
+                        for lqs in by_lesson.values() for q in lqs if 'figure' in q])
     os.makedirs(os.path.join(HERE, 'sql'), exist_ok=True)
     with open(os.path.join(HERE, 'sql', f'{name}.sql'), 'w', encoding='utf-8') as fh:
         fh.write('\n'.join(out) + '\n')
@@ -305,15 +412,19 @@ def main():
             dev = {d: (r[k] - SPLIT[d]) for d, k in ((1, 'easy'), (2, 'medium'), (3, 'hard'))}
             flag = '' if r['after'] >= TARGET else '   <-- BELOW 50'
             print(f"{name:6} {key:8} before {r['before']:3}  new {r['new']:3}  after {r['after']:3}  "
-                  f"E/M/H {r['easy']}/{r['medium']}/{r['hard']}{flag}", file=sys.stderr)
+                  f"E/M/H {r['easy']}/{r['medium']}/{r['hard']}  figures {r.get('figures', 0):2}/{r['new']}{flag}", file=sys.stderr)
             if r['after'] < TARGET:
                 problems.append(f'{key}: only {r["after"]}')
         for rj in rejected:
-            print(f"  REJECTED {rj['lesson']}: {rj['text'][:80]}… — {'; '.join(rj['reasons'])}", file=sys.stderr)
+            print(f"  REJECTED{' FIGURE' if rj.get('kind') == 'figure' else ''} {rj['lesson']}: {rj['text'][:80]}… — {'; '.join(rj['reasons'])}", file=sys.stderr)
     with open(rej_path, 'w', encoding='utf-8') as fh:
         json.dump(rejected_all, fh, ensure_ascii=False, indent=1)
     with open(rep_path, 'w', encoding='utf-8') as fh:
         json.dump(dict(sorted(report.items())), fh, ensure_ascii=False, indent=1)
+    for e in FIG_ERRORS:
+        print('  FIGURE SPEC ERROR ' + e, file=sys.stderr)
+    if FIG_ERRORS:
+        problems.append(f'{len(FIG_ERRORS)} figure spec errors')
     if problems:
         print('LESSONS BELOW TARGET: ' + ', '.join(problems), file=sys.stderr)
         sys.exit(1)

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { SimulationIcon } from '@/components/icons/SimulationIcon';
 import { MomentumDiagram } from '@/components/practice/MomentumDiagrams';
+import { QuestionFigure } from '@/components/practice/QuestionFigure';
 import { trackEvent } from '@/lib/analytics/client';
 import { previewAnswer } from '@/lib/grading/numericAnswer';
 import MathAnswerInput from '@/components/math/MathAnswerInput';
@@ -43,6 +44,8 @@ interface Question {
   lastResult: 'correct' | 'wrong' | null;
   questionText: string;
   imageUrl?: string | null;
+  figureSvg?: string | null;
+  figureAlt?: string | null;
   answerType: 'multiple_choice' | 'numeric' | 'free_text';
   difficultyLevel: number;
   marks?: number | null;
@@ -603,6 +606,7 @@ export function PracticeSession({
               )}
             </div>
 
+            {current.figureSvg && current.figureAlt && <QuestionFigure svg={current.figureSvg} alt={current.figureAlt} />}
             {current.imageUrl && current.imageUrl.startsWith('diagram:') && <MomentumDiagram diagramKey={current.imageUrl} />}
             {current.imageUrl && !current.imageUrl.startsWith('diagram:') && (
               // Uploaded figures are raster images drawn on white: keep a white mat behind them

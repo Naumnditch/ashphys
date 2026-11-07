@@ -18,6 +18,8 @@ export interface PracticeQuestionRow {
   problem_number: number | null;
   question_text: string;
   question_image_url: string | null;
+  figure_svg: string | null;
+  figure_alt: string | null;
   answer_type: string;
   difficulty_level: number;
   points: number;
@@ -30,7 +32,7 @@ export interface PracticeQuestionRow {
 
 export async function loadQuestionBank(topicId: string, curriculumId: CurriculumId): Promise<PracticeQuestionRow[]> {
   const problemsResult = await query(
-    `SELECT p.id, p.problem_number, p.question_text, p.question_image_url, p.answer_type, p.difficulty_level, p.points,
+    `SELECT p.id, p.problem_number, p.question_text, p.question_image_url, p.figure_svg, p.figure_alt, p.answer_type, p.difficulty_level, p.points,
             p.topic_code, p.syllabus_cite, p.solution_id, s.is_published AS solution_published
      FROM problems p
      LEFT JOIN solutions s ON s.id = p.solution_id

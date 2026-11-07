@@ -16,6 +16,7 @@ import { query } from '@/lib/db/client';
 import { CURRICULA, curriculumForTopic } from '@/lib/curricula';
 import { getUserCurriculum } from '@/lib/curricula/queries';
 import { loadQuestionBank } from '@/lib/practice/questions';
+import { questionFigure } from '@/lib/practice/figure';
 
 export async function GET(req: NextRequest, { params }: { params: { topicId: string } }) {
   const user = await getCurrentUser();
@@ -63,6 +64,7 @@ export async function GET(req: NextRequest, { params }: { params: { topicId: str
     lastResult: lastCorrect.has(p.id) ? (lastCorrect.get(p.id) ? 'correct' : 'wrong') : null,
     questionText: p.question_text,
     imageUrl: p.question_image_url,
+    ...questionFigure(p.figure_svg, p.figure_alt),
     answerType: p.answer_type,
     difficultyLevel: p.difficulty_level,
     marks: p.points,

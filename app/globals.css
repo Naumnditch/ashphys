@@ -151,6 +151,33 @@ body {
   }
 }
 
+/* Question figures (problems.figure_svg): drawn in currentColor plus these
+   variables, so one SVG works in both themes. Strokes/text use currentColor. */
+:root {
+  --fig-accent: #1d4ed8;
+  --fig-accent-2: #b45309;
+  --fig-muted: #6b7280;
+  --fig-grid: #d1d5db;
+  --fig-fill: rgba(29, 78, 216, 0.10);
+}
+:root[data-theme="dark"] {
+  --fig-accent: #93c5fd;
+  --fig-accent-2: #fbbf24;
+  --fig-muted: #9ca3af;
+  --fig-grid: #4b5563;
+  --fig-fill: rgba(147, 197, 253, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fig-accent: #93c5fd;
+    --fig-accent-2: #fbbf24;
+    --fig-muted: #9ca3af;
+    --fig-grid: #4b5563;
+    --fig-fill: rgba(147, 197, 253, 0.16);
+  }
+}
+.question-figure-svg svg { display: block; width: 100%; height: auto; max-height: 46dvh; margin: 0 auto; }
+
 /* ------------------------------------------------------------------------
    Interaction feedback (lib/feedback). Transform/opacity only; every
    transform below is switched off under prefers-reduced-motion at the end,

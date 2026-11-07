@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { gradeNumeric, specFromProblem } from '@/lib/grading/numericAnswer';
+import { questionFigure, sanitizeFigureSvg } from '@/lib/practice/figure';
 
 /**
  * The 2026-11-06 A Level bank fill, checked exactly as it is applied: every
@@ -11,11 +12,12 @@ import { gradeNumeric, specFromProblem } from '@/lib/grading/numericAnswer';
  * unit must all be marked right; 10 % off (and the wrong sign, where direction
  * matters) must be marked wrong. Every multiple-choice question must have four
  * options with exactly one correct, matching answer_correct. Nothing may touch
- * a Chapter 22 lesson.
+ * a Chapter 22 lesson. Every figure must pass the same sanitizer the practice
+ * API applies before the markup reaches the page.
  */
 
 const DIR = path.resolve(__dirname, '../../../database/seeds/2026-11-06-a-level-banks/sql');
-const FILES = readdirSync(DIR).filter((f) => f.endsWith('.sql')).sort();
+const FILES = readdirSync(DIR).filter((f) => f.endsWith('.sql') && !f.startsWith('figures-')).sort();
 const CH22_TOPICS = new Set(
   (JSON.parse(readFileSync(path.resolve(DIR, '../lessons.json'), 'utf8')) as { code: string; topic: string }[])
     .filter((l) => l.code.startsWith('22.'))
@@ -125,6 +127,22 @@ for (const file of FILES) {
         if (k.sign && k.value !== 0) {
           expect(gradeNumeric(String(-Number(String(p[12]).split(' ')[0])), spec!).correct, `${k.id} sign flip`).toBe(false);
         }
+      }
+    });
+
+    it('every figure passes the runtime sanitizer and has its description', () => {
+      for (const p of problems) {
+        const svg = (p[20] ?? null) as string | null;
+        const alt = (p[21] ?? null) as string | null;
+        if (svg === null) {
+          expect(alt, `${p[0]} alt without figure`).toBeNull();
+          continue;
+        }
+        expect(sanitizeFigureSvg(svg), `${p[0]} figure refused`).toBe(svg);
+        expect(questionFigure(svg, alt).figureSvg, `${p[0]} figure dropped`).toBe(svg);
+        expect(svg).toContain('<title');
+        expect(svg).toContain('<desc');
+        expect(svg).not.toMatch(/\\u[0-9a-fA-F]{4}/);
       }
     });
 

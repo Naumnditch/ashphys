@@ -54,6 +54,21 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
   (2026-11-07 after ch23: all 14 counts and hashes identical). Count lessons with
   topics.a_level_topic_code (e.g. like '24.%').
 
+## Figures (2026-11-07)
+- Columns problems.figure_svg / figure_alt: migration `database/seeds/2026-11-07-problem-figures.sql`
+  (applied 2026-11-07 as Supabase migration `problem_figures`). The practice API passes them through
+  lib/practice/figure.ts (sanitizer) and components/practice/QuestionFigure.tsx draws them.
+- `figs/<file>.py`: `F('<stem substring>', lambda s: generator(...))`. The match must hit exactly one
+  stem of that content file (otherwise FIGURE SPEC ERROR and exit 1). Numbers come from the stem via
+  `grab(s, r'...')`; every value label printed on a figure (any text with a digit, unless value=False)
+  must appear in the stem, or the figure is dropped with a REJECTED FIGURE line.
+- Generators live in `_figs.py` (house style: one font stack, sizes 14/12, line weights 0.9/1.4/2.0/2.6,
+  currentColor + --fig-* variables, viewBox only, <title>/<desc>).
+- Render check (PNGs outside the repo): `FIGOUT=<scratch>/figjson python3 -I database/seeds/2026-11-06-a-level-banks.py chNN`
+  then `node database/seeds/2026-11-06-a-level-banks/tools/figcheck.js <scratch>/figjson/chNN.json <scratch>/out-chNN --sheets`
+  → clipping/overlap/size report + light and dark contact sheets to inspect.
+- A figure must not give the answer away; skip pure calculation and definition questions.
+
 ## Applied to production
 | file | lessons | commit | md5 | applied | counts after |
 |---|---|---|---|---|---|
@@ -67,3 +82,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch24a + ch24b | 24.1–24.8 | f8d353d | 8e89d05e3a5789000ae074529a5fddba / 7dd24d665ab5c64674fcc059bc8214e6 | 2026-11-07 (pg_net ids 14, 15) | all 50 (17/20/13) |
 | ch25a + ch25b | 25.1–25.5 | f5b45bb | f08cee7ff4f1e89b640471f79afd516f / 5a7b10fe5611c7032057e0172916b20a | 2026-11-07 (pg_net ids 16, 17) | all 50 (17/20/13) |
 | ch26a + ch26b | 26.1–26.5 | e032416 | cdffe80738add4eb1f1136e4824adfe8 / ed1bd05d17e1160f18dbf4d563691635 | 2026-11-07 (pg_net ids 18, 19) | all 50 (17/20/13) |
+| ch27 | 27.1–27.4 | 4bd5cfc | 592dcee493fc9ca926d4c021f7ae6a6a | 2026-11-07 (pg_net id 20) | all 50 (17/20/13) |
