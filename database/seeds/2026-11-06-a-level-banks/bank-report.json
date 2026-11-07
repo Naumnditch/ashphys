@@ -1096,5 +1096,95 @@
    "d3": 5
   },
   "file": "ch25b"
+ },
+ "26.1": {
+  "code": "26.1",
+  "title": "Observing induction",
+  "topic": "677b6661-3e99-4229-b915-0bb8761b4eaf",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 3,
+   "d3": 2
+  },
+  "file": "ch26a"
+ },
+ "26.2": {
+  "code": "26.2",
+  "title": "Explaining electromagnetic induction",
+  "topic": "f7187a6b-c7a4-4e46-9ae9-d6d8824b8ba5",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch26a"
+ },
+ "26.3": {
+  "code": "26.3",
+  "title": "Electromagnetic induction",
+  "topic": "2ad404cd-23bd-5405-96a2-9ca0a634169b",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 5,
+   "d3": 3
+  },
+  "file": "ch26a"
+ },
+ "26.4": {
+  "code": "26.4",
+  "title": "Lenz's law",
+  "topic": "4ac2239b-8226-4bfc-8116-0d8626521f30",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 1,
+   "d3": 4
+  },
+  "file": "ch26b"
+ },
+ "26.5": {
+  "code": "26.5",
+  "title": "Everyday examples of electromagnetic induction",
+  "topic": "24d540aa-65ef-46d8-ac39-5c62ee4aed70",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch26b"
  }
 }
