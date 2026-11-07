@@ -3205,6 +3205,97 @@ def spectrum_lines(title, desc, lines, lo, hi, ticks, absorption=False, w=440, h
 
 
 
+
+# ═════════════════════════ vectors: head-to-tail paths ═════════════════════════
+
+def walk(title, desc, legs, resultant=None, north=True, w=360, h=280, start_label=None, end_label=None, angle=None,
+         pad=46, colors=None):
+    """Vectors drawn head to tail in data units (x east, y north), scaled to fit. legs: (dx, dy, label[, is_value]).
+    resultant: label for a dashed arrow from the start to the end (None: not drawn). angle: (label, ref) marks the
+    angle at the start between the resultant and 'north' or 'east'."""
+    pts = [(0.0, 0.0)]
+    for lg in legs:
+        pts.append((pts[-1][0] + lg[0], pts[-1][1] + lg[1]))
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    padx = max([pad] + [26 + text_w(lg[2], FST) for lg in legs] + ([26 + text_w(resultant, FST)] if resultant else []))
+    sx = (w - 2 * padx) / ((x1 - x0) or 1)
+    sy = (h - 2 * pad) / ((y1 - y0) or 1)
+    sc = min(sx, sy)
+    ox = (w - (x1 - x0) * sc) / 2 - x0 * sc
+    oy = (h + (y1 - y0) * sc) / 2 + y0 * sc
+    P = lambda p: (ox + p[0] * sc, oy - p[1] * sc)  # noqa: E731
+    c = Canvas(w, h)
+    cols = colors or [ACC, ACC2, INK, ACC]
+    for k, lg in enumerate(legs):
+        (ax, ay), (bx, by) = P(pts[k]), P(pts[k + 1])
+        col = cols[k % len(cols)]
+        c.arrow(ax, ay, bx, by, col, 'main', head=9)
+        mx, my = (ax + bx) / 2, (ay + by) / 2
+        L = math.hypot(bx - ax, by - ay) or 1
+        nx, ny = (by - ay) / L, -(bx - ax) / L   # left-hand normal on screen
+        # put the label on the side away from the polygon's centre
+        cx_, cy_ = sum(P(p)[0] for p in pts) / len(pts), sum(P(p)[1] for p in pts) / len(pts)
+        if (mx + nx * 10 - cx_) ** 2 + (my + ny * 10 - cy_) ** 2 < (mx - nx * 10 - cx_) ** 2 + (my - ny * 10 - cy_) ** 2:
+            nx, ny = -nx, -ny
+        anchor = 'start' if nx > 0.35 else ('end' if nx < -0.35 else 'middle')
+        c.text(mx + nx * 14, my + ny * 14 + (4 if abs(ny) < 0.35 else 0), lg[2], FST, anchor=anchor, color=col,
+               value=lg[3] if len(lg) > 3 else None)
+    if resultant is not None:
+        (ax, ay), (bx, by) = P(pts[0]), P(pts[-1])
+        c.arrow(ax, ay, bx, by, MUT, 'axis', head=9, dash='6 4')
+        if resultant:
+            mx, my = (ax + bx) / 2, (ay + by) / 2
+            L = math.hypot(bx - ax, by - ay) or 1
+            nx, ny = (by - ay) / L, -(bx - ax) / L
+            cx_, cy_ = sum(P(p)[0] for p in pts) / len(pts), sum(P(p)[1] for p in pts) / len(pts)
+            if (mx + nx * 10 - cx_) ** 2 + (my + ny * 10 - cy_) ** 2 > (mx - nx * 10 - cx_) ** 2 + (my - ny * 10 - cy_) ** 2:
+                nx, ny = -nx, -ny
+            anchor = 'start' if nx > 0.35 else ('end' if nx < -0.35 else 'middle')
+            c.text(mx + nx * 14, my + ny * 14, resultant, FST, anchor=anchor, color=MUT, value=False)
+    c.dot(*P(pts[0]), 3.4)
+    if start_label:
+        c.text(P(pts[0])[0] - 8, P(pts[0])[1] + 14, start_label, FST, anchor='end', value=False)
+    if end_label:
+        c.text(P(pts[-1])[0] + 8, P(pts[-1])[1] - 10, end_label, FST, anchor='start', value=False)
+    if angle and resultant is not None:
+        lab, ref = angle
+        (ax, ay), (bx, by) = P(pts[0]), P(pts[-1])
+        a_res = math.degrees(math.atan2(-(by - ay), bx - ax))
+        a_ref = 90.0 if ref == 'north' else (0.0 if ref == 'east' else (180.0 if ref == 'west' else -90.0))
+        r = 30
+        p0 = (ax + r * math.cos(math.radians(a_ref)), ay - r * math.sin(math.radians(a_ref)))
+        p1 = (ax + r * math.cos(math.radians(a_res)), ay - r * math.sin(math.radians(a_res)))
+        sweep = 0 if a_res > a_ref else 1
+        c.line(ax, ay, ax + 44 * math.cos(math.radians(a_ref)), ay - 44 * math.sin(math.radians(a_ref)), GRID, 'thin', dash='3 3')
+        c.path(f'M{r1(p0[0])},{r1(p0[1])} A{r},{r} 0 0,{sweep} {r1(p1[0])},{r1(p1[1])}', MUT, 'thin')
+        am = math.radians((a_ref + a_res) / 2)
+        c.text(ax + (r + 12) * math.cos(am), ay - (r + 12) * math.sin(am), lab, FST, value=False)
+    if north:
+        compass(c, w - 22, 34)
+    return c.done(title, desc)
+
+
+def ticker_tape(title, desc, gaps, dim=None, w=440, h=120):
+    """A paper tape with dots; gaps are the successive dot spacings (any units, scaled to fit).
+    dim: (first dot index, last dot index, label) dimension under the tape."""
+    c = Canvas(w, h)
+    x0, x1, y = 24, w - 24, 46
+    total = sum(gaps)
+    sc = (x1 - x0 - 20) / total
+    c.rect(x0, y - 16, x1 - x0, 32, INK, 'thin', fill=FILLC)
+    xs = [x0 + 10]
+    for g in gaps:
+        xs.append(xs[-1] + g * sc)
+    for x in xs:
+        c.dot(x, y, 3.0, INK)
+    if dim:
+        i, j, lab = dim
+        c.dim(xs[i], y + 34, xs[j], y + 34, lab, side=-1)
+        for k in (i, j):
+            c.line(xs[k], y + 18, xs[k], y + 38, GRID, 'thin', dash='2 3')
+    return c.done(title, desc)
+
 # ═════════════════════════ practical apparatus ═════════════════════════
 
 def light_gates(title, desc, card_label=None, sep_label=None, two=True, w=420, h=190):

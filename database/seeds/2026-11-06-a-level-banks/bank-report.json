@@ -1,4 +1,80 @@
 {
+ "1.1": {
+  "code": "1.1",
+  "title": "Speed",
+  "topic": "ffbe7a62-e4c5-4cb6-8a20-6f0177f86d30",
+  "before": 0,
+  "new": 52,
+  "after": 52,
+  "easy": 19,
+  "medium": 21,
+  "hard": 12,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01a",
+  "figures": 4
+ },
+ "1.2": {
+  "code": "1.2",
+  "title": "Distance and displacement, scalar and vector",
+  "topic": "cbfde8f1-1390-4f8a-b259-ff4ad9ad516e",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 19,
+  "medium": 21,
+  "hard": 11,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01a",
+  "figures": 15
+ },
+ "1.3": {
+  "code": "1.3",
+  "title": "Speed and velocity",
+  "topic": "d47d25c0-5538-419d-9d8f-026400e11f72",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 20,
+  "hard": 11,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01a",
+  "figures": 7
+ },
+ "1.4": {
+  "code": "1.4",
+  "title": "Displacement–time graphs",
+  "topic": "b2e3d430-7699-4dac-9f55-e84c5cd5ce9b",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 21,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01a",
+  "figures": 21
+ },
  "16.2": {
   "code": "16.2",
   "title": "Radians and angular speed",
