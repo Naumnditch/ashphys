@@ -3422,3 +3422,82 @@ def ct_gantry(title, desc, w=360, h=320):
     c.text(cx + 70, cy + R - 4, 'detector arc', FST, anchor='start', value=False)
     rot_arrow(c, cx, cy, R + 12, 120, 160)
     return c.done(title, desc)
+
+
+def ascan(title, desc, peaks, t_end, xticks, xlabel='t / µs', tick_labels_=None, w=420, h=240):
+    """A-scan trace: sharp pulses of the given heights at the given times (the transmitted pulse at t = 0
+    is included in `peaks` by the caller)."""
+    xs, ys = [], []
+    n = 900
+    for i in range(n + 1):
+        t = t_end * i / n
+        y = 0.0
+        for tp, hp in peaks:
+            y += hp * math.exp(-((t - tp) / (t_end * 0.006)) ** 2)
+        xs.append(t)
+        ys.append(y)
+    return plot(xlabel, 'echo amplitude', [dict(x=xs, y=ys)], title, desc, xr=(0, t_end), yr=(0, 1.1),
+                xticks=xticks, yticks=[0, 0.5, 1.0], w=w, h=h)
+
+
+def transducer(title, desc, w=380, h=260):
+    """Cross-section of an ultrasound transducer: backing block, piezoelectric crystal, matching layer,
+    electrodes and leads, with the beam leaving the face."""
+    c = Canvas(w, h)
+    x0, x1 = 110, 230
+    c.rect(x0 - 10, 30, x1 - x0 + 20, 170, INK, 'main')
+    c.rect(x0, 40, x1 - x0, 70, MUT, 'thin', fill=FILLC)
+    c.text(x1 + 20, 75, 'backing block', FST, anchor='start', value=False)
+    c.rect(x0, 110, x1 - x0, 30, ACC, 'main', fill=FILLC)
+    c.text(x1 + 20, 125, 'piezoelectric crystal', FST, anchor='start', value=False)
+    c.line(x0, 110, x1, 110, INK, 'axis')
+    c.line(x0, 140, x1, 140, INK, 'axis')
+    c.rect(x0, 140, x1 - x0, 14, ACC2, 'thin', fill=FILLC)
+    c.text(x1 + 20, 152, 'matching layer', FST, anchor='start', value=False)
+    c.line(x0 + 20, 110, x0 + 20, 12, INK, 'thin')
+    c.line(x1 - 20, 140, x1 - 20, 120, INK, 'thin')
+    c.text(x0 + 26, 16, 'leads to a.c. supply / receiver', FST, anchor='start', value=False)
+    for dx in (20, 60, 100):
+        c.arrow(x0 + dx, 206, x0 + dx, 246, ACC2, 'thin', head=6)
+    c.text(x1 + 20, 230, 'ultrasound pulse', FST, anchor='start', color=ACC2, value=False)
+    return c.done(title, desc)
+
+
+def sonar(title, desc, labels=(), w=420, h=250):
+    """A boat sending a sonar pulse down to the sea bed (and an optional shoal), with depth markers."""
+    c = Canvas(w, h)
+    sea = 60
+    c.line(20, sea, w - 20, sea, ACC, 'axis')
+    c.poly([(150, sea - 2), (270, sea - 2), (255, sea + 14), (165, sea + 14)], INK, 'main', fill=FILLC, closed=True)
+    c.rect(195, sea - 22, 30, 20, INK, 'thin', fill=FILLC)
+    c.arrow(200, sea + 16, 200, h - 34, ACC2, 'thin', head=7)
+    c.arrow(220, h - 34, 220, sea + 16, ACC2, 'thin', head=7)
+    c.path(f'M20,{h - 30} Q120,{h - 40} 210,{h - 30} T{w - 20},{h - 26}', INK, 'main')
+    c.text(w - 30, h - 12, 'sea bed', FST, anchor='end', value=False)
+    for k, (y, lab) in enumerate(labels):
+        c.text(240, y, lab, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def pet_ring(title, desc, offset=0.0, offset_label=None, w=360, h=320):
+    """End-on view of a PET detector ring with an annihilation point on a diameter and the two photons
+    travelling to opposite detectors along the line of response; offset is a fraction of the radius."""
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, 168, 125
+    for a in range(0, 360, 10):
+        p = (cx + R * math.cos(math.radians(a)), cy - R * math.sin(math.radians(a)))
+        c.rect(p[0] - 5, p[1] - 5, 10, 10, INK, 'thin', fill=FILLC)
+    c.circle(cx, cy, 60, MUT, 'thin', dash='4 3')
+    c.text(cx, cy + 74, 'patient', FST, color=MUT, value=False)
+    px = cx + offset * R
+    c.line(cx - R + 6, cy, cx + R - 6, cy, MUT, 'thin', dash='5 4')
+    c.arrow(px - 6, cy, cx - R + 8, cy, ACC2, 'main', head=8)
+    c.arrow(px + 6, cy, cx + R - 8, cy, ACC2, 'main', head=8)
+    c.circle(px, cy, 5, ACC, 'main', fill=FILLC)
+    c.dot(cx, cy, 2.4)
+    c.text(cx - R, cy - 22, 'A', FS, weight=600, value=False)
+    c.text(cx + R, cy - 22, 'B', FS, weight=600, value=False)
+    c.text(cx, 14, 'ring of detectors', FST, color=MUT, value=False)
+    if offset_label:
+        c.dim(cx, cy + 26, px, cy + 26, offset_label, side=-1)
+    return c.done(title, desc)

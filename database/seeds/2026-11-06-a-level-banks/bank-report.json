@@ -1765,5 +1765,81 @@
   },
   "file": "ch30a",
   "figures": 9
+ },
+ "30.5": {
+  "code": "30.5",
+  "title": "Ultrasound",
+  "topic": "c42a4d3d-be78-5670-938b-975bb2eaf1ec",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 19,
+  "medium": 18,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 3,
+   "d3": 5
+  },
+  "file": "ch30b",
+  "figures": 3
+ },
+ "30.6": {
+  "code": "30.6",
+  "title": "Echo sounding",
+  "topic": "d8943c26-698b-4e81-97d1-7588165e9880",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch30b",
+  "figures": 8
+ },
+ "30.7": {
+  "code": "30.7",
+  "title": "Ultrasound scanning",
+  "topic": "75e89d65-181a-4db5-a20b-511fa32bab7d",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 18,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch30b",
+  "figures": 1
+ },
+ "30.8": {
+  "code": "30.8",
+  "title": "PET scanning",
+  "topic": "36e936df-9896-57b6-a5e3-651ca3d785ed",
+  "before": 8,
+  "new": 43,
+  "after": 51,
+  "easy": 18,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 1,
+   "d3": 7
+  },
+  "file": "ch30b",
+  "figures": 4
  }
 }
