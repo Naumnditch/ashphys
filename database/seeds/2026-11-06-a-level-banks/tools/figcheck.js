@@ -41,9 +41,14 @@ function page(theme, cells, cols) {
     document.querySelectorAll('.fig').forEach((d) => {
       const svg = d.querySelector('svg');
       const vb = svg.viewBox.baseVal;
+      // boxes in viewBox units, after any <g transform> (getBBox alone is local to the element)
+      const sr = svg.getBoundingClientRect();
+      const k = vb.width / sr.width;
       const texts = [...svg.querySelectorAll('text')].map((t) => {
+        const r = t.getBoundingClientRect();
         const b = t.getBBox();
-        return { s: t.textContent, x: b.x, y: b.y, w: b.width, h: b.height };
+        const kh = b.height / (r.height || 1); // keep the font-box height convention of getBBox
+        return { s: t.textContent, x: (r.left - sr.left) * k + vb.x, y: (r.top - sr.top) * k + vb.y, w: r.width * k, h: r.height * k };
       });
       out.push({ vb: [vb.x, vb.y, vb.width, vb.height], texts, bytes: new TextEncoder().encode(svg.outerHTML).length });
     });

@@ -987,7 +987,7 @@ def compass(c, x, y, size=16):
 
 
 def rails(title, desc, L_label=None, v_label='v', B_label=None, R_label=None, into=True, rails=True,
-          force_label=None, north=False, current=None, w=420, h=250):
+          force_label=None, north=False, current=None, w=420, h=250, rod_label=None):
     """Top view: a rod sliding on two rails (joined by a resistor) through a uniform field."""
     c = Canvas(w, h)
     y1, y2 = 70, 180
@@ -996,14 +996,19 @@ def rails(title, desc, L_label=None, v_label='v', B_label=None, R_label=None, in
     if rails:
         c.line(xr0, y1, xr1, y1, INK, 'main')
         c.line(xr0, y2, xr1, y2, INK, 'main')
-        if R_label is not None:
+        if R_label == 'cell':
+            vcomp(c, 'cell', xr0, y1, y2, None)
+        elif R_label is not None:
             vcomp(c, 'R', xr0, y1, y2, R_label or None, side=-1)
         else:
             c.line(xr0, y1, xr0, y2, INK, 'main')
     field_symbols(c, 104, y1 + 6 if rails else 40, 226, (y2 - y1 - 12) if rails else 170, into)
     c.line(rod, y1 - 16, rod, y2 + 16, ACC2, 'bold')
-    c.arrow(rod + 6, y1 - 26, rod + 70, y1 - 26, ACC2, 'main')
-    c.text(rod + 76, y1 - 26, v_label, FST, anchor='start', color=ACC2)
+    if v_label:
+        c.arrow(rod + 6, y1 - 26, rod + 70, y1 - 26, ACC2, 'main')
+        c.text(rod + 76, y1 - 26, v_label, FST, anchor='start', color=ACC2)
+    if rod_label:
+        c.text(rod + 8, y2 + 30, rod_label, FST, anchor='start', color=ACC2)
     if force_label:
         c.arrow(rod - 6, y2 + 26, rod - 66, y2 + 26, ACC, 'main')
         c.text(rod - 72, y2 + 26, force_label, FST, anchor='end', color=ACC)
@@ -1595,4 +1600,275 @@ def oil_drop(title, desc, gap_label=None, V_label=None, mass_label=None, w=360, 
         c.dim(x1 + 22, yt, x1 + 22, yb, gap_label, side=1)
     if V_label:
         c.text((x0 + x1) / 2, yt - 26, V_label, FST)
+    return c.done(title, desc)
+
+
+# ═════════════════════════ magnetic fields ═════════════════════════
+
+def wire_symbol(c, x, y, out=True, r=10, color=INK):
+    c.circle(x, y, r, color, 'main', fill=FILLC)
+    if out:
+        c.dot(x, y, 2.8, color)
+    else:
+        d = r * 0.6
+        c.line(x - d, y - d, x + d, y + d, color, 'axis')
+        c.line(x - d, y + d, x + d, y - d, color, 'axis')
+
+
+def wires_endon(title, desc, wires, points=(), dims=(), w=420, h=230, pad=60, unit_px=None, note=None):
+    """Long straight wires seen end-on. wires: dict(x, y, out, label) in data units (y up); points: dict(x, y, label);
+    dims: (x1, y1, x2, y2, label, side) in data units. Scaled to fit."""
+    xs = [q['x'] for q in list(wires) + list(points)] + [d[0] for d in dims] + [d[2] for d in dims]
+    ys = [q['y'] for q in list(wires) + list(points)] + [d[1] for d in dims] + [d[3] for d in dims]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    sp = unit_px or min((w - 2 * pad) / ((x1 - x0) or 1), (h - 2 * pad) / ((y1 - y0) or 1))
+    X = lambda v: w / 2 + (v - (x0 + x1) / 2) * sp  # noqa: E731
+    Y = lambda v: h / 2 - (v - (y0 + y1) / 2) * sp  # noqa: E731
+    c = Canvas(w, h)
+    for d in dims:
+        c.dim(X(d[0]), Y(d[1]), X(d[2]), Y(d[3]), d[4], side=d[5])
+    for q in wires:
+        wire_symbol(c, X(q['x']), Y(q['y']), q.get('out', True))
+        if q.get('label'):
+            c.text(X(q['x']), Y(q['y']) - 24, q['label'], FST)
+    for q in points:
+        c.dot(X(q['x']), Y(q['y']), 3.6, ACC2)
+        if q.get('label'):
+            c.text(X(q['x']) + 8, Y(q['y']) - 14, q['label'], FST, anchor='start', color=ACC2)
+    if note:
+        c.text(w / 2, h - 12, note, FST)
+    return c.done(title, desc)
+
+
+def wire_in_uniform(title, desc, out=True, B_label=None, I_label=None, w=320, h=240, north=True):
+    """Top view: a vertical wire (end-on) in the Earth's uniform horizontal field pointing north (up the page)."""
+    c = Canvas(w, h)
+    for k in range(5):
+        x = 40 + k * (w - 80) / 4
+        c.arrow(x, h - 30, x, 30, ACC, 'thin', head=7)
+    wire_symbol(c, w / 2 + 0.5 * (w - 80) / 4, h / 2, out)
+    if I_label:
+        c.text(w / 2 + 0.5 * (w - 80) / 4, h / 2 + 26, I_label, FST)
+    if B_label:
+        c.text(w - 14, 16, B_label, FST, anchor='end', color=ACC)
+    if north:
+        compass(c, 16, 40, 12)
+    return c.done(title, desc)
+
+
+def wire_angle(title, desc, theta_deg, theta_label=None, I_label='I', B_label='B', w=340, h=230, axis=False):
+    """Field lines across the page and a straight wire in the plane of the page at θ to them."""
+    c = Canvas(w, h)
+    lines_y = [36 + k * (h - 72) / 4 for k in range(5)]
+    for y in lines_y:
+        c.arrow(16, y, w - 16, y, ACC, 'thin', head=7)
+    cx, cy = w / 2 - 20, h / 2
+    a = math.radians(theta_deg)
+    L = 100
+    c.line(cx - L * math.cos(a), cy + L * math.sin(a), cx + L * math.cos(a), cy - L * math.sin(a), INK, 'bold')
+    c.arrow(cx + 20 * math.cos(a), cy - 20 * math.sin(a), cx + 70 * math.cos(a), cy - 70 * math.sin(a), ACC2, 'main')
+    gaps = [(p + q) / 2 for p, q in zip(lines_y, lines_y[1:])]
+    ty = cy - 80 * math.sin(a)
+    c.text(cx + 80 * math.cos(a) + 10, min(gaps, key=lambda g: abs(g - ty)), I_label, FST, anchor='start', color=ACC2)
+    if theta_label:
+        r = 40
+        c.path(f'M{r1(cx + r)},{r1(cy)} A{r},{r} 0 0,0 {r1(cx + r * math.cos(a))},{r1(cy - r * math.sin(a))}', MUT, 'axis')
+        c.text(cx + r + 8, cy - 18 if theta_deg > 20 else cy - 10, theta_label, FST, anchor='start')
+    c.text(w - 18, 18, B_label, FST, anchor='end', color=ACC)
+    return c.done(title, desc)
+
+
+def wire_cross_field(title, desc, out=False, B_label='B', w=320, h=220):
+    """A wire seen end-on (current into or out of the page) in a uniform field across the page."""
+    c = Canvas(w, h)
+    for k in range(5):
+        y = 30 + k * (h - 60) / 4
+        c.arrow(16, y, w - 16, y, ACC, 'thin', head=7)
+    wire_symbol(c, w / 2, h / 2, out, r=13)
+    c.text(w - 18, 14, B_label, FST, anchor='end', color=ACC)
+    return c.done(title, desc)
+
+
+def solenoid_end(title, desc, anticlockwise=True, w=260, h=220):
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, h / 2 - 6, 70
+    c.circle(cx, cy, R, INK, 'bold')
+    for ang in (90, 210, 330):
+        a = math.radians(ang)
+        x, y = cx + R * math.cos(a), cy - R * math.sin(a)
+        tang = a + (math.pi / 2 if anticlockwise else -math.pi / 2)
+        c.arrowhead(x, y, -tang, ACC2, 11)
+    c.text(cx, h - 10, 'current direction seen from this end', FST, value=False)
+    return c.done(title, desc)
+
+
+def top_pan(title, desc, reading=None, I_label=None, L_label=None, w=420, h=260):
+    """A U-shaped magnet on a top-pan balance with a horizontal wire held between its poles."""
+    c = Canvas(w, h)
+    # balance
+    c.rect(110, 200, 200, 40, INK, 'main', fill=FILLC, rx=4)
+    c.rect(140, 186, 140, 14, INK, 'main')
+    if reading:
+        c.rect(170, 210, 80, 22, INK, 'thin', rx=3)
+        c.text(210, 221, reading, FST)
+    # magnet (U shape seen from the side) with pole pieces
+    c.rect(150, 116, 120, 70, INK, 'main', fill=FILLC)
+    c.rect(170, 116, 80, 40, INK, 'main', fill='none')
+    c.text(160, 136, 'N', FST, weight=700, value=False)
+    c.text(260, 136, 'S', FST, weight=700, value=False)
+    # wire crossing the gap (end-on), held by a clamp from above
+    wire_symbol(c, 210, 136, out=False, r=8)
+    c.line(210, 128, 210, 60, INK, 'main')
+    c.line(210, 60, 350, 60, INK, 'main')
+    c.rect(330, 50, 50, 20, INK, 'thin', fill=FILLC)
+    c.text(355, 82, 'clamp', FST, value=False)
+    if I_label:
+        c.text(60, 60, I_label, FST, color=ACC2)
+    if L_label:
+        c.text(60, 84, L_label, FST)
+    c.text(202, 96, 'wire', FST, anchor='end', value=False)
+    return c.done(title, desc)
+
+
+def pivot_balance(title, desc, d_force=None, d_rider=None, rider_label=None, wire_label=None, same_side=False, w=420, h=220):
+    """A wire frame on a knife-edge pivot: the magnetic force on the far side is balanced by a rider."""
+    c = Canvas(w, h)
+    px, py = 200, 110
+    c.poly([(px - 12, py + 22), (px + 12, py + 22), (px, py)], INK, 'main', fill=FILLC, closed=True)
+    c.line(60, py, 360, py, INK, 'bold')
+    c.rect(330, py - 30, 60, 60, MUT, 'thin', dash='4 3', fill=FILLC)
+    c.text(360, py - 40, 'magnetic field', FST, value=False)
+    wire_symbol(c, 360, py, out=False, r=7)
+    c.arrow(360, py + 12, 360, py + 56, ACC, 'main')
+    c.text(366, py + 48, 'F', FST, anchor='start', color=ACC)
+    rx = 280 if same_side else 120
+    c.line(rx, py, rx, py + 30, INK, 'thin')
+    c.rect(rx - 10, py + 30, 20, 16, ACC2, 'main', fill=FILLC)
+    if rider_label:
+        c.text(rx, py + 62, rider_label, FST, color=ACC2)
+    if d_force:
+        c.dim(px, py - 50, 360, py - 50, d_force, side=1, off=12)
+    if d_rider:
+        c.dim(px, py - 26 if same_side else py - 50, rx, py - 26 if same_side else py - 50, d_rider, side=1, off=12)
+    if wire_label:
+        c.text(20, h - 14, wire_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def wire_partial(title, desc, inside=0.5, L_label=None, I_label=None, B_label=None, into=True, w=420, h=200):
+    c = Canvas(w, h)
+    rx = 210
+    c.rect(rx, 16, w - rx - 16, h - 60, MUT, 'thin', dash='5 4', fill=FILLC)
+    field_symbols(c, rx, 16, w - rx - 16, h - 60, into, skip=[(rx, (h - 44) / 2 - 10, w, 20)])
+    y = (h - 44) / 2 + 16
+    L = 280
+    x0 = rx - L * (1 - inside)
+    c.line(x0, y, x0 + L, y, INK, 'bold')
+    c.arrow(x0 + 10, y - 14, x0 + 70, y - 14, ACC2, 'main')
+    if I_label:
+        c.text(x0 + 76, y - 14, I_label, FST, anchor='start', color=ACC2)
+    if L_label:
+        c.dim(x0, y + 22, x0 + L, y + 22, L_label, side=-1, off=12)
+    if B_label:
+        field_legend(c, rx + 6, h - 14, B_label, into)
+    return c.done(title, desc)
+
+
+def semicircle_wire(title, desc, r_label=None, I_label=None, B_label=None, into=True, w=340, h=230):
+    c = Canvas(w, h)
+    field_symbols(c, 16, 14, w - 32, h - 50, into, step=34, skip=[(w / 2 - 6, 40, 12, 140)])
+    cx, cy, R = w / 2, h - 60, 110
+    c.path(f'M{r1(cx - R)},{r1(cy)} A{R},{R} 0 0,1 {r1(cx + R)},{r1(cy)}', ACC2, 'bold')
+    c.arrowhead(cx + 3, cy - R, 0, ACC2, 10)
+    c.line(cx - R, cy, cx - R - 20, cy, ACC2, 'bold')
+    c.line(cx + R, cy, cx + R + 20, cy, ACC2, 'bold')
+    if r_label:
+        c.line(cx, cy, cx, cy - R, INK, 'thin', dash='3 3')
+        c.dot(cx, cy, 2.6)
+        c.text(cx + 6, cy - R / 2, r_label, FST, anchor='start')
+    if I_label:
+        c.text(cx, cy - R - 14, I_label, FST, color=ACC2)
+    if B_label:
+        field_legend(c, 20, h - 14, B_label, into)
+    return c.done(title, desc)
+
+
+def split_field_loop(title, desc, left_label=None, right_label=None, w=420, h=220):
+    """A flat loop lying across two regions: the left half in a field out of the page (upwards), the right half
+    in a field into the page (downwards)."""
+    c = Canvas(w, h)
+    mx = w / 2
+    c.rect(20, 20, mx - 20, h - 64, MUT, 'thin', dash='5 4', fill=FILLC)
+    c.rect(mx, 20, w - mx - 20, h - 64, MUT, 'thin', dash='5 4')
+    field_symbols(c, 20, 20, mx - 20, h - 64, into=False, step=34)
+    field_symbols(c, mx, 20, w - mx - 20, h - 64, into=True, step=34)
+    c.rect(mx - 120, 50, 240, h - 124, ACC2, 'bold')
+    if left_label:
+        c.text(30, h - 26, left_label, FST, anchor='start')
+    if right_label:
+        c.text(w - 30, h - 26, right_label, FST, anchor='end')
+    return c.done(title, desc)
+
+
+def l_wire(title, desc, arm1_label=None, arm2_label=None, field='into', I_label='I', axes=False, B_label=None,
+           ratio=1.0, w=360, h=260):
+    """An L-shaped wire: arm 1 along +x (left to right), then arm 2 up the page (+y). field: 'into', 'out'
+    (perpendicular to the page) or 'lines' (uniform field along +x in the plane of the page)."""
+    c = Canvas(w, h)
+    L1 = 170
+    L2 = L1 * ratio if ratio <= 1 else L1
+    if ratio > 1:
+        L1 = L2 / ratio
+    px, py = 70, h - 70
+    if field == 'lines':
+        for k in range(4):
+            y = 40 + k * 45
+            c.arrow(16, y, w - 16, y, ACC, 'thin', head=7)
+    else:
+        field_symbols(c, 16, 30, w - 32, h - 66, field == 'into', step=34,
+                      skip=[(px + 10, py + 4, 120, 24), (px, py + 24, L1, 24), (px + L1 + 6, py - L2 / 2 - 12, 130, 24)])
+    qx, qy = px + L1, py
+    rx, ry = qx, py - L2
+    c.poly([(px, py), (qx, qy), (rx, ry)], ACC2, 'bold')
+    c.arrow(px + 20, py + 16, px + 80, py + 16, ACC2, 'main')
+    c.text(px + 86, py + 16, I_label, FST, anchor='start', color=ACC2)
+    if arm1_label:
+        c.text((px + qx) / 2, py + 36, arm1_label, FST)
+    if arm2_label:
+        c.text(qx + 12, (qy + ry) / 2, arm2_label, FST, anchor='start')
+    if axes:
+        for lab, (x, y) in zip('PQR', [(px, py), (qx, qy), (rx, ry)]):
+            c.dot(x, y, 3)
+            c.text(x - 10, y - 10, lab, FST, weight=600, anchor='end', value=False)
+        c.arrow(w - 70, h - 20, w - 30, h - 20, INK, 'thin', head=7)
+        c.text(w - 24, h - 20, 'x', FST, anchor='start', value=False)
+        c.arrow(w - 70, h - 20, w - 70, h - 60, INK, 'thin', head=7)
+        c.text(w - 70, h - 68, 'y', FST, value=False)
+    if B_label:
+        c.text(w - 16, 14, B_label, FST, anchor='end', color=ACC if field == 'lines' else INK)
+    return c.done(title, desc)
+
+
+def dip_figure(title, desc, dip_deg, total_label=None, h_label=None, dip_label=None, w=340, h=240):
+    """The Earth's field in the north–vertical plane: total field at the angle of dip below the horizontal,
+    with its horizontal (north) and vertical components."""
+    c = Canvas(w, h)
+    ox, oy = 50, 50
+    a = math.radians(dip_deg)
+    L = min(230, 170 / max(math.sin(a), 0.2))
+    ex, ey = ox + L * math.cos(a), oy + L * math.sin(a)
+    c.line(ox, oy, w - 20, oy, MUT, 'thin', dash='4 3')
+    c.text(w - 20, oy - 12, 'north (horizontal)', FST, anchor='end', value=False)
+    c.arrow(ox, oy, ex, oy, ACC2, 'main')
+    c.arrow(ex, oy, ex, ey, ACC2, 'main', dash='5 3')
+    c.arrow(ox, oy, ex, ey, ACC, 'bold')
+    if h_label:
+        c.text((ox + ex) / 2, oy - 12, h_label, FST, color=ACC2)
+    c.text(ex + 8, (oy + ey) / 2, 'vertical component', FST, anchor='start', color=ACC2, value=False) if ex < w - 150 else None
+    if total_label:
+        c.text((ox + ex) / 2 - 14, (oy + ey) / 2 + 6, total_label, FST, anchor='end', color=ACC)
+    r = 44
+    c.path(f'M{r1(ox + r)},{r1(oy)} A{r},{r} 0 0,1 {r1(ox + r * math.cos(a))},{r1(oy + r * math.sin(a))}', MUT, 'axis')
+    if dip_label:
+        c.text(ox + (r + 14) * math.cos(a / 2), oy + (r + 14) * math.sin(a / 2), dip_label, FST, anchor='start')
     return c.done(title, desc)

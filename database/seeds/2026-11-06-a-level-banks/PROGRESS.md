@@ -83,3 +83,10 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch25a + ch25b | 25.1–25.5 | f5b45bb | f08cee7ff4f1e89b640471f79afd516f / 5a7b10fe5611c7032057e0172916b20a | 2026-11-07 (pg_net ids 16, 17) | all 50 (17/20/13) |
 | ch26a + ch26b | 26.1–26.5 | e032416 | cdffe80738add4eb1f1136e4824adfe8 / ed1bd05d17e1160f18dbf4d563691635 | 2026-11-07 (pg_net ids 18, 19) | all 50 (17/20/13) |
 | ch27 | 27.1–27.4 | 4bd5cfc | 592dcee493fc9ca926d4c021f7ae6a6a | 2026-11-07 (pg_net id 20) | all 50 (17/20/13) |
+
+## Figures applied (full chapter SQL re-applied: same rows, figure_svg / figure_alt added)
+| file | commit | md5 | pg_net | figures per lesson |
+|---|---|---|---|---|
+| ch27 | 6ff4338 | 39f545e1d673aa1547e64e586cffff80 | 21 | 27.1 10, 27.2 21, 27.3 7, 27.4 18 |
+| ch26a + ch26b | 3201ca2 | 513b7714c234174f384b26f82f0e3afc / 33b994549e856de649b670eda031d279 | 22, 23 | 26.1 18, 26.2 18, 26.3 12, 26.4 19, 26.5 11 |
+| ch25a + ch25b | 540640e | b3490690643d9bf2ca6a1570f4af6729 / 1df9b5bcbd850709a849eae494b2d4d1 | 24, 25 | 25.1 8, 25.2 13, 25.3 22, 25.4 13, 25.5 15 |
