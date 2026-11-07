@@ -3267,3 +3267,158 @@ def gm_setup(title, desc, d_label=None, w=420, h=200):
     if d_label:
         c.dim(60, y - 44, gx, y - 44, d_label, side=1)
     return c.done(title, desc)
+
+
+# ═════════════════════════ medical physics ═════════════════════════
+
+def xray_tube(title, desc, V_label=None, I_label=None, w=440, h=230):
+    """X-ray tube: heated cathode filament, electron beam to an angled tungsten target on the anode,
+    X-rays leaving through a window; evacuated glass envelope."""
+    c = Canvas(w, h)
+    yc = 100
+    c.rect(40, yc - 50, 330, 100, INK, 'axis', rx=40)
+    c.text(56, yc - 38, 'vacuum', FST, color=MUT, anchor='start', value=False)
+    c.path(f'M80,{yc - 10} q5,-10 10,0 t10,0 t10,0', INK, 'main')
+    c.line(80, yc - 10, 60, yc - 10, INK, 'main')
+    c.line(110, yc - 10, 120, yc - 20, INK, 'thin')
+    c.text(95, yc + 22, 'cathode', FST, value=False)
+    c.poly([(290, yc - 30), (330, yc - 30), (330, yc + 30), (290, yc + 10)], INK, 'main', fill=FILLC, closed=True)
+    c.line(330, yc, 385, yc, INK, 'bold')
+    c.text(318, yc - 42, 'anode (tungsten target)', FST, value=False)
+    for dy in (-12, 0, 12):
+        c.arrow(115, yc + dy * 0.3, 284, yc - 4 + dy * 0.6, ACC, 'thin', head=6)
+    c.text(200, yc + 20, 'electrons', FST, color=ACC, value=False)
+    for dx in (-14, 0, 14):
+        c.arrow(296 + dx, yc + 6, 286 + dx * 1.6, h - 22, ACC2, 'thin', head=7)
+    c.line(262, yc + 50, 318, yc + 50, ACC2, 'main')
+    c.text(345, h - 20, 'X-rays', FST, color=ACC2, anchor='start', value=False)
+    if V_label:
+        c.text(205, 22, V_label, FST)
+        c.line(60, yc - 10, 60, 22, INK, 'thin')
+        c.line(60, 22, 160, 22, INK, 'thin')
+        c.line(250, 22, 385, 22, INK, 'thin')
+        c.line(385, 22, 385, yc, INK, 'thin')
+    if I_label:
+        c.text(205, 40, I_label, FST, color=MUT)
+    return c.done(title, desc)
+
+
+def xray_spectrum(title, desc, kv, lines=(0.0209, 0.0184), w=420, h=280, compare=None):
+    """Relative intensity against wavelength for a tungsten-target tube at kv kilovolts (Kramers-type
+    continuum from the cut-off λ = hc/eV, with two characteristic lines); compare = second kV to overlay."""
+    def curve(kv_):
+        lmin = 6.63e-34 * 3.00e8 / (1.60e-19 * kv_ * 1e3) * 1e9
+        xs = [lmin + (0.12 - lmin) * i / 300 for i in range(301)]
+        ys = [7.7e-4 * max(0.0, (x / lmin - 1)) / x ** 2 for x in xs]   # Kramers' law, same tube current
+        if kv_ >= 70:                    # tungsten K lines need electrons above the 69.5 keV K-shell energy
+            for L in lines:
+                for i, x in enumerate(xs):
+                    ys[i] += 1.2 * math.exp(-((x - L) / 0.0005) ** 2)
+        return [0.0, lmin] + xs, [0.0, 0.0] + ys, lmin
+    xs, ys, lmin = curve(kv)
+    series = [dict(x=xs, y=ys)]
+    if compare:
+        x2, y2, _ = curve(compare)
+        series.append(dict(x=x2, y=[v * 1.0 for v in y2], color=ACC2, dash='5 4'))
+    return plot('λ / nm', 'relative intensity', series, title, desc, xr=(0, 0.12), yr=(0, 3.0),
+                xticks=[0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12], yticks=[0, 1, 2, 3], w=w, h=h)
+
+
+def layers(title, desc, items, w=440, h=200):
+    """A beam crossing slabs side by side: items = (width_px, name, label)."""
+    c = Canvas(w, h)
+    x = 70
+    y0, y1 = 50, 140
+    c.arrow(14, (y0 + y1) / 2, x - 4, (y0 + y1) / 2, ACC2, 'main')
+    c.text(14, (y0 + y1) / 2 - 16, 'I₀', FST, anchor='start', color=ACC2, value=False)
+    for wd, name, lab in items:
+        fill = FILLC if 'bone' not in name else MUT
+        c.rect(x, y0, wd, y1 - y0, INK, 'main', fill=fill)
+        c.text(x + wd / 2, y0 - 14, name, FST, value=False)
+        if lab:
+            c.text(x + wd / 2, y1 + 18, lab, FST)
+        x += wd
+    c.arrow(x + 4, (y0 + y1) / 2, x + 50, (y0 + y1) / 2, ACC2, 'main')
+    c.text(x + 56, (y0 + y1) / 2, 'I', FST, anchor='start', color=ACC2, value=False)
+    return c.done(title, desc)
+
+
+def penumbra(title, desc, spot_label=None, a_label=None, b_label=None, w=460, h=300):
+    """Geometric unsharpness: a focal spot of finite width, an object edge, and the blurred region
+    (penumbra) on the detector; a = source–object distance, b = object–detector distance."""
+    c = Canvas(w, h)
+    xs, x_obj, x_det = 90, 270, 370
+    sp = 30
+    c.rect(xs - 8, 120 - sp / 2, 16, sp, ACC2, 'main', fill=FILLC)
+    c.text(xs, 120 - sp / 2 - 14, 'focal spot', FST, value=False)
+    c.rect(x_obj - 6, 70, 12, 50, INK, 'main', fill=MUT)
+    c.line(x_det, 30, x_det, 250, INK, 'bold')
+    c.text(x_det, 22, 'detector', FST, value=False)
+    ye = 120
+    for ys in (120 - sp / 2, 120 + sp / 2):
+        k = (x_det - xs) / (x_obj - xs)
+        yd = ys + (ye - ys) * k
+        c.line(xs, ys, x_det, yd, MUT, 'thin', dash='4 3')
+    y_a = 120 - sp / 2 + (ye - (120 - sp / 2)) * (x_det - xs) / (x_obj - xs)
+    y_b = 120 + sp / 2 + (ye - (120 + sp / 2)) * (x_det - xs) / (x_obj - xs)
+    c.line(x_det + 6, min(y_a, y_b), x_det + 6, max(y_a, y_b), ACC, 'bold')
+    c.text(x_det + 12, (y_a + y_b) / 2, 'penumbra', FST, anchor='start', color=ACC, value=False)
+    c.text(x_obj, 60, 'object', FST, value=False)
+    if spot_label:
+        c.text(xs, 120 + sp / 2 + 16, spot_label, FST)
+    if a_label:
+        c.dim(xs, 270, x_obj, 270, a_label, side=-1)
+    if b_label:
+        c.dim(x_obj, 270, x_det, 270, b_label, side=-1)
+    return c.done(title, desc)
+
+
+def voxel_grid(title, desc, cells, rows=(None, None), cols=(None, None), diag=None, w=360, h=290):
+    """A 2 × 2 block of voxels with the beam readings along rows (right), columns (below) and the
+    top-left to bottom-right diagonal; cells = [[tl, tr], [bl, br]] labels."""
+    c = Canvas(w, h)
+    x0, y0, s = 110, 60, 80
+    for r in range(2):
+        for k in range(2):
+            c.rect(x0 + k * s, y0 + r * s, s, s, INK, 'main', fill=FILLC)
+            lab = cells[r][k]
+            if lab is not None:
+                c.text(x0 + k * s + s / 2, y0 + r * s + s / 2, str(lab), FS, value=not str(lab).isalpha() and str(lab) != '?')
+    for r in range(2):
+        y = y0 + r * s + s / 2
+        c.arrow(30, y, x0 - 6, y, ACC2, 'thin', head=6)
+        if rows[r] is not None:
+            c.line(x0 + 2 * s + 4, y, x0 + 2 * s + 30, y, MUT, 'thin')
+            c.text(x0 + 2 * s + 36, y, str(rows[r]), FS, anchor='start', color=ACC2)
+    for k in range(2):
+        x = x0 + k * s + s / 2
+        c.arrow(x, 18, x, y0 - 6, ACC2, 'thin', head=6)
+        if cols[k] is not None:
+            c.text(x, y0 + 2 * s + 22, str(cols[k]), FS, color=ACC2)
+    if diag is not None:
+        c.line(x0 - 24, y0 - 24, x0 + 2 * s + 18, y0 + 2 * s + 18, ACC, 'thin', dash='4 3')
+        c.text(x0 + 2 * s + 24, y0 + 2 * s + 26, str(diag), FS, anchor='start', color=ACC)
+    return c.done(title, desc)
+
+
+def ct_gantry(title, desc, w=360, h=320):
+    """CT scanner end-on: X-ray tube and an opposite arc of detectors rotating round the patient,
+    with a fan-shaped beam through the slice."""
+    c = Canvas(w, h)
+    cx, cy, R = w / 2, 160, 120
+    c.circle(cx, cy, R, MUT, 'thin', dash='5 4')
+    c.circle(cx, cy, 48, INK, 'main', fill=FILLC)
+    c.text(cx, cy, 'patient', FST, value=False)
+    tx, ty = cx, cy - R
+    c.rect(tx - 20, ty - 12, 40, 24, ACC2, 'main', fill=FILLC, rx=4)
+    c.text(tx + 28, ty - 12, 'X-ray tube', FST, anchor='start', color=ACC2, value=False)
+    span = 34
+    for a in range(-span, span + 1, 4):
+        p = (cx + R * math.sin(math.radians(a)), cy + R * math.cos(math.radians(a)))
+        c.rect(p[0] - 4, p[1] - 4, 8, 8, INK, 'thin', fill=FILLC)
+    for a in (-span, 0, span):
+        p = (cx + R * math.sin(math.radians(a)), cy + R * math.cos(math.radians(a)))
+        c.line(tx, ty + 12, p[0], p[1] - 4, ACC2, 'thin')
+    c.text(cx + 70, cy + R - 4, 'detector arc', FST, anchor='start', value=False)
+    rot_arrow(c, cx, cy, R + 12, 120, 160)
+    return c.done(title, desc)

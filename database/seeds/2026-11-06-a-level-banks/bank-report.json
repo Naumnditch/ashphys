@@ -1689,5 +1689,81 @@
   },
   "file": "ch29b",
   "figures": 0
+ },
+ "30.1": {
+  "code": "30.1",
+  "title": "X-ray imaging and CT",
+  "topic": "fed684c4-735b-500a-85f8-bf99a91029e7",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch30a",
+  "figures": 6
+ },
+ "30.2": {
+  "code": "30.2",
+  "title": "X-ray attenuation",
+  "topic": "0f96d95f-3125-445b-b0da-4dd630b4ff15",
+  "before": 6,
+  "new": 47,
+  "after": 53,
+  "easy": 20,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch30a",
+  "figures": 5
+ },
+ "30.3": {
+  "code": "30.3",
+  "title": "Improving X-ray images",
+  "topic": "3029b74c-e574-49c0-b55c-05e9699dc0bb",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch30a",
+  "figures": 5
+ },
+ "30.4": {
+  "code": "30.4",
+  "title": "Computerised axial tomography",
+  "topic": "b4831698-a4b4-443d-99d1-518973eaa5a7",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 19,
+  "medium": 18,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch30a",
+  "figures": 9
  }
 }
