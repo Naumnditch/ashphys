@@ -2034,3 +2034,200 @@ def point_charges(title, desc, charges, points=(), dims=(), w=420, h=200, pad=70
         c.dot(X(x), Y(y), 3.6)
         c.text(X(x), Y(y) - 14, lab, FST, weight=600)
     return c.done(title, desc)
+
+
+# ═════════════════════════ gases ═════════════════════════
+
+def syringe(title, desc, gas_frac=0.6, label=None, gauge=None, push=None, w=420, h=170, tube=False):
+    """A gas syringe (horizontal barrel) with the gas filling gas_frac of the barrel; optional gauge on the nozzle."""
+    c = Canvas(w, h)
+    x0, x1, y0, y1 = 100, 290, 50, 110
+    c.rect(x0, y0, x1 - x0, y1 - y0, INK, 'main', rx=3)
+    xp = x0 + gas_frac * (x1 - x0)
+    c.rect(x0 + 1, y0 + 1, xp - x0 - 2, y1 - y0 - 2, 'none', 'thin', fill=FILLC)
+    c.line(xp, y0 + 2, xp, y1 - 2, INK, 'bold')
+    c.line(xp, (y0 + y1) / 2, x1 + 50, (y0 + y1) / 2, INK, 'bold')
+    c.line(x1 + 50, y0 + 6, x1 + 50, y1 - 6, INK, 'bold')
+    for k in range(1, 10):
+        x = x0 + k * (x1 - x0) / 10
+        c.line(x, y0, x, y0 + (8 if k % 5 == 0 else 5), INK, 'thin')
+    c.line(x0, (y0 + y1) / 2, x0 - 40 if (gauge or tube) else x0 - 16, (y0 + y1) / 2, INK, 'bold')
+    if gauge:
+        c.circle(x0 - 62, (y0 + y1) / 2, 20, INK, 'main', fill=FILLC)
+        c.line(x0 - 62, (y0 + y1) / 2, x0 - 52, (y0 + y1) / 2 - 12, INK, 'axis')
+        c.text(x0 - 62, (y0 + y1) / 2 + 36, gauge, FST)
+    if label:
+        c.text((x0 + xp) / 2, y1 + 22, label, FST)
+    if push == 'in':
+        c.arrow(x1 + 116, (y0 + y1) / 2, x1 + 60, (y0 + y1) / 2, ACC2, 'main')
+        c.text(x1 + 88, (y0 + y1) / 2 - 16, 'push', FST, color=ACC2, value=False)
+    elif push == 'out':
+        c.arrow(x1 + 60, (y0 + y1) / 2, x1 + 116, (y0 + y1) / 2, ACC2, 'main')
+        c.text(x1 + 88, (y0 + y1) / 2 - 16, 'pull', FST, color=ACC2, value=False)
+    return c.done(title, desc)
+
+
+def bubble_lake(title, desc, depth_label=None, bottom_label=None, top_label=None, w=360, h=280):
+    c = Canvas(w, h)
+    ys, yb = 50, h - 30
+    c.rect(20, ys, w - 40, yb - ys, ACC, 'thin', fill=FILLC)
+    c.line(20, ys, w - 20, ys, ACC, 'main')
+    c.line(20, yb, w - 20, yb, INK, 'bold')
+    bx = 160
+    c.circle(bx, yb - 22, 9, INK, 'main')
+    c.circle(bx, ys + 16, 15, INK, 'main')
+    c.arrow(bx, yb - 40, bx, ys + 40, ACC2, 'main', dash='5 4')
+    if bottom_label:
+        c.text(bx + 18, yb - 22, bottom_label, FST, anchor='start')
+    if top_label:
+        c.text(bx + 24, ys + 16, top_label, FST, anchor='start')
+    c.text(w - 26, ys - 14, 'surface', FST, anchor='end', value=False)
+    if depth_label:
+        c.dim(60, ys, 60, yb, depth_label, side=1)
+    return c.done(title, desc)
+
+
+def piston_cylinder(title, desc, mass_label=None, area_label=None, height_label=None, extra_mass=None, atm_label=None, w=320, h=300):
+    """A vertical cylinder of trapped gas under a frictionless piston, with optional masses on top."""
+    c = Canvas(w, h)
+    x0, x1, yb = 100, 220, h - 30
+    yp = 130
+    c.line(x0, 60, x0, yb, INK, 'bold')
+    c.line(x1, 60, x1, yb, INK, 'bold')
+    c.line(x0, yb, x1, yb, INK, 'bold')
+    c.rect(x0 + 2, yp + 12, x1 - x0 - 4, yb - yp - 14, 'none', 'thin', fill=FILLC)
+    c.rect(x0 + 2, yp, x1 - x0 - 4, 12, INK, 'main', fill=MUT)
+    c.text((x0 + x1) / 2, (yp + yb) / 2 + 6, 'gas', FST, value=False)
+    top = yp
+    if mass_label:
+        c.text(x1 + 10, yp + 6, mass_label, FST, anchor='start')
+    if extra_mass:
+        c.rect((x0 + x1) / 2 - 24, yp - 30, 48, 30, INK, 'main', fill=FILLC)
+        c.text((x0 + x1) / 2, yp - 15, extra_mass, FST)
+    if area_label:
+        c.text((x0 + x1) / 2, yb + 18, area_label, FST)
+    if height_label:
+        c.dim(x0 - 20, yp + 12, x0 - 20, yb, height_label, side=-1)
+    if atm_label:
+        c.text((x0 + x1) / 2, 40, atm_label, FST)
+    return c.done(title, desc)
+
+
+def two_flasks(title, desc, a_label=None, b_label=None, a_text=None, b_text=None, tap=True, w=420, h=230):
+    c = Canvas(w, h)
+    for cx, lab, txt, filled in ((110, a_label, a_text, True), (310, b_label, b_text, False)):
+        c.circle(cx, 120, 62, INK, 'main', fill=FILLC if filled else 'none')
+        if lab:
+            c.text(cx, 120, lab, FS, weight=600, value=False)
+        if txt:
+            c.text(cx, 206, txt, FST)
+    c.line(172, 120, 248, 120, INK, 'bold')
+    if tap:
+        c.circle(210, 120, 9, INK, 'main', fill=FILLC)
+        c.line(210, 109, 210, 131, INK, 'axis')
+        c.text(210, 98, 'tap', FST, value=False)
+    return c.done(title, desc)
+
+
+def air_column(title, desc, col_label=None, hg_label=None, tube_label=None, vertical=True, w=260, h=300):
+    """A uniform tube closed at the bottom with an air column trapped under a mercury thread."""
+    c = Canvas(w, h)
+    x0, x1, yb = 110, 140, h - 30
+    ya = 150
+    yt = 90
+    c.path(f'M{x0},{40} V{yb} H{x1} V{40}', INK, 'main')
+    c.rect(x0 + 2, ya, x1 - x0 - 4, yb - ya - 2, 'none', 'thin', fill=FILLC)
+    c.rect(x0 + 2, yt, x1 - x0 - 4, ya - yt, INK, 'thin', fill=MUT)
+    c.text(x1 + 12, (yt + ya) / 2, 'mercury', FST, anchor='start', value=False)
+    c.text(x1 + 12, (ya + yb) / 2 + 16, 'trapped air', FST, anchor='start', value=False)
+    if col_label:
+        c.dim(x0 - 16, ya, x0 - 16, yb, col_label, side=-1)
+    if hg_label:
+        c.text(x1 + 12, (yt + ya) / 2 + 16, hg_label, FST, anchor='start')
+    if tube_label:
+        c.text((x0 + x1) / 2, 26, tube_label, FST)
+    return c.done(title, desc)
+
+
+def manometer(title, desc, diff_label=None, gas_label='gas', w=360, h=280):
+    c = Canvas(w, h)
+    xl, xr, yb = 140, 220, h - 40
+    lev_l, lev_r = 170, 120
+    c.path(f'M{xl - 12},{60} V{yb} A{(xr - xl) / 2 + 12},{(xr - xl) / 2 + 12} 0 0,0 {xr + 12},{yb} V{40}', INK, 'main')
+    c.path(f'M{xl + 12},{60} V{yb} A{(xr - xl) / 2 - 12},{(xr - xl) / 2 - 12} 0 0,0 {xr - 12},{yb} V{40}', INK, 'main')
+    c.rect(xl - 10, lev_l, 20, yb - lev_l, 'none', 'thin', fill=FILLC)
+    c.rect(xr - 10, lev_r, 20, yb - lev_r, 'none', 'thin', fill=FILLC)
+    c.line(xl - 12, 60, 80, 60, INK, 'main')
+    c.text(80, 44, gas_label, FST, anchor='middle', value=False)
+    c.line(xl + 12, lev_r, xr + 30, lev_r, MUT, 'thin', dash='3 3')
+    if diff_label:
+        c.dim(xr + 30, lev_r, xr + 30, lev_l, diff_label, side=1)
+    c.line(xr - 12, lev_l, xr + 30, lev_l, MUT, 'thin', dash='3 3')
+    c.text(xr + 14, 30, 'open to air', FST, anchor='start', value=False)
+    return c.done(title, desc)
+
+
+def water_bath(title, desc, gauge=True, thermometer=True, w=360, h=280):
+    c = Canvas(w, h)
+    c.rect(40, 90, 230, 160, INK, 'main')
+    c.rect(41, 110, 228, 139, 'none', 'thin', fill=FILLC)
+    c.text(60, 100, 'water', FST, anchor='start', value=False)
+    c.circle(150, 190, 40, INK, 'main')
+    c.line(150, 150, 150, 50, INK, 'bold')
+    c.line(150, 50, 290, 50, INK, 'bold')
+    if gauge:
+        c.circle(300, 70, 22, INK, 'main', fill=FILLC)
+        c.line(300, 70, 312, 58, INK, 'axis')
+        c.text(300, 108, 'pressure gauge', FST, value=False)
+    c.text(150, 194, 'air', FST, value=False)
+    if thermometer:
+        c.rect(230, 60, 8, 150, INK, 'thin', rx=4)
+        c.circle(234, 214, 8, INK, 'thin', fill=ACC2)
+    c.rect(60, 252, 190, 14, INK, 'thin', fill=MUT)
+    c.text(155, 276, 'heater', FST, value=False)
+    c.h = 286
+    return c.done(title, desc)
+
+
+def molecule_box(title, desc, L_label=None, comps=False, w=320, h=300):
+    """A cubical box (oblique view) with one molecule and its velocity (components optional)."""
+    c = Canvas(w, h)
+    s, d = 160, 50
+    x0, y0 = 60, 90
+    c.rect(x0, y0, s, s, INK, 'main')
+    c.poly([(x0, y0), (x0 + d, y0 - d), (x0 + s + d, y0 - d), (x0 + s, y0)], INK, 'main')
+    c.poly([(x0 + s, y0), (x0 + s + d, y0 - d), (x0 + s + d, y0 + s - d), (x0 + s, y0 + s)], INK, 'main')
+    mx, my = x0 + 70, y0 + 80
+    c.circle(mx, my, 7, ACC2, 'main', fill=FILLC)
+    if comps:
+        c.arrow(mx + 8, my, mx + 70, my, ACC2, 'main')
+        c.text(mx + 76, my, 'u', FST, anchor='start', color=ACC2, italic=True, value=False)
+        c.arrow(mx, my - 8, mx, my - 56, ACC2, 'main')
+        c.text(mx, my - 66, 'v', FST, color=ACC2, italic=True, value=False)
+        c.arrow(mx - 6, my + 6, mx - 34, my + 34, ACC2, 'main')
+        c.text(mx - 42, my + 44, 'w', FST, color=ACC2, italic=True, value=False)
+    else:
+        c.arrow(mx + 6, my - 3, mx + 70, my - 30, ACC2, 'main')
+    if L_label:
+        c.dim(x0, y0 + s + 18, x0 + s, y0 + s + 18, L_label, side=-1, off=12)
+    return c.done(title, desc)
+
+
+def brownian(title, desc, n=40, seed=7, w=300, h=240):
+    """A random-walk path for a smoke particle (deterministic pseudo-random steps)."""
+    c = Canvas(w, h)
+    x, y = w / 2, h / 2
+    pts = [(x, y)]
+    v = seed
+    for _ in range(n):
+        v = (v * 1103515245 + 12345) % 2 ** 31
+        ang = (v % 3600) / 3600 * 2 * math.pi
+        v = (v * 1103515245 + 12345) % 2 ** 31
+        L = 10 + (v % 20)
+        x = min(w - 20, max(20, x + L * math.cos(ang)))
+        y = min(h - 20, max(20, y + L * math.sin(ang)))
+        pts.append((x, y))
+    c.poly(pts, ACC2, 'axis')
+    for px, py in pts[::4]:
+        c.dot(px, py, 2.2, ACC2)
+    return c.done(title, desc)
