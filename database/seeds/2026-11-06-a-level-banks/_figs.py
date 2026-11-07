@@ -291,6 +291,14 @@ def plot(xlabel, ylabel, series, title, desc, xr=None, yr=None, w=400, h=290, no
         elif kind == 'dots':
             for px, py in pts:
                 c.dot(px, py, 3.4, col)
+        elif kind == 'errbar':   # crosses with vertical error bars of half-length err (data units)
+            for (px, py), x, y, e in zip(pts, s['x'], s['y'], s['err']):
+                y1, y2 = Y(y - e), Y(y + e)
+                c.line(px, y1, px, y2, col, 'thin')
+                c.line(px - 4, y1, px + 4, y1, col, 'thin')
+                c.line(px - 4, y2, px + 4, y2, col, 'thin')
+                c.line(px - 3, py - 3, px + 3, py + 3, col, 'axis')
+                c.line(px - 3, py + 3, px + 3, py - 3, col, 'axis')
         elif kind == 'area':   # shaded region between the curve and the x axis
             base = Y(max(yr[0], 0))
             c.poly(pts + [(pts[-1][0], base), (pts[0][0], base)], 'none', 'thin', fill=FILLC, closed=True)
@@ -364,7 +372,7 @@ def table_rows_from_stem(stem, labels):
 # ═════════════════════════ circuits ═════════════════════════
 
 class El:
-    """One component drawn horizontally on a wire. kind: R C cell battery ac lamp diode switch V A G wire var_R"""
+    """One component drawn horizontally on a wire. kind: R C cell battery ac lamp diode switch V A G wire var_R ldr"""
 
     def __init__(self, kind, label=None, value=True, w=None, flip=False, closed=False):
         self.kind, self.label, self.value, self.flip, self.closed = kind, label, value, flip, closed
@@ -376,7 +384,7 @@ class El:
     def draw(self, c, x, y, w, below=False):
         cx = x + w / 2
         k = self.kind
-        half = {'R': 18, 'var_R': 18, 'C': 5, 'cell': 5, 'battery': 12, 'ac': 12, 'lamp': 11, 'diode': 9, 'switch': 14,
+        half = {'R': 18, 'var_R': 18, 'ldr': 18, 'C': 5, 'cell': 5, 'battery': 12, 'ac': 12, 'lamp': 11, 'diode': 9, 'switch': 14,
                 'V': 12, 'A': 12, 'G': 12, 'wire': 0, 'scope': 20}[k]
         c.line(x, y, cx - half, y, INK, 'main')
         c.line(cx + half, y, x + w, y, INK, 'main')
@@ -384,6 +392,11 @@ class El:
             c.rect(cx - 18, y - 7, 36, 14, INK, 'main')
             if k == 'var_R':
                 c.arrow(cx - 16, y + 12, cx + 16, y - 14, INK, 'thin', head=7)
+        elif k == 'ldr':
+            c.rect(cx - 18, y - 7, 36, 14, INK, 'main')
+            c.circle(cx, y, 24, INK, 'thin')
+            for dx in (-14, -2):
+                c.arrow(cx + dx - 14, y - 34, cx + dx - 2, y - 16, INK, 'thin', head=6)
         elif k == 'C':
             c.line(cx - 5, y - 12, cx - 5, y + 12, INK, 'bold')
             c.line(cx + 5, y - 12, cx + 5, y + 12, INK, 'bold')
@@ -3190,6 +3203,79 @@ def spectrum_lines(title, desc, lines, lo, hi, ticks, absorption=False, w=440, h
     return c.done(title, desc)
 
 
+
+
+# ═════════════════════════ practical apparatus ═════════════════════════
+
+def light_gates(title, desc, card_label=None, sep_label=None, two=True, w=420, h=190):
+    """A trolley carrying a card on a horizontal track, passing through one or two light gates."""
+    c = Canvas(w, h)
+    yt = h - 50
+    c.line(20, yt, w - 20, yt, INK, 'main')
+    for k in range(10):
+        x = 30 + k * (w - 60) / 9
+        c.line(x, yt, x - 8, yt + 8, INK, 'thin')
+    tx = 40
+    c.rect(tx, yt - 28, 70, 22, INK, 'main', fill=FILLC)
+    for wx in (tx + 14, tx + 56):
+        c.circle(wx, yt - 4, 4, INK, 'main', fill=FILLC)
+    c.rect(tx + 28, yt - 58, 14, 30, ACC2, 'main', fill=FILLC)
+    if card_label:
+        c.text(tx + 35, yt - 70, card_label, FST)
+    c.arrow(tx + 78, yt - 17, tx + 110, yt - 17, ACC, 'axis', head=8)
+    gates = [w * 0.48, w * 0.82] if two else [w * 0.6]
+    for k, gx in enumerate(gates):
+        c.path(f'M{r1(gx - 16)},{r1(yt - 4)} L{r1(gx - 16)},{r1(yt - 74)} L{r1(gx + 16)},{r1(yt - 74)} L{r1(gx + 16)},{r1(yt - 4)}', INK, 'main')
+        c.line(gx - 14, yt - 45, gx + 14, yt - 45, ACC, 'thin', dash='3 2')
+        c.text(gx, yt - 86, 'gate ' + 'AB'[k] if two else 'light gate', FST, value=False)
+    if two and sep_label:
+        c.dim(gates[0], yt + 22, gates[1], yt + 22, sep_label, side=-1)
+    return c.done(title, desc)
+
+
+def fall_tube(title, desc, mark_label, sphere_label=None, w=260, h=320):
+    """A tall tube of liquid with two marks low down; a sphere falls between them."""
+    c = Canvas(w, h)
+    x0, x1, yt, yb = 90, 150, 30, h - 20
+    c.rect(x0, yt + 22, x1 - x0, yb - yt - 22, 'none', 'thin', fill=FILLC)
+    c.line(x0, yt, x0, yb, INK, 'main')
+    c.line(x1, yt, x1, yb, INK, 'main')
+    c.line(x0, yb, x1, yb, INK, 'main')
+    c.line(x0, yt + 22, x1, yt + 22, INK, 'thin')
+    m1, m2 = yb - 150, yb - 50
+    for m in (m1, m2):
+        c.line(x0 - 10, m, x1 + 10, m, ACC2, 'axis')
+    c.dim(x1 + 30, m1, x1 + 30, m2, mark_label, side=1)
+    c.circle((x0 + x1) / 2, yt + 70, 8, INK, 'main', fill=INK)
+    c.arrow((x0 + x1) / 2, yt + 82, (x0 + x1) / 2, yt + 112, ACC, 'axis', head=8)
+    if sphere_label:
+        c.text(x0 - 12, yt + 70, sphere_label, FST, anchor='end')
+    c.text(x0 - 12, (m1 + m2) / 2, 'marks', FST, anchor='end', value=False)
+    return c.done(title, desc)
+
+
+def resonance_tube(title, desc, L1, L2, L1_label, L2_label, fork_label=None, w=320, h=330):
+    """A tube open at the top dipping into water, with the two water levels that give the first and second
+    resonances (lengths in metres, drawn to scale) and a tuning fork above."""
+    c = Canvas(w, h)
+    x0, x1, yt = 110, 150, 70
+    sc = (h - yt - 40) / (L2 * 1.12)
+    y1, y2 = yt + L1 * sc, yt + L2 * sc
+    c.rect(x0, y2, x1 - x0, h - 25 - y2, 'none', 'thin', fill=FILLC)
+    c.line(x0, yt, x0, h - 25, INK, 'main')
+    c.line(x1, yt, x1, h - 25, INK, 'main')
+    c.line(x0 - 6, y1, x1 + 6, y1, ACC2, 'axis', dash='5 4')
+    c.line(x0, y2, x1, y2, ACC2, 'axis')
+    fx = (x0 + x1) / 2
+    c.path(f'M{r1(fx - 8)},{r1(yt - 44)} L{r1(fx - 8)},{r1(yt - 18)} Q{r1(fx)},{r1(yt - 8)} {r1(fx + 8)},{r1(yt - 18)} L{r1(fx + 8)},{r1(yt - 44)}', INK, 'main')
+    c.line(fx, yt - 12, fx, yt - 2, INK, 'main')
+    if fork_label:
+        c.text(fx + 18, yt - 34, fork_label, FST, anchor='start')
+    c.dim(x1 + 24, yt, x1 + 24, y1, L1_label, side=1)
+    c.dim(x0 - 24, yt, x0 - 24, y2, L2_label, side=-1)
+    c.text(x1 + 12, y1 + 16, 'first', FST, anchor='start', color=MUT, value=False)
+    c.text(x1 + 12, y2 + 16, 'second', FST, anchor='start', color=MUT, value=False)
+    return c.done(title, desc)
 
 # ═════════════════════════ astronomy ═════════════════════════
 

@@ -1917,5 +1917,100 @@
   },
   "file": "ch31",
   "figures": 11
+ },
+ "P2.1": {
+  "code": "P2.1",
+  "title": "Planning and analysis",
+  "topic": "c32a7123-0b11-417e-a3dd-2024f9fdf5d2",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "p2",
+  "figures": 15
+ },
+ "P2.2": {
+  "code": "P2.2",
+  "title": "Planning",
+  "topic": "41348043-60df-4740-a4bb-9fdc383dd64d",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 19,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "p2",
+  "figures": 8
+ },
+ "P2.3": {
+  "code": "P2.3",
+  "title": "Analysis of the data",
+  "topic": "ce473f5f-8864-4efe-be59-be54ed9c0caa",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 18,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "p2",
+  "figures": 14
+ },
+ "P2.4": {
+  "code": "P2.4",
+  "title": "Treatment of uncertainties",
+  "topic": "88532559-c2d8-4be9-80c7-6275e8d6cf54",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 18,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "p2",
+  "figures": 3
+ },
+ "P2.5": {
+  "code": "P2.5",
+  "title": "Conclusions and evaluation of results",
+  "topic": "8b8b53aa-cac1-4dda-a21f-0e8b114d6d31",
+  "before": 6,
+  "new": 46,
+  "after": 52,
+  "easy": 19,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "p2",
+  "figures": 3
  }
 }
