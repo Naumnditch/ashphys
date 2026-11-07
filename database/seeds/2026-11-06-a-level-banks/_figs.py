@@ -2458,3 +2458,106 @@ def barton(title, desc, n=5, w=420, h=250):
     c.text(xd, 30 + Ld + 40, 'heavy driver', FST, color=ACC2, value=False)
     c.text((xs[0] + xs[-1]) / 2, h - 12, 'light pendulums of different lengths', FST, value=False)
     return c.done(title, desc)
+
+
+# ═════════════════════════ gravitation ═════════════════════════
+
+def planet_orbits(title, desc, R, orbits=(), planet_label=None, w=360, h=320, tangents=None, ground=None, sat_angle=45):
+    """A planet of radius R (data units) with circular orbits dict(r, label, dash, height_label, radius_label, sat, angle)
+    drawn to scale. Orbits with a height or radius label put their satellite straight above the planet, with the
+    arrow vertical and its label to the right, so the text never sits on a sloping line."""
+    c = Canvas(w, h)
+    cx, cy = w / 2, h / 2
+    rmax = max([o['r'] for o in orbits] + [R])
+    sc = (min(w, h) / 2 - 34) / rmax
+    Rp = max(R * sc, 10)
+    c.circle(cx, cy, Rp, INK, 'main', fill=FILLC)
+    if planet_label:
+        c.text(cx, cy, planet_label, FST, weight=600, value=False)
+    for k, o in enumerate(orbits):
+        ro = o['r'] * sc
+        c.circle(cx, cy, ro, ACC if k == 0 else ACC2, 'axis', dash=o.get('dash'))
+        vertical = o.get('height_label') or o.get('radius_label')
+        a = math.radians(o.get('angle', 90 if vertical else sat_angle + 25 * k))
+        sx, sy = cx + ro * math.cos(a), cy - ro * math.sin(a)
+        if o.get('sat', True):
+            c.rect(sx - 6, sy - 4, 12, 8, ACC2 if k else ACC, 'main', fill=FILLC)
+        if o.get('label'):
+            c.text(sx + 12, sy - 12, o['label'], FST, anchor='start' if math.cos(a) >= 0 else 'end')
+        if o.get('height_label'):
+            ex, ey = cx + Rp * math.cos(a), cy - Rp * math.sin(a)
+            tip = 5 if o.get('sat', True) else 0
+            c.arrow(ex, ey, sx - tip * math.cos(a), sy + tip * math.sin(a), MUT, 'thin', head=7, both=True)
+            c.text((ex + sx) / 2 + 8, (ey + sy) / 2 + 5, o['height_label'], FST, anchor='start')
+        if o.get('radius_label'):
+            c.line(cx, cy, sx, sy, MUT, 'thin', dash='4 3')
+            off = 18 if tangents is not None else 8
+            c.text((cx + sx) / 2 + off, (cy + sy) / 2 + 5, o['radius_label'], FST, anchor='start')
+    if tangents is not None:
+        ro = orbits[0]['r'] * sc
+        sx, sy = cx, cy - ro
+        half = math.asin(min(1.0, Rp / ro))
+        for s in (-1, 1):
+            L = math.sqrt(ro ** 2 - Rp ** 2)
+            c.line(sx, sy, sx + L * math.sin(s * half), sy + L * math.cos(half), MUT, 'thin', dash='4 3')
+    if ground:
+        top = cy - orbits[0]['r'] * sc
+        c.line(cx, cy - Rp, cx, top, ACC2, 'thin', dash='5 3')
+        c.dot(cx, cy - Rp, 3, ACC2)
+        c.text(cx + 8, cy - Rp - 8, ground, FST, anchor='start', color=ACC2)
+    return c.done(title, desc)
+
+
+def bodies(title, desc, items, points=(), dims=(), w=420, h=None, pad=70):
+    """Masses (x, y, radius_px, label) and marked points (x, y, label[, 'below']) in data units, scaled to fit the
+    width; dims are (x1, y1, x2, y2, label, side) in the same units. The height follows the content unless given."""
+    xs = [q[0] for q in items] + [p[0] for p in points] + [d[0] for d in dims] + [d[2] for d in dims]
+    ys = [q[1] for q in items] + [p[1] for p in points] + [d[1] for d in dims] + [d[3] for d in dims]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    sp = (w - 2 * pad) / ((x1 - x0) or 1)
+    rmax = max([q[2] for q in items] + [4])
+    if h is None:
+        h = (y1 - y0) * sp + 2 * (rmax + 36)
+    elif y1 > y0:
+        sp = min(sp, (h - 2 * (rmax + 36)) / (y1 - y0))
+    X = lambda v: w / 2 + (v - (x0 + x1) / 2) * sp  # noqa: E731
+    Y = lambda v: h / 2 - (v - (y0 + y1) / 2) * sp  # noqa: E731
+    c = Canvas(w, h)
+    for d in dims:
+        c.dim(X(d[0]), Y(d[1]), X(d[2]), Y(d[3]), d[4], side=d[5])
+    for x, y, r, lab in items:
+        c.circle(X(x), Y(y), r, INK, 'main', fill=FILLC)
+        if lab:
+            c.text(X(x), Y(y) - r - 12, lab, FST)
+    for pt in points:
+        x, y, lab = pt[:3]
+        c.dot(X(x), Y(y), 3.6, ACC2)
+        if len(pt) > 3 and pt[3] == 'below':
+            c.text(X(x), Y(y) + 20, lab, FST, color=ACC2)
+        else:
+            c.text(X(x) + 8, Y(y) - 12, lab, FST, anchor='start', color=ACC2)
+    return c.done(title, desc)
+
+
+def equipotentials(title, desc, values, labels, w=440, h=340):
+    """Equipotential circles round a planet: radius ∝ 1/|φ| (point-mass field), computed from the values.
+    Labels sit in a column on the right, joined to their circles by thin horizontal leaders (outermost highest)."""
+    c = Canvas(w, h)
+    cx, cy = 24 + (min(w, h) / 2 - 24), h / 2
+    inv = [1 / abs(v) for v in values]
+    sc = (min(w, h) / 2 - 24) / max(inv)
+    c.circle(cx, cy, min(inv) * sc * 0.6, INK, 'main', fill=FILLC)
+    order = sorted(range(len(values)), key=lambda i: -inv[i])   # outermost first
+    lx = cx + max(inv) * sc + 18
+    prev = None
+    for i in order:
+        r = inv[i] * sc
+        c.circle(cx, cy, r, ACC, 'axis', dash='5 4')
+        ly = cy - 0.72 * r if prev is None else max(cy - 0.72 * r, prev + 26)
+        prev = ly
+        dy = ly - cy
+        px = cx + math.sqrt(max(r * r - dy * dy, 0))
+        c.line(px, ly, lx - 4, ly, MUT, 'thin')
+        c.dot(px, ly, 2.4, MUT)
+        c.text(lx, ly + 5, labels[i], FST, anchor='start')
+    return c.done(title, desc)

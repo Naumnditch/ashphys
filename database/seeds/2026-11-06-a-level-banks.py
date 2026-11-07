@@ -215,7 +215,7 @@ _FNUM = re.compile(r'(?<![\w.])[−-]?(\d+(?:\.\d+)?(?:\s*×\s*10[⁻⁰¹²³�
 
 
 def fig_numbers(t):
-    return {re.sub(r'\s+', '', m) for m in _FNUM.findall(t.replace('\u2009', ' '))}
+    return {re.sub(r'\s+', '', m) for m in _FNUM.findall(t.replace(chr(0x2009), ' '))}
 
 
 def fig_namespace():
