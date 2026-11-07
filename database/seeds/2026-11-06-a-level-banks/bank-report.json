@@ -75,6 +75,82 @@
   "file": "ch01a",
   "figures": 21
  },
+ "1.5": {
+  "code": "1.5",
+  "title": "Combining displacements",
+  "topic": "11e7164b-e47d-4b4d-8bad-1002c892ba20",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 19,
+  "medium": 21,
+  "hard": 11,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01b",
+  "figures": 27
+ },
+ "1.6": {
+  "code": "1.6",
+  "title": "Combining velocities",
+  "topic": "0e10f0fa-b4fd-4e02-beba-8c15b05746c1",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 19,
+  "medium": 21,
+  "hard": 11,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01b",
+  "figures": 22
+ },
+ "1.7": {
+  "code": "1.7",
+  "title": "Subtracting vectors",
+  "topic": "19109221-dd23-4986-8f92-84b0ea2c6033",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 21,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01b",
+  "figures": 15
+ },
+ "1.8": {
+  "code": "1.8",
+  "title": "Other examples of scalar and vector quantities",
+  "topic": "e1b6c84c-afbc-4845-b67b-d5b6bd15720c",
+  "before": 0,
+  "new": 51,
+  "after": 51,
+  "easy": 20,
+  "medium": 21,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch01b",
+  "figures": 12
+ },
  "16.2": {
   "code": "16.2",
   "title": "Radians and angular speed",

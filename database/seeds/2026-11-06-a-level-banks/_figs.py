@@ -3296,6 +3296,48 @@ def ticker_tape(title, desc, gaps, dim=None, w=440, h=120):
             c.line(xs[k], y + 18, xs[k], y + 38, GRID, 'thin', dash='2 3')
     return c.done(title, desc)
 
+
+def vector_diff(title, desc, v1, v2, l1, l2, ld='Δv', w=340, h=260, north=True, pad=50, sum_=False):
+    """v₁ and v₂ drawn from a common point (data units, x east, y north) with Δv = v₂ − v₁ dashed from the head of
+    v₁ to the head of v₂ (sum_=True: the resultant v₁ + v₂ by the parallelogram rule instead)."""
+    pts = [(0, 0), v1, v2] + ([(v1[0] + v2[0], v1[1] + v2[1])] if sum_ else [])
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    padx = max(pad, 22 + max(text_w(l1, FST), text_w(l2, FST)))
+    sc = min((w - 2 * padx) / ((x1 - x0) or 1), (h - 2 * pad) / ((y1 - y0) or 1))
+    ox = (w - (x1 - x0) * sc) / 2 - x0 * sc
+    oy = (h + (y1 - y0) * sc) / 2 + y0 * sc
+    P = lambda p: (ox + p[0] * sc, oy - p[1] * sc)  # noqa: E731
+    c = Canvas(w, h)
+    O = P((0, 0))
+    for v, lab, col in ((v1, l1, ACC), (v2, l2, ACC2)):
+        E = P(v)
+        c.arrow(O[0], O[1], E[0], E[1], col, 'main', head=9)
+        ang = math.atan2(-(E[1] - O[1]), E[0] - O[0])
+        lx, ly = E[0] + 14 * math.cos(ang), E[1] - 14 * math.sin(ang)
+        anchor = 'start' if math.cos(ang) > 0.3 else ('end' if math.cos(ang) < -0.3 else 'middle')
+        c.text(lx, ly + (4 if anchor != 'middle' else (-2 if math.sin(ang) > 0 else 12)), lab, FST, anchor=anchor, color=col)
+    if sum_:
+        S = P(pts[3])
+        for v in (v1, v2):
+            E = P(v)
+            c.line(E[0], E[1], S[0], S[1], GRID, 'thin', dash='3 3')
+        c.arrow(O[0], O[1], S[0], S[1], MUT, 'axis', head=9, dash='6 4')
+        c.text(S[0] + 10, S[1] - 8, ld, FST, anchor='start', color=MUT, value=False)
+    else:
+        A, B = P(v1), P(v2)
+        c.arrow(A[0], A[1], B[0], B[1], MUT, 'axis', head=9, dash='6 4')
+        mx, my = (A[0] + B[0]) / 2, (A[1] + B[1]) / 2
+        L = math.hypot(B[0] - A[0], B[1] - A[1]) or 1
+        nx, ny = (B[1] - A[1]) / L, -(B[0] - A[0]) / L
+        if (mx + nx * 10 - O[0]) ** 2 + (my + ny * 10 - O[1]) ** 2 < (mx - nx * 10 - O[0]) ** 2 + (my - ny * 10 - O[1]) ** 2:
+            nx, ny = -nx, -ny
+        c.text(mx + nx * 14, my + ny * 14, ld, FST, anchor='start' if nx > 0.35 else ('end' if nx < -0.35 else 'middle'), color=MUT, value=False)
+    c.dot(O[0], O[1], 3.4)
+    if north:
+        compass(c, w - 22, 34)
+    return c.done(title, desc)
+
 # ═════════════════════════ practical apparatus ═════════════════════════
 
 def light_gates(title, desc, card_label=None, sep_label=None, two=True, w=420, h=190):
