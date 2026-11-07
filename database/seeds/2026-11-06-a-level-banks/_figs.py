@@ -1016,27 +1016,29 @@ def rails(title, desc, L_label=None, v_label='v', B_label=None, R_label=None, in
     return c.done(title, desc)
 
 
-def rod_angle(title, desc, theta_deg, theta_label, v_label='v', B_label='B', w=340, h=230):
+def rod_angle(title, desc, theta_deg, theta_label, v_label='v', B_label='B', w=340, h=230, body='rod (end-on)'):
     """Side view: field lines across the page, a rod end-on (perpendicular to the page) moving at θ to them."""
     c = Canvas(w, h)
     for k in range(5):
         y = 30 + k * 40
         c.arrow(20, y, w - 20, y, ACC, 'thin', head=7)
-    c.text(w - 22, 16, B_label, FST, anchor='end', color=ACC)
+    c.text(w - 22, 14, B_label, FST, anchor='end', color=ACC)
     ox, oy = (110, 150) if theta_deg >= 0 else (170, 70)
     c.circle(ox, oy, 9, INK, 'main', fill=FILLC)
     c.dot(ox, oy, 2.4)
     a = math.radians(theta_deg)
     L = 130
     c.arrow(ox + 11 * math.cos(a), oy - 11 * math.sin(a), ox + L * math.cos(a), oy - L * math.sin(a), ACC2, 'bold')
-    c.text(ox + (L + 12) * math.cos(a), oy - (L + 12) * math.sin(a) - (14 if abs(math.sin(a)) < 0.3 else 0), v_label, FST,
-           anchor='start' if math.cos(a) > 0.3 else 'middle', color=ACC2)
+    tx, ty = ox + (L + 10) * math.cos(a), oy - (L + 10) * math.sin(a)
+    gaps = [50 + 40 * k for k in range(4)]
+    ly = min(gaps, key=lambda g: abs(g - ty)) if 30 <= ty <= 190 else ty
+    c.text(tx, ly, v_label, FST, anchor='start' if math.cos(a) > 0.3 else 'middle', color=ACC2)
     if theta_label:
         c.line(ox, oy, ox + 90, oy, MUT, 'thin', dash='4 3')
         r = 50
         c.path(f'M{r1(ox + r)},{r1(oy)} A{r},{r} 0 0,0 {r1(ox + r * math.cos(a))},{r1(oy - r * math.sin(a))}', MUT, 'axis')
         c.text(ox + (r + 14) * math.cos(a / 2), oy - (r + 14) * math.sin(a / 2), theta_label, FST, anchor='start')
-    c.text(ox - 16, oy - 18, 'rod (end-on)', FST, anchor='end', value=False)
+    c.text(ox - 16, oy - 18, body, FST, anchor='end', value=False)
     return c.done(title, desc)
 
 
@@ -1337,4 +1339,260 @@ def shrinking_loop(title, desc, r_label=None, rate_label=None, B_label=None, int
         c.text(cx, h - 30, rate_label, FST, color=ACC2)
     if B_label:
         field_legend(c, 24, h - 12, B_label, into)
+    return c.done(title, desc)
+
+
+# ═════════════════════════ charged particles ═════════════════════════
+
+def particle_field(title, desc, into=True, v_dir=0, sign='+', north=False, B_label=None, v_label='v', w=320, h=230):
+    """Top view: a charged particle (sign) moving with velocity at v_dir degrees (0 = right, 90 = up the page)
+    through a uniform field into (×) or out of (•) the page."""
+    c = Canvas(w, h)
+    field_symbols(c, 30, 20, w - 60, h - 64, into, skip=[(w / 2 - 20, (h - 44) / 2 - 20, 40, 40)])
+    cx, cy = w / 2, (h - 44) / 2 + 20
+    c.circle(cx, cy, 11, ACC2, 'main', fill=FILLC)
+    c.text(cx, cy + 0.5, sign, FS, weight=700, color=ACC2, value=False)
+    a = math.radians(v_dir)
+    c.arrow(cx + 14 * math.cos(a), cy - 14 * math.sin(a), cx + 80 * math.cos(a), cy - 80 * math.sin(a), ACC2, 'bold')
+    c.text(cx + 92 * math.cos(a) + (8 if abs(math.cos(a)) < 0.3 else 0), cy - 92 * math.sin(a), v_label, FST,
+           anchor='start' if math.cos(a) >= -0.3 else 'end', color=ACC2)
+    if north:
+        compass(c, 28, 44)
+    if B_label:
+        field_legend(c, 30, h - 14, B_label, into)
+    return c.done(title, desc)
+
+
+def selector(title, desc, B_label=None, E_label=None, gap_label=None, v_label=None, into=True, top='+', particle=None,
+             paths=("straight",), length_label=None, w=440, h=240):
+    """Velocity selector / Thomson crossed fields: horizontal plates (E down the page when top is +) with a uniform
+    magnetic field between them; a beam enters from the left."""
+    c = Canvas(w, h)
+    x0, x1, yt, yb = 120, 340, 50, 160
+    c.rect(x0, yt - 8, x1 - x0, 8, INK, 'thin', fill=FILLC)
+    c.rect(x0, yb, x1 - x0, 8, INK, 'thin', fill=FILLC)
+    c.text(x0 - 12, yt - 4, top, FS, weight=700, anchor='end', value=False)
+    c.text(x0 - 12, yb + 4, MINUS if top == '+' else '+', FS, weight=700, anchor='end', value=False)
+    field_symbols(c, x0 + 6, yt + 6, x1 - x0 - 12, yb - yt - 12, into, step=32, skip=[(x0, (yt + yb) / 2 - 8, x1 - x0, 16)])
+    ym = (yt + yb) / 2
+    c.arrow(18, ym, x0 - 8, ym, ACC2, 'main')
+    if particle:
+        c.text(20, ym - 14, particle, FST, anchor='start', color=ACC2, value=False)
+    if v_label:
+        c.text(20, ym + 16, v_label, FST, anchor='start', color=ACC2)
+    for p in paths:
+        if p == 'straight':
+            c.line(x0, ym, x1 + 10, ym, ACC2, 'main', dash='6 4')
+            c.arrowhead(x1 + 16, ym, 0, ACC2, 8)
+        else:
+            sgn = -1 if p == 'up' else 1
+            pts = [(x0 + (x1 - x0) * t, ym + sgn * 40 * t * t) for t in [i / 30 for i in range(31)]]
+            c.poly(pts, ACC2, 'main', dash='6 4')
+    if gap_label:
+        c.dim(x1 + 34, yt, x1 + 34, yb, gap_label, side=1)
+    y = yb + 30
+    if length_label:
+        c.dim(x0, y, x1, y, length_label, side=-1, off=12)
+        y += 34
+    else:
+        y += 8
+    if E_label:
+        c.text(x0, y, E_label, FST, anchor='start')
+        y += 20
+    if B_label:
+        field_legend(c, x0 + 4, y, B_label, into)
+        y += 20
+    c.h = y + 4
+    return c.done(title, desc)
+
+
+def semicircles(title, desc, radii, labels=(), into=False, entry_label=None, B_label=None, detector=True, acc_label=None, w=420, h=260):
+    """Mass spectrometer: particles enter a field region through a slit at the bottom-left and travel semicircles
+    (radii in data units, scaled so the largest fits) to a detector along the entry edge."""
+    c = Canvas(w, h)
+    rx0, ry0, rx1, ry1 = 60, 20, w - 20, h - 60
+    c.rect(rx0, ry0, rx1 - rx0, ry1 - ry0, MUT, 'thin', dash='5 4', fill=FILLC)
+    field_symbols(c, rx0, ry0, rx1 - rx0, ry1 - ry0, into, step=34)
+    ex = rx0 + 30
+    scale = min((rx1 - ex - 20) / (2 * max(radii)), (ry1 - ry0 - 20) / max(radii))
+    cols = [ACC2, ACC]
+    for k, r in enumerate(radii):
+        R = r * scale
+        c.path(f'M{r1(ex)},{r1(ry1)} A{r1(R)},{r1(R)} 0 0,1 {r1(ex + 2 * R)},{r1(ry1)}', cols[k % 2], 'bold')
+        if k < len(labels) and labels[k]:
+            inside_lab = len(radii) > 1 and k == 0
+            c.text(ex + R, ry1 - R + (16 if inside_lab else -12), labels[k], FST, color=cols[k % 2])
+    c.line(ex, ry1 + 30, ex, ry1, ACC2, 'main')
+    c.arrowhead(ex, ry1 - 2, -math.pi / 2, ACC2, 8)
+    if entry_label:
+        c.text(ex + 8, ry1 + 22, entry_label, FST, anchor='start', color=ACC2)
+    if detector:
+        c.line(ex + 12, ry1 + 4, rx1 - 4, ry1 + 4, INK, 'bold')
+        c.text(rx1 - 6, ry1 + 20, 'detector', FST, anchor='end', value=False)
+    if B_label:
+        field_legend(c, rx0 + 8, h - 12, B_label, into)
+    if acc_label:
+        c.text(14, ry1 + 22, acc_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def circle_orbit(title, desc, into=True, clockwise=True, r_label=None, B_label=None, sign=None, gun=False, full=True,
+                 v_label='v', w=320, h=260):
+    """A charged particle on a circular orbit in a uniform field (fine-beam tube style if gun=True)."""
+    c = Canvas(w, h)
+    field_symbols(c, 16, 14, w - 32, h - 50, into, step=34)
+    cx, cy, R = w / 2, (h - 36) / 2 + 4, 80
+    if full:
+        c.circle(cx, cy, R, ACC2, 'bold')
+    else:
+        c.path(f'M{r1(cx)},{r1(cy + R)} A{R},{R} 0 0,{1 if clockwise else 0} {r1(cx)},{r1(cy - R)}', ACC2, 'bold')
+    # velocity arrow at the bottom of the orbit, along the direction of travel
+    d = -1 if clockwise else 1
+    bx, by = cx, cy + R
+    c.arrow(bx, by, bx + d * 46, by, ACC2, 'main')
+    c.text(bx + d * 52, by, v_label, FST, anchor='start' if d > 0 else 'end', color=ACC2)
+    if sign:
+        c.circle(bx, by, 7, ACC2, 'main', fill=FILLC)
+        c.text(bx, by + 0.5, sign, FST, weight=700, color=ACC2, value=False)
+    if r_label:
+        c.dot(cx, cy, 2.6)
+        c.line(cx, cy, cx + R * 0.7071, cy - R * 0.7071, INK, 'thin')
+        c.text(cx + R * 0.35 + 6, cy - R * 0.35 + 10, r_label, FST, anchor='start')
+    if gun:
+        c.rect(bx - 14, by + 4, 28, 14, INK, 'axis', fill=FILLC)
+    if B_label:
+        field_legend(c, 20, h - 12, B_label, into)
+    return c.done(title, desc)
+
+
+def spiral_track(title, desc, r_labels=(), into=True, B_label=None, w=320, h=260):
+    c = Canvas(w, h)
+    field_symbols(c, 16, 14, w - 32, h - 50, into, step=34)
+    cx, cy = w / 2, (h - 36) / 2 + 4
+    pts = []
+    for i in range(361):
+        t = 3 * math.pi * i / 360
+        r = 95 * math.exp(-0.17 * t)
+        pts.append((cx + r * math.cos(t), cy - r * math.sin(t)))
+    c.poly(pts, ACC2, 'bold')
+    if r_labels:   # labels outside the spiral, joined to the points they describe by thin leaders
+        c.line(cx + 95, cy, cx + 112, cy + 26, INK, 'thin')
+        c.text(cx + 114, cy + 36, r_labels[0], FST, anchor='start', color=ACC2)
+        if len(r_labels) > 1:
+            r2 = 95 * math.exp(-0.17 * 2 * math.pi)
+            c.dot(cx + r2, cy, 2.6, ACC2)
+            c.line(cx + r2, cy, cx + 60, cy + 108, INK, 'thin')
+            c.text(cx + 64, cy + 114, r_labels[1], FST, anchor='start', color=ACC2)
+    if B_label:
+        field_legend(c, 20, h - 12, B_label, into)
+    return c.done(title, desc)
+
+
+def cyclotron(title, desc, R_label=None, B_label=None, supply_label=None, into=False, w=360, h=310):
+    c = Canvas(w, h)
+    cx, cy, R, g = w / 2, 130, 105, 8
+    for side in (-1, 1):
+        x = cx + side * g
+        sweep = 1 if side > 0 else 0
+        c.path(f'M{r1(x)},{r1(cy - R)} A{R},{R} 0 0,{sweep} {r1(x)},{r1(cy + R)} Z', INK, 'main', fill=FILLC)
+    pts = []
+    for i in range(721):
+        t = 4 * math.pi * i / 720
+        r = 12 + 80 * t / (4 * math.pi)
+        pts.append((cx + r * math.sin(t) * (1 if math.sin(t) >= 0 else 1), cy - r * math.cos(t)))
+    c.poly(pts, ACC2, 'main')
+    c.dot(cx, cy, 3)
+    if R_label:
+        c.line(cx + g, cy, cx + g + R * 0.866, cy + R * 0.5, INK, 'thin')
+        c.text(cx + g + R * 0.5, cy + R * 0.29 + 14, R_label, FST, anchor='start')
+    y2 = cy + R + 26
+    c.line(cx - g - 30, cy + R - 20, cx - g - 30, y2, INK, 'main')
+    c.line(cx + g + 30, cy + R - 20, cx + g + 30, y2, INK, 'main')
+    Series(El('ac', supply_label)).draw(c, cx - g - 30, y2, 2 * (g + 30), below=True)
+    if B_label:
+        field_legend(c, 16, 16, B_label, into)
+    return c.done(title, desc)
+
+
+def strip_arc(title, desc, width, r, width_label=None, B_label=None, into=True, v_label='v', w=400, h=240):
+    """A beam entering a strip of uniform field (width, radius in the same units) and leaving deflected on a circular arc."""
+    c = Canvas(w, h)
+    sx0, sw = 150, 110
+    s = sw / width
+    R = r * s
+    c.rect(sx0, 14, sw, h - 50, MUT, 'thin', dash='5 4', fill=FILLC)
+    field_symbols(c, sx0, 14, sw, h - 50, into, step=30)
+    y0 = 80
+    c.arrow(20, y0, sx0, y0, ACC2, 'main')
+    c.text(24, y0 - 14, v_label, FST, anchor='start', color=ACC2)
+    th = math.asin(min(1.0, width / r))
+    pts = [(sx0 + R * math.sin(th * i / 40), y0 + R * (1 - math.cos(th * i / 40))) for i in range(41)]
+    c.poly(pts, ACC2, 'bold')
+    ex, ey = pts[-1]
+    L = 90
+    c.arrow(ex, ey, ex + L * math.cos(th), ey + L * math.sin(th), ACC2, 'main', dash='6 4')
+    c.line(ex, ey, ex + 80, ey, MUT, 'thin', dash='3 3')
+    if width_label:
+        c.dim(sx0, h - 26, sx0 + sw, h - 26, width_label, side=-1, off=11)
+    if B_label:
+        c.text(20, h - 14, B_label, FST, anchor='start')
+    return c.done(title, desc)
+
+
+def hall_slab(title, desc, I_label='I', B_label=None, width_label=None, thick_label=None, into=True, carriers=None,
+              voltmeter=True, w=420, h=260):
+    """A thin rectangular slab (top view) carrying a current along its length in a field into the page;
+    the Hall voltage is measured across its width by a voltmeter joined to the middle of the two long edges."""
+    c = Canvas(w, h)
+    x0, x1, y0, y1 = 110, 320, 80, 170
+    ym = (y0 + y1) / 2
+    c.rect(x0, y0, x1 - x0, y1 - y0, INK, 'main', fill=FILLC)
+    field_symbols(c, x0 + 6, y0 + 4, x1 - x0 - 12, y1 - y0 - 8, into, step=30, skip=[(x0, ym - 22, x1 - x0, 44)])
+    c.arrow(x0 + 12, ym, x1 - 12, ym, ACC2, 'bold')
+    c.text((x0 + x1) / 2, ym - 13, I_label, FST, color=ACC2)
+    if voltmeter:
+        xm = (x0 + x1) / 2 + 40
+        c.dot(xm, y0, 2.6)
+        c.dot(xm, y1, 2.6)
+        c.line(xm, y0, xm, 40, INK, 'main')
+        c.line(xm, 40, 380, 40, INK, 'main')
+        c.line(xm, y1, xm, 210, INK, 'main')
+        c.line(xm, 210, 380, 210, INK, 'main')
+        vcomp(c, 'V', 380, 40, 210, None)
+        c.text(398, 125, 'V_H', FST, anchor='start', value=False)
+    if width_label:
+        c.dim(x0 - 18, y0, x0 - 18, y1, width_label, side=-1)
+    y = 236
+    if thick_label:
+        c.text(x0, y, thick_label, FST, anchor='start')
+        y += 20
+    if carriers:
+        c.text(x0, y, carriers, FST, anchor='start')
+        y += 20
+    if B_label:
+        field_legend(c, 24, y, B_label, into)
+        y += 20
+    c.h = y
+    return c.done(title, desc)
+
+
+def oil_drop(title, desc, gap_label=None, V_label=None, mass_label=None, w=360, h=230):
+    c = Canvas(w, h)
+    x0, x1, yt, yb = 70, 290, 50, 170
+    c.rect(x0, yt - 8, x1 - x0, 8, INK, 'thin', fill=FILLC)
+    c.rect(x0, yb, x1 - x0, 8, INK, 'thin', fill=FILLC)
+    c.text(x0 - 12, yt - 4, '+', FS, weight=700, anchor='end', value=False)
+    c.text(x0 - 12, yb + 4, MINUS, FS, weight=700, anchor='end', value=False)
+    cx, cy = (x0 + x1) / 2, (yt + yb) / 2
+    c.circle(cx, cy, 7, ACC2, 'main', fill=FILLC)
+    c.arrow(cx, cy - 9, cx, cy - 50, ACC, 'main')
+    c.text(cx + 8, cy - 40, 'electric force', FST, anchor='start', color=ACC, value=False)
+    c.arrow(cx, cy + 9, cx, cy + 50, ACC, 'main')
+    c.text(cx + 8, cy + 40, 'weight', FST, anchor='start', color=ACC, value=False)
+    if mass_label:
+        c.text(cx - 14, cy, mass_label, FST, anchor='end', color=ACC2)
+    if gap_label:
+        c.dim(x1 + 22, yt, x1 + 22, yb, gap_label, side=1)
+    if V_label:
+        c.text((x0 + x1) / 2, yt - 26, V_label, FST)
     return c.done(title, desc)
