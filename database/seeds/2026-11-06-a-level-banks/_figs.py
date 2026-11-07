@@ -3190,6 +3190,118 @@ def spectrum_lines(title, desc, lines, lo, hi, ticks, absorption=False, w=440, h
     return c.done(title, desc)
 
 
+
+# ═════════════════════════ astronomy ═════════════════════════
+
+def _star(c, x, y, r=9, color=None):
+    col = color or ACC2
+    for k in range(8):
+        a = k * math.pi / 4
+        c.line(x + (r + 3) * math.cos(a), y + (r + 3) * math.sin(a), x + (r + 8) * math.cos(a), y + (r + 8) * math.sin(a), col, 'thin')
+    c.circle(x, y, r, col, 'main', fill=FILLC)
+
+
+def _galaxy(c, x, y, rx=16, ry=7):
+    c.path(f'M{r1(x - rx)},{r1(y)} A{rx},{ry} 0 1,0 {r1(x + rx)},{r1(y)} A{rx},{ry} 0 1,0 {r1(x - rx)},{r1(y)}', ACC2, 'main', fill=FILLC)
+    c.circle(x, y, 3, ACC2, 'main', fill=ACC2)
+
+
+def star_line(title, desc, bodies, dims=(), w=460, h=190, note=None):
+    """Bodies along a line of sight. bodies: dict(x (data units, any scale), kind 'star'|'sun'|'planet'|'earth'|'galaxy',
+    label, sub, value). dims: (i, j, label, value) dimension arrows between bodies i and j, stacked below the line."""
+    c = Canvas(w, h)
+    xs = [b['x'] for b in bodies]
+    lo, hi = min(xs), max(xs)
+    half = lambda b: max(text_w(b.get('label') or '', FST), text_w(b.get('sub') or '', FST)) / 2 + 8  # noqa: E731
+    first, last = min(bodies, key=lambda b: b['x']), max(bodies, key=lambda b: b['x'])
+    x0, x1, y = max(46, half(first)), w - max(46, half(last)), 62
+    X = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)  # noqa: E731
+    c.line(x0, y, x1, y, GRID, 'thin', dash='5 4')
+    for b in bodies:
+        bx, kind = X(b['x']), b.get('kind', 'star')
+        if kind in ('star', 'sun'):
+            _star(c, bx, y, 10 if kind == 'sun' else 8)
+        elif kind == 'galaxy':
+            _galaxy(c, bx, y)
+        else:
+            c.circle(bx, y, 6 if kind == 'earth' else 5, INK, 'main', fill=FILLC)
+        if b.get('label'):
+            c.text(bx, y - 30, b['label'], FST, weight=600, value=b.get('value'))
+        if b.get('sub'):
+            c.text(bx, y + 28, b['sub'], FST, value=b.get('value'))
+    for k, (i, j, lab, isv) in enumerate(dims):
+        yy = y + 54 + 30 * k
+        c.dim(X(bodies[i]['x']), yy, X(bodies[j]['x']), yy, lab, side=-1, value=isv)
+        for idx in (i, j):
+            c.line(X(bodies[idx]['x']), y + 12, X(bodies[idx]['x']), yy + 4, GRID, 'thin', dash='2 3')
+    if note:
+        c.text(w - 8, h - 8, note, FST, anchor='end', color=MUT, value=False)
+    return c.done(title, desc)
+
+
+def _planck(lam, T):
+    h_, c_, k_ = 6.626e-34, 3.00e8, 1.381e-23
+    x = h_ * c_ / (lam * k_ * T)
+    if x > 700:
+        return 0.0
+    return 2 * h_ * c_ ** 2 / lam ** 5 / math.expm1(x)
+
+
+def blackbody(title, desc, curves, lam_hi, unit='nm', lam_lo=0.0, peaks=(), w=420, h=290, xticks=None, visible=False,
+              equal_power=False):
+    """Black-body spectra: curves = (T, label or None, is_value). Intensity is relative (tallest peak = 1).
+    peaks: (lambda in `unit`, label, is_value) vertical markers. equal_power scales each curve by 1/T⁴ so the areas
+    match (stars of equal luminosity)."""
+    f = {'nm': 1e-9, 'µm': 1e-6, 'mm': 1e-3}[unit]
+    data = []
+    for T, lab, isv in curves:
+        xs, ys = curve(lambda v: _planck(max(v, lam_hi * 1e-3) * f, T) / (T ** 4 if equal_power else 1), lam_lo, lam_hi, 240)
+        data.append((xs, ys, T, lab, isv))
+    top = max(max(d[1]) for d in data)
+    series, notes, legend = [], [], []
+    for k, (xs, ys, T, lab, isv) in enumerate(data):
+        yn = [v / top for v in ys]
+        col, dash = (ACC, None) if k == 0 else (ACC2, '6 4')
+        series.append(dict(x=xs, y=yn, color=col, dash=dash))
+        if lab:
+            legend.append((lab, col, dash))
+    vl = [(v, lab, isv) for v, lab, isv in peaks]
+    if visible:
+        series.insert(0, dict(x=[400, 700, 700, 400], y=[0, 0, 1.12, 1.12], kind='area'))
+        notes.append((550, 0, 'visible', 'middle', 0, -9, False))
+    return plot(f'wavelength λ / {unit}', 'intensity (relative)', series, title, desc, xr=(lam_lo, lam_hi), yr=(0, 1.15),
+                w=w, h=h, notes=notes, vlines=vl, xticks=xticks, yticks=[0, 0.5, 1.0], ytl=[(0, '0'), (0.5, ''), (1.0, '')],
+                legend=legend or None)
+
+
+def redshift_strips(title, desc, lab, obs, lo, hi, ticks, w=460, h=214, names=('laboratory', 'galaxy')):
+    """Two spectrum strips: laboratory lines (top) and the same lines observed from a moving source (bottom).
+    lab, obs: lists of (nm, label or None). Dashed links join each pair."""
+    c = Canvas(w, h)
+    x0, x1 = 104, w - 24
+    X = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)  # noqa: E731
+    s1, s2 = (34, 66), (106, 138)
+    for (ya, yb), name in zip((s1, s2), names):
+        c.rect(x0, ya, x1 - x0, yb - ya, INK, 'thin')
+        c.text(x0 - 10, (ya + yb) / 2, name, FST, anchor='end', value=False)
+    for (nm, t) in lab:
+        c.line(X(nm), s1[0], X(nm), s1[1], ACC, 'bold')
+        if t:
+            c.text(X(nm), s1[0] - 12, t, FST)
+    for (nm, t) in obs:
+        c.line(X(nm), s2[0], X(nm), s2[1], ACC, 'bold')
+        if t:
+            c.text(X(nm), s2[1] + 13, t, FST)
+    for (a, _), (b, _) in zip(lab, obs):
+        c.line(X(a), s1[1], X(b), s2[0], MUT, 'thin', dash='4 3')
+    ya = s2[1] + 30
+    c.line(x0, ya, x1, ya, INK, 'axis')
+    for t in ticks:
+        c.line(X(t), ya, X(t), ya + 5, INK, 'thin')
+        c.text(X(t), ya + 16, fmt(t), FST, value=False)
+    c.text((x0 + x1) / 2, h - 8, 'wavelength / nm', FST, value=False)
+    return c.done(title, desc)
+
 # ═════════════════════════ nuclear physics ═════════════════════════
 
 def nz_chart(title, desc, points, nr, zr, nticks, zticks, arrows=(), w=400, h=300):

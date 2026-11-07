@@ -1841,5 +1841,81 @@
   },
   "file": "ch30b",
   "figures": 4
+ },
+ "31.1": {
+  "code": "31.1",
+  "title": "Standard candles and luminosity",
+  "topic": "c1dea5ed-8a5a-585f-8f31-604ecae9ba9f",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 3,
+   "d3": 5
+  },
+  "file": "ch31",
+  "figures": 8
+ },
+ "31.2": {
+  "code": "31.2",
+  "title": "Luminosity and radiant flux intensity",
+  "topic": "26443cb9-a498-4768-a082-b6366197eb43",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch31",
+  "figures": 9
+ },
+ "31.3": {
+  "code": "31.3",
+  "title": "Stellar radii: Wien and Stefan–Boltzmann",
+  "topic": "2df83c3e-834f-517a-a55c-cf1ff80eccfb",
+  "before": 8,
+  "new": 43,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch31",
+  "figures": 9
+ },
+ "31.4": {
+  "code": "31.4",
+  "title": "Hubble’s law and the Big Bang",
+  "topic": "397b2565-7a2c-5e16-a138-021d30b81dd9",
+  "before": 8,
+  "new": 43,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 2,
+   "d3": 6
+  },
+  "file": "ch31",
+  "figures": 11
  }
 }
