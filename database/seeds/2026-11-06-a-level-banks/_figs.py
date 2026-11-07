@@ -3247,3 +3247,23 @@ def be_curve(title, desc, marks=(), w=420, h=300, light=True):
         notes.append((A, b, lab, 'start' if A < 200 else 'end', 6 if A < 200 else -6, 16, isv))
     return plot('nucleon number A', 'BE per nucleon / MeV', series, title, desc, xr=(0, 250), yr=(0, 10),
                 xticks=[0, 50, 100, 150, 200, 250], yticks=[0, 2, 4, 6, 8, 10], notes=notes, w=w, h=h)
+
+
+def gm_setup(title, desc, d_label=None, w=420, h=200):
+    """A radioactive source in a holder facing the window of a GM tube, wired to a counter."""
+    c = Canvas(w, h)
+    y = 90
+    c.rect(30, y - 30, 14, 60, INK, 'main', fill=FILLC)
+    c.rect(44, y - 8, 16, 16, ACC2, 'main', fill=FILLC)
+    c.text(52, y + 46, 'source', FST, value=False)
+    gx = 200
+    c.rect(gx, y - 16, 110, 32, INK, 'main', fill=FILLC, rx=6)
+    c.line(gx, y - 16, gx, y + 16, ACC, 'bold')
+    c.text(gx + 55, y + 34, 'GM tube', FST, value=False)
+    c.line(gx + 110, y, gx + 130, y, INK, 'main')
+    c.path(f'M{gx + 130},{y} C{gx + 150},{y} {gx + 150},{y + 50} {gx + 170},{y + 50}', INK, 'main')
+    c.rect(gx + 170, y + 30, 40, 40, INK, 'main', fill=FILLC, rx=4)
+    c.text(gx + 190, y + 86, 'counter', FST, value=False)
+    if d_label:
+        c.dim(60, y - 44, gx, y - 44, d_label, side=1)
+    return c.done(title, desc)

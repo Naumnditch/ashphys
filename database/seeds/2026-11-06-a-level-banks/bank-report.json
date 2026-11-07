@@ -1613,5 +1613,81 @@
   },
   "file": "ch29a",
   "figures": 5
+ },
+ "29.5": {
+  "code": "29.5",
+  "title": "Randomness and radioactive decay",
+  "topic": "7e92910a-485e-4872-a909-b370e88e8ace",
+  "before": 6,
+  "new": 47,
+  "after": 53,
+  "easy": 18,
+  "medium": 22,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch29b",
+  "figures": 2
+ },
+ "29.6": {
+  "code": "29.6",
+  "title": "The mathematics of radioactive decay",
+  "topic": "f629eef1-c5f1-4ad6-a060-b766376ed3f9",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch29b",
+  "figures": 0
+ },
+ "29.7": {
+  "code": "29.7",
+  "title": "Decay graphs and equations",
+  "topic": "0d4f60c0-0c46-45a6-886d-ead834200dc8",
+  "before": 6,
+  "new": 45,
+  "after": 51,
+  "easy": 17,
+  "medium": 21,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch29b",
+  "figures": 15
+ },
+ "29.8": {
+  "code": "29.8",
+  "title": "Decay constant λ and half-life",
+  "topic": "97e38b4a-35e0-45e7-a53f-405ee0ee00fd",
+  "before": 5,
+  "new": 45,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 5,
+   "d1": 3,
+   "d2": 2,
+   "d3": 0
+  },
+  "file": "ch29b",
+  "figures": 0
  }
 }

@@ -85,6 +85,7 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch27 | 27.1–27.4 | 4bd5cfc | 592dcee493fc9ca926d4c021f7ae6a6a | 2026-11-07 (pg_net id 20) | all 50 (17/20/13) |
 | ch28a | 28.1–28.6 (with 29 figures) | 62c2a53 | 96dcbf644734075b5b0951da50053786 | 2026-11-07 (pg_net id 39) | 28.1 51, 28.2 51, 28.3–28.6 50 |
 | ch28b | 28.7–28.11 (with 27 figures) | 53dd71d | 2c1ea2def9d8eab564eceffcab7335ef | 2026-11-07 (pg_net id 40) | all 50 |
+| ch29a | 29.1–29.4 (with 12 figures) | 168262e | 3d07c3a1cb6a568d7a1b1f3520f27585 | 2026-11-07 (pg_net id 41) | all 50 |
 
 ## Figures applied (full chapter SQL re-applied: same rows, figure_svg / figure_alt added)
 | file | commit | md5 | pg_net | figures per lesson |
