@@ -101,7 +101,7 @@ UNITS = {
     'counts per minute': 1 / 60, 'counts min⁻¹': 1 / 60, 'counts s⁻¹': 1, 'kg s⁻¹': 1, 'm³ s⁻¹': 1, 'Pa s': 1,
     'dB': 1, 'times': 1, 'turns': 1, 'turns m⁻¹': 1, 'cycles': 1, 'oscillations': 1, 'photons s⁻¹': 1,
     'K s⁻¹': 1, 'K min⁻¹': 1 / 60, 'J kg⁻¹ K⁻¹ ': 1, 'kg m⁻²': 1, 'W m⁻¹ K⁻¹': 1, 'J m⁻³': 1, 'mol m⁻³': 1, 'm⁻³': 1, 'kg m²': 1, 'N m²': 1,
-    'N m² kg⁻¹': 1, 'N m² kg⁻²': 1, 'J m kg⁻¹': 1, 'N s² m⁻¹': 1, 'm² s⁻²': 1, 'J s': 1, 'W m⁻² K⁻⁴': 1, 'm K': 1,
+    'N m² kg⁻¹': 1, 'N m² kg⁻²': 1, 'J m kg⁻¹': 1, 'N s² m⁻¹': 1, 'm² s⁻²': 1, 'J s': 1, 'W m⁻² K⁻⁴': 1, 'm K': 1, 'T m A⁻¹': 1, 'H m⁻¹': 1,
     'electrons': 1, 'nuclei': 1, 'H m⁻¹': 1, 'F m⁻¹': 1, 'Wb m⁻²': 1, 'T m': 1, 'N A⁻¹ m⁻¹': 1,
 }
 PREFIXABLE = {'m', 's', 'g', 'N', 'J', 'W', 'V', 'A', 'C', 'Ω', 'F', 'T', 'Hz', 'Pa', 'Wb', 'H', 'Bq', 'eV', 'N m⁻¹', 'V m⁻¹'}

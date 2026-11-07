@@ -50,6 +50,9 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
   step that evaluates to it ("In µC: 3.0 × 10⁻⁶ × 10⁶ = 3.0"). Only '10ⁿ X' units take the SI value.
 - Do not put a parenthetical straight after a printed result ("= 6.02 × 10²² (volume …)"): the
   checker reads it as part of the expression. Put side remarks in their own sentence.
+- Ch22 check: run ch22-fingerprint.sql verbatim and compare with ch22-baseline.json
+  (2026-11-07 after ch23: all 14 counts and hashes identical). Count lessons with
+  topics.a_level_topic_code (e.g. like '24.%').
 
 ## Applied to production
 | file | lessons | commit | md5 | applied | counts after |
@@ -60,3 +63,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch19 | 19.1–19.6 | fd8f04a (SQL same as ea02146) | 32aac7ce9869c99a06323696959ba9ea | 2026-11-06 (pg_net id 8) | 19.1 50, 19.2 51, 19.3 50, 19.4 50, 19.5 50, 19.6 53 |
 | ch20a + ch20b | 20.1–20.8 | 955c2cc | daa4c97e03824f41b4cba2926e363b95 / df2425c119612789b2ccea09976756b1 | 2026-11-06 (pg_net ids 9, 10) | all 50 (20.4 18/19/13, others 17/20/13) |
 | ch21 | 21.1–21.4 | 4b6c00e | ae97bf2944c593ff0fdd2472654b7bed | 2026-11-06 (pg_net id 11) | all 50 (17/20/13) |
+| ch23a + ch23b | 23.1–23.7 | 6057970 | 5c799bb74cf3c9117e49d39c68bb78ec / 26f58596a1a4dbf566b1f162949c8c61 | 2026-11-07 (pg_net ids 12, 13) | all 50 (17/20/13) |

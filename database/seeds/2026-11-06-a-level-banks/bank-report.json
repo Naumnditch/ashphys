@@ -862,5 +862,149 @@
    "d3": 1
   },
   "file": "ch23b"
+ },
+ "24.1": {
+  "code": "24.1",
+  "title": "Magnetic fields due to currents",
+  "topic": "97b06d01-998b-5bf4-8645-77d648f0a328",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 2,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch24a"
+ },
+ "24.2": {
+  "code": "24.2",
+  "title": "Force on a current-carrying conductor",
+  "topic": "58c686dd-7b6b-5113-bac6-799f7572dda5",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 5,
+   "d3": 2
+  },
+  "file": "ch24a"
+ },
+ "24.3": {
+  "code": "24.3",
+  "title": "Magnetic fields and flux density",
+  "topic": "ec5a5988-7f11-54f1-aea3-84eee8a77be3",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 4,
+   "d3": 3
+  },
+  "file": "ch24a"
+ },
+ "24.4": {
+  "code": "24.4",
+  "title": "Measuring magnetic flux density",
+  "topic": "afcda447-9d59-47a9-b3e4-68d27e28446a",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 4,
+   "d3": 2
+  },
+  "file": "ch24a"
+ },
+ "24.5": {
+  "code": "24.5",
+  "title": "Currents crossing fields",
+  "topic": "1f9b9b3e-2978-4618-bfd5-4659023c5bdb",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 2,
+   "d3": 3
+  },
+  "file": "ch24b"
+ },
+ "24.6": {
+  "code": "24.6",
+  "title": "Forces between currents",
+  "topic": "24441dab-5d68-43e9-91a5-25bd381ac0fa",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch24b"
+ },
+ "24.7": {
+  "code": "24.7",
+  "title": "Relating SI units",
+  "topic": "14809cb4-dd9e-441c-8e01-0d6f752491da",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch24b"
+ },
+ "24.8": {
+  "code": "24.8",
+  "title": "Comparing forces in magnetic, electric and gravitational fields",
+  "topic": "97095f82-4b6d-40bd-962b-6deb83efbf42",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch24b"
  }
 }
