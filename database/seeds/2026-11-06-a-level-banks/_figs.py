@@ -3338,6 +3338,36 @@ def vector_diff(title, desc, v1, v2, l1, l2, ld='Δv', w=340, h=260, north=True,
         compass(c, w - 22, 34)
     return c.done(title, desc)
 
+
+def strobe(title, desc, positions, ticks, unit='cm', w=260, h=330, label=None, horizontal=False):
+    """Multiflash images of a ball at the given positions (data units from the release point) beside a scale."""
+    c = Canvas(w, h)
+    lo, hi = min(ticks), max(ticks)
+    if horizontal:
+        x0, x1, y = 40, w - 30, h / 2
+        X = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)  # noqa: E731
+        c.line(x0, y + 26, x1, y + 26, INK, 'axis')
+        for t in ticks:
+            c.line(X(t), y + 26, X(t), y + 32, INK, 'thin')
+            c.text(X(t), y + 44, fmt(t), FST, value=False)
+        c.text((x0 + x1) / 2, y + 64, f'distance / {unit}', FST, value=False)
+        for p in positions:
+            c.circle(X(p), y, 7, ACC, 'main', fill=FILLC)
+    else:
+        y0, y1, x = 30, h - 30, w / 2 + 20
+        Y = lambda v: y0 + (v - lo) / (hi - lo) * (y1 - y0)  # noqa: E731
+        c.line(x - 46, y0, x - 46, y1, INK, 'axis')
+        for t in ticks:
+            c.line(x - 52, Y(t), x - 46, Y(t), INK, 'thin')
+            c.text(x - 58, Y(t), fmt(t), FST, anchor='end', value=False)
+        c.text(x - 46, y0 - 14, unit, FST, value=False)
+        for p in positions:
+            c.circle(x, Y(p), 7, ACC, 'main', fill=FILLC)
+            c.line(x - 46, Y(p), x - 9, Y(p), GRID, 'thin', dash='2 3')
+    if label:
+        c.text(w - 8, h - 8, label, FST, anchor='end', color=MUT, value=False)
+    return c.done(title, desc)
+
 # ═════════════════════════ practical apparatus ═════════════════════════
 
 def light_gates(title, desc, card_label=None, sep_label=None, two=True, w=420, h=190):

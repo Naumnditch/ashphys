@@ -721,6 +721,25 @@
   "file": "ch02a",
   "figures": 5
  },
+ "2.10": {
+  "code": "2.10",
+  "title": "Uniform and non-uniform acceleration",
+  "topic": "643b6cd1-3fbe-4618-9330-b9d737f06161",
+  "before": 0,
+  "new": 54,
+  "after": 54,
+  "easy": 22,
+  "medium": 22,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02b",
+  "figures": 15
+ },
  "2.2": {
   "code": "2.2",
   "title": "Calculating acceleration",
@@ -796,6 +815,82 @@
   },
   "file": "ch02a",
   "figures": 29
+ },
+ "2.6": {
+  "code": "2.6",
+  "title": "Measuring velocity and acceleration",
+  "topic": "97c777dc-0adf-4df6-bd8f-9c659f0ef783",
+  "before": 0,
+  "new": 53,
+  "after": 53,
+  "easy": 21,
+  "medium": 22,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02b",
+  "figures": 15
+ },
+ "2.7": {
+  "code": "2.7",
+  "title": "Determining velocity and acceleration in the laboratory",
+  "topic": "c16862d4-9430-4015-95fa-20d7cf89a45d",
+  "before": 0,
+  "new": 52,
+  "after": 52,
+  "easy": 20,
+  "medium": 23,
+  "hard": 9,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02b",
+  "figures": 10
+ },
+ "2.8": {
+  "code": "2.8",
+  "title": "The equations of motion",
+  "topic": "69f49b38-4492-521c-be78-56effb528ad2",
+  "before": 0,
+  "new": 54,
+  "after": 54,
+  "easy": 20,
+  "medium": 23,
+  "hard": 11,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02b",
+  "figures": 6
+ },
+ "2.9": {
+  "code": "2.9",
+  "title": "Deriving the equations of motion",
+  "topic": "69bb568e-7993-444e-9ce8-19ebbd98c526",
+  "before": 0,
+  "new": 53,
+  "after": 53,
+  "easy": 20,
+  "medium": 23,
+  "hard": 10,
+  "before_split": {
+   "n": 0,
+   "d1": 0,
+   "d2": 0,
+   "d3": 0
+  },
+  "file": "ch02b",
+  "figures": 11
  },
  "20.1": {
   "code": "20.1",
