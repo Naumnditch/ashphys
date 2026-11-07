@@ -1186,5 +1186,77 @@
    "d3": 5
   },
   "file": "ch26b"
+ },
+ "27.1": {
+  "code": "27.1",
+  "title": "Alternating current and r.m.s. values",
+  "topic": "521788f0-c0f7-5ff9-94e2-bd6a8cd8daac",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 5,
+   "d3": 2
+  },
+  "file": "ch27"
+ },
+ "27.2": {
+  "code": "27.2",
+  "title": "Alternating voltages",
+  "topic": "1dcc934a-cbaa-4233-91fd-46dc3b235528",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 4,
+   "d3": 1
+  },
+  "file": "ch27"
+ },
+ "27.3": {
+  "code": "27.3",
+  "title": "Power and alternating current",
+  "topic": "53ce2bac-1ccd-4752-8293-357079212398",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 3,
+   "d3": 3
+  },
+  "file": "ch27"
+ },
+ "27.4": {
+  "code": "27.4",
+  "title": "Rectification and smoothing",
+  "topic": "71ba01f7-9a9e-5018-974d-21999c276ce5",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 1,
+   "d2": 3,
+   "d3": 4
+  },
+  "file": "ch27"
  }
 }

@@ -66,3 +66,4 @@ mark scheme in `explanation`. Chapter 22 (22.1–22.5) is never touched
 | ch23a + ch23b | 23.1–23.7 | 6057970 | 5c799bb74cf3c9117e49d39c68bb78ec / 26f58596a1a4dbf566b1f162949c8c61 | 2026-11-07 (pg_net ids 12, 13) | all 50 (17/20/13) |
 | ch24a + ch24b | 24.1–24.8 | f8d353d | 8e89d05e3a5789000ae074529a5fddba / 7dd24d665ab5c64674fcc059bc8214e6 | 2026-11-07 (pg_net ids 14, 15) | all 50 (17/20/13) |
 | ch25a + ch25b | 25.1–25.5 | f5b45bb | f08cee7ff4f1e89b640471f79afd516f / 5a7b10fe5611c7032057e0172916b20a | 2026-11-07 (pg_net ids 16, 17) | all 50 (17/20/13) |
+| ch26a + ch26b | 26.1–26.5 | e032416 | cdffe80738add4eb1f1136e4824adfe8 / ed1bd05d17e1160f18dbf4d563691635 | 2026-11-07 (pg_net ids 18, 19) | all 50 (17/20/13) |
