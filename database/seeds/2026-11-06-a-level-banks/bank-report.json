@@ -1006,5 +1006,95 @@
    "d3": 5
   },
   "file": "ch24b"
+ },
+ "25.1": {
+  "code": "25.1",
+  "title": "Force on a moving charge",
+  "topic": "ca14c791-7996-5cb6-9fb9-b8764146fc83",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 4,
+   "d3": 4
+  },
+  "file": "ch25a"
+ },
+ "25.2": {
+  "code": "25.2",
+  "title": "Orbiting charged particles",
+  "topic": "9a577035-5226-4d06-b1f8-39a2b1f93b0a",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch25a"
+ },
+ "25.3": {
+  "code": "25.3",
+  "title": "Electric and magnetic fields",
+  "topic": "939a9c6c-194e-484e-83e2-0ab494ffa0d4",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch25a"
+ },
+ "25.4": {
+  "code": "25.4",
+  "title": "The Hall effect",
+  "topic": "a672dd4c-ca86-419b-a02b-af95771ed387",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch25b"
+ },
+ "25.5": {
+  "code": "25.5",
+  "title": "Discovering the electron",
+  "topic": "932c79b4-ef68-44f7-9381-87d5ddebfa17",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 1,
+   "d3": 5
+  },
+  "file": "ch25b"
  }
 }
