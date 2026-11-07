@@ -1348,6 +1348,44 @@
   "file": "ch28a",
   "figures": 0
  },
+ "28.10": {
+  "code": "28.10",
+  "title": "Wave–particle duality",
+  "topic": "5859af45-f88d-5515-9a6d-031a8e33d756",
+  "before": 8,
+  "new": 42,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 8,
+   "d1": 0,
+   "d2": 3,
+   "d3": 5
+  },
+  "file": "ch28b",
+  "figures": 3
+ },
+ "28.11": {
+  "code": "28.11",
+  "title": "Revisiting photons",
+  "topic": "06ec1944-95d0-4562-b279-41821556ab5c",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch28b",
+  "figures": 2
+ },
  "28.2": {
   "code": "28.2",
   "title": "Photons: energy and momentum",
@@ -1442,5 +1480,62 @@
   },
   "file": "ch28a",
   "figures": 18
+ },
+ "28.7": {
+  "code": "28.7",
+  "title": "Explaining the origin of line spectra",
+  "topic": "8e9dd5f1-dd78-4ce4-8525-76c12991e03f",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch28b",
+  "figures": 13
+ },
+ "28.8": {
+  "code": "28.8",
+  "title": "Photon energies",
+  "topic": "d5ab6308-3e9f-4910-b58c-36e18c1c8758",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 18,
+  "medium": 19,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 1,
+   "d2": 1,
+   "d3": 4
+  },
+  "file": "ch28b",
+  "figures": 1
+ },
+ "28.9": {
+  "code": "28.9",
+  "title": "The nature of light: waves or particles?",
+  "topic": "7ea4a576-84c8-4a0f-9474-20a442190683",
+  "before": 6,
+  "new": 44,
+  "after": 50,
+  "easy": 17,
+  "medium": 20,
+  "hard": 13,
+  "before_split": {
+   "n": 6,
+   "d1": 0,
+   "d2": 2,
+   "d3": 4
+  },
+  "file": "ch28b",
+  "figures": 8
  }
 }

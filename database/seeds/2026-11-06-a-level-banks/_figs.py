@@ -3037,3 +3037,154 @@ def mirror_rays(title, desc, angle, angle_label, w=360, h=230):
     c.text(p_in[0] - 6, p_in[1] - 10, 'incident beam', FST, anchor='middle', color=ACC2, value=False)
     c.text(p_out[0] + 6, p_out[1] - 10, 'reflected beam', FST, anchor='middle', color=ACC2, value=False)
     return c.done(title, desc)
+
+
+# ═════════════════════════ optics: slits, gratings, spectra ═════════════════════════
+
+def double_slit(title, desc, a_label=None, D_label=None, x_label=None, source='laser', w=440, h=250):
+    """Two-slit interference: source on the left, double slit, screen with bright fringes on the right.
+    a_label marks the slit separation, D_label the slit-to-screen distance, x_label the fringe spacing."""
+    c = Canvas(w, h)
+    yc = 116
+    xb, xs = 150, 382
+    c.rect(18, yc - 12, 56, 24, INK, 'main', fill=FILLC, rx=3)
+    c.text(46, yc + 26, source, FST, value=False)
+    c.line(74, yc, xb, yc, ACC2, 'main')
+    g = 9
+    c.line(xb, 34, xb, yc - g - 4, INK, 'bold')
+    c.line(xb, yc - g + 4, xb, yc + g - 4, INK, 'bold')
+    c.line(xb, yc + g + 4, xb, h - 50, INK, 'bold')
+    c.line(xs, 30, xs, h - 46, INK, 'main')
+    sp = 22
+    for k in range(-4, 5):
+        y = yc + k * sp
+        hw = 7 - abs(k) * 0.8
+        c.rect(xs + 3, y - hw / 2 - 2, 14, hw + 4, ACC, 'thin', fill=ACC if k == 0 else FILLC)
+    for ys in (yc - g, yc + g):
+        c.line(xb, ys, xs, yc, MUT, 'thin', dash='3 3')
+    if a_label:
+        c.text(xb + 10, yc - 30, a_label, FST, anchor='start')
+        c.line(xb + 8, yc - 24, xb + 2, yc - g, MUT, 'thin')
+    if D_label:
+        c.dim(xb, h - 30, xs, h - 30, D_label, side=-1)
+    if x_label:
+        y1, y2 = yc + 2 * sp, yc + 3 * sp
+        c.dim(xs - 10, y1, xs - 10, y2, x_label, side=-1)
+    c.text(xb, 22, 'double slit', FST, value=False)
+    c.text(xs, 18, 'screen', FST, value=False)
+    return c.done(title, desc)
+
+
+def grating(title, desc, orders, spacing_label=None, symmetric=True, angle_mark=None, w=420, h=280):
+    """A diffraction grating lit normally from the left; orders: (n, angle_deg); angle_mark: (n, label)
+    marks the angle of order n from the straight-through beam."""
+    c = Canvas(w, h)
+    xg, yc = 140, h / 2
+    c.line(20, yc, xg, yc, ACC2, 'main')
+    c.arrowhead(xg - 30, yc, 0, ACC2, 8)
+    c.line(xg, 30, xg, h - 30, INK, 'bold')
+    for y in range(36, int(h - 30), 8):
+        c.line(xg - 4, y, xg + 4, y, INK, 'thin')
+    L = w - xg - 62
+    c.line(xg, yc, xg + L, yc, MUT, 'thin', dash='4 3')
+    c.text(xg + L + 4, yc, 'n = 0', FST, anchor='start', value=False)
+    for n, ang in orders:
+        for s in ((1, -1) if symmetric else (1,)):
+            a = math.radians(ang) * s
+            Lb = min(L, (yc - 30) / max(abs(math.sin(a)), 1e-6))
+            ex, ey = xg + Lb * math.cos(a), yc - Lb * math.sin(a)
+            c.arrow(xg, yc, ex, ey, ACC, 'main', head=8)
+            if s > 0:
+                c.text(ex + 4, ey - 4, f'n = {n}', FST, anchor='start', value=False)
+    if angle_mark:
+        n, lab = angle_mark
+        ang = dict(orders)[n]
+        r = 70
+        p1 = (xg + r * math.cos(math.radians(ang)), yc - r * math.sin(math.radians(ang)))
+        c.path(f'M{r1(xg + r)},{r1(yc)} A{r},{r} 0 0,0 {r1(p1[0])},{r1(p1[1])}', INK, 'thin')
+        if any(a2 < ang for _, a2 in orders):      # a lower order runs through the arc: label beyond the beam
+            m = (xg + 92 * math.cos(math.radians(ang + 24)), yc - 92 * math.sin(math.radians(ang + 24)))
+            c.text(m[0], m[1], lab, FST, anchor='start')
+            q = (xg + (r + 2) * math.cos(math.radians(ang * 0.8)), yc - (r + 2) * math.sin(math.radians(ang * 0.8)))
+            c.line(m[0] - 2, m[1] + 6, q[0], q[1], MUT, 'thin')
+        else:
+            m = (xg + (r + 16) * math.cos(math.radians(ang / 2)), yc - (r + 16) * math.sin(math.radians(ang / 2)))
+            c.text(m[0], m[1], lab, FST, anchor='start')
+    c.text(xg, 18, 'grating', FST, value=False)
+    if spacing_label:
+        c.text(xg, h - 14, spacing_label, FST)
+    return c.done(title, desc)
+
+
+def diffraction_tube(title, desc, V_label=None, L_label=None, r_label=None, w=460, h=250):
+    """Electron diffraction tube (side view) with the ring pattern on the screen shown face-on beside it."""
+    c = Canvas(w, h)
+    yc = 110
+    c.rect(20, yc - 16, 70, 32, INK, 'main', fill=FILLC, rx=4)
+    c.text(55, yc + 30, 'electron gun', FST, value=False)
+    if V_label:
+        c.text(55, yc - 28, V_label, FST)
+    c.line(90, yc - 10, 150, yc - 14, INK, 'axis')
+    c.line(90, yc + 10, 150, yc + 14, INK, 'axis')
+    c.path(f'M150,{yc - 14} A80,80 0 1,1 150,{yc + 14}', INK, 'axis')
+    c.line(90, yc, 170, yc, ACC2, 'main')
+    c.line(170, yc - 12, 170, yc + 12, INK, 'bold')
+    c.text(170, yc + 72, 'graphite', FST, value=False)
+    c.line(170, yc + 60, 170, yc + 16, MUT, 'thin')
+    xs = 300
+    for s in (-1, 1):
+        c.line(170, yc, xs, yc + s * 36, ACC, 'thin')
+    c.line(170, yc, xs, yc, MUT, 'thin', dash='3 3')
+    c.line(xs, yc - 60, xs, yc + 60, ACC, 'bold')
+    c.text(xs + 8, yc - 66, 'screen', FST, anchor='start', value=False)
+    if L_label:
+        c.dim(170, h - 22, xs, h - 22, L_label, side=-1)
+    cx2, r1_, r2_ = 400, 22, 36
+    c.circle(cx2, yc, 46, INK, 'thin', fill=FILLC)
+    c.circle(cx2, yc, r1_, ACC, 'main')
+    c.circle(cx2, yc, r2_, ACC, 'main')
+    c.dot(cx2, yc, 3, ACC)
+    c.text(cx2, yc - 60, 'screen, face on', FST, value=False)
+    if r_label:
+        c.line(cx2, yc, cx2 + r2_, yc, INK, 'axis')
+        c.text(cx2, yc + 62, f'ring radius {r_label}', FST)
+    return c.done(title, desc)
+
+
+def point_source(title, desc, r_label, detector_label=None, power_label=None, w=380, h=240):
+    """A point source radiating equally in all directions; a sphere of radius r through a small detector."""
+    c = Canvas(w, h)
+    sx, sy = 70, h / 2
+    R = 230
+    c.path(f'M{r1(sx + R * math.cos(math.radians(-30)))},{r1(sy - R * math.sin(math.radians(-30)))} A{R},{R} 0 0,0 {r1(sx + R * math.cos(math.radians(30)))},{r1(sy - R * math.sin(math.radians(30)))}', MUT, 'thin', dash='5 4')
+    for a in (-24, -12, 0, 12, 24):
+        ex, ey = sx + 60 * math.cos(math.radians(a)), sy - 60 * math.sin(math.radians(a))
+        c.arrow(sx + 14 * math.cos(math.radians(a)), sy - 14 * math.sin(math.radians(a)), ex, ey, ACC2, 'thin', head=6)
+    c.circle(sx, sy, 8, ACC2, 'main', fill=FILLC)
+    if power_label:
+        c.text(sx, sy + 26, power_label, FST)
+    dx = sx + R
+    c.rect(dx - 4, sy - 10, 10, 20, INK, 'main', fill=FILLC)
+    if detector_label:
+        c.text(dx - 10, sy - 22, detector_label, FST, anchor='end')
+    c.dim(sx, sy + 46, dx, sy + 46, r_label, side=-1)
+    return c.done(title, desc)
+
+
+def spectrum_lines(title, desc, lines, lo, hi, ticks, absorption=False, w=440, h=150):
+    """A spectrum strip with lines at the given wavelengths (nm): lines = (nm, label or None)."""
+    c = Canvas(w, h)
+    x0, x1, y0, y1 = 40, w - 30, 40, 90
+    X = lambda v: x0 + (v - lo) / (hi - lo) * (x1 - x0)  # noqa: E731
+    c.rect(x0, y0, x1 - x0, y1 - y0, INK, 'thin', fill=FILLC if absorption else 'none')
+    for nm, lab in lines:
+        c.line(X(nm), y0, X(nm), y1, INK if absorption else ACC, 'bold')
+        if lab:
+            c.text(X(nm), y0 - 12, lab, FST)
+    c.line(x0, y1 + 12, x1, y1 + 12, INK, 'axis')
+    for t in ticks:
+        v, lab = t if isinstance(t, tuple) else (t, fmt(t))
+        c.line(X(v), y1 + 12, X(v), y1 + 17, INK, 'thin')
+        c.text(X(v), y1 + 28, lab, FST, value=False)
+    c.text((x0 + x1) / 2, h - 10, 'wavelength / nm', FST, value=False)
+    return c.done(title, desc)
