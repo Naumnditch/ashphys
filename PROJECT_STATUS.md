@@ -5,7 +5,7 @@ This file is the source of truth for "what's actually built and where things
 stand," separate from README_DEVELOPMENT.md (generic setup instructions).
 Update it whenever something significant ships or changes.
 
-Last updated: 2026-11-03 (**maths answer box**: every typed student answer is now a MathLive equation field — powers, fractions, roots, Greek, standard form and units typed the way they are written on paper, with an on-screen physics keyboard on phones; the grader reads the LaTeX and the old plain text alike — see "Maths answer box (MathLive)"). Previously 2026-11-02 (**question explanations now show their equations in LaTeX**, converted automatically in code with no AI or API cost; optional hand-written six-section worked solutions at `/admin/explanations` — see "Question explanations in LaTeX"). Previously 2026-10-30 (second announcement video **Share Your Solution** (~30 s, real footage + hand-drawn notes) and the hero "What's New" slot is now a **newest-first playlist** with a Next button — see "Share Your Solution video + hero playlist"; its production row is in **unpublished**: press Publish at /admin/updates once this branch is deployed). Previously 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
+Last updated: 2026-11-08 (**A Level (A2) question banks filled to 50+ per lesson with figures**: chapters 16–31 except 22, plus P2 — 5382 questions, 862 with inline SVG figures, every one with a worked solution and mark scheme; Chapter 22 untouched; practice UI now draws `figure_svg` — see "A Level (A2) question-bank fill + figures"). Previously 2026-11-03 (**maths answer box**: every typed student answer is now a MathLive equation field — powers, fractions, roots, Greek, standard form and units typed the way they are written on paper, with an on-screen physics keyboard on phones; the grader reads the LaTeX and the old plain text alike — see "Maths answer box (MathLive)"). Previously 2026-11-02 (**question explanations now show their equations in LaTeX**, converted automatically in code with no AI or API cost; optional hand-written six-section worked solutions at `/admin/explanations` — see "Question explanations in LaTeX"). Previously 2026-10-30 (second announcement video **Share Your Solution** (~30 s, real footage + hand-drawn notes) and the hero "What's New" slot is now a **newest-first playlist** with a Next button — see "Share Your Solution video + hero playlist"; its production row is in **unpublished**: press Publish at /admin/updates once this branch is deployed). Previously 2026-10-29 (student workspace and "Share my solution": students work each practice question on their own canvas + typed steps and can share it for review; admins approve/reject/verify at /admin/shared-solutions; approved ones show as "Student solution by …" beside the teacher solution — see "Student workspace & Share my solution"; migration `shared_solutions` APPLIED to production 2026-10-29). Previously 2026-10-28, latest (answer feedback: confetti + a synthesized chime on a correct practice answer, a shake + soft tone on a wrong one, a bigger celebration on finishing a set or mastering a lesson, a speaker mute button in the practice top bar, button/modal/toast/route motion, all in `lib/feedback` and switched off under reduced motion — see "Answer feedback: confetti, sounds and motion"). Before that (homepage "What's New" announcement videos: `site_updates` table + public bucket + RLS, /admin/updates, hero slot with muted loop / modal / previous updates; the `video/` Remotion pipeline; the first video, Handwritten Worked Solutions, replays the owner's stored handwriting; canvas strokes now store per-point timestamps — see "Hero 'What's New' announcement videos + video pipeline"; **the site_updates migration still needs applying to production**). Earlier 2026-10-28 (handwritten worked solutions on every practice question: admin-only canvas, students see it read-only after a wrong answer under the solutions tier gate; practice page redesigned to fit one viewport — see "Handwritten worked solutions & full-screen practice page"). Also 2026-10-27 (student progress reports: "My Progress Report" dashboard tab, teacher notes, PDF download — see "Student progress report" under "Live site"). Previously 2026-10-26 (AS Chapter 6 Momentum one-page cheat sheets, 7 lessons — see "Revision cheat sheets"). Also 2026-10-26 (AS Chapter 6 Momentum: 20-question tier-ordered banks for 6.1 The idea of momentum, 6.2 Conservation of momentum and collisions, 6.3 Understanding collisions, 41 parametric figures — see "AS Chapter 6 Momentum practice banks"). Previously 2026-10-19 (AS Chapters 1 Kinematics and 2 Accelerated motion: one-page cheat sheet per lesson, 8 + 14 sheets — see "Revision cheat sheets"). Previously 2026-10-17 (revision cheat sheets: new six-section format, precise vector diagrams instead of Rough.js, and an A Level Circular motion sheet (horizontal, vertical, conical) alongside the IGCSE one — see "Revision cheat sheets" below). Also 2026-10-17 (student analytics on `/admin/students/[id]`: right/wrong/skipped/not reached, time on site, strengths and weak points, most-missed questions; practice skips now recorded — see "Student analytics (2026-10-17)" under "Admin student history & activity"). Previously 2026-10-16 (new admin student history page at `/admin/students` + logging of admin revocations/account changes — see "Admin student history & activity" below). Previously 2026-10-15 (Landing page refresh from `claude/relaxed-pasteur-623hnp` merged in and live: restructured hero, full-width updates banner, real updates list in `lib/announcements/updates.ts` (sampleAnnouncements.ts is gone; the What's New entries added on main were ported into it), mobile menu sheet — see "Landing page refresh" below. Also today: Khan-style curriculum redesign merged into `main` and live — it had only ever been deployed from `claude/friendly-allen-1mudd4` and was overwritten by later production deploys; see "Curriculum view redesign" below. Earlier the same day: What's New feed caught up: it had stopped at 24 Sep because nobody added entries — see "What's New feed was stale" under the homepage feed section). Previously 2026-10-14, newest (student video request submit "Network error" fixed — see "Video request submission: 'Network error'" below; migration 06 added, NOT applied). Before that, latest (admin Video Solve Requests page stuck on "Loading…" fixed — see "Admin video requests: stuck on Loading…" below; **PRODUCTION IS RUNNING CODE THAT NEEDS MIGRATIONS 01–05, WHICH ARE NOT APPLIED**). Before that (student dashboard rebuilt as a two-column tabbed page — see "Student dashboard: two-column tabs" below; migration 05 added, NOT yet applied). Earlier 2026-10-14 (lesson videos, student dashboard, hero video-request CTA, real row-level security — see "Lesson videos, student dashboard & hero request CTA" below; migrations NOT yet applied to production). Previously 2026-10-13 (17.4 Coulomb's law: CHALLENGING tier Q60–Q99, 40 questions incl. 23 suspended-charge problems, two last-digit fixes to Q40/Q58 — see "17.4 Coulomb CHALLENGING tier" below. ALSO: Vercel now builds from `ashphys` `main`, not `ashphyss` — see "Live site"). Previously 2026-10-09 (AS Level Kinematics + Accelerated motion: 440 new tier-ordered questions across all 22 lessons of Chapters 1-2, 230 with reusable generated figures — see "AS Level Kinematics & Accelerated motion practice banks" below). Previously 2026-10-06 (Circular Motion & Gravitation Challenge Set: +10 questions in each shared lesson, both banks — see "Challenge set" below). Previously 2026-10-01 (cross-multiplication shortcut in the Equation Rearranger — see "Cross-multiplication in the Equation Rearranger"). Previously 2026-09-30 (A Level units 12–13 practice banks: 99 questions with 46 original figures from the owner's circular motion and gravitation worksheets — see "A Level circular motion & gravitation practice". The multi-curriculum branch reached `master` with it.)
 
 ---
 
@@ -24,6 +24,152 @@ Last updated: 2026-11-03 (**maths answer box**: every typed student answer is no
 - Standard deploy: `git push origin main` (from the `ashphys` clone).
 - Supabase project: `ashphys-platform` (id `uolwvcszclviqrtyxwgl`, eu-central-1)
 - Vercel project: `ashphyss` (id `prj_7lk98vPTJcP5ScK1syAZA0aPgTNV`), team `abdelrahman-elashmawys-projects`
+
+### A Level (A2) question-bank fill + figures (NEW 2026-11-08)
+
+**What:** every A2 lesson in the A Level bank (`problems.curriculum_id = 'a-level'`,
+chapters 16–31 except 22, plus P2) now has at least 50 original questions,
+tagged easy/medium/hard (difficulty_level 1/2/3, marks 1–2 / 3–4 / 5–7), each with a
+worked solution and a mark scheme in `explanation`. Chapter 22 (Coulomb's law,
+22.1–22.5) was not touched: its count/hash fingerprint matches
+`database/seeds/2026-11-06-a-level-banks/ch22-baseline.json` exactly (checked 2026-11-08).
+
+**Figures:** `problems.figure_svg` / `figure_alt` (migration
+`database/seeds/2026-11-07-problem-figures.sql`, applied as `problem_figures`).
+The practice API passes them through `lib/practice/figure.ts` (sanitiser: no scripts,
+foreignObject, external refs or raster images; size cap) and
+`components/practice/QuestionFigure.tsx` draws them, theme-aware via CSS variables.
+Figures are generated by `database/seeds/2026-11-06-a-level-banks/_figs.py` from the
+numbers in each stem (`figs/<file>.py`), render-checked to PNG outside the repo.
+
+**How it was built/applied:** content files `database/seeds/2026-11-06-a-level-banks/ch*.py`,
+`p2.py`; driver `database/seeds/2026-11-06-a-level-banks.py <file>` checks every question
+(independent re-evaluation of the printed working, units, duplicates, mark totals) and
+writes `sql/<file>.sql`; each file was applied through pg_net with an md5 check. The full
+apply log (commit, md5, pg_net id) is in `database/seeds/2026-11-06-a-level-banks/PROGRESS.md`.
+
+**Not done / open:**
+- 16.1 keeps its 55 existing questions; their mark schemes were not added.
+- Figures were added to the new questions only; the ~800 questions that were in the A2
+  banks before this fill have no figures.
+- AS lessons 1.1–1.8 and 2.1–2.10 also received new questions (934, applied 2026-11-07)
+  before the owner said only A2 was wanted. They are live in the A Level bank; the seed
+  files are `ch01a.py`, `ch01b.py`, `ch02a.py`, `ch02b.py`. Removing them would be a
+  delete by their seed key. Nothing else from AS, P1 or the Maths lessons was written.
+
+**Per-lesson counts (production, 2026-11-08):**
+
+| Lesson | Title | Before | After | E/M/H | With figures |
+|---|---|---|---|---|---|
+| 16.1 | Describing circular motion | 55 | 55 | 7/24/24 | 0 |
+| 16.2 | Radians and angular speed | 9 | 51 | 17/21/13 | 9 |
+| 16.3 | Steady speed, changing velocity | 6 | 50 | 17/20/13 | 7 |
+| 16.4 | Angular speed | 8 | 50 | 17/21/12 | 2 |
+| 16.5 | Centripetal forces | 9 | 50 | 17/19/14 | 7 |
+| 16.6 | Calculating acceleration and force | 8 | 50 | 17/20/13 | 3 |
+| 16.7 | The origins of centripetal forces | 11 | 50 | 14/21/15 | 15 |
+| 17.1 | Gravitational fields and field lines | 5 | 51 | 18/21/12 | 6 |
+| 17.2 | Field strength of a point mass | 9 | 52 | 18/21/13 | 5 |
+| 17.3 | Energy in a gravitational field | 6 | 50 | 18/20/12 | 2 |
+| 17.4 | Gravitational potential | 13 | 50 | 18/19/13 | 5 |
+| 17.5 | Orbiting under gravity | 32 | 51 | 14/19/18 | 2 |
+| 17.6 | The orbital period | 10 | 50 | 17/19/14 | 2 |
+| 17.7 | Orbiting the Earth | 11 | 50 | 17/19/14 | 4 |
+| 18.1 | Free and forced oscillations | 6 | 50 | 17/20/13 | 10 |
+| 18.2 | Observing oscillations | 6 | 50 | 17/20/13 | 12 |
+| 18.3 | Describing oscillations | 6 | 50 | 17/20/13 | 8 |
+| 18.4 | Simple harmonic motion | 5 | 50 | 17/20/13 | 8 |
+| 18.5 | Representing s.h.m. graphically | 6 | 50 | 17/20/13 | 24 |
+| 18.6 | Frequency and angular frequency | 6 | 50 | 17/20/13 | 0 |
+| 18.7 | Equations of s.h.m. | 6 | 50 | 18/20/12 | 7 |
+| 18.8 | Energy in simple harmonic motion | 8 | 50 | 18/20/12 | 7 |
+| 18.9 | Damped oscillations | 6 | 50 | 17/20/13 | 4 |
+| 18.10 | Damped and forced oscillations, resonance | 8 | 50 | 17/20/13 | 3 |
+| 19.1 | Changes of state | 6 | 50 | 17/20/13 | 2 |
+| 19.2 | The first law of thermodynamics | 8 | 51 | 17/21/13 | 12 |
+| 19.3 | Internal energy | 8 | 50 | 17/20/13 | 0 |
+| 19.4 | Thermal equilibrium | 8 | 50 | 17/20/13 | 0 |
+| 19.5 | Temperature scales | 8 | 50 | 19/18/13 | 8 |
+| 19.6 | Specific heat capacity and latent heat | 8 | 53 | 17/20/16 | 4 |
+| 20.1 | Particles of a gas | 6 | 50 | 17/20/13 | 1 |
+| 20.2 | Explaining pressure | 6 | 50 | 17/20/13 | 4 |
+| 20.3 | The mole and the Avogadro constant | 8 | 50 | 17/20/13 | 0 |
+| 20.4 | Boyle's law | 0 | 50 | 18/19/13 | 17 |
+| 20.5 | Changing temperature | 6 | 50 | 17/20/13 | 6 |
+| 20.6 | The ideal gas equation | 8 | 50 | 17/20/13 | 4 |
+| 20.7 | Kinetic theory of gases | 8 | 50 | 17/20/13 | 1 |
+| 20.8 | Temperature and molecular kinetic energy | 6 | 50 | 17/20/13 | 2 |
+| 21.1 | Attraction and repulsion | 6 | 50 | 17/20/13 | 10 |
+| 21.2 | Electric fields and field lines | 8 | 50 | 17/20/13 | 11 |
+| 21.3 | Uniform electric fields | 8 | 50 | 17/20/13 | 15 |
+| 21.4 | Force on a charge | 6 | 50 | 17/20/13 | 16 |
+| 23.1 | Capacitors and capacitance | 8 | 50 | 17/20/13 | 14 |
+| 23.2 | Energy stored in a capacitor | 8 | 50 | 17/20/13 | 8 |
+| 23.3 | Capacitors in parallel | 6 | 50 | 17/20/13 | 15 |
+| 23.4 | Capacitors in series | 6 | 50 | 17/20/13 | 20 |
+| 23.5 | Comparing capacitors and resistors | 6 | 50 | 17/20/13 | 17 |
+| 23.6 | Capacitor networks | 6 | 50 | 17/20/13 | 24 |
+| 23.7 | Discharging a capacitor | 5 | 50 | 17/20/13 | 15 |
+| 24.1 | Magnetic fields due to currents | 8 | 50 | 17/20/13 | 14 |
+| 24.2 | Force on a current-carrying conductor | 8 | 50 | 17/20/13 | 10 |
+| 24.3 | Magnetic fields and flux density | 8 | 50 | 17/20/13 | 9 |
+| 24.4 | Measuring magnetic flux density | 6 | 50 | 17/20/13 | 15 |
+| 24.5 | Currents crossing fields | 6 | 50 | 17/20/13 | 9 |
+| 24.6 | Forces between currents | 6 | 50 | 17/20/13 | 10 |
+| 24.7 | Relating SI units | 6 | 50 | 17/20/13 | 0 |
+| 24.8 | Comparing forces in magnetic, electric and gravitational fields | 6 | 50 | 17/20/13 | 5 |
+| 25.1 | Force on a moving charge | 8 | 50 | 17/20/13 | 8 |
+| 25.2 | Orbiting charged particles | 6 | 50 | 17/20/13 | 13 |
+| 25.3 | Electric and magnetic fields | 6 | 50 | 17/20/13 | 22 |
+| 25.4 | The Hall effect | 6 | 50 | 17/20/13 | 13 |
+| 25.5 | Discovering the electron | 6 | 50 | 17/20/13 | 15 |
+| 26.1 | Observing induction | 6 | 50 | 17/20/13 | 18 |
+| 26.2 | Explaining electromagnetic induction | 6 | 50 | 17/20/13 | 18 |
+| 26.3 | Electromagnetic induction | 8 | 50 | 17/20/13 | 12 |
+| 26.4 | Lenz's law | 6 | 50 | 17/20/13 | 19 |
+| 26.5 | Everyday examples of electromagnetic induction | 6 | 50 | 17/20/13 | 12 |
+| 27.1 | Alternating current and r.m.s. values | 8 | 50 | 17/20/13 | 10 |
+| 27.2 | Alternating voltages | 6 | 50 | 17/20/13 | 21 |
+| 27.3 | Power and alternating current | 6 | 50 | 17/20/13 | 7 |
+| 27.4 | Rectification and smoothing | 8 | 50 | 17/20/13 | 18 |
+| 28.1 | Modelling with particles and waves | 6 | 51 | 17/21/13 | 0 |
+| 28.2 | Photons: energy and momentum | 8 | 51 | 19/20/12 | 0 |
+| 28.3 | The photoelectric effect | 5 | 50 | 17/20/13 | 6 |
+| 28.4 | Threshold frequency and wavelength | 6 | 50 | 17/20/13 | 4 |
+| 28.5 | Photons have momentum too | 6 | 50 | 17/20/13 | 1 |
+| 28.6 | Energy levels and line spectra | 8 | 50 | 17/20/13 | 18 |
+| 28.7 | Explaining the origin of line spectra | 6 | 50 | 18/19/13 | 13 |
+| 28.8 | Photon energies | 6 | 50 | 18/19/13 | 1 |
+| 28.9 | The nature of light: waves or particles? | 6 | 50 | 17/20/13 | 8 |
+| 28.10 | Wave–particle duality | 8 | 50 | 17/20/13 | 3 |
+| 28.11 | Revisiting photons | 6 | 50 | 17/20/13 | 2 |
+| 29.1 | Balanced equations | 6 | 50 | 17/20/13 | 3 |
+| 29.2 | Mass and energy | 6 | 50 | 18/19/13 | 0 |
+| 29.3 | Energy released in radioactive decay | 6 | 50 | 17/20/13 | 4 |
+| 29.4 | Mass defect and binding energy | 8 | 50 | 17/20/13 | 5 |
+| 29.5 | Randomness and radioactive decay | 6 | 53 | 18/22/13 | 2 |
+| 29.6 | The mathematics of radioactive decay | 6 | 50 | 17/20/13 | 0 |
+| 29.7 | Decay graphs and equations | 6 | 51 | 17/21/13 | 15 |
+| 29.8 | Decay constant λ and half-life | 5 | 50 | 17/20/13 | 0 |
+| 30.1 | X-ray imaging and CT | 8 | 50 | 17/20/13 | 6 |
+| 30.2 | X-ray attenuation | 6 | 53 | 20/20/13 | 5 |
+| 30.3 | Improving X-ray images | 6 | 50 | 17/20/13 | 5 |
+| 30.4 | Computerised axial tomography | 6 | 50 | 19/18/13 | 9 |
+| 30.5 | Ultrasound | 8 | 50 | 19/18/13 | 3 |
+| 30.6 | Echo sounding | 6 | 50 | 18/19/13 | 8 |
+| 30.7 | Ultrasound scanning | 6 | 51 | 18/20/13 | 1 |
+| 30.8 | PET scanning | 8 | 51 | 18/20/13 | 4 |
+| 31.1 | Standard candles and luminosity | 8 | 50 | 18/19/13 | 8 |
+| 31.2 | Luminosity and radiant flux intensity | 6 | 50 | 18/19/13 | 9 |
+| 31.3 | Stellar radii: Wien and Stefan–Boltzmann | 8 | 51 | 17/21/13 | 9 |
+| 31.4 | Hubble’s law and the Big Bang | 8 | 51 | 17/21/13 | 11 |
+| P2.1 | Planning and analysis | 6 | 50 | 17/20/13 | 15 |
+| P2.2 | Planning | 6 | 51 | 19/19/13 | 8 |
+| P2.3 | Analysis of the data | 6 | 51 | 18/20/13 | 14 |
+| P2.4 | Treatment of uncertainties | 6 | 51 | 18/20/13 | 3 |
+| P2.5 | Conclusions and evaluation of results | 6 | 52 | 19/20/13 | 3 |
+| **Total** | 107 lessons (16–31 except 22, plus P2) | **802** | **5382** | | **862** |
+
 
 ### Maths answer box (MathLive) (NEW 2026-11-03)
 
